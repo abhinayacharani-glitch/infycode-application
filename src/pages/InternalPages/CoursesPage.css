@@ -1,0 +1,212 @@
+/* =========================================
+   CoursesPage.css
+   Styles for the All Courses page
+   ========================================= */
+
+.courses-page {
+  width: 100%;
+  font-family: 'Urbanist', sans-serif;
+  background: var(--bg, #f4f6f9);
+}
+
+/* Hero Section */
+.courses-hero {
+  position: relative;
+  width: 100%;
+  height: 70vh;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  padding-top: 100px;
+}
+
+.courses-hero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(rgba(10, 25, 47, 0.85), rgba(37, 99, 235, 0.4));
+  z-index: 1;
+}
+
+.courses-hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  padding: 0 20px;
+}
+
+.courses-hero h1 {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: white;
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+
+.courses-hero p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  margin-bottom: 30px;
+}
+
+/* Search Bar */
+.courses-search {
+  display: flex;
+  max-width: 500px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 50px;
+  padding: 5px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.courses-search input {
+  flex: 1;
+  border: none;
+  padding: 15px 20px;
+  border-radius: 50px;
+  font-size: 1rem;
+  outline: none;
+  color: #1e293b;
+}
+
+.courses-search button {
+  background: var(--blue-600, #2563eb);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 50px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.courses-search button:hover {
+  background: var(--blue-700, #1d4ed8);
+}
+
+/* Content Section */
+.courses-section {
+  padding: 80px 5%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.courses-section-title {
+  text-align: center;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--text-dark, #1e293b);
+  margin-bottom: 50px;
+}
+
+/* Course Grid */
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 30px;
+}
+
+.courses-card {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  transition: transform 0.3s, box-shadow 0.3s;
+  display: flex;
+  flex-direction: column;
+}
+
+.courses-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+.courses-card-img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+}
+
+.courses-card-info {
+  padding: 25px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.courses-card-tag {
+  background: var(--blue-50, #eff6ff);
+  color: var(--blue-600, #2563eb);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  align-self: flex-start;
+  margin-bottom: 15px;
+}
+
+.courses-card-info h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: var(--text-dark, #1e293b);
+}
+
+.courses-card-info p {
+  color: var(--text-muted, #64748b);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  flex: 1;
+}
+
+.courses-card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--border, #e2e8f0);
+  padding-top: 20px;
+  margin-top: auto;
+}
+
+.courses-card-meta span {
+  font-size: 0.9rem;
+  color: var(--text-muted, #64748b);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.courses-enroll-btn {
+  background: white;
+  color: var(--blue-600, #2563eb);
+  border: 1px solid var(--blue-600, #2563eb);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.courses-enroll-btn:hover {
+  background: var(--blue-600, #2563eb);
+  color: white;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .courses-hero h1 {
+    font-size: 2.2rem;
+  }
+  .courses-section {
+    padding: 50px 5%;
+  }
+}

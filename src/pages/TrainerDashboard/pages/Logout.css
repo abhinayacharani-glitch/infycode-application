@@ -1,0 +1,71 @@
+.trainer-logout-page {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2000;
+  font-family: 'Urbanist', sans-serif;
+}
+
+.logout-card {
+  background: var(--white);
+  padding: 4rem;
+  border-radius: 30px;
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+  max-width: 500px;
+  animation: scaleUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes scaleUp {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.logout-icon-box {
+  width: 100px;
+  height: 100px;
+  background: var(--blue-50);
+  color: var(--blue-500);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 2rem;
+  font-size: 40px;
+}
+
+.logout-card h2 {
+  font-size: 28px;
+  margin-bottom: 1rem;
+  font-weight: 800;
+  color: var(--text-dark);
+}
+
+.logout-card p {
+  color: var(--text-muted);
+  margin-bottom: 2.5rem;
+  font-size: 15px;
+}
+
+.relogin-btn {
+  display: inline-block;
+  padding: 1rem 2.5rem;
+  background: var(--blue-500);
+  color: #fff;
+  border-radius: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.relogin-btn:hover {
+  background: var(--blue-600);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+}

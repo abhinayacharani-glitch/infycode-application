@@ -1,0 +1,70 @@
+import React, { useState, useEffect } from 'react';
+import { FaArrowRight } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import './SkillTest.css';
+
+const SkillTest = () => {
+  const navigate = useNavigate();
+  const [isUnlocked, setIsUnlocked] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem("foundationalTestCompleted") === "true") {
+      setIsUnlocked(true);
+    }
+  }, []);
+
+  return (
+    <div className="page-container">
+      <header className="page-header-centered">
+        <h2>Skill Based Test</h2>
+        <p>Evaluate your strengths and get categorized into the right learning path.</p>
+      </header>
+
+      <div className="special-note-box">
+        <p>
+          ⚠️Mandatory Step:Students must first complete 
+           Aptitude, Reasoning, and Communication tests before attempting the 
+          Core Technical Test.
+        </p>
+      </div>
+
+      <div className="skill-content-flow">
+        <div className="skill-card modern">
+          <div className="card-badge">Step 01</div>
+          <div className="skill-image-box">
+            <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&q=80&w=800" alt="Foundational Test" />
+          </div>
+          <div className="skill-info">
+            <h3>Aptitude, Reasoning & Communication</h3>
+            <p>Master the basics that are crucial for any job role and clear initial filtering rounds.</p>
+            <button className="start-btn-modern" onClick={() => navigate("/student/test")}>Start Test</button>
+          </div>
+        </div>
+
+        <div className="flow-indicator">
+          <FaArrowRight className="flow-arrow" />
+        </div>
+
+        <div className="skill-card modern">
+          <div className="card-badge secondary">Step 02</div>
+          <div className="skill-image-box">
+            <img src="https://images.unsplash.com/photo-1516116216624-53e697fedbea?auto=format&fit=crop&q=80&w=800" alt="Technical Test" />
+          </div>
+          <div className="skill-info">
+            <h3>Core Technical Test</h3>
+            <p>Deep dive into DSA, System Design, and niche technologies to prove your technical expertise.</p>
+            <button 
+              className={`start-btn-modern ${!isUnlocked ? "locked" : ""}`} 
+              onClick={() => isUnlocked && navigate("/student/core-test")}
+              disabled={!isUnlocked}
+            >
+              {isUnlocked ? "Start Core Test" : "Join Waiting List"}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SkillTest;

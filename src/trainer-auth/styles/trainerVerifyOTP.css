@@ -1,0 +1,164 @@
+/* ══════════════════════════════════════════════
+   Trainer VerifyOTP Page — builds on login.css tokens
+══════════════════════════════════════════════ */
+
+/* ── OTP Digit Row ─────────────────────────── */
+.trainer-otp-inputs-wrap {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 4px 0 8px;
+}
+
+.trainer-otp-digit {
+  width: 48px;
+  height: 56px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  font-family: 'Poppins', sans-serif;
+  color: var(--text);
+  background: #f8fafc;
+  border: 2px solid var(--border);
+  border-radius: var(--r-input);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+  caret-color: var(--accent);
+}
+
+.trainer-otp-digit:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(30, 144, 255, 0.15);
+  transform: translateY(-2px) scale(1.06);
+  background: #fff;
+}
+
+.trainer-otp-digit--filled {
+  border-color: var(--accent);
+  background: #EFF6FF;
+}
+
+.trainer-otp-digit--error {
+  border-color: var(--error);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.09);
+  animation: trainerOtpShake 0.35s ease;
+}
+
+@keyframes trainerOtpShake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-4px); }
+  60%       { transform: translateX(4px); }
+  80%       { transform: translateX(-2px); }
+}
+
+/* ── Timer ─────────────────────────────────── */
+.trainer-otp-timer {
+  text-align: center;
+  font-size: 13.5px;
+  color: var(--muted);
+  background: #f1f5f9;
+  border-radius: 8px;
+  padding: 9px 14px;
+  font-family: 'Poppins', sans-serif;
+  transition: color 0.3s ease;
+}
+
+.trainer-otp-timer__count {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.trainer-otp-timer--warning .trainer-otp-timer__count {
+  color: #dc2626;
+  animation: trainerPulse 1s ease infinite;
+}
+
+@keyframes trainerPulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.45; }
+}
+
+/* ── Success / Expired Banners ─────────────── */
+.trainer-otp-success-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f0fdf4;
+  border: 1.5px solid #86efac;
+  border-radius: var(--r-input);
+  padding: 11px 14px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #15803d;
+  margin-bottom: 10px;
+  animation: fadeIn 0.4s ease;
+}
+
+.trainer-otp-expired-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fef2f2;
+  border: 1.5px solid #fca5a5;
+  border-radius: var(--r-input);
+  padding: 11px 14px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #b91c1c;
+  margin-bottom: 10px;
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Resend Button ─────────────────────────── */
+.trainer-otp-resend-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13.5px;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  color: var(--accent);
+  padding: 4px 0;
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.trainer-otp-resend-btn:disabled {
+  color: var(--muted);
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.trainer-otp-resend-btn:not(:disabled):hover {
+  color: var(--primary);
+}
+
+.trainer-otp-resend-icon {
+  transition: transform 0.35s ease;
+}
+
+.trainer-otp-resend-btn:not(:disabled):hover .trainer-otp-resend-icon {
+  transform: rotate(180deg);
+}
+
+.trainer-otp-resend-hint {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.spinning {
+  animation: trainerSpin 0.7s linear infinite;
+}
+
+@keyframes trainerSpin {
+  to { transform: rotate(360deg); }
+}

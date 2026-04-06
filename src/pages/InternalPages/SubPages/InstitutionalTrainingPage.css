@@ -1,0 +1,184 @@
+/* =========================================
+   InstitutionalTrainingPage.css
+   Styles for the Institutional Partnerships page
+   ========================================= */
+
+.institutional-page {
+  width: 100%;
+  font-family: 'Urbanist', sans-serif;
+  background: var(--bg, #f4f6f9);
+}
+
+/* Hero Section */
+.institutional-hero {
+  position: relative;
+  width: 100%;
+  height: 70vh;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  padding-top: 100px;
+}
+
+.institutional-hero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(rgba(10, 25, 47, 0.88), rgba(20, 184, 166, 0.45));
+  z-index: 1;
+}
+
+.institutional-hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  padding: 0 20px;
+}
+
+.institutional-hero h1 {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: white;
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+
+.institutional-hero p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  margin-bottom: 30px;
+}
+
+/* CTA Hero Button */
+.institutional-hero-btn {
+  background: white;
+  color: #0f766e;
+  padding: 12px 30px;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: transform 0.3s;
+}
+
+.institutional-hero-btn:hover {
+  transform: translateY(-3px);
+}
+
+/* Content Section */
+.institutional-section {
+  padding: 80px 5%;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Content Card */
+.institutional-content-card {
+  background: white;
+  padding: 50px;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+}
+
+.institutional-title {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 20px;
+  color: var(--text-dark, #1e293b);
+}
+
+.institutional-desc {
+  color: var(--text-muted, #64748b);
+  font-size: 1.1rem;
+  line-height: 1.8;
+  margin-bottom: 30px;
+}
+
+/* Feature List */
+.institutional-feature-list {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 30px;
+  columns: 2;
+  column-gap: 40px;
+}
+
+.institutional-feature-list li {
+  margin-bottom: 15px;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--text-dark, #1e293b);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  break-inside: avoid;
+}
+
+.institutional-feature-list li::before {
+  content: '✓';
+  background: #14b8a6;
+  color: white;
+  min-width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+/* CTA Banner */
+.institutional-cta-banner {
+  background: linear-gradient(135deg, #14b8a6, #0f766e);
+  border-radius: 24px;
+  padding: 40px;
+  text-align: center;
+  color: white;
+  margin-top: 40px;
+  box-shadow: 0 20px 40px rgba(20,184,166,0.3);
+}
+
+.institutional-cta-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: white;
+  margin-bottom: 20px;
+}
+
+.institutional-cta-btn {
+  background: white;
+  color: #0f766e;
+  padding: 12px 30px;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: transform 0.3s;
+}
+
+.institutional-cta-btn:hover {
+  transform: translateY(-3px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .institutional-hero h1 {
+    font-size: 2.2rem;
+  }
+  .institutional-content-card {
+    padding: 30px 20px;
+  }
+  .institutional-feature-list {
+    columns: 1;
+  }
+}

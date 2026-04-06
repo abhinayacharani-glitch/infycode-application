@@ -1,0 +1,168 @@
+/* =========================================
+   EbooksPage.css
+   Styles for the eBooks & Guides library page
+   ========================================= */
+
+.ebooks-page {
+  width: 100%;
+  font-family: 'Urbanist', sans-serif;
+  background: var(--bg, #f4f6f9);
+}
+
+/* Hero Section */
+.ebooks-hero {
+  position: relative;
+  width: 100%;
+  height: 70vh;
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  padding-top: 100px;
+}
+
+.ebooks-hero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(rgba(10, 25, 47, 0.85), rgba(109, 40, 217, 0.4));
+  z-index: 1;
+}
+
+.ebooks-hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  padding: 0 20px;
+}
+
+.ebooks-hero h1 {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: white;
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+
+.ebooks-hero p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  margin-bottom: 30px;
+}
+
+/* Content Section */
+.ebooks-section {
+  padding: 80px 5%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* eBook Grid */
+.ebooks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 30px;
+}
+
+.ebooks-card {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  transition: transform 0.3s, box-shadow 0.3s;
+  display: flex;
+  flex-direction: column;
+}
+
+.ebooks-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+.ebooks-card-img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.ebooks-card-body {
+  padding: 25px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.ebooks-card-header {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.ebooks-type-tag {
+  background: #f3e8ff;
+  color: #7c3aed;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.ebooks-size-label {
+  color: var(--text-muted, #64748b);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.ebooks-card-body h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: var(--text-dark, #1e293b);
+}
+
+.ebooks-card-body p {
+  color: var(--text-muted, #64748b);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  flex: 1;
+}
+
+.ebooks-card-footer {
+  margin-top: auto;
+  padding-top: 15px;
+}
+
+.ebooks-download-btn {
+  width: 100%;
+  text-align: center;
+  background: #7c3aed;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.3s;
+}
+
+.ebooks-download-btn:hover {
+  background: #6d28d9;
+  transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .ebooks-hero h1 {
+    font-size: 2.2rem;
+  }
+  .ebooks-section {
+    padding: 50px 5%;
+  }
+}

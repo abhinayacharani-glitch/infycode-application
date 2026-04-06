@@ -1,0 +1,528 @@
+/* ═══════════════════════════════════════════════════════════
+   Course Topics – Landing Page + Subtopic Detail
+   White & Light Blue Theme
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── LANDING PAGE ── */
+.ctp-landing {
+  padding: 5px 8px;
+  min-height: 80vh;
+  font-family: 'Urbanist', sans-serif;
+}
+
+.ctp-landing-header {
+  margin-bottom: 32px;
+}
+
+.ctp-landing-category {
+  display: inline-block;
+  background: #e8f2ff;
+  color: #2563eb;
+  padding: 5px 14px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 14px;
+}
+
+.ctp-landing-title {
+  font-size: 32px !important;
+  font-weight: 900;
+  color: #0f172a !important;
+  margin: 0 0 10px 0;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.ctp-landing-subtitle {
+  font-size: 15px;
+  color: #7a8ba5;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Cards Row ── */
+.ctp-cards-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.ctp-info-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 26px;
+  border: 1px solid #e8f0fa;
+  box-shadow: 0 2px 12px rgba(37, 99, 235, 0.04);
+}
+
+.ctp-card-icon-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.ctp-card-icon-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ctp-icon-blue {
+  background: #e8f2ff;
+  color: #2563eb;
+}
+
+.ctp-icon-green {
+  background: #e8faf0;
+  color: #10b981;
+}
+
+.ctp-icon-purple {
+  background: #f0ecff;
+  color: #8b5cf6;
+}
+
+.ctp-card-icon-header h3 {
+  font-size: 17px;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0;
+}
+
+/* ── Trainer Card ── */
+.ctp-trainer-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  background: #f5f9ff;
+  border-radius: 14px;
+}
+
+.ctp-trainer-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.ctp-trainer-name {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 2px 0;
+}
+
+.ctp-trainer-role {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}
+
+.ctp-trainer-stats {
+  display: flex;
+  gap: 16px;
+}
+
+.ctp-stat-item {
+  flex: 1;
+  background: #f8fbff;
+  border-radius: 12px;
+  padding: 12px 14px;
+  border: 1px solid #edf3fb;
+}
+
+.ctp-stat-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.ctp-stat-value {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.3;
+}
+
+/* ── Batch Card ── */
+.ctp-batch-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.ctp-batch-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #f5f9ff;
+  border-radius: 12px;
+  border: 1px solid #edf3fb;
+}
+
+.ctp-batch-icon {
+  color: #2563eb;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.ctp-batch-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 3px;
+}
+
+.ctp-batch-value {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.3;
+}
+
+/* ── Objectives ── */
+.ctp-objectives-section {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 26px;
+  border: 1px solid #e8f0fa;
+  box-shadow: 0 2px 12px rgba(37, 99, 235, 0.04);
+  margin-bottom: 24px;
+}
+
+.ctp-obj-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.ctp-obj-header h3 {
+  font-size: 17px;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0;
+}
+
+.ctp-obj-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ctp-obj-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 18px;
+  background: #f5f9ff;
+  border-radius: 14px;
+  border: 1px solid #edf3fb;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.ctp-obj-item:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.06);
+}
+
+.ctp-obj-check {
+  color: #2563eb;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.ctp-obj-item span {
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+  line-height: 1.5;
+}
+
+/* ── Landing Hint ── */
+.ctp-landing-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+  color: #94a3b8;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SUBTOPIC DETAIL VIEW
+   ═══════════════════════════════════════════════════════════ */
+
+.ctp-content-only {
+  padding: 5px 15px 10px 15px;
+  min-height: 80vh;
+  font-family: 'Urbanist', sans-serif;
+  background: #f8fafc;
+}
+
+/* ── Detail Panel (Main Container) ── */
+.ctp-detail-panel {
+  background: #ffffff;
+  border-radius: 28px;
+  padding: 16px;
+  color: #0f172a; /* Dark text */
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+}
+
+/* ── Breadcrumb ── */
+.ctp-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 600;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.ctp-bc-current {
+  color: #94a3b8;
+}
+
+/* ── Level Badge ── */
+.ctp-detail-level-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 16px;
+}
+
+/* ── Title ── */
+.ctp-detail-title {
+  font-size: 34px !important;
+  font-weight: 900;
+  color: #0f172a !important; /* Dark Title */
+  margin: 0 0 16px 0;
+  letter-spacing: -1px;
+  line-height: 1.2;
+}
+
+/* ── Definition Card (was Description) ── */
+.ctp-detail-desc-card {
+  display: flex;
+  gap: 18px;
+  background: #f8fafc; /* Light gray background */
+  border-radius: 18px;
+  padding: 16px;
+  margin-bottom: 20px;
+  border: 1px solid #e2e8f0;
+}
+
+.ctp-desc-icon {
+  width: 42px;
+  height: 42px;
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ctp-desc-heading {
+  font-size: 16px;
+  font-weight: 800;
+  color: #334155;
+  margin: 0 0 6px 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.ctp-desc-text {
+  font-size: 15px;
+  color: #475569;
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* ── Related Examples Section (NEW) ── */
+.ctp-examples-section {
+  margin-bottom: 20px;
+  background: #020617; /* Even darker for code feel */
+  border-radius: 20px;
+  padding: 16px;
+  border: 1px solid #1e293b;
+}
+
+.ctp-ex-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  color: #3b82f6;
+}
+
+.ctp-ex-header h3 {
+  font-size: 18px;
+  font-weight: 800;
+  color: #f8fafc;
+  margin: 0;
+}
+
+.ctp-ex-content pre {
+  margin: 0;
+  padding: 16px;
+  background: #0f172a;
+  border-radius: 12px;
+  overflow-x: auto;
+  border: 1px solid #1e293b;
+}
+
+.ctp-ex-content code {
+  font-family: 'Fira Code', 'Courier New', monospace;
+  font-size: 14px;
+  color: #60a5fa;
+  line-height: 1.6;
+}
+
+
+
+/* ── Responsive ── */
+@media (max-width: 1100px) {
+  .ctp-landing, .ctp-content-only {
+    padding: 24px;
+  }
+
+  .ctp-cards-row {
+    grid-template-columns: 1fr;
+  }
+
+  .ctp-landing-title, .ctp-detail-title {
+    font-size: 26px !important;
+  }
+
+  .ctp-kp-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .ctp-landing, .ctp-content-only {
+    padding: 16px;
+  }
+
+  .ctp-batch-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ctp-trainer-stats {
+    flex-direction: column;
+  }
+
+  .ctp-detail-desc-card {
+    flex-direction: column;
+    gap: 12px;
+    padding: 18px;
+  }
+}
+
+/* ── Back Button Top ── */
+.ctp-back-btn-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-bottom: 12px;
+  padding: 0;
+  transition: color 0.2s, transform 0.2s;
+  font-family: inherit;
+}
+
+.ctp-back-btn-top:hover {
+  color: #2563eb;
+  transform: translateX(-4px);
+}
+
+/* ── Content Section (was Detailed Notes) ── */
+.ctp-notes-section {
+  background: #f8fafc;
+  border-radius: 20px;
+  padding: 16px;
+  border: 1px solid #e2e8f0;
+}
+
+.ctp-notes-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  color: #60a5fa;
+}
+
+.ctp-notes-header h3 {
+  font-size: 20px;
+  font-weight: 900;
+  color: #1e293b;
+  margin: 0;
+}
+
+.ctp-notes-content {
+  color: #475569;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.ctp-notes-para {
+  margin-bottom: 20px;
+}
+
+.ctp-notes-para:last-child {
+  margin-bottom: 0;
+}
+
+.ctp-notes-para strong {
+  color: #1e3a8a;
+  font-weight: 800;
+  background: rgba(59, 130, 246, 0.1);
+  padding: 0 4px;
+  border-radius: 4px;
+}

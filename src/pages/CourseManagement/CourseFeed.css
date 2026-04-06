@@ -1,0 +1,572 @@
+/* ════════════════════════════════════════
+   CourseFeed — Professional Course Stream
+   ════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+.cf-page {
+  min-height: 100vh;
+  background: #f0f4ff;
+  font-family: 'Urbanist', sans-serif;
+}
+
+/* ── Hero ─────────────────────────────── */
+.cf-hero {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #3b82f6 100%);
+  padding: 3.5rem 2rem 5rem;
+  text-align: center;
+}
+
+.cf-hero-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.cf-hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(99,179,255,0.18);
+  border: 1px solid rgba(99,179,255,0.35);
+  color: #93c5fd;
+  padding: 5px 16px;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 1.25rem;
+}
+
+.cf-hero-title {
+  font-size: clamp(1.875rem, 4vw, 3rem);
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+  margin-bottom: 0.875rem;
+}
+
+.cf-hero-sub {
+  color: rgba(255,255,255,0.65);
+  font-size: 1.0625rem;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.cf-publish-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  color: #1e3a8a;
+  font-weight: 800;
+  font-size: 0.9375rem;
+  padding: 12px 28px;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+}
+.cf-publish-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+
+/* Blobs */
+.cf-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.3;
+  pointer-events: none;
+}
+.cf-blob-1 { width:400px; height:400px; background:#3b82f6; top:-120px; right:-80px; }
+.cf-blob-2 { width:280px; height:280px; background:#818cf8; bottom:-70px; left:-50px; }
+
+/* ── Controls Bar ─────────────────────── */
+.cf-controls {
+  background: #fff;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 2px 12px rgba(15,23,42,0.06);
+}
+
+.cf-search-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 220px;
+}
+
+.cf-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.cf-search {
+  width: 100%;
+  padding: 9px 12px 9px 36px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  color: #0f172a;
+  background: #f8fafc;
+  font-family: 'Urbanist', sans-serif;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.cf-search:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+  background: #fff;
+}
+
+.cf-filter-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  color: #64748b;
+}
+
+.cf-chip {
+  padding: 6px 16px;
+  border-radius: 50px;
+  border: 1.5px solid #e2e8f0;
+  background: #f8fafc;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Urbanist', sans-serif;
+}
+.cf-chip:hover { border-color: #93c5fd; color: #2563eb; }
+.cf-chip.active {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(37,99,235,0.25);
+}
+
+/* ── Body / Grid ──────────────────────── */
+.cf-body {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2.5rem 2rem 4rem;
+}
+
+.cf-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.75rem;
+}
+
+/* ── Card ─────────────────────────────── */
+.cf-card {
+  background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+}
+.cf-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 48px rgba(15,23,42,0.1);
+  border-color: #93c5fd;
+}
+
+.cf-card-img {
+  position: relative;
+  height: 190px;
+  overflow: hidden;
+}
+.cf-card-img img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+.cf-card:hover .cf-card-img img {
+  transform: scale(1.04);
+}
+
+.cf-category-tag {
+  position: absolute;
+  top: 12px; right: 12px;
+  background: rgba(15,23,42,0.7);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  backdrop-filter: blur(6px);
+}
+
+.cf-card-body {
+  padding: 1.25rem 1.25rem 0;
+  flex: 1;
+}
+
+.cf-instructor {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 0.75rem;
+}
+
+.cf-avatar {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cf-instructor span {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.cf-card-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.35;
+  margin-bottom: 0.5rem;
+}
+
+.cf-card-desc {
+  font-size: 0.875rem;
+  color: #64748b;
+  line-height: 1.55;
+  margin-bottom: 1rem;
+}
+
+.cf-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 0.75rem;
+  border-top: 1px solid #f1f5f9;
+  flex-wrap: wrap;
+  margin-bottom: 0.25rem;
+}
+
+.cf-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.cf-level-badge {
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.7125rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  margin-left: auto;
+}
+
+.cf-card-footer {
+  padding: 0.875rem 1.25rem 1.25rem;
+}
+
+.cf-enroll-btn {
+  width: 100%;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.875rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.2s;
+  font-family: 'Urbanist', sans-serif;
+}
+.cf-enroll-btn:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+/* ── Empty state ──────────────────────── */
+.cf-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 5rem 1rem;
+  text-align: center;
+  color: #94a3b8;
+}
+.cf-empty h3 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #334155;
+}
+.cf-empty p {
+  font-size: 0.9rem;
+  max-width: 360px;
+  line-height: 1.6;
+}
+.cf-empty-btn {
+  margin-top: 0.5rem;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  color: #fff !important;
+}
+
+/* ── Social action buttons ────────────── */
+.cf-social {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.625rem 0;
+  border-top: 1px solid #f1f5f9;
+  margin-top: 0.5rem;
+}
+
+.cf-action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: background 0.15s, color 0.15s;
+  font-family: 'Inter', sans-serif;
+}
+.cf-action-btn:hover { background: #f1f5f9; color: #0f172a; }
+.cf-action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.cf-action-btn.cf-liked { color: #ef4444; }
+.cf-action-btn.cf-liked:hover { background: #fee2e2; }
+.cf-ml-auto { margin-left: auto; }
+
+.cf-edit-btn:hover  { background: #eff6ff; color: #2563eb; }
+.cf-delete-btn:hover { background: #fee2e2; color: #ef4444; }
+
+/* ── Inline edit card ─────────────────── */
+.cf-edit-card {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  border: 2px solid #2563eb;
+}
+
+.cf-edit-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.cf-edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cf-edit-field label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cf-edit-input {
+  padding: 9px 12px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: 'Inter', sans-serif;
+  color: #0f172a;
+  background: #f8fafc;
+  transition: border-color 0.2s;
+  width: 100%;
+  resize: vertical;
+}
+.cf-edit-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  background: #fff;
+}
+
+.cf-edit-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.cf-edit-actions {
+  display: flex;
+  gap: 0.625rem;
+}
+
+.cf-edit-save {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 16px;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: opacity 0.2s;
+}
+.cf-edit-save:disabled { opacity: 0.65; cursor: not-allowed; }
+
+.cf-edit-cancel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 16px;
+  background: #f1f5f9;
+  color: #475569;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: background 0.2s;
+}
+.cf-edit-cancel:hover { background: #e2e8f0; }
+
+/* ── Skeleton loader ──────────────────── */
+.cf-skeleton { pointer-events: none; border: 1px solid #e2e8f0; }
+
+.cf-skeleton-img {
+  height: 190px;
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: cf-shimmer 1.4s infinite;
+}
+
+.cf-skeleton-line {
+  height: 14px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: cf-shimmer 1.4s infinite;
+  margin-bottom: 10px;
+  width: 100%;
+}
+.cf-sk-short  { width: 55%; }
+.cf-sk-medium { width: 75%; }
+
+@keyframes cf-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Deleting state ───────────────────── */
+.cf-card-deleting {
+  opacity: 0.5;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+/* ── Toast notification ───────────────── */
+.cf-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  z-index: 9999;
+  animation: cf-slide-up 0.3s ease forwards;
+  white-space: nowrap;
+}
+.cf-toast-error   { background: #fef2f2; color: #dc2626; border: 1.5px solid #fca5a5; }
+.cf-toast-success { background: #f0fdf4; color: #16a34a; border: 1.5px solid #86efac; }
+
+.cf-toast button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  padding: 0;
+  margin-left: 4px;
+  display: flex;
+}
+
+@keyframes cf-slide-up {
+  from { opacity: 0; transform: translate(-50%, 12px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* ── Spinner for buttons ──────────────── */
+.cf-btn-spinner {
+  display: inline-block;
+  width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: ap-spin 0.7s linear infinite;
+}
+.cf-del-spinner {
+  border-color: rgba(239,68,68,0.3);
+  border-top-color: #ef4444;
+}
+
+@keyframes ap-spin { to { transform: rotate(360deg); } }
+
+/* ── Responsive ──────────────────────── */
+@media (max-width: 600px) {
+  .cf-controls { padding: 0.875rem 1rem; }
+  .cf-body     { padding: 1.5rem 1rem 3rem; }
+  .cf-edit-row { grid-template-columns: 1fr; }
+}

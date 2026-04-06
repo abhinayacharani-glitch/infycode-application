@@ -1,0 +1,207 @@
+/* 🔷 ROOT VARIABLES (OPTIONAL BUT RECOMMENDED) */
+:root {
+  --primary-color: #2563eb;
+  --accent-blue: #3b82f6;
+  --text-blue: #1e3a8a;
+  --shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+  --shadow-hover: 0 16px 30px rgba(0, 0, 0, 0.12);
+  --transition: all 0.3s ease;
+}
+
+/* 🔷 SPECIAL NOTE BOX */
+.special-note-box {
+  background: #fdfdfd;
+  border: 2px dashed var(--accent-blue);
+  padding: 1.5rem 2rem;
+  border-radius: 12px;
+  margin-bottom: 3rem;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  box-shadow: 0 10px 20px rgba(59, 130, 246, 0.05);
+}
+
+.special-note-box p {
+  color: black;
+  font-size: var(--fs-text);
+  font-family: 'Urbanist', sans-serif;
+}
+
+.special-note-box span {
+  color: black;
+  font-weight: 700;
+}
+
+/* 🔷 MAIN LAYOUT */
+.skill-content-flow {
+  display: flex;
+  align-items: stretch;
+  /* 🔥 FIX: equal height */
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+/* 🔷 CARD */
+.skill-card.modern {
+  background: #ffffff;
+  width: 100%;
+  max-width: 420px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  border: 1px solid #f1f5f9;
+
+  display: flex;
+  flex-direction: column;
+
+  min-height: 500px;
+  /* 🔥 FIXED HEIGHT */
+  transition: var(--transition);
+}
+
+/* 🔥 HOVER EFFECT */
+.skill-card.modern:hover {
+  transform: translateY(-10px) scale(1.01);
+  box-shadow: var(--shadow-hover);
+}
+
+/* 🔷 BADGE */
+.card-badge {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: var(--primary-color);
+  color: #ffffff;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: var(--fs-small);
+  font-weight: 700;
+  z-index: 2;
+  font-family: 'Urbanist', sans-serif;
+}
+
+.card-badge.secondary {
+  background: #64748b;
+}
+
+/* 🔷 IMAGE */
+.skill-image-box {
+  height: 200px;
+  overflow: hidden;
+}
+
+.skill-image-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.skill-card.modern:hover .skill-image-box img {
+  transform: scale(1.05);
+}
+
+/* 🔷 CONTENT */
+.skill-info {
+  padding: 1.8rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* 🔷 HEADING (IMPORTANT FONT) */
+.skill-info h3 {
+  font-size: var(--fs-h3);
+  margin-bottom: 0.8rem;
+  color: #3b6ff5;
+  font-weight: 700;
+  font-family: 'Urbanist', sans-serif;
+  /* 🔥 PROFESSIONAL FONT */
+  letter-spacing: 0.3px;
+}
+
+/* 🔷 DESCRIPTION (IMPORTANT FONT) */
+.skill-info p {
+  color: black;
+  font-size: var(--fs-text);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+  /* Weighted professional description */
+  font-family: 'Urbanist', sans-serif;
+  /* 🔥 CLEAN BODY FONT */
+
+  min-height: 70px;
+  /* 🔥 FIX ALIGNMENT */
+}
+
+/* 🔷 BUTTON */
+.start-btn-modern {
+  width: 100%;
+  padding: 0.9rem;
+  border-radius: 10px;
+  background: var(--primary-color);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: var(--fs-text);
+
+  font-family: 'Urbanist', sans-serif;
+
+  margin-top: auto;
+  /* 🔥 ALIGN BUTTONS */
+  transition: var(--transition);
+}
+
+/* 🔷 BUTTON HOVER */
+.start-btn-modern:hover:not(.locked) {
+  background: var(--accent-blue);
+  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
+}
+
+/* 🔷 LOCKED BUTTON */
+.start-btn-modern.locked {
+  background: #f1f5f9;
+  color: #94a3b8;
+  cursor: not-allowed;
+  border: 1px solid #e2e8f0;
+}
+
+/* 🔷 FLOW ARROW */
+.flow-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flow-arrow {
+  font-size: var(--fs-h1);
+  color: var(--accent-blue);
+  animation: bounceX 2s infinite ease-in-out;
+}
+
+/* 🔷 ANIMATION */
+@keyframes bounceX {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(15px);
+  }
+}
+
+/* 🔷 RESPONSIVE */
+@media (max-width: 1100px) {
+  .flow-indicator {
+    display: none;
+  }
+
+  .skill-content-flow {
+    flex-direction: column;
+    align-items: center;
+  }
+}

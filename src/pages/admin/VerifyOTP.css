@@ -1,0 +1,124 @@
+/* ══════════════════════════════════════════════
+   OTP Digit Inputs
+══════════════════════════════════════════════ */
+.otp-inputs-wrap {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 4px 0 2px;
+}
+
+.otp-digit {
+  width: 46px;
+  height: 52px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--admin-text);
+  background: #f8fafc;
+  border: 2px solid var(--admin-border);
+  border-radius: 10px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+  caret-color: var(--admin-accent);
+  letter-spacing: 0;
+}
+
+.otp-digit:focus {
+  border-color: var(--admin-accent);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+  transform: translateY(-2px) scale(1.04);
+  background: #fff;
+}
+
+.otp-digit--filled {
+  border-color: var(--admin-accent);
+  background: #eff6ff;
+}
+
+.otp-digit--error {
+  border-color: var(--admin-error);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  animation: otpShake 0.35s ease;
+}
+
+@keyframes otpShake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-4px); }
+  60%       { transform: translateX(4px); }
+  80%       { transform: translateX(-2px); }
+}
+
+/* ── Timer ───────────────────────────────────────── */
+.otp-timer {
+  text-align: center;
+  font-size: 13px;
+  color: var(--admin-muted);
+  background: #f1f5f9;
+  border-radius: 8px;
+  padding: 8px 12px;
+  transition: color 0.3s ease, background 0.3s ease;
+}
+
+.otp-timer__count {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--admin-accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.otp-timer--warning .otp-timer__count {
+  color: #dc2626;
+  animation: pulse 1s ease infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
+/* ── Resend Button ───────────────────────────────── */
+.otp-resend-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--admin-accent);
+  padding: 4px 0;
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.otp-resend-btn:disabled {
+  color: var(--admin-muted);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.otp-resend-btn:not(:disabled):hover {
+  color: var(--admin-text);
+}
+
+.otp-resend-icon {
+  transition: transform 0.3s ease;
+}
+
+.otp-resend-btn:not(:disabled):hover .otp-resend-icon {
+  transform: rotate(180deg);
+}
+
+.spinning {
+  animation: spinOnce 0.7s linear infinite;
+}
+
+@keyframes spinOnce {
+  to { transform: rotate(360deg); }
+}
+
+.otp-resend-hint {
+  font-size: 11.5px;
+  color: var(--admin-muted);
+}

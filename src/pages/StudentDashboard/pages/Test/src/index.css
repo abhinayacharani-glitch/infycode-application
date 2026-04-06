@@ -1,0 +1,126 @@
+:root {
+  --primary-blue: #0A3D91; /* Royal Blue */
+  --secondary-blue: #2A75D3;
+  --light-blue: #E8F0FE;
+  --bg-color: #F4F7FB;
+  --text-dark: #333333;
+  --text-light: #FFFFFF;
+  --success-green: #28A745;
+  --warning-orange: #FD7E14;
+  --danger-red: #DC3545;
+  --neutral-grey: #6C757D;
+  --border-color: #DEE2E6;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Urbanist', sans-serif;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-dark);
+}
+
+.App {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.assessment-header {
+  background-color: var(--primary-blue);
+  color: var(--text-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  z-index: 1000;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.header-sections {
+  display: flex;
+  gap: 15px;
+}
+
+.section-tab-btn {
+  background-color: var(--secondary-blue);
+  border: none;
+  color: var(--text-light);
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.section-tab-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.section-tab-btn.active {
+  background-color: var(--text-light);
+  color: var(--primary-blue);
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.2rem;
+}
+
+.main-layout {
+  display: flex;
+  flex: 1;
+  margin-top: 60px; /* Header height offset */
+  height: calc(100vh - 60px);
+  padding: 20px;
+  gap: 20px;
+}
+
+/* Left Section */
+.left-section {
+  flex: 3;
+  background-color: var(--text-light);
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow-y: auto;
+}
+
+/* Right Section */
+.right-section {
+  flex: 1;
+  background-color: var(--text-light);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  min-width: 250px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}

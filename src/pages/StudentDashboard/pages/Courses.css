@@ -1,0 +1,234 @@
+/* ===========================
+   ENROLL COURSES PAGE
+   =========================== */
+.enroll-page { padding: 0; }
+
+.enroll-page-header {
+  background: linear-gradient(135deg, #f8faff 0%, #eff6ff 100%);
+  padding: 48px 48px 32px;
+  border-bottom: 1px solid var(--border);
+}
+
+.enroll-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  background: #dbeafe;
+  color: var(--primary);
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.enroll-page-header h1 { font-size: 2rem; margin: 0 0 8px; }
+.enroll-page-header p { color: var(--text-muted); margin-bottom: 24px; }
+
+.enroll-course-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 40px 48px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Row Container */
+.ec-row-container {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.ec-row-container:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.ec-row-container.is-open {
+  border-color: var(--primary);
+}
+
+/* Main Row */
+.ec-row-main {
+  display: flex;
+  align-items: center;
+  padding: 24px 32px;
+  cursor: pointer;
+  gap: 28px;
+}
+
+/* Icon Col */
+.ec-row-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Info Col */
+.ec-row-info {
+  flex: 1;
+}
+.ec-row-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 4px;
+  letter-spacing: -0.02em;
+}
+.ec-row-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #64748b;
+  font-size: 0.85rem;
+}
+.ec-row-trainer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+.ec-row-dot { color: #cbd5e1; }
+.ec-row-time {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Status Col */
+.ec-row-status {
+  text-align: right;
+  min-width: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.ec-row-progress-text {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 0;
+  line-height: 1.2;
+}
+.ec-row-complete-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+.ec-row-complete-badge.done {
+  color: #10b981;
+}
+
+/* Toggle Col */
+.ec-row-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+}
+
+/* Dropdown */
+.ec-row-dropdown {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+  background: #f8fafc;
+}
+.ec-row-dropdown.is-visible {
+  max-height: 300px;
+  border-top: 1px solid #e2e8f0;
+}
+.ec-dropdown-inner {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Inner Sections */
+.ec-progress-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ec-progress-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #334155;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.ec-progress-bar {
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 4px;
+}
+.ec-progress-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 4px;
+}
+
+.ec-current-topic-box-simple {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ec-ct-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 1px;
+}
+.ec-ct-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 12px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+.ec-ct-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+.ec-ct-resume-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.ec-ct-resume-btn:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(37,99,235,0.2);
+}
+
+@media (max-width: 768px) {
+  .enroll-course-grid { padding: 24px; }
+  .ec-row-main { flex-wrap: wrap; gap: 16px; }
+  .ec-row-status { order: 2; text-align: left; flex: 1; }
+  .ec-row-toggle { order: 3; }
+  .ec-row-info { min-width: 100%; order: 1; }
+}

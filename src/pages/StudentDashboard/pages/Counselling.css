@@ -1,0 +1,239 @@
+/* 🔷 HEADER */
+.page-header-centered {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.page-header-centered h2 {
+  font-size: var(--fs-h2);
+  margin-bottom: 0.7rem;
+  color: var(--text-main);
+}
+
+.page-header-centered p {
+  font-size: var(--fs-text);
+  color: var(--text-main);
+  font-weight: 500;
+  max-width: 650px;
+  margin: 0 auto;
+}
+
+/* 🔷 GRID */
+.counselling-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* 🔷 CARD */
+.counselling-card-premium {
+  background: #ffffff;
+  border-radius: 16px;
+  /* ✅ overflow: hidden removed so dropdown can display outside */
+  overflow: visible;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  min-height: 400px;
+}
+
+/* 🔥 HOVER EFFECT */
+.counselling-card-premium:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12);
+}
+
+/* 🔷 IMAGE WRAPPER */
+.card-image-wrapper {
+  height: 220px;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 16px 16px 0 0;
+  /* ✅ smooth top corners */
+}
+
+/* 🔥 FIXED IMAGE (FULL WIDTH) */
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* 🔥 FULL CARD COVER */
+  object-position: center;
+  display: block;
+  padding: 0;
+  /* ❌ removed gap */
+  transition: transform 0.4s ease;
+}
+
+/* 🔥 IMAGE HOVER */
+.counselling-card-premium:hover .card-image {
+  transform: scale(1.05);
+}
+
+/* 🔷 CONTENT */
+.card-content-premium {
+  padding: 1.2rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  flex: 1;
+}
+
+/* 🔷 TITLE */
+.card-content-premium h3 {
+  font-size: var(--fs-h3);
+  color: var(--text-main);
+  font-weight: 700;
+  margin: 0;
+}
+
+/* 🔷 DESCRIPTION */
+.card-content-premium p {
+  font-size: var(--fs-text);
+  color: black;
+  line-height: 1.6;
+  margin: 0;
+  flex-grow: 1;
+}
+
+/* 🔷 BUTTONS CONTAINER */
+.card-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: auto;
+  flex-wrap: wrap;
+}
+
+/* 🔷 BUTTON */
+.card-action-btn {
+  padding: 0.5rem 1rem;
+  background-color: var(--primary-color);
+  color: #ffffff;
+  border-radius: 6px;
+  font-size: var(--fs-small);
+  font-weight: 600;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+}
+
+.card-action-btn.meet-btn {
+  background-color: #ea4335;
+  margin-left: auto;
+}
+
+/* 🔥 BUTTON HOVER */
+.card-action-btn:hover {
+  background-color: #1e3a8a;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.25);
+}
+
+.card-action-btn.meet-btn:hover {
+  background-color: #c52d21;
+  box-shadow: 0 4px 12px rgba(234, 67, 53, 0.25);
+}
+
+/* 🔷 RESPONSIVE */
+@media (max-width: 850px) {
+  .counselling-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 🔷 DROPDOWN & COUNTDOWN */
+.meet-dropdown-container {
+  position: relative;
+  margin-left: auto;
+}
+
+.slots-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 5px);
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  width: 160px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: fadeInDown 0.2s ease-out;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slot-dropdown-item {
+  padding: 0.8rem 1rem;
+  background: none;
+  border: none;
+  border-bottom: 1px solid #f1f5f9;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.slot-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.slot-dropdown-item:hover {
+  background-color: #f8fafc;
+  color: var(--primary-color);
+}
+
+.slot-dropdown-empty {
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.countdown-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+  color: white;
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  min-width: 140px;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+}
+
+.countdown-label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.9;
+}
+
+.countdown-time {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}

@@ -1,0 +1,67 @@
+/* GalleryPage Styles */
+.gallery-hero {
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&q=80&w=1920');
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 30px;
+}
+
+.gallery-item {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    height: 300px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.gallery-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.gallery-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(15, 23, 42, 0.9));
+    padding: 30px;
+    color: white;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: all 0.4s ease;
+}
+
+.gallery-item:hover .gallery-img {
+    transform: scale(1.1);
+}
+
+.gallery-item:hover .gallery-overlay {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.gallery-overlay h4 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    margin-bottom: 5px;
+}
+
+.gallery-overlay span {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+    .gallery-grid {
+        grid-template-columns: 1fr;
+    }
+}

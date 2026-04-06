@@ -1,0 +1,282 @@
+/* =========================================
+   BecomeTrainerPage.css
+   Styles for the Become a Trainer page (self-contained)
+   ========================================= */
+
+/* Base Page Wrapper */
+.internal-page {
+  width: 100%;
+  font-family: 'Urbanist', sans-serif;
+  background: var(--bg, #f4f6f9);
+}
+
+/* Hero Section */
+.internal-hero {
+  position: relative;
+  width: 100%;
+  height: 70vh;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  padding-top: 100px;
+}
+
+.internal-hero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(rgba(10, 25, 47, 0.85), rgba(37, 99, 235, 0.4));
+  z-index: 1;
+}
+
+.internal-hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  padding: 0 20px;
+}
+
+.internal-hero h1 {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: white;
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+
+.internal-hero p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  margin-bottom: 30px;
+}
+
+/* Content Section */
+.internal-section {
+  padding: 80px 5%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Section Title */
+.section-title {
+  text-align: center;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--text-dark, #1e293b);
+  margin-bottom: 50px;
+}
+
+/* CTA Button */
+.cta-btn {
+  background: white;
+  color: var(--blue-600, #2563eb);
+  padding: 16px 40px;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: transform 0.3s;
+}
+
+.cta-btn:hover {
+  transform: translateY(-3px);
+}
+
+
+.trainer-hero {
+  background-image: url(https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&q=80&w=1920);
+}
+
+.trainer-section {
+  max-width: 1000px;
+}
+
+.trainer-benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  margin-bottom: 80px;
+}
+
+.trainer-benefit-card {
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.trainer-benefit-title {
+  font-size: 1.4rem;
+  color: var(--blue-600);
+  margin-bottom: 15px;
+}
+
+.trainer-benefit-desc {
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+/* Our Experts Section Polish */
+.trainer-experts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 32px;
+  margin-bottom: 80px;
+}
+
+.trainer-expert-card {
+  background: white;
+  padding: 45px 30px;
+  border-radius: 28px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.03), 0 20px 80px rgba(0,0,0,0.02);
+  text-align: center;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 1px solid #f1f5f9;
+  position: relative;
+  overflow: hidden;
+}
+
+.trainer-expert-card:hover {
+  transform: translateY(-12px) scale(1.01);
+  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.1);
+  border-color: #dbeafe;
+}
+
+.trainer-expert-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, var(--blue-600), transparent);
+  transform: scaleX(0);
+  transition: transform 0.4s ease;
+}
+
+.trainer-expert-card:hover::after {
+  transform: scaleX(1);
+}
+
+.expert-image-wrapper {
+  width: 110px;
+  height: 110px;
+  margin: 0 auto 25px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid #eff6ff;
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.12);
+  transition: transform 0.4s ease;
+}
+
+.trainer-expert-card:hover .expert-image-wrapper {
+  transform: scale(1.05);
+  border-color: #dbeafe;
+}
+
+.expert-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.trainer-expert-card:hover .expert-image {
+  transform: scale(1.15);
+}
+
+.expert-name {
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 6px;
+  letter-spacing: -0.5px;
+}
+
+.expert-role {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #2563eb;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.expert-exp {
+  display: inline-block;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #2563eb;
+  background: #eff6ff;
+  padding: 6px 16px;
+  border-radius: 50px;
+  margin-bottom: 20px;
+  border: 1px solid #dbeafe;
+}
+
+.expert-bio {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #475569;
+  max-width: 90%;
+  margin: 0 auto;
+}
+
+.trainer-form-card {
+  background: white;
+  padding: 50px;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+.trainer-form-title {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.trainer-form-sub {
+  color: var(--text-muted);
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.trainer-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.trainer-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.trainer-input {
+  padding: 16px 20px;
+  border-radius: 12px;
+  border: 1px solid var(--border, #e2e8f0);
+  outline: none;
+  font-size: 1rem;
+  width: 100%;
+  font-family: 'Urbanist', sans-serif;
+  background: #f8fafc;
+}
+
+.trainer-input.textarea {
+  resize: none;
+}
+
+.trainer-submit-btn {
+  background: var(--blue-600);
+  color: white;
+  margin: 20px auto 0;
+  display: block;
+}

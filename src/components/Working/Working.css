@@ -1,0 +1,132 @@
+.how-it-works-section {
+  background: linear-gradient(rgba(0, 35, 41, 0.9), rgba(0, 35, 41, 0.9)),
+  url('https://images.pexels.com/photos/3184328/pexels-photo-3184328.jpeg?auto=compress&cs=tinysrgb&w=1600');
+  
+  background-size: cover;
+  background-position: center;
+
+  padding: 100px 2rem; /* 🔥 more balanced spacing */
+  box-sizing: border-box;
+  overflow-x: hidden;
+
+  color: #ffffff;
+  position: relative;
+
+  display: flex;              /* ✅ CENTER FIX */
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+/* CONTAINER CENTER */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* TITLE */
+.section-head-centered {
+  text-align: center;
+}
+
+.sub-label-blue {
+  font-family: 'Urbanist', sans-serif;
+  font-size: 18px;
+  color: #ffffff;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.section-title-white {
+  font-family: 'Urbanist', sans-serif;
+  font-size: 42px;
+  font-weight: 700;
+  margin-top: 10px;
+  color: #ffffff;
+}
+
+/* STEPS */
+.steps-container {
+  display: flex;              /* 🔥 GRID → FLEX */
+  justify-content: center;
+  align-items: center;
+  gap: 3rem;
+
+  margin-top: 3rem;
+  flex-wrap: wrap; /* ✅ responsive */
+}
+
+/* CARD */
+.step-item {
+  text-align: center;
+  max-width: 280px;
+  position: relative;
+}
+
+/* ICON */
+.step-diamond-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.step-diamond {
+  width: 70px;
+  height: 70px;
+
+  background: #3b82f6; /* 🔥 CHANGE COLOR HERE */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transform: rotate(45deg);
+  border-radius: 0.75rem;
+  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.4);
+}
+
+.step-diamond svg {
+  transform: rotate(-45deg);
+  color: #ffffff;
+}
+
+/* TITLE TEXT */
+.step-title {
+  font-family: 'Urbanist', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+/* DESCRIPTION */
+.step-desc {
+  font-family: 'Urbanist', sans-serif;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.5rem;
+}
+
+/* ARROWS */
+.step-arrow-wrap {
+  position: absolute;
+  top: 35px;
+  left: 70%;
+  width: 100%;
+}
+
+.step-arrow-svg {
+  width: 100px;
+  height: 35px;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .steps-container {
+    flex-direction: column;
+  }
+
+  .step-arrow-wrap {
+    display: none;
+  }
+}

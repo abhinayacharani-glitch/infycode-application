@@ -1,0 +1,173 @@
+/* 🔷 ROOT VARIABLES (OPTIONAL) */
+:root {
+  --sidebar-bg: #3b6ff5;
+  --primary-color: #2563eb;
+  --accent-blue: #3b82f6;
+}
+
+/* 🔷 NAVBAR */
+.navbar-premium {
+  height: 100px;
+  background-color: var(--nav-bg-glass);
+  /* Glassmorphism base */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  padding: 0 5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  font-family: 'Urbanist', sans-serif;
+  color: #ffffff;
+  /* Explicitly set white text */
+}
+
+/* 🔷 CONTAINER */
+.navbar-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+/* 🔷 CENTER TEXT */
+.navbar-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+}
+
+/* 🔷 WELCOME TEXT */
+.welcome-msg {
+  font-size: var(--fs-h2);
+  font-weight: 700;
+  color: #ffffff;
+  /* Force white text */
+  margin: 0;
+}
+
+/* 🔷 TAGLINE */
+.welcome-desc {
+  font-size: var(--fs-text);
+  color: rgba(255, 255, 255, 0.85);
+  margin-top: 4px;
+  font-family: 'Urbanist', sans-serif;
+}
+
+/* 🔷 RIGHT SIDE */
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  /* 🔥 perfect spacing */
+}
+
+/* 🔷 COMMON ICON STYLE */
+.nav-icon-box {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  font-size: 1.4rem;
+  color: #ffffff;
+  /* Force white icon */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+/* 🔷 ICON HOVER */
+.nav-icon-box:hover {
+  transform: scale(1.15);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+
+
+
+
+/* 🔔 NOTIFICATION ICON */
+.nav-icon-box.notification {
+  color: #ffffff;
+}
+
+/* 🔔 NOTIFICATION HOVER */
+.nav-icon-box.notification:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* 🔔 NOTIFICATION BADGE */
+.notification-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 10px;
+  padding: 3px 6px;
+  border-radius: 50%;
+  font-weight: 600;
+
+}
+
+/* 👤 PROFILE CIRCLE */
+.profile-circle {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #a78bfa, #8b5cf6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* 👤 PROFILE HOVER */
+.profile-circle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+/* 🔷 RESPONSIVE */
+@media (max-width: 768px) {
+  .navbar-premium {
+    padding: 0 1.5rem;
+    height: 80px;
+  }
+
+  .welcome-msg {
+    font-size: 1.2rem;
+  }
+
+  .welcome-desc {
+    font-size: 0.85rem;
+  }
+
+  .navbar-right {
+    gap: 18px;
+  }
+
+  .nav-icon-box {
+    width: 32px;
+    height: 32px;
+    font-size: 1.2rem;
+  }
+
+  .profile-circle {
+    width: 34px;
+    height: 34px;
+    font-size: 1rem;
+    margin-left: 20px;
+  }
+}

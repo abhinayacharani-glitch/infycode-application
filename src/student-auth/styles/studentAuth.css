@@ -1,0 +1,499 @@
+/* studentAuth.css — Shared styles for student ForgotPassword, VerifyOTP, ResetPassword */
+
+@import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500;600;700;800&display=swap');
+
+/* ─────────────────────────────────────────────
+   CSS Variables  (mirror Login.css tokens)
+───────────────────────────────────────────── */
+:root {
+  --sa-primary:  #1E90FF;
+  --sa-accent:   #1C86EE;
+  --sa-surface:  #ffffff;
+  --sa-bg-from:  #e2e2e2;
+  --sa-bg-to:    #c9d6ff;
+  --sa-text:     #0f172a;
+  --sa-muted:    #64748b;
+  --sa-border:   #e2e8f0;
+  --sa-error:    #ef4444;
+  --sa-radius:   30px;          /* matches .studentLogin-container border-radius */
+  --sa-ease:     cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+input::-ms-reveal, input::-ms-clear { display: none; }
+
+/* ─────────────────────────────────────────────
+   Page wrapper  (same bg as login wrapper)
+───────────────────────────────────────────── */
+.student-wrapper {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Urbanist', sans-serif;
+  padding: 24px;
+  background: linear-gradient(to right, var(--sa-bg-from), var(--sa-bg-to));
+  position: relative;
+  overflow: hidden;
+}
+
+/* animated blobs identical to Login page bg feel */
+.student-wrapper::before,
+.student-wrapper::after {
+  content: '';
+  position: absolute;
+  width: 55vw;
+  height: 55vw;
+  border-radius: 50%;
+  filter: blur(110px);
+  z-index: 0;
+  opacity: 0.35;
+  animation: saBgFloat 18s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+}
+.student-wrapper::before {
+  top: -18%;
+  left: -8%;
+  background: rgba(30, 144, 255, 0.18);
+}
+.student-wrapper::after {
+  bottom: -18%;
+  right: -8%;
+  background: rgba(201, 214, 255, 0.28);
+  animation-delay: -9s;
+}
+
+@keyframes saBgFloat {
+  0%   { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(4%, 8%) scale(1.08); }
+}
+
+/* ─────────────────────────────────────────────
+   Card  (same shadow & radius as Login)
+───────────────────────────────────────────── */
+.student-card {
+  display: flex;
+  width: 100%;
+  max-width: 850px;
+  min-height: 480px;
+  border-radius: var(--sa-radius);
+  overflow: hidden;
+  box-shadow:
+    0 5px 15px rgba(0, 0, 0, 0.35);
+  background: var(--sa-surface);
+  position: relative;
+  z-index: 10;
+  animation: saCardIn 0.6s var(--sa-ease) both;
+}
+
+@keyframes saCardIn {
+  from { opacity: 0; transform: translateY(30px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+/* ─────────────────────────────────────────────
+   LEFT — White Form Side
+───────────────────────────────────────────── */
+.student-form-side {
+  flex: 1;
+  background: var(--sa-surface);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 48px 52px;
+  animation: saFadeUp 0.5s var(--sa-ease) 0.05s both;
+}
+
+@keyframes saFadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.student-form-header { margin-bottom: 6px; }
+
+.student-form-heading {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--sa-text);
+  letter-spacing: -0.6px;
+  margin-bottom: 6px;
+}
+
+.student-form-sub {
+  font-size: 14px;
+  color: var(--sa-muted);
+  margin-bottom: 26px;
+  line-height: 1.6;
+}
+
+.student-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.student-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.student-form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--sa-text);
+}
+
+/* Input wrapper */
+.student-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.student-input-icon {
+  position: absolute;
+  left: 13px;
+  color: #94a3b8;
+  z-index: 2;
+  transition: color 0.3s ease;
+}
+.student-input-wrap:focus-within .student-input-icon { color: var(--sa-accent); }
+
+.student-input-wrap input {
+  width: 100%;
+  /* same padding style as Login inputs */
+  padding: 10px 42px 10px 40px;
+  font-size: 13px;
+  font-family: 'Urbanist', sans-serif;
+  color: var(--sa-text);
+  background: #eee;             /* matches .studentLogin-container input bg */
+  border: none;
+  border-radius: 8px;
+  outline: none;
+  transition: all 0.25s ease;
+}
+.student-input-wrap input::placeholder { color: #94a3b8; font-weight: 400; }
+.student-input-wrap input:focus {
+  background: #ffffff;
+  box-shadow: 0 0 0 2px rgba(30, 144, 255, 0.28);
+  transform: translateY(-1px);
+}
+.student-input-wrap input.student-error {
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3);
+}
+
+/* password toggle eye icon */
+.student-toggle-pw {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  z-index: 2;
+  transition: color 0.25s ease;
+  padding: 0;
+  margin: 0;
+  height: auto;
+}
+.student-toggle-pw:hover { color: var(--sa-text); }
+
+.student-error-text {
+  font-size: 11.5px;
+  color: var(--sa-error);
+}
+
+/* ─────────────────────────────────────────────
+   Submit button  (same as Login's blue btn)
+───────────────────────────────────────────── */
+.student-submit-btn {
+  width: 100%;
+  height: 44px;
+  margin-top: 4px;
+  background: var(--sa-primary);
+  color: #fff;
+  font-family: 'Urbanist', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  box-shadow: 0 4px 14px rgba(30, 144, 255, 0.3);
+  transition: all 0.25s ease;
+}
+.student-submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(30, 144, 255, 0.38);
+  filter: brightness(1.07);
+}
+.student-submit-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+.student-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ─────────────────────────────────────────────
+   Footer link row
+───────────────────────────────────────────── */
+.student-form-footer {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--sa-muted);
+}
+.student-form-footer a {
+  color: var(--sa-accent);
+  font-weight: 600;
+  text-decoration: none;
+  margin-left: 5px;
+  transition: color 0.25s;
+}
+.student-form-footer a:hover { color: var(--sa-primary); }
+
+/* ─────────────────────────────────────────────
+   RIGHT — Blue Panel
+   Uses same solid #1E90FF as Login toggle panel
+───────────────────────────────────────────── */
+.student-panel-side {
+  /* flex-basis mirrors Login's 50% toggle panel width */
+  flex: 0 0 50%;
+  background: #1E90FF;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 56px 40px;
+  position: relative;
+  overflow: hidden;
+  animation: saPanelIn 0.6s var(--sa-ease) 0.15s both;
+}
+
+/* subtle grid overlay — same as studentAuth.css before */
+.student-panel-side::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  z-index: 1;
+}
+
+/* radial glow top-right */
+.student-panel-side::after {
+  content: '';
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(255,255,255,0.16) 0%, transparent 60%);
+  top: -100px;
+  right: -100px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes saPanelIn {
+  from { opacity: 0; transform: translateX(30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.student-panel-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.student-panel-heading {
+  font-size: 36px;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.15;
+  letter-spacing: -0.8px;
+  margin-bottom: 14px;
+}
+
+.student-panel-sub {
+  font-size: 14.5px;
+  color: rgba(255, 255, 255, 0.82);
+  line-height: 1.65;
+  max-width: 260px;
+  margin-bottom: 32px;
+  font-weight: 400;
+}
+
+/* Outline button — same as Login's .studentLogin-hidden button */
+.student-panel-btn {
+  padding: 10px 36px;
+  background: transparent;
+  color: #ffffff;
+  font-family: 'Urbanist', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  border: 2px solid rgba(255, 255, 255, 0.75);
+  border-radius: 50px;
+  cursor: pointer;
+  text-decoration: none;
+  letter-spacing: 0.3px;
+  transition: all 0.25s ease;
+}
+.student-panel-btn:hover {
+  border-color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ─────────────────────────────────────────────
+   Alert Banners
+───────────────────────────────────────────── */
+.student-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 13px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  animation: saFadeUp 0.35s var(--sa-ease) both;
+}
+.student-banner--success {
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  color: #15803d;
+}
+.student-banner--error {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #b91c1c;
+}
+
+/* ─────────────────────────────────────────────
+   Spinner / Loading state
+───────────────────────────────────────────── */
+.student-btn-inner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.student-spinner {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: saSpin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes saSpin { to { transform: rotate(360deg); } }
+
+/* ─────────────────────────────────────────────
+   OTP Digit Inputs
+───────────────────────────────────────────── */
+.student-otp-wrap {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 8px 0;
+}
+
+.student-otp-digit {
+  width: 46px;
+  height: 50px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 700;
+  font-family: 'Urbanist', sans-serif;
+  border: 2px solid var(--sa-border);
+  border-radius: 10px;
+  background: #eee;
+  color: var(--sa-text);
+  outline: none;
+  transition: all 0.2s ease;
+  caret-color: var(--sa-accent);
+}
+.student-otp-digit:focus {
+  border-color: var(--sa-accent);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.14);
+  transform: translateY(-2px);
+}
+.student-otp-digit--filled {
+  border-color: var(--sa-accent);
+  background: #eff8ff;
+  color: var(--sa-accent);
+}
+.student-otp-digit--error {
+  border-color: var(--sa-error) !important;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+/* ─────────────────────────────────────────────
+   OTP Timer
+───────────────────────────────────────────── */
+.student-otp-timer {
+  text-align: center;
+  font-size: 13px;
+  color: var(--sa-muted);
+  margin-top: 4px;
+}
+.student-otp-timer__count {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* ─────────────────────────────────────────────
+   Disabled group (reset password)
+───────────────────────────────────────────── */
+.student-disabled-group {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* ─────────────────────────────────────────────
+   Responsive
+───────────────────────────────────────────── */
+@media (max-width: 800px) {
+  .student-wrapper { padding: 16px; }
+
+  /* Stack: blue panel moves to top on mobile */
+  .student-card {
+    flex-direction: column-reverse;
+    max-width: 460px;
+    min-height: auto;
+  }
+  .student-panel-side {
+    flex: none;
+    min-height: 220px;
+    padding: 36px 28px;
+    border-radius: 0;
+  }
+  .student-panel-heading { font-size: 26px; }
+  .student-form-side {
+    padding: 36px 28px;
+    flex: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .student-form-side { padding: 28px 20px; }
+  .student-form-heading { font-size: 22px; }
+  .student-otp-digit { width: 38px; height: 44px; font-size: 17px; }
+  .student-otp-wrap { gap: 6px; }
+}

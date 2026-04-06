@@ -1,0 +1,239 @@
+
+/* Equal Grid System */
+.mock-grid-equal {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 3rem;
+  margin-bottom: 2rem;
+}
+
+.equal-card-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.mock-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.centered-header {
+  justify-content: center;
+  margin-bottom: 3rem;
+}
+
+.section-icon {
+  font-size: var(--fs-h1);
+  color: #3b6ff5;
+}
+
+.page-header-centered h2 {
+  color: rgb(21, 106, 242); /* or any color */
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.page-header-centered p {
+  color: #555; /* or any color */
+}
+
+.mock-header h3 {
+  font-size: var(--fs-h2);
+  color: #3b6ff5;
+  font-weight: 800;
+}
+
+/* Premium Card (Equal Heights via Flex) */
+.card-equal-height {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  flex: 1;
+}
+
+.premium-card {
+  background: #ffffff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  border: 1px solid #f1f5f9;
+  transition: var(--transition);
+}
+
+.premium-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-hover);
+}
+
+.card-img-wrapper {
+  height: 220px;
+  overflow: hidden;
+}
+
+.card-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s ease;
+}
+
+.premium-card:hover .card-img-wrapper img {
+  transform: scale(1.05);
+}
+
+.card-body {
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.card-body h4 {
+  font-size: var(--fs-h3);
+  margin-bottom: 1rem;
+  color: #3b6ff5;
+}
+
+.card-body p {
+  color: black;
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+.card-meta-flex {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  font-weight: 700;
+  font-size: var(--fs-text);
+  color: black;
+}
+
+.mt-auto {
+  margin-top: auto;
+}
+
+/* Lists inside cards */
+.prep-list-minimal {
+  list-style: none;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.prep-list-minimal li {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  color:black;
+  font-size: var(--fs-text);
+}
+
+.text-success {
+  color: #10b981;
+  font-size: 1.2rem;
+  margin-top: 0.15rem;
+}
+
+/* Buttons */
+.primary-action-btn {
+  width: 100%;
+  padding: 1rem;
+  background: var(--primary-color);
+  color: #ffffff;
+  border-radius: 12px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.primary-action-btn:hover {
+  background: var(--accent-blue);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+}
+
+.secondary-action-btn {
+  width: 100%;
+  padding: 1rem;
+  background: #f1f5f9;
+  color: var(--text-main);
+  border-radius: 12px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.secondary-action-btn:hover {
+  background: var(--primary-color);
+  color: #ffffff;
+}
+
+/* Spacer */
+.section-spacer {
+  border: none;
+  height: 1px;
+  background: #e2e8f0;
+  margin: 5rem 0;
+}
+
+/* Interview Types Grid */
+.interview-types-grid {
+  display: flex;
+  justify-content: center;
+  gap: 2.5rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.type-card {
+  flex: 1;
+  max-width: 400px;
+  background: #ffffff;
+  padding: 2.5rem 2rem;
+  border-radius: 20px;
+  text-align: center;
+  border: 1px solid #f1f5f9;
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+}
+
+.premium-hover:hover {
+  border-color: var(--accent-blue);
+  background: #fdfdfd;
+  transform: translateY(-8px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.06);
+}
+
+.type-icon-lg {
+  font-size: var(--fs-h1);
+  color: #3b6ff5;
+  margin-bottom: 1.5rem;
+}
+
+.title-blue {
+  color:#3b6ff5;
+  font-size: var(--fs-h3);
+  margin-bottom: 1rem;
+}
+
+.desc-black {
+  color: black;
+  font-size: var(--fs-text);
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+@media (max-width: 1000px) {
+  .mock-grid-equal { grid-template-columns: 1fr; gap: 4rem; }
+  .interview-types-grid { grid-template-columns: 1fr; }
+  .section-spacer { margin: 3rem 0; }
+}

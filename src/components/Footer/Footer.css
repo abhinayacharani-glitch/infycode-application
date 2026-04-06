@@ -1,0 +1,164 @@
+.footer {
+  background: #e1e9fa; /* Light Blue */
+  color: #000; /* Black text */
+  padding: 60px 80px 20px;
+}
+
+.footer-container {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 40px;
+}
+
+.footer-col {
+  flex: 1;
+  min-width: 200px;
+}
+
+.footer-col h3 {
+  margin-bottom: 20px;
+  font-size: var(--fs-h3);
+  color: #000; /* Black headlines */
+}
+
+.footer-col p {
+  margin-bottom: 10px;
+  color: #334155; /* Dark slate for paragraphs */
+}
+
+/* LOGO */
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  text-decoration: none;
+}
+
+.footer-logo img {
+  height: 44px;
+  display: block;
+  /* Darken slightly for white backgrounds if needed, but here we just ensure clarity */
+}
+
+.footer-logo .logo-text img {
+  height: 38px;
+  display: block;
+  position: relative;
+  top: 4px;
+}
+
+.brand p {
+  margin-bottom: 15px;
+  color: #334155;
+}
+
+.contact p {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  color: #000;
+}
+
+/* NEWSLETTER */
+
+.newsletter-box {
+  display: flex;
+  margin-top: 15px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.newsletter-box input {
+  padding: 10px;
+  border: none;
+  outline: none;
+  flex: 1;
+  background: white;
+  color: #000;
+}
+
+.newsletter-box button {
+  background: #3b6ff5;
+  border: none;
+  color: white;
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.newsletter-box button:hover {
+  background: #2563eb;
+}
+
+/* BOTTOM */
+
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 40px;
+  border-top: 1px solid #cbd5e1;
+  padding-top: 20px;
+  flex-wrap: wrap;
+  gap: 15px;
+  color: #475569;
+}
+
+.footer-bottom span {
+  color: #000;
+  font-weight: 600;
+}
+
+/* SOCIAL */
+
+.socials {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.icons {
+  display: flex;
+  gap: 10px;
+}
+
+/* CIRCLE ICONS */
+
+.social-circle {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #cbd5e1; /* Light grey/blue background for icons */
+  color: #1e293b;
+  font-size: var(--fs-h3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.social-circle:hover {
+  background: #3b6ff5;
+  color: white;
+  transform: translateY(-3px);
+}
+
+.footer-link {
+  display: block;
+  color: #1e293b;
+  text-decoration: none;
+  cursor: pointer;
+  margin: 5px 0;
+  transition: all 0.3s ease;
+}
+
+.footer-link:hover {
+  color: #3b6ff5;
+  padding-left: 5px;
+}

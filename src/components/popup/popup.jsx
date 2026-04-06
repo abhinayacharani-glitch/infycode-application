@@ -1,0 +1,40 @@
+import React from 'react';
+import './popup.css';
+import { IoClose } from 'react-icons/io5';
+import { HiOutlineBookOpen } from 'react-icons/hi';
+
+const Popup = ({ onClose }) => {
+  return (
+    <div className="popup-overlay" onClick={(e) => {
+      if (e.target.className === 'popup-overlay') onClose();
+    }}>
+      <div className="popup-container" onClick={(e) => e.stopPropagation()}>
+        <button className="popup-close-btn" onClick={onClose} aria-label="Close popup">
+          <IoClose />
+        </button>
+        
+        <div className="popup-icon-container">
+          <div className="popup-icon-circle">
+            <HiOutlineBookOpen className="popup-main-icon" />
+          </div>
+        </div>
+
+        <div className="popup-content">
+          <h2 className="popup-title">Java Masterclass</h2>
+          <p className="popup-date">Start Date: <span className="date-value">Oct 25, 2026</span></p>
+          
+          <div className="popup-badge">
+            <span className="fire-emoji">🔥</span>
+            <span className="badge-text">Few seats left!</span>
+          </div>
+
+          <button className="popup-action-btn" onClick={onClose}>
+            Reserve Now
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Popup;

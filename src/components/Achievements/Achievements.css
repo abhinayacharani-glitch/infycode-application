@@ -1,0 +1,143 @@
+.counter-up {
+  padding: 60px 2rem; /* 🔥 balanced top & bottom */
+  background-color: #fff;
+  margin-bottom: 80px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.counter-title {
+  margin-bottom: 50px;
+  text-align: center;
+}
+
+.counter-title h2 {
+  font-size: 36px;
+  position: relative;
+  display: inline-block;
+  color: var(--text-main);
+  font-weight: 700;
+}
+
+.counter-title h2::before,
+.counter-title h2::after {
+  content: '';
+  width: 40px;
+  position: absolute;
+  height: 1px;
+  background: #3b82f6;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.counter-title h2::before {
+  left: -60px;
+}
+
+.counter-title h2::after {
+  right: -60px;
+}
+
+.counter-title h2 span {
+  color: #3b82f6;
+}
+
+/* GRID */
+.row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 30px;
+  padding: 2rem;
+  box-sizing: border-box;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.col-xl-3 {
+  width: 100%;
+}
+
+/* CARD */
+.counter-item {
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px; /* smoother corners */
+  text-align: center;
+  padding: 30px 20px 20px;
+  position: relative;
+  background: transparent;
+  transition: all 0.3s ease;
+  margin-top: 25px; /* Give room for the overlapping icon */
+  margin-left: 10px; /* Give room for left edge overlap */
+}
+
+/* 🔥 HOVER EFFECT */
+.counter-item:hover {
+  transform: translateY(-5px); /* lift effect */
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  border-color: #3b82f6;
+}
+
+/* ICON */
+.counter-item .cicon {
+  width: 50px;
+  height: 50px;
+  background-color: #e0f2fe;
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 5px #ffffff; /* Visual gap to break the border */
+}
+
+.counter-item .cicon svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* TEXT */
+.counter-item h4 {
+  font-size: 28px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 5px;
+}
+
+.counter-item p {
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 400;
+  margin: 0;
+}
+
+
+/* 📱 TABLET */
+@media (max-width: 991px) {
+  .row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .counter-title h2::before,
+  .counter-title h2::after {
+    display: none;
+  }
+}
+
+/* 📱 MOBILE */
+@media (max-width: 576px) {
+  .row {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+  }
+
+  .counter-title h2 {
+    font-size: 28px;
+  }
+
+  .counter-item {
+    padding: 35px 20px 20px;
+  }
+}

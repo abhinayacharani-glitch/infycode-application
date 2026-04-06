@@ -1,0 +1,116 @@
+.nav-panel {
+  background: var(--white);
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.nav-title {
+  color: var(--primary-dark);
+  font-size: 1.15rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+.nav-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+  gap: 10px !important;
+  margin-bottom: 1.5rem;
+}
+
+.nav-item {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px !important;
+  border-radius: 8px !important;
+  border: 2px solid transparent;
+  width: 40px !important;
+  height: 40px !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nav-item:hover:not(.nav-item-current) {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+}
+
+.nav-item-unanswered {
+  background-color: #f97316; /* Orange */
+  border-color: #ea580c;
+  color: var(--white);
+}
+
+.nav-item-unanswered:hover {
+  background-color: #ea580c;
+}
+
+.nav-item-answered {
+  background-color: #16a34a; /* Green */
+  border-color: #15803d;
+  color: var(--white);
+}
+
+.nav-item-answered:hover {
+  opacity: 0.9;
+}
+
+.nav-item-current {
+  background-color: var(--primary-color);
+  border-color: var(--primary-dark);
+  color: var(--white);
+  box-shadow: 0 0 0 2px var(--primary-light);
+}
+
+.nav-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: var(--bg-color);
+  border-radius: 8px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.legend-box {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.nav-footer {
+  margin-top: auto;
+  display: flex;
+}
+
+.btn-final-submit {
+  width: 100%;
+  padding: 0.5rem; /* Reduced size */
+  background-color: #ef4444; /* Red */
+  color: var(--white);
+  font-size: 0.95rem; /* Reduced text size */
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-final-submit:hover {
+  background-color: #dc2626; /* darker red */
+}

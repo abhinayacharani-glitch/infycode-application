@@ -1,0 +1,36 @@
+@import url('./login.css');
+
+/* Signup-only tweaks: tighter to fit 5 fields (name, email, phone, password, confirm) */
+.signup-form-section {
+  padding: 32px 52px;
+}
+.signup-form-section .auth-header {
+  margin-bottom: 18px;
+}
+.signup-form-section .auth-header h1 {
+  font-size: 25px;
+}
+.signup-form {
+  gap: 13px;
+}
+.signup-form .form-group {
+  gap: 5px;
+}
+.signup-form .form-group label {
+  font-size: 12.5px;
+}
+.signup-form .input-wrapper input {
+  padding: 11px 14px 11px 44px;
+  font-size: 14px;
+}
+.signup-form .submit-btn {
+  height: 46px;
+  margin-top: 2px;
+}
+.signup-form-section .auth-footer {
+  margin-top: 18px;
+}
+
+@media (max-width: 900px) {
+  .signup-form-section { padding: 28px 20px; }
+}

@@ -1,0 +1,200 @@
+/* =========================================
+   TrainingsPage.css
+   Styles for the Professional Training Solutions page
+   ========================================= */
+
+.trainings-page {
+  width: 100%;
+  font-family: 'Urbanist', sans-serif;
+  background: var(--bg, #f4f6f9);
+}
+
+/* Hero Section */
+.trainings-hero {
+  position: relative;
+  width: 100%;
+  height: 70vh;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  padding-top: 100px;
+}
+
+.trainings-hero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(rgba(10, 25, 47, 0.85), rgba(37, 99, 235, 0.4));
+  z-index: 1;
+}
+
+.trainings-hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  padding: 0 20px;
+}
+
+.trainings-hero h1 {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: white;
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+
+.trainings-hero p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  margin-bottom: 30px;
+}
+
+/* Content Section */
+.trainings-section {
+  padding: 80px 5%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Split Layout */
+.trainings-split {
+  display: flex;
+  align-items: center;
+  gap: 60px;
+  margin-bottom: 100px;
+}
+
+.trainings-split.reverse {
+  flex-direction: row-reverse;
+}
+
+.trainings-img-wrap {
+  flex: 1;
+}
+
+.trainings-img-wrap img {
+  width: 100%;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.trainings-text {
+  flex: 1;
+}
+
+.trainings-text h2 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--text-dark, #1e293b);
+  margin-bottom: 20px;
+}
+
+.trainings-text p {
+  color: var(--text-muted, #64748b);
+  font-size: 1.1rem;
+  line-height: 1.7;
+  margin-bottom: 30px;
+}
+
+/* Feature List */
+.trainings-feature-list {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 30px;
+}
+
+.trainings-feature-list li {
+  margin-bottom: 15px;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--text-dark, #1e293b);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.trainings-feature-list li::before {
+  content: '✓';
+  background: var(--green, #22c55e);
+  color: white;
+  min-width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+/* CTA Banner */
+.trainings-cta-banner {
+  background: linear-gradient(135deg, var(--blue-600, #2563eb), var(--blue-800, #1e40af));
+  border-radius: 24px;
+  padding: 60px 40px;
+  text-align: center;
+  color: white;
+  margin: 60px auto;
+  max-width: 1200px;
+  box-shadow: 0 20px 40px rgba(37,99,235,0.3);
+}
+
+.trainings-cta-banner h2 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: white;
+  margin-bottom: 20px;
+}
+
+.trainings-cta-banner p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  margin-bottom: 10px;
+}
+
+.trainings-cta-btn {
+  background: white;
+  color: var(--blue-600, #2563eb);
+  padding: 16px 40px;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: transform 0.3s;
+}
+
+.trainings-cta-btn:hover {
+  transform: translateY(-3px);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .trainings-split,
+  .trainings-split.reverse {
+    flex-direction: column;
+    gap: 40px;
+    margin-bottom: 60px;
+  }
+}
+
+@media (max-width: 768px) {
+  .trainings-hero h1 {
+    font-size: 2.2rem;
+  }
+  .trainings-section {
+    padding: 50px 5%;
+  }
+  .trainings-cta-banner {
+    padding: 40px 20px;
+  }
+  .trainings-cta-banner h2 {
+    font-size: 1.8rem;
+  }
+}

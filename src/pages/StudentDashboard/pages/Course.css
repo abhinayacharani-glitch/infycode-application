@@ -1,0 +1,284 @@
+/* ── Premium Dashboard Viewport ── */
+.dc-main-viewport {
+  padding: 30px;
+  background: #f8fbff;
+  min-height: 100vh;
+  font-family: 'Urbanist', sans-serif;
+  color: #1e293b;
+}
+
+/* ── Refined Hero Section ── */
+.dc-hero-banner {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border-radius: 24px;
+  padding: 50px 60px;
+  margin-bottom: 50px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.1);
+}
+
+.dc-hero-banner::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.1) 0%, transparent 70%);
+  z-index: 1;
+}
+
+.dc-hero-text {
+  position: relative;
+  z-index: 2;
+  max-width: 550px;
+}
+
+.dc-main-heading {
+  font-size: 42px !important;
+  font-weight: 900;
+  color: #ffffff !important;
+  margin-bottom: 12px;
+  letter-spacing: -0.5px;
+}
+
+.dc-main-desc {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+}
+
+/* ── Content Body Container ── */
+.dc-content-body {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ── Professional Section Layout ── */
+.dc-section-premium {
+  margin-bottom: 60px;
+}
+
+.dc-sec-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.dc-sec-intro {
+  position: relative;
+}
+
+.dc-sec-title-premium {
+  font-size: 26px !important;
+  font-weight: 800;
+  color: #0f172a !important;
+  margin: 0 0 10px 0;
+}
+
+.dc-sec-underline {
+  height: 4px;
+  width: 60px;
+  background: #2563eb;
+  border-radius: 2px;
+}
+
+.dc-btn-ghost-premium {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #2563eb;
+  background: #eff6ff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dc-btn-ghost-premium:hover {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+/* ── Premium Grid System ── */
+.dc-grid-premium {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+
+/* ── High-End Course Card ── */
+.dc-card-premium {
+  background: #ffffff;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  border: 1px solid #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.dc-card-img-wrap {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.dc-card-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dc-glass-tag {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  padding: 6px 14px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #0f172a;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* ── Card Information Area ── */
+.dc-card-info {
+  padding: 24px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.dc-badge-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.dc-premium-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 5px 12px;
+  border-radius: 8px;
+  letter-spacing: 0.5px;
+}
+
+.dc-level-indicator {
+  font-size: 12px;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.dc-card-head {
+  font-size: 19px !important;
+  font-weight: 800;
+  line-height: 1.4;
+  color: #0f172a !important;
+  margin: 0 0 20px 0;
+  min-height: 54px;
+}
+
+/* ── Meta Metadata ── */
+.dc-meta-row {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 20px;
+  border-bottom: 1px dashed #e2e8f0;
+  margin-bottom: 20px;
+}
+
+.dc-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.dc-icon-blue { color: #3b82f6; }
+.dc-icon-gold { color: #f59e0b; }
+
+/* ── Action Footer ── */
+.dc-card-actions {
+  margin-top: auto;
+}
+
+.dc-btn-enrol-premium {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 800;
+  font-family: 'Urbanist', sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dc-card-premium:hover .dc-btn-enrol-premium {
+  background: #0f172a;
+  color: #ffffff;
+  border-color: #0f172a;
+}
+
+/* ── Modern Responsive Breakpoints ── */
+@media (max-width: 1200px) {
+  .dc-grid-premium {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .dc-hero-banner {
+    padding: 40px;
+  }
+  .dc-main-heading {
+    font-size: 32px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .dc-main-viewport {
+    padding: 20px;
+  }
+  .dc-grid-premium {
+    grid-template-columns: 1fr;
+  }
+  .dc-hero-banner {
+    flex-direction: column;
+    text-align: center;
+    padding: 30px 20px;
+  }
+  .dc-sec-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+}
