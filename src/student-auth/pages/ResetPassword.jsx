@@ -67,7 +67,7 @@ const ResetPassword = () => {
       await studentResetPassword(resetToken, formData.password, formData.confirmPassword);
       setSuccess(true);
       setTimeout(() =>
-        navigate('/student/login', { state: { message: 'Password reset successful. Please sign in.' } }),
+        navigate('/student/login', { state: { fromReset: true } }),
         2500
       );
 
