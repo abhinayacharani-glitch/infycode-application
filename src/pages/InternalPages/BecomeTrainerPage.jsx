@@ -21,35 +21,35 @@ const BecomeTrainerPage = () => {
         <div className="trainer-experts-grid">
           {[
             {
-              name: "Dr. Arshdeep Singh",
+              name: "Dr. Suresh",
               role: "Senior Java Architect",
               exp: "12+ Years Experience",
               bio: "Expert in Spring Boot, Microservices, and Enterprise Architecture with a track record of training 2000+ developers.",
               img: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=400"
             },
             {
-              name: "Sarah Chen",
+              name: "Manasa",
               role: "Python & AI Developer",
               exp: "8+ Years Experience",
               bio: "Specialist in Data Science, Machine Learning, and Automation. Passionate about making complex algorithms accessible.",
               img: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=400"
             },
             {
-              name: "Michael Rodriguez",
+              name: "Michael ",
               role: "Cybersecurity Lead",
               exp: "10+ Years Experience",
               bio: "Certified Ethical Hacker (CEH) with extensive experience in network security, digital forensics, and cloud defense.",
               img: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=400"
             },
             {
-              name: "Priyanka Sharma",
+              name: "Priyanka ",
               role: "Full Stack Specialist",
               exp: "7+ Years Experience",
               bio: "MERN Stack expert focused on high-performance web applications and modern frontend architectures like React and Next.js.",
               img: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=400"
             },
             {
-              name: "David Werner",
+              name: "David ",
               role: "UI/UX Design Master",
               exp: "9+ Years Experience",
               bio: "Crafting intuitive digital experiences. David brings industrial design thinking to the modern web and mobile apps.",
@@ -60,17 +60,21 @@ const BecomeTrainerPage = () => {
               role: "Cloud Ops Engineer",
               exp: "6+ Years Experience",
               bio: "AWS Certified Solution Architect specialized in DevOps, scaling infrastructure, and CI/CD pipeline automation.",
-              img: "https://images.unsplash.com/photo-1598550874175-4d0fe4a2c942?auto=format&fit=crop&q=80&w=400"
+              img: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&q=80&w=400"
             }
-          ].map((expert, index) => (
+          ].slice(0, 6).map((expert, index) => (
             <div key={index} className="trainer-expert-card">
               <div className="expert-image-wrapper">
                 <img src={expert.img} alt={expert.name} className="expert-image" />
               </div>
-              <h3 className="expert-name">{expert.name}</h3>
-              <p className="expert-role">{expert.role}</p>
-              <span className="expert-exp">{expert.exp}</span>
-              <p className="expert-bio">{expert.bio}</p>
+              <div className="expert-content">
+                <h3 className="expert-name">{expert.name}</h3>
+                <p className="expert-role">{expert.role}</p>
+                <div className="expert-footer">
+                  <span className="expert-exp">{expert.exp}</span>
+                  <p className="expert-bio">{expert.bio}</p>
+                </div>
+              </div>
             </div>
           ))}
         </div>
