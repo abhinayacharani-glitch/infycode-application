@@ -3,28 +3,67 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { COURSE_MAP } from './data/extraCourses';
 import './Courseoverview.css';
 
-// ─── Helpers ───
-const durationToDays = (d) => {
-  if (d === '10 Days') return 10;
-  if (d === '1 Month') return 30;
-  if (d === '3 Months') return 90;
-  if (d === '6 Months') return 180;
-  return 30;
+const daysOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+const parse12HourToMinutes = (time12) => {
+  if (!time12) return 0;
+  const [time, suffix] = time12.split(' ');
+  let [hour, minute] = time.split(':').map(Number);
+  if (suffix === 'PM' && hour !== 12) hour += 12;
+  if (suffix === 'AM' && hour === 12) hour = 0;
+  return (hour * 60) + minute;
 };
 
-const getSessionStatus = (config) => {
+const formatCountdown = (ms) => {
+  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  return `${String(hours).padStart(2, '0')} : ${String(minutes).padStart(2, '0')} : ${String(seconds).padStart(2, '0')}`;
+};
+
+const getDayStatus = (dayName, dayData, now) => {
+  if (dayData?.status === 'cancelled') {
+    return { state: 'cancelled', text: `Class Cancelled: ${dayData.reason || 'No reason provided'}` };
+  }
+  if (dayData?.status !== 'scheduled') return { state: 'completed', text: 'Class is Over' };
+
+  const currentDayIndex = (now.getDay() + 6) % 7;
+  const itemDayIndex = daysOrder.indexOf(dayName);
+  const startMinutes = parse12HourToMinutes(dayData.startTime);
+  const endMinutes = parse12HourToMinutes(dayData.endTime);
+  const nowMinutes = (now.getHours() * 60) + now.getMinutes();
+
+  if (itemDayIndex === currentDayIndex) {
+    if (nowMinutes >= startMinutes && nowMinutes <= endMinutes) {
+      return { state: 'live', text: 'Class is Live Now' };
+    }
+    if (nowMinutes < startMinutes) {
+      const target = new Date(now);
+      target.setHours(Math.floor(startMinutes / 60), startMinutes % 60, 0, 0);
+      return { state: 'upcoming', text: `Class starts in: ${formatCountdown(target.getTime() - now.getTime())}` };
+    }
+    return { state: 'completed', text: 'Class is Over' };
+  }
+
+  if (itemDayIndex > currentDayIndex) {
+    const target = new Date(now);
+    target.setDate(now.getDate() + (itemDayIndex - currentDayIndex));
+    target.setHours(Math.floor(startMinutes / 60), startMinutes % 60, 0, 0);
+    return { state: 'upcoming', text: `Class starts in: ${formatCountdown(target.getTime() - now.getTime())}` };
+  }
+
+  return { state: 'completed', text: 'Class is Over' };
+};
+
+const getOverallStatus = (config, now) => {
   if (!config || !config.sessionLink) return 'no-link';
-  const now = new Date();
-  // Check duration expiry
-  const saved = new Date(config.lastSaved);
-  const expiryDays = durationToDays(config.duration);
-  const expiryDate = new Date(saved.getTime() + expiryDays * 864e5);
-  if (now > expiryDate) return 'expired';
-  // Check time window (compare HH:MM only)
-  const pad = (n) => String(n).padStart(2, '0');
-  const currentHHMM = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
-  if (currentHHMM >= config.startTime && currentHHMM <= config.endTime) return 'live';
-  if (currentHHMM < config.startTime) return 'upcoming';
+  const liveSessionRaw = localStorage.getItem('liveSessionData');
+  const dayWiseData = liveSessionRaw ? JSON.parse(liveSessionRaw) : {};
+  const todayName = daysOrder[(now.getDay() + 6) % 7];
+  const todayStatus = getDayStatus(todayName, dayWiseData[todayName], now);
+  if (todayStatus.state === 'live') return 'live';
+  if (todayStatus.state === 'upcoming') return 'upcoming';
   return 'ended';
 };
 
@@ -36,19 +75,63 @@ const CourseOverview = () => {
 
   const [sessionStatus, setSessionStatus] = useState('no-link');
   const [sessionConfig, setSessionConfig] = useState(null);
+  const [dayStatuses, setDayStatuses] = useState([]);
+  const [sessionData, setSessionData] = useState({});
+
+  useEffect(() => {
+    const getData = () => {
+      const raw = localStorage.getItem('liveSessionData');
+      const data = raw ? JSON.parse(raw) : {};
+      setSessionData(data || {});
+    };
+
+    getData();
+    window.addEventListener('storage', getData);
+    return () => {
+      window.removeEventListener('storage', getData);
+    };
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const raw = localStorage.getItem('liveSessionData');
+      const data = raw ? JSON.parse(raw) : {};
+      setSessionData(data || {});
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const check = () => {
       try {
         const raw = localStorage.getItem('live_session_config');
         const config = raw ? JSON.parse(raw) : null;
+        const liveSessionRaw = localStorage.getItem('liveSessionData');
+        const liveSessionData = liveSessionRaw ? JSON.parse(liveSessionRaw) : {};
+        const now = new Date();
+        const todayIndex = (now.getDay() + 6) % 7;
+        const todayName = daysOrder[todayIndex];
+        const tomorrowName = daysOrder[(todayIndex + 1) % 7];
+        const computedStatuses = [
+          { day: todayName, ...getDayStatus(todayName, liveSessionData[todayName], now) },
+          { day: tomorrowName, ...getDayStatus(tomorrowName, liveSessionData[tomorrowName], now) },
+        ];
         setSessionConfig(config);
-        setSessionStatus(getSessionStatus(config));
-      } catch { setSessionStatus('no-link'); }
+        setSessionStatus(getOverallStatus(config, now));
+        setDayStatuses(computedStatuses);
+      } catch {
+        setSessionStatus('no-link');
+      }
     };
+
     check();
-    const timer = setInterval(check, 30000); // re-check every 30s
-    return () => clearInterval(timer);
+    const timer = setInterval(check, 1000);
+    window.addEventListener('storage', check);
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener('storage', check);
+    };
   }, []);
 
   if (!course) {
@@ -99,6 +182,16 @@ const CourseOverview = () => {
             <span>{statusLabel.icon}</span>
             <span>{statusLabel.text}</span>
           </div>
+          {dayStatuses.length > 0 && (
+            <div className="co-day-status-list">
+              {dayStatuses.map((item) => (
+                <div key={item.day} className={`co-day-status-row ${item.state}`}>
+                  <span className="co-day-name">{item.day}</span>
+                  <span className="co-day-value">{item.text}</span>
+                </div>
+              ))}
+            </div>
+          )}
           {/* Join Button */}
           <button
             className={`co-join-btn ${sessionStatus !== 'live' ? 'disabled' : ''}`}
