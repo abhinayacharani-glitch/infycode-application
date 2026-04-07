@@ -1,11 +1,21 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";   // ✅ NEW
+import React, { useState, useEffect } from "react";  // 🔥 added useEffect
+import { useNavigate } from "react-router-dom";
+import AOS from "aos";                                // 🔥 NEW
+import "aos/dist/aos.css";                            // 🔥 NEW
 import "./FAQ.css";
 
 function FAQ() {
 
   const [openIndex, setOpenIndex] = useState(0);
-  const navigate = useNavigate();   // ✅ NEW
+  const navigate = useNavigate();
+
+  // 🔥 INIT AOS
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true
+    });
+  }, []);
 
   const toggleFAQ = (index) => {
     setOpenIndex(openIndex === index ? null : index);
@@ -40,22 +50,33 @@ function FAQ() {
 
       <div className="faq-container">
 
-        <div className="faq-image">
+        {/* 🔥 IMAGE ANIMATION */}
+        <div className="faq-image" data-aos="fade-up">
           <img
             src="https://reactheme.com/products/html/echooling/assets/images/Home7/qna/1.png"
             alt="student"
           />
         </div>
 
-        <div className="faq-questions">
+        {/* 🔥 QUESTIONS ANIMATION */}
+        <div className="faq-questions" data-aos="fade-up">
 
-          <p className="faq-small-title">Learn more about INFYCODE</p>
+          <p className="faq-small-title" data-aos="fade-up">
+            Learn more about INFYCODE
+          </p>
 
-          <h2>Frequently asked questions</h2>
+          <h2 data-aos="fade-up" data-aos-delay="100">
+            Frequently asked questions
+          </h2>
 
           {faqData.map((item, index) => (
 
-            <div key={index} className="faq-item">
+            <div 
+              key={index} 
+              className="faq-item"
+              data-aos="fade-up"
+              data-aos-delay={index * 100}   // 🔥 stagger effect
+            >
 
               <div
                 className="faq-question"
@@ -82,10 +103,12 @@ function FAQ() {
 
           ))}
 
-          {/* ✅ UPDATED BUTTON */}
+          {/* 🔥 BUTTON ANIMATION */}
           <button 
             className="faq-btn"
             onClick={() => navigate("/courses")}
+            data-aos="zoom-in"
+            data-aos-delay="300"
           >
             View Courses
           </button>

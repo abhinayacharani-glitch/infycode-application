@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
+import AOS from "aos";
+import "aos/dist/aos.css";
 import './Achievements.css';
 
 function Achievements() {
@@ -8,6 +10,15 @@ function Achievements() {
   const intervalRef = useRef(null);
 
   const targetValues = [120, 17, 70, 50];
+
+  // ✅ AOS INIT
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+      easing: "ease-in-out",
+    });
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -33,7 +44,6 @@ function Achievements() {
   }, []);
 
   const startCounting = () => {
-    // Clear previous interval if any
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
@@ -66,14 +76,15 @@ function Achievements() {
     <div className="achievements-wrapper" ref={sectionRef}>
       <section className="counter-up section-padding">
         <div className="container">
-          <div className="counter-title text-center">
+
+          <div className="counter-title text-center" data-aos="fade-up">
             <h2>Trusted by <span>Companies</span> Achievements</h2>
           </div>
 
           <div className="row">
 
             {/* Item 1 */}
-            <div className="col-xl-3 col-md-6 col-12">
+            <div className="col-xl-3 col-md-6 col-12" data-aos="fade-up" data-aos-delay="100">
               <div className="counter-item">
                 <div className="cicon">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -91,7 +102,7 @@ function Achievements() {
             </div>
 
             {/* Item 2 */}
-            <div className="col-xl-3 col-md-6 col-12">
+            <div className="col-xl-3 col-md-6 col-12" data-aos="fade-up" data-aos-delay="200">
               <div className="counter-item">
                 <div className="cicon">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -107,7 +118,7 @@ function Achievements() {
             </div>
 
             {/* Item 3 */}
-            <div className="col-xl-3 col-md-6 col-12">
+            <div className="col-xl-3 col-md-6 col-12" data-aos="fade-up" data-aos-delay="300">
               <div className="counter-item">
                 <div className="cicon">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -124,7 +135,7 @@ function Achievements() {
             </div>
 
             {/* Item 4 */}
-            <div className="col-xl-3 col-md-6 col-12">
+            <div className="col-xl-3 col-md-6 col-12" data-aos="fade-up" data-aos-delay="400">
               <div className="counter-item">
                 <div className="cicon">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
