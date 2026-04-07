@@ -124,108 +124,148 @@
   line-height: 1.6;
 }
 
-/* Our Experts Section Polish */
+/* Premium Uniform Experts Grid */
 .trainer-experts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 32px;
-  margin-bottom: 80px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  margin-bottom: 100px;
+  max-width: 1250px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 40px 20px;
 }
 
+@media (max-width: 1024px) {
+  .trainer-experts-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+  }
+}
+
+@media (max-width: 768px) {
+  .trainer-experts-grid {
+    grid-template-columns: 1fr;
+    max-width: 400px;
+  }
+}
+
+/* Uniform Floating Expert Card */
 .trainer-expert-card {
-  background: white;
-  padding: 45px 30px;
-  border-radius: 28px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.03), 0 20px 80px rgba(0,0,0,0.02);
-  text-align: center;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  border: 1px solid #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   position: relative;
-  overflow: hidden;
+  height: 100%;
 }
 
 .trainer-expert-card:hover {
-  transform: translateY(-12px) scale(1.01);
-  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.1);
-  border-color: #dbeafe;
+  transform: translateY(-8px);
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.trainer-expert-card::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, transparent, var(--blue-600), transparent);
-  transform: scaleX(0);
-  transition: transform 0.4s ease;
-}
-
-.trainer-expert-card:hover::after {
-  transform: scaleX(1);
-}
-
+/* Portrait at Top (Uniform Size) */
 .expert-image-wrapper {
-  width: 110px;
-  height: 110px;
-  margin: 0 auto 25px;
+  width: 130px;
+  height: 130px;
   border-radius: 50%;
   overflow: hidden;
-  border: 4px solid #eff6ff;
-  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.12);
-  transition: transform 0.4s ease;
+  border: 4px solid #ffffff;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+  transition: all 0.4s ease;
+  flex-shrink: 0;
+  position: relative;
 }
 
 .trainer-expert-card:hover .expert-image-wrapper {
+  box-shadow: 0 15px 30px rgba(37, 99, 235, 0.2);
   transform: scale(1.05);
-  border-color: #dbeafe;
+  border-color: #2563eb;
 }
 
 .expert-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.5s ease;
+  filter: grayscale(100%);
+  transition: transform 0.5s ease, filter 0.5s ease;
 }
 
 .trainer-expert-card:hover .expert-image {
-  transform: scale(1.15);
+  transform: scale(1.1);
+  filter: grayscale(0%);
+}
+
+/* Dark Floating Content Card (Uniform Height) */
+.expert-content {
+  background: #0f172a;
+  border-radius: 24px;
+  padding: 85px 25px 30px;
+  margin-top: -65px;
+  width: 100%;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  z-index: 1;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  transition: all 0.4s ease;
+}
+
+.trainer-expert-card:hover .expert-content {
+  box-shadow: 0 25px 55px rgba(0, 0, 0, 0.4);
+  border-color: rgba(37, 99, 235, 0.25);
+  background: #111827;
 }
 
 .expert-name {
-  font-size: 1.65rem;
+  font-size: 1.3rem;
   font-weight: 800;
-  color: #0f172a;
+  color:white;
   margin-bottom: 6px;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.3px;
 }
 
 .expert-role {
-  font-size: 0.9rem;
+  font-size: 0.75rem;
   font-weight: 700;
-  color: #2563eb;
+  color: #3b82f6; 
   margin-bottom: 12px;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.2px;
+}
+
+.expert-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  margin-top: auto;
 }
 
 .expert-exp {
   display: inline-block;
-  font-size: 0.85rem;
+  font-size: 0.7rem;
   font-weight: 800;
-  color: #2563eb;
-  background: #eff6ff;
-  padding: 6px 16px;
+  color: #60a5fa;
+  background: rgba(37, 99, 235, 0.12);
+  padding: 4px 14px;
   border-radius: 50px;
-  margin-bottom: 20px;
-  border: 1px solid #dbeafe;
+  border: 1px solid rgba(96, 165, 250, 0.25);
 }
 
 .expert-bio {
-  font-size: 1rem;
-  line-height: 1.7;
-  color: #475569;
-  max-width: 90%;
-  margin: 0 auto;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: white;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .trainer-form-card {

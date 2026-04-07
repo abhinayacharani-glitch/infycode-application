@@ -1,5 +1,7 @@
-import React from "react";
-import { FiUsers, FiPlayCircle,FiCheckCircle, FiBriefcase } from "react-icons/fi";
+import React, { useEffect } from "react";
+import AOS from "aos";
+import "aos/dist/aos.css";
+import { FiUsers, FiPlayCircle, FiCheckCircle, FiBriefcase } from "react-icons/fi";
 import "./Features.css";
 
 // ✅ Rename array
@@ -31,14 +33,35 @@ const featuresData = [
 ];
 
 export default function Features() {
+
+  // ✅ AOS INIT
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+      easing: "ease-in-out",
+    });
+  }, []);
+
   return (
     <section className="features">
-      <p className="subtitle">InfyCode Features</p>
-      <h2 className="title">Academic to Professional Journey</h2>
+
+      <p className="subtitle" data-aos="fade-up">
+        InfyCode Features
+      </p>
+
+      <h2 className="title" data-aos="fade-up" data-aos-delay="100">
+        Academic to Professional Journey
+      </h2>
 
       <div className="features-grid">
-        {featuresData.map((item) => (
-          <div className="feature-card" key={item.id}>
+        {featuresData.map((item, index) => (
+          <div
+            className="feature-card"
+            key={item.id}
+            data-aos="zoom-in"
+            data-aos-delay={index * 150}
+          >
             <div className="badge">{item.id}</div>
 
             <div className="icon-circle">
@@ -50,6 +73,7 @@ export default function Features() {
           </div>
         ))}
       </div>
+
     </section>
   );
 }
