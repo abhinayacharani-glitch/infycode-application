@@ -34,8 +34,6 @@ const Topbar = () => {
       </div>
       <div className="topbar-actions">
         <div className="date-chip">{liveDate}</div>
-        <div className="icon-btn" title="Notifications">📨<span className="notif-dot"></span></div>
-        <div className="icon-btn" title="Settings">🔧</div>
       </div>
     </div>
   );

@@ -1,91 +1,142 @@
-import React, { useState } from 'react';
-import './LiveSession.css';
+import React, { useState } from "react";
+import "./LiveSession.css";
 
-const VideoIllustration = () => (
-  <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="20" y="40" width="160" height="120" rx="20" fill="#eff6ff" />
-    <rect x="40" y="60" width="40" height="30" rx="8" fill="#3b82f6" fillOpacity="0.2" />
-    <rect x="90" y="60" width="70" height="10" rx="5" fill="#3b82f6" fillOpacity="0.2" />
-    <rect x="90" y="80" width="50" height="10" rx="5" fill="#3b82f6" fillOpacity="0.1" />
-    <circle cx="100" cy="120" r="25" fill="#3b82f6" fillOpacity="0.1" />
-    <path d="M95 110L115 120L95 130V110Z" fill="#3b82f6" />
-    <rect x="40" y="100" width="40" height="40" rx="10" fill="#3b82f6" fillOpacity="0.05" stroke="#3b82f6" strokeWidth="2" strokeDasharray="4 4" />
-  </svg>
-);
+const timeOptions = [
+  "08:00 AM", "09:00 AM", "10:00 AM",
+  "11:00 AM", "12:00 PM", "01:00 PM",
+  "02:00 PM", "03:00 PM", "04:00 PM"
+];
+
+const days = [
+  "Monday", "Tuesday", "Wednesday",
+  "Thursday", "Friday", "Saturday", "Sunday"
+];
 
 const LiveSession = () => {
-  const [sessionLink, setSessionLink] = useState('');
-  const [startTime, setStartTime] = useState('');
-  const [endTime, setEndTime] = useState('');
+  const [meetingLink, setMeetingLink] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
 
-  const handleSave = () => {
-    const data = {
-      sessionLink,
-      startTime,
-      endTime
-    };
-    console.log('Session data saved:', data);
-    alert('Live session details saved successfully!');
+  const [schedule, setSchedule] = useState(
+    days.map(day => ({
+      day,
+      enabled: true,
+      start: "09:00 AM",
+      end: "10:00 AM"
+    }))
+  );
+
+  const handleChange = (index, field, value) => {
+    const updated = [...schedule];
+    updated[index][field] = value;
+    setSchedule(updated);
   };
+
+  const isDisabled = !meetingLink;
 
   return (
     <div className="live-session-container">
-      {/* 1. Page Header */}
-      <div className="live-session-header text-center">
+
+      {/* 🔥 CENTERED HEADER */}
+      <div className="page-header">
         <h1>Live Session Manager</h1>
-        <p>Configure and manage your virtual classroom sessions</p>
+        <p>Set up and control your weekly live class schedule efficiently</p>
       </div>
 
-      {/* 2. Centered Card */}
       <div className="live-session-card">
-        {/* Card Illustration */}
-        <div className="card-illustration">
-          <VideoIllustration />
+
+        {/* Image */}
+        <div className="image-container">
+          <img
+            src="https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b"
+            alt="Live Session"
+            className="live-session-image"
+          />
         </div>
 
-        {/* Input Fields */}
-        <div className="form-group mb-4">
-          <label htmlFor="meeting-link">Meeting Link</label>
-          <div className="input-with-icon">
+        {/* Meeting Link */}
+        <div className="form-group">
+          <label>Meeting Link</label>
+          <div className="input-wrapper">
+            <span className="icon">🔗</span>
             <input
-              id="meeting-link"
-              type="url"
-              placeholder="Paste Google Meet / Teams Link"
-              value={sessionLink}
-              onChange={(e) => setSessionLink(e.target.value)}
-            />
-            {/* Using a simple icon symbol for cleanliness */}
-            <i className="link-icon">🔗</i>
-          </div>
-        </div>
-
-        {/* Time Fields Grid */}
-        <div className="time-grid mb-6">
-          <div className="time-box">
-            <label htmlFor="start-time">Start Time</label>
-            <input
-              id="start-time"
-              type="time"
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
-            />
-          </div>
-          <div className="time-box">
-            <label htmlFor="end-time">End Time</label>
-            <input
-              id="end-time"
-              type="time"
-              value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
+              type="text"
+              placeholder="Paste Google Meet / Teams link"
+              value={meetingLink}
+              onChange={(e) => setMeetingLink(e.target.value)}
             />
           </div>
         </div>
 
-        {/* Action Button */}
-        <button className="save-btn" onClick={handleSave}>
-          <span className="save-icon">💾</span>
+        {/* Time Buttons */}
+        <div className="top-time-row">
+          <button className="time-btn">Start: 9:00 AM</button>
+          <button className="time-btn">End: 10:00 AM</button>
+        </div>
+
+        {/* 🔥 NEW SIDE HEADING */}
+        <div className="section-heading">
+          Manage Weekly Availability
+        </div>
+
+        {/* Dropdown */}
+        <div
+          className="dropdown-header"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <span>Edit Session Timings</span>
+          <span>{isOpen ? "▲" : "▼"}</span>
+        </div>
+
+        {isOpen && (
+          <div className="schedule-container">
+            {schedule.map((item, index) => (
+              <div key={index} className="schedule-row">
+
+                <div className="day">
+                  <input
+                    type="checkbox"
+                    checked={item.enabled}
+                    onChange={(e) =>
+                      handleChange(index, "enabled", e.target.checked)
+                    }
+                  />
+                  <span>{item.day}</span>
+                </div>
+
+                <select
+                  disabled={!item.enabled}
+                  value={item.start}
+                  onChange={(e) =>
+                    handleChange(index, "start", e.target.value)
+                  }
+                >
+                  {timeOptions.map((time, i) => (
+                    <option key={i}>{time}</option>
+                  ))}
+                </select>
+
+                <select
+                  disabled={!item.enabled}
+                  value={item.end}
+                  onChange={(e) =>
+                    handleChange(index, "end", e.target.value)
+                  }
+                >
+                  {timeOptions.map((time, i) => (
+                    <option key={i}>{time}</option>
+                  ))}
+                </select>
+
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Save */}
+        <button className="save-btn" disabled={isDisabled}>
           Save Details
         </button>
+
       </div>
     </div>
   );

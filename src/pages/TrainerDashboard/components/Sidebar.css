@@ -1,0 +1,295 @@
+/* ================= ROOT ================= */
+
+:root {
+  --sd-bg: #ffffff;
+  /* ✅ white background */
+  --sd-hover: rgba(0, 0, 0, 0.05);
+  /* subtle hover */
+  --sd-active: rgba(0, 0, 0, 0.08);
+  /* active bg */
+  --sd-accent: #3b82f6;
+  /* keep blue */
+}
+
+/* ================= SIDEBAR ================= */
+
+.sd-sidebar {
+  width: 260px;
+  height: 100vh;
+  background: var(--sd-bg);
+
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 12px 0;
+  gap: 16px;
+
+  font-family: 'Urbanist', sans-serif;
+  z-index: 1000;
+
+  animation: sdFade 0.4s ease;
+}
+
+/* ================= BRAND ================= */
+
+.sd-brand {
+  padding: 12px 20px;
+}
+
+.sd-logo-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+  text-decoration: none;
+}
+
+.sd-logo-wrap:hover {
+  transform: scale(1.05);
+}
+
+.sd-logo {
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  object-fit: contain;
+}
+
+.sd-brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.sd-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #111827;
+  /* ✅ dark text */
+}
+
+.sd-subtitle {
+  font-size: 11px;
+  color: #6b7280;
+  /* ✅ grey */
+  font-weight: 600;
+}
+
+.sd-user-link {
+  text-decoration: none;
+}
+
+.sd-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  margin: 0 20px;
+  padding: 12px;
+
+  border-radius: 14px;
+  background: #f8fafc;
+  /* light card */
+
+  transition: 0.3s;
+}
+
+.sd-user:hover {
+  background: #f1f5f9;
+}
+
+.sd-avatar {
+  width: 42px;
+  height: 42px;
+
+  border-radius: 50%;
+  background: linear-gradient(135deg, #a78bfa, #8b5cf6);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.sd-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  /* ✅ dark */
+}
+
+.sd-role {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* ================= NAV ================= */
+
+.sd-nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+
+  padding: 0 14px;
+  gap: 8px;
+
+  overflow-y: auto;
+}
+
+.nav-section-header {
+  padding: 12px 14px 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #9ca3af;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* ================= NAV ITEM ================= */
+
+.sd-item {
+  text-decoration: none;
+}
+
+.sd-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 10px 14px;
+  border-radius: 10px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  color: #0B5ED7;
+  /* ✅ brand blue */
+
+  transition: all 0.25s ease;
+  position: relative;
+}
+
+/* ICON */
+
+.sd-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+/* TEXT */
+
+.sd-text {
+  white-space: nowrap;
+}
+
+/* BADGE */
+
+.nav-badge {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: var(--sd-accent);
+  color: #fff;
+}
+
+.nav-badge.green {
+  background: #10b981;
+}
+
+.nav-badge.amber {
+  background: #f59e0b;
+}
+
+
+/* ================= HOVER ================= */
+
+.sd-box:hover {
+  background: var(--sd-hover);
+  transform: translateX(4px);
+  color: #111827;
+}
+
+/* ================= ACTIVE ================= */
+
+.sd-item.active .sd-box {
+  background: var(--sd-active);
+
+  border-left: 4px solid var(--sd-accent);
+  border-radius: 8px 12px 12px 8px;
+
+  color: #111827;
+  font-weight: 600;
+}
+
+/* ================= FOOTER ================= */
+
+.sd-footer {
+  padding: 10px 20px;
+}
+
+/* ================= LOGOUT ================= */
+
+.sd-logout {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 10px 14px;
+  border-radius: 10px;
+
+  text-decoration: none;
+  color: #0B5ED7;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  transition: all 0.25s ease;
+}
+
+.sd-logout:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+/* ================= SCROLLBAR ================= */
+
+.sd-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.sd-nav {
+  scrollbar-width: none;
+}
+
+/* ================= ANIMATION ================= */
+
+@keyframes sdFade {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 1024px) {
+  .sd-sidebar {
+    transform: translateX(-100%);
+  }
+}

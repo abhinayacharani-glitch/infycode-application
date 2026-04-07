@@ -1,13 +1,55 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { COURSE_MAP } from './data/extraCourses';
 import './Courseoverview.css';
+
+// ─── Helpers ───
+const durationToDays = (d) => {
+  if (d === '10 Days') return 10;
+  if (d === '1 Month') return 30;
+  if (d === '3 Months') return 90;
+  if (d === '6 Months') return 180;
+  return 30;
+};
+
+const getSessionStatus = (config) => {
+  if (!config || !config.sessionLink) return 'no-link';
+  const now = new Date();
+  // Check duration expiry
+  const saved = new Date(config.lastSaved);
+  const expiryDays = durationToDays(config.duration);
+  const expiryDate = new Date(saved.getTime() + expiryDays * 864e5);
+  if (now > expiryDate) return 'expired';
+  // Check time window (compare HH:MM only)
+  const pad = (n) => String(n).padStart(2, '0');
+  const currentHHMM = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  if (currentHHMM >= config.startTime && currentHHMM <= config.endTime) return 'live';
+  if (currentHHMM < config.startTime) return 'upcoming';
+  return 'ended';
+};
 
 const CourseOverview = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const courseId = location.state || 'java-fs-01';
   const course = COURSE_MAP[courseId];
+
+  const [sessionStatus, setSessionStatus] = useState('no-link');
+  const [sessionConfig, setSessionConfig] = useState(null);
+
+  useEffect(() => {
+    const check = () => {
+      try {
+        const raw = localStorage.getItem('live_session_config');
+        const config = raw ? JSON.parse(raw) : null;
+        setSessionConfig(config);
+        setSessionStatus(getSessionStatus(config));
+      } catch { setSessionStatus('no-link'); }
+    };
+    check();
+    const timer = setInterval(check, 30000); // re-check every 30s
+    return () => clearInterval(timer);
+  }, []);
 
   if (!course) {
     return <div className="overview-error">Course not found.</div>;
@@ -20,6 +62,20 @@ const CourseOverview = () => {
   const handleBack = () => {
     navigate('/student-dashboard/courses');
   };
+
+  const handleJoin = () => {
+    if (sessionStatus === 'live' && sessionConfig?.sessionLink) {
+      window.open(sessionConfig.sessionLink, '_blank');
+    }
+  };
+
+  const statusLabel = {
+    'live':     { icon: '🟢', text: 'Live Now',    className: 'status-live' },
+    'upcoming': { icon: '🟡', text: sessionConfig ? `Starts at ${sessionConfig.startTime}` : 'Upcoming', className: 'status-upcoming' },
+    'ended':    { icon: '🔴', text: 'Session Ended', className: 'status-ended' },
+    'expired':  { icon: '🔴', text: 'Session Ended', className: 'status-ended' },
+    'no-link':  { icon: '⚪', text: 'Not Configured', className: 'status-none' },
+  }[sessionStatus];
 
   return (
     <div className="course-overview-page">
@@ -38,8 +94,19 @@ const CourseOverview = () => {
           <p className="co-subtitle">Explore the curriculum, meet your trainer, and get started on your learning journey.</p>
         </div>
         <div className="co-hero-right">
-          <button className="co-join-btn" onClick={() => window.open('https://meet.google.com/new', '_blank')}>
-            <div className="co-join-dot" />
+          {/* Session Status Indicator */}
+          <div className={`session-status-badge ${statusLabel.className}`}>
+            <span>{statusLabel.icon}</span>
+            <span>{statusLabel.text}</span>
+          </div>
+          {/* Join Button */}
+          <button
+            className={`co-join-btn ${sessionStatus !== 'live' ? 'disabled' : ''}`}
+            onClick={handleJoin}
+            disabled={sessionStatus !== 'live'}
+            title={sessionStatus === 'no-link' ? 'Session not configured by trainer' : undefined}
+          >
+            <div className={`co-join-dot ${sessionStatus === 'live' ? 'live' : 'inactive'}`} />
             Join Live Class
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 10 20 5 20 19 15 14" /><rect x="2" y="5" width="13" height="14" rx="2" ry="2" /></svg>
           </button>

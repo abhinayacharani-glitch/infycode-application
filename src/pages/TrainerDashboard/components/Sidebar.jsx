@@ -1,5 +1,8 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
+import './Sidebar.css';
+import icLogo from '../../../assets/infycode-final-logo4-1.png';
+import bannerLogo from '../../../assets/color-logo-3.png';
 
 // ✅ SVG Icons
 const DashboardIcon = () => (
@@ -59,14 +62,6 @@ const MessageIcon = () => (
   </svg>
 );
 
-const MailIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-       stroke="currentColor" strokeWidth="2">
-    <path d="M4 4h16v16H4z"/>
-    <polyline points="22,6 12,13 2,6"/>
-  </svg>
-);
-
 const LogoutIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
        stroke="currentColor" strokeWidth="2">
@@ -76,107 +71,112 @@ const LogoutIcon = () => (
   </svg>
 );
 
-const VideoIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-       stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M23 7l-7 5 7 5V7z"/>
-    <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
-  </svg>
-);
-
 const Sidebar = () => {
-  const loggedUser = JSON.parse(localStorage.getItem("loggedUser") || "{}");
-  const userName = loggedUser.username || "Trainer";
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const userName = user.fullName || user.fullname || "Trainer";
+  const userEmail = user.email || "active.trainer@infycode.com";
   const userInitial = userName ? userName.charAt(0).toUpperCase() : 'T';
 
   return (
-    <aside className="sidebar" id="sidebar">
-      <div className="brand-section">
-        <div className="logo-container">
-          <img 
-            src="https://image2url.com/r2/default/images/1773904682881-8c279e0e-742e-4d5d-9f55-df1bf46bce45.png" 
-            alt="InfyCode Logo" 
-            className="infycode-logo" 
-          />
-          <div className="brand-text">
-            <span className="brand-name">INFYCODE</span>
-            <span className="brand-tagline">Trainer Portal</span>
+    <aside className="sd-sidebar">
+      {/* BRAND */}
+      <div className="sd-brand">
+        <Link to="/trainer-dashboard/dashboard" className="sd-logo-wrap">
+          <img src={icLogo} alt="InfyCode Logo" className="sd-logo" />
+          <div className="sd-brand-text">
+            <img src={bannerLogo} alt="InfyCode Banner" style={{ width: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} className="sd-title" />
+            <span className="sd-subtitle">Trainer Portal</span>
           </div>
-        </div>
+        </Link>
       </div>
 
-      <div className="trainer-card">
-        <div className="trainer-avatar">{userInitial}</div>
-        <div>
-          <div className="trainer-name">{userName}</div>
-          <div className="trainer-role">
-            <span className="status-dot"></span>Active Trainer
+      {/* USER */}
+      <Link to="/trainer-dashboard/profile" className="sd-user-link">
+        <div className="sd-user">
+          <div className="sd-avatar">{userInitial}</div>
+          <div>
+            <div className="sd-name">{userName}</div>
+            <div className="sd-role">{userEmail}</div>
           </div>
         </div>
+      </Link>
+
+      {/* NAV */}
+      <div className="sd-nav">
+        <div className="nav-section-header">MAIN</div>
+
+        <NavLink to="/trainer-dashboard/dashboard"
+          className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
+          <div className="sd-box">
+            <span className="sd-icon"><DashboardIcon /></span>
+            <span className="sd-text">Dashboard</span>
+          </div>
+        </NavLink>
+
+        <NavLink to="/trainer-dashboard/profile"
+          className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
+          <div className="sd-box">
+            <span className="sd-icon"><UserIcon /></span>
+            <span className="sd-text">My Profile</span>
+          </div>
+        </NavLink>
+
+        <NavLink to="/trainer-dashboard/batches"
+          className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
+          <div className="sd-box">
+            <span className="sd-icon"><BookIcon /></span>
+            <span className="sd-text">Batches</span>
+            <span className="nav-badge">4</span>
+          </div>
+        </NavLink>
+
+        <NavLink to="/trainer-dashboard/schedule"
+          className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
+          <div className="sd-box">
+            <span className="sd-icon"><CalendarIcon /></span>
+            <span className="sd-text">Schedule</span>
+          </div>
+        </NavLink>
+
+        <div className="nav-section-header">ACADEMIC</div>
+
+        <NavLink to="/trainer-dashboard/materials"
+          className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
+          <div className="sd-box">
+            <span className="sd-icon"><PaperclipIcon /></span>
+            <span className="sd-text">Course Materials</span>
+            <span className="nav-badge green">12</span>
+          </div>
+        </NavLink>
+
+        <NavLink to="/trainer-dashboard/attendance"
+          className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
+          <div className="sd-box">
+            <span className="sd-icon"><ClipboardIcon /></span>
+            <span className="sd-text">Attendance</span>
+          </div>
+        </NavLink>
+
+        <NavLink to="/trainer-dashboard/feedback"
+          className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
+          <div className="sd-box">
+            <span className="sd-icon"><MessageIcon /></span>
+            <span className="sd-text">Feedback & Ratings</span>
+            <span className="nav-badge amber">3</span>
+          </div>
+        </NavLink>
       </div>
 
-      <div className="nav-section">Main</div>
-
-      <NavLink to="/trainer-dashboard/dashboard"
-        className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-        <span className="nav-icon"><DashboardIcon /></span> Dashboard
-      </NavLink>
-
-      <NavLink to="/trainer-dashboard/profile"
-        className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-        <span className="nav-icon"><UserIcon /></span> My Profile
-      </NavLink>
-
-      <NavLink to="/trainer-dashboard/batches"
-        className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-        <span className="nav-icon"><BookIcon /></span> My Batches
-        <span className="nav-badge">4</span>
-      </NavLink>
-
-      <NavLink to="/trainer-dashboard/schedule"
-        className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-        <span className="nav-icon"><CalendarIcon /></span> Schedule
-      </NavLink>
-
-      <NavLink to="/trainer-dashboard/live-session"
-        className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-        <span className="nav-icon"><VideoIcon /></span> Live Session
-      </NavLink>
-
-      <div className="nav-section">Academic</div>
-
-      <NavLink to="/trainer-dashboard/materials"
-        className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-        <span className="nav-icon"><PaperclipIcon /></span> Course Materials
-        <span className="nav-badge green">12</span>
-      </NavLink>
-
-      <NavLink to="/trainer-dashboard/attendance"
-        className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-        <span className="nav-icon"><ClipboardIcon /></span> Attendance
-      </NavLink>
-
-      <NavLink to="/trainer-dashboard/feedback"
-        className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-        <span className="nav-icon"><MessageIcon /></span> Feedback & Ratings
-        <span className="nav-badge amber">3</span>
-      </NavLink>
-
-      {/* <div className="nav-section">Communication</div>
-
-      <NavLink to="/trainer-dashboard/messages"
-        className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-        <span className="nav-icon"><MailIcon /></span> Messages
-        <span className="nav-badge">5</span>
-      </NavLink> */}
-
-      <div className="sidebar-footer">
-        <NavLink to="/trainer-dashboard/logout" className="logout-btn">
-          <LogoutIcon /> Logout
+      {/* FOOTER */}
+      <div className="sd-footer">
+        <NavLink to="/trainer-dashboard/logout" className="sd-logout">
+          <span className="sd-icon"><LogoutIcon /></span>
+          <span className="sd-text">Logout</span>
         </NavLink>
       </div>
     </aside>
   );
 };
+
 
 export default Sidebar;
