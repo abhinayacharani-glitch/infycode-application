@@ -30,6 +30,7 @@
 
   font-family: 'Urbanist', sans-serif;
   z-index: 1000;
+  border-right: 1.5px solid #dbeafe;
 
   animation: sdFade 0.4s ease;
 }

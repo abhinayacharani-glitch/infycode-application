@@ -248,6 +248,12 @@ export const resendRegistrationOTP = (emailOrObj, role) => {
 // COURSES
 // ─────────────────────────────────────────────
 
+/** Helper to get the stored auth token */
+const getAuthHeader = () => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return { Authorization: `Bearer ${user.token || ''}` };
+};
+
 /**
  * POST /api/courses
  * Creates (publishes) a new course.
@@ -257,6 +263,7 @@ export const resendRegistrationOTP = (emailOrObj, role) => {
 export const createCourse = (courseData) =>
   request('/api/courses', {
     method: 'POST',
+    headers: getAuthHeader(),
     body: JSON.stringify(courseData),
   });
 
@@ -265,14 +272,20 @@ export const createCourse = (courseData) =>
  * Retrieves all published courses (newest first).
  * @returns {{ courses: Course[] }}
  */
-export const getAllCourses = () => request('/api/courses');
+export const getAllCourses = () =>
+  request('/api/courses', {
+    headers: getAuthHeader(),
+  });
 
 /**
  * GET /api/courses/:id
  * Retrieves a single course by Firebase key.
  * @returns {{ course: Course }}
  */
-export const getCourseById = (id) => request(`/api/courses/${id}`);
+export const getCourseById = (id) =>
+  request(`/api/courses/${id}`, {
+    headers: getAuthHeader(),
+  });
 
 /**
  * PUT /api/courses/:id
@@ -284,6 +297,7 @@ export const getCourseById = (id) => request(`/api/courses/${id}`);
 export const updateCourse = (id, fields) =>
   request(`/api/courses/${id}`, {
     method: 'PUT',
+    headers: getAuthHeader(),
     body: JSON.stringify(fields),
   });
 
@@ -293,7 +307,10 @@ export const updateCourse = (id, fields) =>
  * @returns {{ message }}
  */
 export const deleteCourse = (id) =>
-  request(`/api/courses/${id}`, { method: 'DELETE' });
+  request(`/api/courses/${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeader(),
+  });
 
 /**
  * PUT /api/courses/:id/like
@@ -301,7 +318,10 @@ export const deleteCourse = (id) =>
  * @returns {{ message, isLiked, likes }}
  */
 export const toggleCourseLike = (id) =>
-  request(`/api/courses/${id}/like`, { method: 'PUT' });
+  request(`/api/courses/${id}/like`, {
+    method: 'PUT',
+    headers: getAuthHeader(),
+  });
 
 // ─────────────────────────────────────────────
 // DASHBOARDS

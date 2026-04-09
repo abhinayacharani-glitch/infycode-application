@@ -1,5 +1,8 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import "./Sidebar.css";
+import icLogo from '../../../assets/infycode-final-logo4-1.png';
+import bannerLogo from '../../../assets/color-logo-3.png';
 
 /* ── SVG Icons ── */
 const DashboardIcon = () => (
@@ -92,13 +95,12 @@ const Sidebar = () => {
       <div className="adm-brand-section">
         <div className="adm-logo-container">
           <img
-            src="https://image2url.com/r2/default/images/1773904682881-8c279e0e-742e-4d5d-9f55-df1bf46bce45.png"
+            src={icLogo}
             alt="InfyCode Logo"
             className="adm-logo-img"
           />
           <div className="adm-brand-text">
-            <span className="adm-brand-name">INFYCODE</span>
-            <span className="adm-brand-tagline">Admin Portal</span>
+            <img src={bannerLogo} alt="InfyCode Banner" style={{ width: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} className="adm-title-img" />
           </div>
         </div>
       </div>

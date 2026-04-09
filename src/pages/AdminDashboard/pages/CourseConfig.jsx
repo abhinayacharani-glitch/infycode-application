@@ -1,149 +1,140 @@
-import React, { useState } from "react";
-import { useAdmin } from "../../../context/AdminContext";
+import React, { useState } from 'react';
+import { useAdmin } from '../../../context/AdminContext';
+import AdminPage from '../components/CourseManagement/AdminPage';
+import CourseFeed from '../components/CourseManagement/CourseFeed';
+import { CheckCircle2 } from 'lucide-react';
 
 const CourseConfig = () => {
-  const { courses, toggleCourseStatus } = useAdmin();
-  const [showForm, setShowForm] = useState(false);
-  const [newCourse, setNewCourse] = useState({ name: '', duration: '', level: 'Beginner', mode: 'Online' });
+  const {
+    courses,
+    addCourse,
+    updateCourse,
+    deleteCourse,
+    toggleCourseLike
+  } = useAdmin();
 
-  const handleAddCourse = (e) => {
-    e.preventDefault();
-    // In a real app, this would call an addCourse action from context
-    alert(`Course "${newCourse.name}" would be added in a real implementation.`);
-    setShowForm(false);
-    setNewCourse({ name: '', duration: '', level: 'Beginner', mode: 'Online' });
+  const [activeTab, setActiveTab] = useState('feed'); // 'feed' or 'create'
+  const [publishedTitle, setPublishedTitle] = useState('');
+
+  const handleCoursePublished = (newCourse) => {
+    setPublishedTitle(newCourse?.title || 'Your course');
+    setActiveTab('feed');
+    // Auto-clear success banner after 4 seconds
+    setTimeout(() => setPublishedTitle(''), 4000);
   };
 
   return (
-    <div className="page active">
-      <div className="card">
-        <div className="card-header">
-           <div>
-             <h3 className="card-title">Course Configuration</h3>
-             <p className="card-sub">Define course objectives, syllabus structure, and supported learning modes.</p>
-           </div>
-           <div style={{ display: 'flex', gap: '8px' }}>
-             <button 
-               className={showForm ? 'btn-secondary' : 'btn-primary'} 
-               onClick={() => setShowForm(!showForm)}
-             >
-               {showForm ? 'Cancel' : '+ Add New Course'}
-             </button>
-           </div>
+    <div className="adm-course-config-wrapper" style={{ paddingBottom: '40px' }}>
+      {/* ── Dashboard Header ── */}
+      <div className="adm-page-header" style={{ marginBottom: '24px' }}>
+        <h2 className="adm-page-title" style={{ fontSize: '24px', fontWeight: '800', color: '#0f172a' }}>
+          Course Management Portal
+        </h2>
+        <p className="adm-page-subtitle" style={{ color: '#64748b', fontSize: '14px', marginTop: '4px' }}>
+          Publish new content, manage existing courses, and track learner engagement.
+        </p>
+      </div>
+
+      {/* ── Tab Navigation ── */}
+      <div className="adm-tabs" style={{
+        display: 'flex',
+        gap: '8px',
+        marginBottom: '24px',
+        borderBottom: '1.5px solid #dbeafe',
+        paddingBottom: '2px'
+      }}>
+        <button
+          onClick={() => setActiveTab('feed')}
+          className={`adm-tab-btn ${activeTab === 'feed' ? 'active' : ''}`}
+          style={{
+            padding: '10px 20px',
+            fontSize: '14px',
+            fontWeight: '600',
+            border: 'none',
+            background: 'none',
+            cursor: 'pointer',
+            color: activeTab === 'feed' ? '#2563eb' : '#64748b',
+            borderBottom: activeTab === 'feed' ? '3px solid #2563eb' : '3px solid transparent',
+            transition: 'all 0.3s ease'
+          }}
+        >
+          Course Feed & Management
+        </button>
+        <button
+          onClick={() => setActiveTab('create')}
+          className={`adm-tab-btn ${activeTab === 'create' ? 'active' : ''}`}
+          style={{
+            padding: '10px 20px',
+            fontSize: '14px',
+            fontWeight: '600',
+            border: 'none',
+            background: 'none',
+            cursor: 'pointer',
+            color: activeTab === 'create' ? '#2563eb' : '#64748b',
+            borderBottom: activeTab === 'create' ? '3px solid #2563eb' : '3px solid transparent',
+            transition: 'all 0.3s ease'
+          }}
+        >
+          Create New Course
+        </button>
+      </div>
+
+      {/* ── Success Banner (shows in feed tab after publish) ── */}
+      {activeTab === 'feed' && publishedTitle && (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: '10px',
+          background: '#f0fdf4', border: '1.5px solid #86efac',
+          color: '#15803d', padding: '14px 18px', borderRadius: '12px',
+          fontWeight: '600', fontSize: '0.95rem', marginBottom: '20px',
+          boxShadow: '0 2px 8px rgba(22,163,74,0.10)',
+          animation: 'slideInBanner 0.3s ease-out'
+        }}>
+          <CheckCircle2 size={20} color="#16a34a" />
+          <span>🎉 <strong>"{publishedTitle}"</strong> was published successfully and is now live in the feed!</span>
         </div>
-        
-        {showForm && (
-          <div className="card-body" style={{ borderBottom: '1px solid var(--border)', background: '#f8fafc' }}>
-            <form onSubmit={handleAddCourse} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-              <div className="form-group">
-                <label style={{ display: 'block', marginBottom: '4px', fontSize: '13px', fontWeight: '500' }}>Course Name</label>
-                <input 
-                  type="text" 
-                  className="filter-select-premium" 
-                  style={{ width: '100%', padding: '10px' }}
-                  value={newCourse.name}
-                  onChange={(e) => setNewCourse({...newCourse, name: e.target.value})}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label style={{ display: 'block', marginBottom: '4px', fontSize: '13px', fontWeight: '500' }}>Duration</label>
-                <input 
-                  type="text" 
-                  placeholder="e.g. 8 Weeks"
-                  className="filter-select-premium" 
-                  style={{ width: '100%', padding: '10px' }}
-                  value={newCourse.duration}
-                  onChange={(e) => setNewCourse({...newCourse, duration: e.target.value})}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label style={{ display: 'block', marginBottom: '4px', fontSize: '13px', fontWeight: '500' }}>Skill Level</label>
-                <select 
-                  className="filter-select-premium" 
-                  style={{ width: '100%' }}
-                  value={newCourse.level}
-                  onChange={(e) => setNewCourse({...newCourse, level: e.target.value})}
-                >
-                  <option>Beginner</option>
-                  <option>Intermediate</option>
-                  <option>Advanced</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label style={{ display: 'block', marginBottom: '4px', fontSize: '13px', fontWeight: '500' }}>Mode</label>
-                <select 
-                  className="filter-select-premium" 
-                  style={{ width: '100%' }}
-                  value={newCourse.mode}
-                  onChange={(e) => setNewCourse({...newCourse, mode: e.target.value})}
-                >
-                  <option>Online</option>
-                  <option>Offline</option>
-                  <option>Hybrid</option>
-                </select>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'flex-end' }}>
-                <button type="submit" className="btn-primary" style={{ width: '100%', margin: 0 }}>Create Course</button>
-              </div>
-            </form>
+      )}
+
+      {/* ── Content Area ── */}
+      <div className="adm-course-content-area">
+        {activeTab === 'create' ? (
+          <div className="animate-fadeIn">
+            <AdminPage
+              onCoursePublished={handleCoursePublished}
+              isEmbedded={true}
+            />
+          </div>
+        ) : (
+          <div className="animate-fadeIn">
+            <CourseFeed
+              courses={courses}
+              onToggleLike={toggleCourseLike}
+              onUpdateCourse={updateCourse}
+              onDeleteCourse={deleteCourse}
+              isEmbedded={true}
+            />
           </div>
         )}
-
-        <div className="card-body">
-            <table className="batch-table">
-               <thead>
-                 <tr>
-                   <th>Course Code</th>
-                   <th>Course Name</th>
-                   <th>Duration</th>
-                   <th>Level</th>
-                   <th>Mode</th>
-                   <th>Status</th>
-                   <th>Actions</th>
-                 </tr>
-               </thead>
-               <tbody>
-                 {courses.map(course => (
-                    <tr key={course.id}>
-                      <td><b>{course.id}</b></td>
-                      <td>{course.name}</td>
-                      <td>{course.duration}</td>
-                      <td>{course.level}</td>
-                      <td>{course.mode}</td>
-                      <td>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <span className={`badge ${course.status === 'Active' ? 'active-b' : 'offline'}`}>{course.status}</span>
-                          <label className="switch" style={{ position: 'relative', display: 'inline-block', width: '34px', height: '20px' }}>
-                            <input 
-                              type="checkbox" 
-                              checked={course.status === 'Active'} 
-                              onChange={() => toggleCourseStatus(course.id)}
-                              style={{ opacity: 0, width: 0, height: 0 }}
-                            />
-                            <span style={{
-                              position: 'absolute', cursor: 'pointer', top: 0, left: 0, right: 0, bottom: 0,
-                              backgroundColor: course.status === 'Active' ? 'var(--blue-600)' : '#ccc',
-                              transition: '.4s', borderRadius: '20px'
-                            }}>
-                              <span style={{
-                                position: 'absolute', content: '""', height: '14px', width: '14px', left: course.status === 'Active' ? '17px' : '3px', bottom: '3px',
-                                backgroundColor: 'white', transition: '.4s', borderRadius: '50%'
-                              }}></span>
-                            </span>
-                          </label>
-                        </div>
-                      </td>
-                      <td>
-                        <button className="btn-secondary btn-small" style={{ margin: 0 }}>Edit</button>
-                      </td>
-                    </tr>
-                 ))}
-               </tbody>
-            </table>
-        </div>
       </div>
+
+      <style dangerouslySetInnerHTML={{
+        __html: `
+        .adm-tab-btn:hover {
+          color: #2563eb !important;
+          background: rgba(37, 99, 235, 0.04) !important;
+          border-radius: 6px 6px 0 0;
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.4s ease-out;
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideInBanner {
+          from { opacity: 0; transform: translateY(-8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}} />
     </div>
   );
 };
