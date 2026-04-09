@@ -9,6 +9,7 @@ import AuthLayout from '../components/AuthLayout';
 import AuthFormCard from '../components/AuthFormCard';
 import PageWrapper from '../components/PageWrapper';
 import "../styles/authComponents.css"; // Use standardized styles
+import "../styles/Login.css"; // Include sliding panel animations
 
 function Login() {
   const navigate = useNavigate();
@@ -245,80 +246,9 @@ function Login() {
     setShowOTP(false);
   };
 
-  if (!isActive) {
-    // --- SIGN IN UI ---
-    return (
-      <PageWrapper key="signin">
-        <AuthLayout
-          panelHeading="Welcome Back!"
-          panelText="Enter your email and password to sign in"
-        >
-          <AuthFormCard>
-            <h1 className="sa-form-heading">Sign In</h1>
-            <p className="sa-form-sub">Glad to see you again!</p>
-
-            {successMessage && (
-              <div className="sa-banner sa-banner--success">
-                <CheckCircle size={16} />
-                <span>{successMessage}</span>
-              </div>
-            )}
-
-            {signInApiError && <p className="sa-api-error">{signInApiError}</p>}
-
-            <form className="sa-form" onSubmit={handleSignInSubmit} noValidate>
-              <div className="sa-input-wrap">
-                <Mail size={15} className="sa-input-icon" />
-                <input
-                  type="email" name="email" placeholder="Email Address"
-                  value={signInForm.email} onChange={handleSignInChange}
-                  className={`sa-input${signInErrors.email ? ' sa-input--error' : ''}`}
-                  autoComplete="email"
-                />
-              </div>
-              {signInErrors.email && <span className="sa-error-text">{signInErrors.email}</span>}
-
-              <div className="sa-input-wrap">
-                <Lock size={15} className="sa-input-icon" />
-                <input
-                  type={showSignInPassword ? "text" : "password"} name="password" placeholder="Password"
-                  value={signInForm.password} onChange={handleSignInChange}
-                  className={`sa-input${signInErrors.password ? ' sa-input--error' : ''}`}
-                  autoComplete="current-password"
-                />
-                <button
-                  type="button" onClick={() => setShowSignInPassword(!showSignInPassword)}
-                  className="sa-eye-btn"
-                >
-                  {showSignInPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
-              {signInErrors.password && <span className="sa-error-text">{signInErrors.password}</span>}
-
-              <div className="sa-forgot-wrap">
-                <Link to="/student/forgot-password" data-id="forgot-link" className="sa-forgot-link">
-                  Forgot Password?
-                </Link>
-              </div>
-
-              <button type="submit" className="sa-submit-btn" disabled={isSignInLoading}>
-                {isSignInLoading ? "Signing in..." : "Sign In"}
-              </button>
-            </form>
-
-            <p className="sa-form-footer">
-              Don't have an account? <span onClick={toggleMode} className="sa-link">Sign Up</span>
-            </p>
-          </AuthFormCard>
-        </AuthLayout>
-      </PageWrapper>
-    );
-  }
-
-  // --- SIGN UP UI ---
   return (
-    <PageWrapper key="signup">
-      <div className="auth-wrapper" style={{ position: 'relative', width: '100%', height: '100%' }}>
+    <PageWrapper>
+      <div className="studentLogin-wrapper">
         {/* ── OTP POPUP ── */}
         {showOTP && (
           <div className="otp-popup-overlay" style={{
@@ -474,17 +404,16 @@ function Login() {
         }
       `}</style>
 
-        <AuthLayout
-          panelHeading="Join Us Today!"
-          panelText="Create your account to start learning"
-        >
-          <AuthFormCard>
-            <h1 className="sa-form-heading">Create Account</h1>
-            <p className="sa-form-sub">Join us to start your learning journey</p>
-
-            {signUpApiError && <p className="sa-api-error">{signUpApiError}</p>}
-
+        <div className={`studentLogin-container ${isActive ? "studentLogin-active" : ""}`} id="container">
+          
+          {/* SIGN UP FORM */}
+          <div className="studentLogin-form-container studentLogin-sign-up">
             <form className="sa-form" onSubmit={handleSignUpSubmit} noValidate>
+              <h1 className="sa-form-heading">Create Account</h1>
+              <p className="sa-form-sub">Join us to start your learning journey</p>
+
+              {signUpApiError && <p className="sa-api-error">{signUpApiError}</p>}
+
               <div className="sa-input-wrap">
                 <User size={15} className="sa-input-icon" />
                 <input
@@ -553,12 +482,80 @@ function Login() {
                 {isSignUpLoading ? "Creating..." : "Sign Up"}
               </button>
             </form>
+          </div>
 
-            <p className="sa-form-footer">
-              Already have an account? <span onClick={toggleMode} className="sa-link">Sign In</span>
-            </p>
-          </AuthFormCard>
-        </AuthLayout>
+          {/* SIGN IN FORM */}
+          <div className="studentLogin-form-container studentLogin-sign-in">
+            <form className="sa-form" onSubmit={handleSignInSubmit} noValidate>
+              <h1 className="sa-form-heading">Sign In</h1>
+              <p className="sa-form-sub">Glad to see you again!</p>
+
+              {successMessage && (
+                <div className="sa-banner sa-banner--success">
+                  <CheckCircle size={16} />
+                  <span>{successMessage}</span>
+                </div>
+              )}
+
+              {signInApiError && <p className="sa-api-error">{signInApiError}</p>}
+
+              <div className="sa-input-wrap">
+                <Mail size={15} className="sa-input-icon" />
+                <input
+                  type="email" name="email" placeholder="Email Address"
+                  value={signInForm.email} onChange={handleSignInChange}
+                  className={`sa-input${signInErrors.email ? ' sa-input--error' : ''}`}
+                  autoComplete="email"
+                />
+              </div>
+              {signInErrors.email && <span className="sa-error-text">{signInErrors.email}</span>}
+
+              <div className="sa-input-wrap">
+                <Lock size={15} className="sa-input-icon" />
+                <input
+                  type={showSignInPassword ? "text" : "password"} name="password" placeholder="Password"
+                  value={signInForm.password} onChange={handleSignInChange}
+                  className={`sa-input${signInErrors.password ? ' sa-input--error' : ''}`}
+                  autoComplete="current-password"
+                />
+                <button
+                  type="button" onClick={() => setShowSignInPassword(!showSignInPassword)}
+                  className="sa-eye-btn"
+                >
+                  {showSignInPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+              {signInErrors.password && <span className="sa-error-text">{signInErrors.password}</span>}
+
+              <div className="sa-forgot-wrap" style={{ margin: "10px 0" }}>
+                <Link to="/student/forgot-password" data-id="forgot-link" className="sa-forgot-link">
+                  Forgot Password?
+                </Link>
+              </div>
+
+              <button type="submit" className="sa-submit-btn" disabled={isSignInLoading}>
+                {isSignInLoading ? "Signing in..." : "Sign In"}
+              </button>
+            </form>
+          </div>
+
+          {/* TOGGLE PANELS */}
+          <div className="studentLogin-toggle-container">
+            <div className="studentLogin-toggle">
+              <div className="studentLogin-toggle-panel studentLogin-toggle-left">
+                <h1>Welcome Back!</h1>
+                <p>Enter your personal details to use all site features</p>
+                <button className="studentLogin-hidden" onClick={toggleMode} type="button">Sign In</button>
+              </div>
+              <div className="studentLogin-toggle-panel studentLogin-toggle-right">
+                <h1>Hello, Friend!</h1>
+                <p>Enter your personal details and start journey with us</p>
+                <button className="studentLogin-hidden" onClick={toggleMode} type="button">Sign Up</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
       </div>
     </PageWrapper>
   );

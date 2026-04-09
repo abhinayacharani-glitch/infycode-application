@@ -61,6 +61,13 @@
   cursor: pointer;
 }
 
+.studentLogin-container button.sa-eye-btn {
+  background-color: transparent;
+  padding: 0;
+  margin: 0;
+  color: #333; /* Make it black/dark gray instead of inheriting white */
+}
+
 .studentLogin-container button.studentLogin-hidden {
   background-color: transparent;
   border-color: #fff;
@@ -76,10 +83,14 @@
   height: 100%;
 }
 
+.studentLogin-container .sa-input-wrap {
+  margin: 8px 0;
+}
+
 .studentLogin-container input {
   background-color: #eee;
   border: none;
-  margin: 8px 0;
+  margin: 0 !important; /* Move margin to wrapper to keep eye icons centered */
   padding: 10px 15px;
   font-size: 13px;
   border-radius: 8px;

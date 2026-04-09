@@ -5,6 +5,7 @@ import { Lock, Eye, EyeOff, CheckCircle, AlertCircle } from 'lucide-react';
 import AuthLayout   from '../components/AuthLayout';
 import AuthFormCard from '../components/AuthFormCard';
 import PageWrapper  from '../components/PageWrapper';
+import "../styles/Login.css";
 import { validatePassword }    from '../utils/validation';
 import { studentResetPassword } from '../../services/api';
 
@@ -80,104 +81,107 @@ const ResetPassword = () => {
 
   return (
     <PageWrapper>
-      <AuthLayout
-        panelHeading="Reset Password"
-      panelText="Set a new password for your account"
-    >
-      <AuthFormCard>
-        <h1 className="sa-form-heading">Reset Password</h1>
-        <p  className="sa-form-sub">Enter and confirm your new password below.</p>
+      <div className="studentLogin-wrapper">
+        <div className="studentLogin-container studentLogin-active">
+          <div className="studentLogin-form-container studentLogin-sign-up">
+            <form className="sa-form" onSubmit={handleSubmit} noValidate>
+              <h1 className="sa-form-heading">Reset Password</h1>
+              <p className="sa-form-sub">Enter and confirm your new password below.</p>
 
-        {/* Access denied */}
-        {!otpVerified && !success && (
-          <div className="sa-banner sa-banner--error" style={{ marginBottom:10 }}>
-            <AlertCircle size={14} />
-            <span>Access denied. Please verify your OTP first.</span>
-          </div>
-        )}
-        {/* API error */}
-        {errors.api && (
-          <div className="sa-banner sa-banner--error" style={{ marginBottom:10 }}>
-            <AlertCircle size={14} /><span>{errors.api}</span>
-          </div>
-        )}
-        {/* General error */}
-        {errors.general && (
-          <div className="sa-banner sa-banner--error" style={{ marginBottom:10 }}>
-            <AlertCircle size={14} /><span>{errors.general}</span>
-          </div>
-        )}
-        {/* Success */}
-        {success && (
-          <div className="sa-banner sa-banner--success" style={{ marginBottom:10 }}>
-            <CheckCircle size={14} /><span>Password changed successfully</span>
-          </div>
+              {/* Access denied */}
+              {!otpVerified && !success && (
+                <div className="sa-banner sa-banner--error" style={{ marginBottom:10 }}>
+                  <AlertCircle size={14} />
+                  <span>Access denied. Please verify your OTP first.</span>
+                </div>
+              )}
+              {/* API error */}
+              {errors.api && (
+                <div className="sa-banner sa-banner--error" style={{ marginBottom:10 }}>
+                  <AlertCircle size={14} /><span>{errors.api}</span>
+                </div>
+              )}
+              {/* General error */}
+              {errors.general && (
+                <div className="sa-banner sa-banner--error" style={{ marginBottom:10 }}>
+                  <AlertCircle size={14} /><span>{errors.general}</span>
+                </div>
+              )}
+              {/* Success */}
+              {success && (
+                <div className="sa-banner sa-banner--success" style={{ marginBottom:10 }}>
+                  <CheckCircle size={14} /><span>Password changed successfully</span>
+                </div>
+              )}
 
-        )}
+              {/* New Password */}
+              <div className={`sa-input-wrap${!otpVerified ? ' sa-disabled-group':''}`}>
+                <Lock size={15} className="sa-input-icon" />
+                <input
+                  id="rp-password" type={showPw ? 'text' : 'password'}
+                  name="password" placeholder="Min 8 chars, uppercase, number & symbol"
+                  value={formData.password} onChange={handleChange}
+                  className={`sa-input${errors.password ? ' sa-input--error':''}`}
+                  disabled={!otpVerified || success || loading}
+                  autoComplete="new-password" autoFocus={otpVerified}
+                />
+                <button type="button" className="sa-eye-btn"
+                  onClick={() => setShowPw(!showPw)} tabIndex={-1} disabled={!otpVerified}>
+                  {showPw ? <EyeOff size={15}/> : <Eye size={15}/>}
+                </button>
+              </div>
 
-        <form className="sa-form" onSubmit={handleSubmit} noValidate>
+              {/* Strength bar */}
+              {formData.password && (
+                <div style={{ width:'100%', height:4, background:'#e2e8f0', borderRadius:4, marginTop:-6 }}>
+                  <div style={{ width:`${strength.pct}%`, height:'100%', background:strength.color, borderRadius:4, transition:'all 0.3s ease' }} />
+                </div>
+              )}
+              {strength.label && formData.password && (
+                <span style={{ fontSize:11, color:strength.color, alignSelf:'flex-start' }}>{strength.label}</span>
+              )}
+              {errors.password && <span className="sa-error-text">{errors.password}</span>}
 
-          {/* New Password */}
-          <div className={`sa-input-wrap${!otpVerified ? ' sa-disabled-group':''}`}>
-            <Lock size={15} className="sa-input-icon" />
-            <input
-              id="rp-password" type={showPw ? 'text' : 'password'}
-              name="password" placeholder="Min 8 chars, uppercase, number & symbol"
-              value={formData.password} onChange={handleChange}
-              className={`sa-input${errors.password ? ' sa-input--error':''}`}
-              disabled={!otpVerified || success || loading}
-              autoComplete="new-password" autoFocus={otpVerified}
-            />
-            <button type="button" className="sa-eye-btn"
-              onClick={() => setShowPw(!showPw)} tabIndex={-1} disabled={!otpVerified}>
-              {showPw ? <EyeOff size={15}/> : <Eye size={15}/>}
-            </button>
+              {/* Confirm Password */}
+              <div className={`sa-input-wrap${!otpVerified ? ' sa-disabled-group':''}`}>
+                <Lock size={15} className="sa-input-icon" />
+                <input
+                  id="rp-confirm" type={showCfm ? 'text' : 'password'}
+                  name="confirmPassword" placeholder="Re-enter your new password"
+                  value={formData.confirmPassword} onChange={handleChange}
+                  className={`sa-input${errors.confirmPassword ? ' sa-input--error':''}`}
+                  disabled={!otpVerified || success || loading}
+                  autoComplete="new-password"
+                />
+                <button type="button" className="sa-eye-btn"
+                  onClick={() => setShowCfm(!showCfm)} tabIndex={-1} disabled={!otpVerified}>
+                  {showCfm ? <EyeOff size={15}/> : <Eye size={15}/>}
+                </button>
+              </div>
+              {errors.confirmPassword && <span className="sa-error-text">{errors.confirmPassword}</span>}
+
+              <button
+                type="submit" className="sa-submit-btn"
+                disabled={!otpVerified || loading || success}
+              >
+                {loading
+                  ? <span className="sa-btn-inner"><span className="sa-spinner"/>Resetting…</span>
+                  : success ? 'Password Reset ✓' : 'Reset Password →'}
+              </button>
+            </form>
           </div>
-
-          {/* Strength bar */}
-          {formData.password && (
-            <div style={{ width:'100%', height:4, background:'#e2e8f0', borderRadius:4, marginTop:-6 }}>
-              <div style={{ width:`${strength.pct}%`, height:'100%', background:strength.color, borderRadius:4, transition:'all 0.3s ease' }} />
+          
+          <div className="studentLogin-toggle-container">
+            <div className="studentLogin-toggle">
+              <div className="studentLogin-toggle-panel studentLogin-toggle-left">
+                <h1>Reset Password</h1>
+                <p>Set a new password for your account</p>
+                <button className="studentLogin-hidden" onClick={() => navigate('/student/login')} type="button">Back to Login</button>
+              </div>
             </div>
-          )}
-          {strength.label && formData.password && (
-            <span style={{ fontSize:11, color:strength.color, alignSelf:'flex-start' }}>{strength.label}</span>
-          )}
-          {errors.password && <span className="sa-error-text">{errors.password}</span>}
-
-          {/* Confirm Password */}
-          <div className={`sa-input-wrap${!otpVerified ? ' sa-disabled-group':''}`}>
-            <Lock size={15} className="sa-input-icon" />
-            <input
-              id="rp-confirm" type={showCfm ? 'text' : 'password'}
-              name="confirmPassword" placeholder="Re-enter your new password"
-              value={formData.confirmPassword} onChange={handleChange}
-              className={`sa-input${errors.confirmPassword ? ' sa-input--error':''}`}
-              disabled={!otpVerified || success || loading}
-              autoComplete="new-password"
-            />
-            <button type="button" className="sa-eye-btn"
-              onClick={() => setShowCfm(!showCfm)} tabIndex={-1} disabled={!otpVerified}>
-              {showCfm ? <EyeOff size={15}/> : <Eye size={15}/>}
-            </button>
           </div>
-          {errors.confirmPassword && <span className="sa-error-text">{errors.confirmPassword}</span>}
-
-          <button
-            type="submit" className="sa-submit-btn"
-            disabled={!otpVerified || loading || success}
-          >
-            {loading
-              ? <span className="sa-btn-inner"><span className="sa-spinner"/>Resetting…</span>
-              : success ? 'Password Reset ✓' : 'Reset Password →'}
-          </button>
-        </form>
-
-        <p className="sa-form-footer">
-          <Link to="/student/login" className="sa-link">← Back to Login</Link>
-        </p>
-      </AuthFormCard>
-    </AuthLayout>
+        </div>
+      </div>
     </PageWrapper>
   );
 };

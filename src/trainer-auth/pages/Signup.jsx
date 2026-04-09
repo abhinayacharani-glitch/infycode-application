@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Eye, EyeOff, User, Mail, Lock, Phone } from 'lucide-react';
+import { Eye, EyeOff, User, Mail, Lock, Phone, RefreshCw } from 'lucide-react';
 import { validateEmail, validatePassword } from '../utils/validation';
 import { trainerRegister, verifyRegistrationOTP, resendRegistrationOTP } from '../../services/api';
 import '../styles/login.css';
@@ -77,19 +77,7 @@ const Signup = () => {
     return () => clearInterval(interval);
   }, [showOTP, otpTimer, handleClose]);
 
-  useEffect(() => {
-    const handleBack = () => {
-      window.history.pushState(null, "", window.location.href);
-      window.location.replace("/trainer/login");
-    };
-
-    window.history.pushState(null, "", window.location.href);
-    window.addEventListener("popstate", handleBack);
-
-    return () => {
-      window.removeEventListener("popstate", handleBack);
-    };
-  }, []);
+  // Remove back button interception that might interfere with navigation
 
   const handleResendOTP = async () => {
     setOtpTimer(60);

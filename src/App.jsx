@@ -48,6 +48,7 @@ import ArticlesPage from "./pages/InternalPages/SubPages/ArticlesPage";
 import EbooksPage from "./pages/InternalPages/SubPages/EbooksPage";
 import AboutPage from "./pages/InternalPages/AboutPage";
 import GalleryPage from "./pages/InternalPages/GalleryPage";
+import InstagramPage from "./pages/InternalPages/InstagramPage";
 
 import CoreTestApp from "./pages/StudentDashboard/pages/core-test/CoreTest";
 // Course management is now handled in AdminDashboard
@@ -177,6 +178,7 @@ function Layout({ courses, setCourses, onToggleLike, onUpdateCourse, onDeleteCou
           <Route path="/video-courses/payment/:courseId" element={<VideoPaymentPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/gallery" element={<GalleryPage />} />
+          <Route path="/instagram" element={<InstagramPage />} />
 
           {/* ── Protected ── */}
           <Route path="/student/test/*" element={<ProtectedRoute><TestApp /></ProtectedRoute>} />
