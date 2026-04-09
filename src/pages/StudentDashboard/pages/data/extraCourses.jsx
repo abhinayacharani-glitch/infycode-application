@@ -31,7 +31,7 @@ export const COURSE_MAP = {
     modules: [
       {
         id: 'beginner',
-        label: "Beginner Module",
+        label: "Module 1",
         subtitle: "Java Basics",
         duration: "4 Weeks",
         color: "#10b981",
@@ -49,7 +49,7 @@ export const COURSE_MAP = {
       },
       {
         id: 'intermediate',
-        label: "Intermediate Module",
+        label: "Module 2",
         subtitle: "Core OOP",
         duration: "6 Weeks",
         color: "#2563eb",
@@ -67,7 +67,7 @@ export const COURSE_MAP = {
       },
       {
         id: 'advanced',
-        label: "Advanced Module",
+        label: "Module 3",
         subtitle: "Spring Framework",
         duration: "8 Weeks",
         color: "#8b5cf6",
@@ -128,7 +128,7 @@ export const COURSE_MAP = {
     modules: [
       {
         id: 'beginner',
-        label: "Beginner Module",
+        label: "Module 1",
         subtitle: "Python Basics",
         duration: "3 Weeks",
         color: "#10b981",
@@ -145,7 +145,7 @@ export const COURSE_MAP = {
       },
       {
         id: 'intermediate',
-        label: "Intermediate Module",
+        label: "Module 2",
         subtitle: "OOP & Django",
         duration: "5 Weeks",
         color: "#2563eb",
@@ -162,7 +162,7 @@ export const COURSE_MAP = {
       },
       {
         id: 'advanced',
-        label: "Advanced Module",
+        label: "Module 3",
         subtitle: "DRF & React",
         duration: "6 Weeks",
         color: "#8b5cf6",
@@ -190,100 +190,7 @@ export const COURSE_MAP = {
       ]
     }
   },
-  'mern-fs-01': {
-    id: 'mern-fs-01',
-    title: "MERN Stack Developer Program",
-    description: "Build modern, scalable web applications using MongoDB, Express, React, and Node.js.",
-    duration: "6 Months",
-    students: 15400,
-    rating: 4.9,
-    level: "Intermediate",
-    progress: 20,
-    trainer: {
-      name: "Anjali Sharma",
-      role: "MERN Stack Expert",
-      experience: "8+ Years",
-      specialization: "React, Node.js, MongoDB"
-    },
-    batch: {
-      name: "Weekend Batch",
-      id: "BID-MERN-2026-01",
-      startDate: "Mar 1, 2026",
-      timing: "Sat, Sun — 9:00 AM to 12:00 PM",
-      duration: "6 Months · Online Live"
-    },
-    objective: "Become a complete MERN Stack Developer by mastering the four core technologies: MongoDB for database design, Express.js for server-side routing, React for dynamic UIs, and Node.js for building scalable backend services. This program bridges the gap between theory and real-world development through hands-on projects and mentorship from industry experts.",
-    benefits: [
-      { icon: "⚡", label: "Fast-Track Learning", desc: "Intensive, structured curriculum" },
-      { icon: "👨‍💻", label: "Fullstack Focus", desc: "Frontend + Backend covered" },
-      { icon: "♾️", label: "Lifetime Access", desc: "All material always available" },
-      { icon: "🚀", label: "Deploy to Cloud", desc: "Ship apps to Vercel & Railway" }
-    ],
-    modules: [
-      {
-        id: 'mern-beg',
-        label: "Frontend Foundations",
-        subtitle: "React Fundamentals",
-        duration: "4 Weeks",
-        color: "#10b981",
-        topics: [
-          { id: 'react-basics', title: "React Setup & JSX", content: "<p>Create React App, Vite setup, understanding JSX, and the virtual DOM.</p>" },
-          { id: 'react-components', title: "Components & Props", content: "<p>Functional components, passing props, component composition, and prop types.</p>" },
-          { id: 'react-state', title: "State & useState Hook", content: "<p>Managing local state, controlled components, and state lifting patterns.</p>" },
-          { id: 'react-effects', title: "useEffect & Lifecycle", content: "<p>Data fetching, side effects, cleanup, and the component lifecycle model.</p>" },
-          { id: 'react-hooks', title: "Advanced React Hooks", content: "<p>useContext, useRef, useReducer, useMemo, useCallback for performance.</p>" },
-          { id: 'react-router', title: "React Router v6", content: "<p>Setting up multi-page SPAs, dynamic routes, protected routes, and nested layouts.</p>" },
-          { id: 'react-tailwind', title: "Styling with Tailwind CSS", content: "<p>Utility-first CSS, responsive design, and dark mode configuration.</p>" }
-        ],
-        assignment: "Build a responsive portfolio website using React and Tailwind CSS."
-      },
-      {
-        id: 'mern-int',
-        label: "Backend & API",
-        subtitle: "Node.js & MongoDB",
-        duration: "6 Weeks",
-        color: "#2563eb",
-        topics: [
-          { id: 'node-basics', title: "Node.js Fundamentals", content: "<p>Node.js architecture, event loop, fs module, and npm ecosystem.</p>" },
-          { id: 'express-basics', title: "Express.js & HTTP", content: "<p>REST principles, routing, middleware, request/response lifecycle.</p>" },
-          { id: 'express-middleware', title: "Middleware & Error Handling", content: "<p>Custom middleware, error-handling patterns, and request validation.</p>" },
-          { id: 'mongodb', title: "MongoDB & Mongoose", content: "<p>Schema design, data modeling, CRUD operations, and indexes.</p>" },
-          { id: 'jwt-auth', title: "JWT Authentication", content: "<p>User registration, login, JWT signing/verification, and protecting routes.</p>" },
-          { id: 'file-upload', title: "File Uploads & Multer", content: "<p>Handling file uploads, storing on disk and cloud (Cloudinary).</p>" },
-          { id: 'rest-api', title: "Advanced REST API Design", content: "<p>Pagination, filtering, sorting, rate limiting, and API versioning.</p>" }
-        ],
-        assignment: "Create a full Task Manager REST API with JWT authentication and MongoDB."
-      },
-      {
-        id: 'mern-adv',
-        label: "Fullstack Integration",
-        subtitle: "State Management & Deploy",
-        duration: "5 Weeks",
-        color: "#8b5cf6",
-        topics: [
-          { id: 'redux', title: "Redux Toolkit & State Management", content: "<p>Global state with Redux Toolkit, slices, async thunks, and RTK Query.</p>" },
-          { id: 'react-query', title: "React Query for Data Fetching", content: "<p>Caching, background refetching, optimistic updates with React Query.</p>" },
-          { id: 'socket', title: "Real-Time with Socket.io", content: "<p>WebSocket connections, rooms, broadcasting, and chat applications.</p>" },
-          { id: 'payments', title: "Payment Integration", content: "<p>Integrating Razorpay/Stripe payment gateway in MERN apps.</p>" },
-          { id: 'testing-mern', title: "Testing with Jest & Supertest", content: "<p>Unit tests for React components, API endpoint testing with Supertest.</p>" },
-          { id: 'deployment', title: "Deployment to Vercel & Railway", content: "<p>CI/CD pipelines, environment variables, and frontend + backend deployment.</p>" },
-          { id: 'perf', title: "Performance Optimization", content: "<p>Code splitting, lazy loading, image optimization, and Lighthouse audits.</p>" }
-        ],
-        assignment: "Integrate your Task Manager API with a React frontend using Redux Toolkit."
-      }
-    ],
-    finalAssignment: {
-      title: "Full-scale E-Learning Platform",
-      description: "A complete platform for hosting and managing online courses with real-time features.",
-      requirements: [
-        "User & Instructor role management",
-        "Video streaming integration",
-        "Payment gateway simulation",
-        "Real-time chat with Socket.io",
-        "Deployed to cloud"
-      ]
-    }
-  },
+
   'cloud-comp-01': {
     id: 'cloud-comp-01',
     title: "Cloud Computing Mastery",
@@ -316,7 +223,7 @@ export const COURSE_MAP = {
     modules: [
       {
         id: 'beginner',
-        label: "Beginner Module",
+        label: "Module 1",
         subtitle: "Cloud Fundamentals",
         duration: "3 Weeks",
         color: "#10b981",
@@ -333,7 +240,7 @@ export const COURSE_MAP = {
       },
       {
         id: 'intermediate',
-        label: "Intermediate Module",
+        label: "Module 2",
         subtitle: "Infra & Security",
         duration: "5 Weeks",
         color: "#2563eb",
@@ -350,7 +257,7 @@ export const COURSE_MAP = {
       },
       {
         id: 'advanced',
-        label: "Advanced Module",
+        label: "Module 3",
         subtitle: "IaC & Kubernetes",
         duration: "6 Weeks",
         color: "#8b5cf6",
@@ -375,100 +282,6 @@ export const COURSE_MAP = {
         "Full infrastructure via Terraform",
         "Kubernetes deployment on EKS",
         "CI/CD pipeline with CodePipeline"
-      ]
-    }
-  },
-  'devops-01': {
-    id: 'devops-01',
-    title: "DevOps Engineering",
-    description: "Automate your infrastructure and master CI/CD pipelines from end to end.",
-    duration: "5 Months",
-    students: 8000,
-    rating: 4.7,
-    level: "Advanced",
-    progress: 0,
-    trainer: {
-      name: "Emily Watson",
-      role: "Lead DevOps Engineer",
-      experience: "11+ Years",
-      specialization: "Kubernetes, Jenkins, GitOps"
-    },
-    batch: {
-      name: "Weekend Intensive",
-      id: "BID-DEVOPS-2026-01",
-      startDate: "Feb 15, 2026",
-      timing: "Sat, Sun — 8:00 AM to 1:00 PM",
-      duration: "5 Months · Online Live"
-    },
-    objective: "This program equips you with the end-to-end DevOps mindset and toolchain — from Linux system administration and version control, through Docker containerization and Kubernetes orchestration, to automated CI/CD pipelines and production monitoring. You will graduate as an engineer who can bridge the gap between development and operations.",
-    benefits: [
-      { icon: "🔧", label: "Tool Mastery", desc: "Docker, K8s, Jenkins & more" },
-      { icon: "👨‍💻", label: "Production Focus", desc: "Real pipelines, real systems" },
-      { icon: "♾️", label: "Lifetime Access", desc: "Labs and videos forever" },
-      { icon: "🚀", label: "Job Ready", desc: "Clear interview prep path" }
-    ],
-    modules: [
-      {
-        id: 'beginner',
-        label: "Beginner Module",
-        subtitle: "Linux & Git",
-        duration: "3 Weeks",
-        color: "#10b981",
-        topics: [
-          { id: 'linux-basics', title: "Linux Fundamentals & CLI", content: "<p>File system navigation, permissions, process management, and shell scripting.</p>" },
-          { id: 'git', title: "Git Version Control", content: "<p>Branching, merging, rebasing, and collaborative workflows with GitHub.</p>" },
-          { id: 'docker', title: "Docker & Containerization", content: "<p>Dockerfiles, multi-stage builds, volumes, networks, and Docker Compose.</p>" },
-          { id: 'docker-adv', title: "Advanced Docker Patterns", content: "<p>Docker registries, secrets management, and Compose for local dev.</p>" },
-          { id: 'yaml-json', title: "YAML, JSON & Config Management", content: "<p>Mastering structured data formats used across all DevOps tools.</p>" },
-          { id: 'networking', title: "Networking for DevOps", content: "<p>TCP/IP, DNS, HTTP, TLS/SSL certificates, and load balancing basics.</p>" },
-          { id: 'linux-adv', title: "Shell Scripting & Automation", content: "<p>Writing bash scripts for automation, cron jobs, and system monitoring.</p>" }
-        ],
-        assignment: "Dockerize a Node.js application with Docker Compose including a MongoDB service."
-      },
-      {
-        id: 'intermediate',
-        label: "Intermediate Module",
-        subtitle: "CI/CD & Kubernetes",
-        duration: "6 Weeks",
-        color: "#2563eb",
-        topics: [
-          { id: 'cicd', title: "CI/CD Concepts & Jenkins", content: "<p>Pipeline as code with Jenkinsfile, build, test, and deploy stages.</p>" },
-          { id: 'github-actions', title: "GitHub Actions Workflows", content: "<p>Automated testing, Docker builds, and deployments using GitHub Actions.</p>" },
-          { id: 'k8s-intro', title: "Kubernetes Core Concepts", content: "<p>Pods, Deployments, ReplicaSets, Services, and Namespaces.</p>" },
-          { id: 'k8s-config', title: "K8s ConfigMaps & Secrets", content: "<p>Externalizing configuration and managing sensitive data securely.</p>" },
-          { id: 'k8s-networking', title: "K8s Networking & Ingress", content: "<p>ClusterIP, NodePort, LoadBalancer services, and Ingress controllers.</p>" },
-          { id: 'helm', title: "Helm — The Kubernetes Package Manager", content: "<p>Creating and deploying Helm charts for repeatable K8s application packaging.</p>" },
-          { id: 'k8s-storage', title: "Persistent Volumes & Stateful Apps", content: "<p>PVs, PVCs, StatefulSets and running databases on Kubernetes.</p>" }
-        ],
-        assignment: "Build a full Jenkins pipeline that builds, tests, and deploys to a K8s cluster."
-      },
-      {
-        id: 'advanced',
-        label: "Advanced Module",
-        subtitle: "GitOps & Observability",
-        duration: "6 Weeks",
-        color: "#8b5cf6",
-        topics: [
-          { id: 'argocd', title: "GitOps with ArgoCD", content: "<p>Continuous delivery using pull-based GitOps with ArgoCD on Kubernetes.</p>" },
-          { id: 'terraform-devops', title: "Infrastructure as Code with Terraform", content: "<p>Automating cloud resource provisioning via Terraform in CI/CD pipelines.</p>" },
-          { id: 'prometheus', title: "Prometheus Monitoring", content: "<p>Metrics collection, alerting rules, and PromQL queries.</p>" },
-          { id: 'grafana', title: "Grafana Dashboards", content: "<p>Visualizing infrastructure and application metrics with Grafana.</p>" },
-          { id: 'efk', title: "Centralized Logging with EFK Stack", content: "<p>Elasticsearch, Fluentd/Bit, and Kibana for log aggregation and search.</p>" },
-          { id: 'security-devops', title: "DevSecOps & Container Security", content: "<p>Image scanning with Trivy, SAST tools, and secrets detection in pipelines.</p>" },
-          { id: 'sre', title: "SLOs, SLIs & Incident Management", content: "<p>Site Reliability Engineering concepts: on-call, runbooks, and post-mortems.</p>" }
-        ],
-        assignment: "Deploy a microservices app via Helm with ArgoCD and Prometheus monitoring."
-      }
-    ],
-    finalAssignment: {
-      title: "End-to-End DevOps Pipeline",
-      description: "A fully automated CI/CD pipeline that deploys a multi-tier app to EKS with GitOps.",
-      requirements: [
-        "Git-based GitOps workflow with ArgoCD",
-        "Automated tests & Docker image scanning",
-        "Kubernetes deployment via Helm",
-        "Full Prometheus + Grafana monitoring",
-        "Runbook and post-mortem documentation"
       ]
     }
   }
