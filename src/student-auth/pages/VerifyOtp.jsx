@@ -190,22 +190,28 @@ const VerifyOtp = () => {
           </div>
 
           {/* Verify + Resend buttons */}
-          <div style={{ display:'flex', gap:'10px', width:'100%' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', width: '100%', marginTop: '16px' }}>
             <button
-              type="button" className="sa-submit-btn" style={{ margin:0 }}
-              onClick={handleVerify} disabled={loading || expired}
+              type="button"
+              className="sa-submit-btn"
+              style={{ width: '160px', flex: '0 0 auto', margin: 0, height: '44px', whiteSpace: 'nowrap', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              onClick={handleVerify}
+              disabled={loading || expired}
             >
               {loading
-                ? <span className="sa-btn-inner"><span className="sa-spinner"/>Verifying…</span>
+                ? <span className="sa-btn-inner"><span className="sa-spinner" />VERIFYING...</span>
                 : 'Verify OTP'}
             </button>
             <button
-              type="button" className="sa-submit-btn" style={{ margin:0 }}
-              onClick={handleResend} disabled={resending || loading}
+              type="button"
+              className="sa-submit-btn"
+              style={{ width: '160px', flex: '0 0 auto', margin: 0, height: '44px', whiteSpace: 'nowrap', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              onClick={handleResend}
+              disabled={resending || loading}
             >
               {resending
-                ? <span className="sa-btn-inner"><RefreshCw size={13} style={{ marginRight:4, animation:'saSpin 0.7s linear infinite' }}/>Resending…</span>
-                : <span className="sa-btn-inner"><RefreshCw size={13} style={{ marginRight:4 }}/>Resend OTP</span>}
+                ? <span className="sa-btn-inner"><RefreshCw size={14} style={{ animation: 'saSpin 0.7s linear infinite' }} /></span>
+                : <span className="sa-btn-inner"><RefreshCw size={14} style={{ marginRight: 6 }} />Resend OTP</span>}
             </button>
           </div>
         </div>

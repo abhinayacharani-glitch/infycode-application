@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
-import { User, Mail, Phone, Lock, Eye, EyeOff, RefreshCw } from "lucide-react";
+import { User, Mail, Phone, Lock, Eye, EyeOff, RefreshCw, CheckCircle } from "lucide-react";
 import { validateEmail, validatePassword, validateFullName, validatePhone } from "../utils/validation";
 import { studentLogin, studentRegister, studentVerifyRegistrationOTP, resendRegistrationOTP } from "../../services/api";
 
@@ -49,6 +49,7 @@ function Login() {
   const [otpExpired, setOtpExpired] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [otpMsg, setOtpMsg] = useState({ type: "", text: "" });
+  const [successMessage, setSuccessMessage] = useState("");
 
   const maskEmail = (email) => {
     const [name, domain] = email.split("@");
@@ -80,6 +81,26 @@ function Login() {
     }
     return () => clearInterval(interval);
   }, [showOTP, otpTimer]);
+
+  // --- SUCCESS MESSAGE TIMER ---
+  React.useEffect(() => {
+    if (location.state?.fromRegister || location.state?.fromReset) {
+      const msg = location.state.fromRegister
+        ? "Account created successfully, please sign in"
+        : "Password reset successful, please sign in";
+      setSuccessMessage(msg);
+
+      // Clear the message after 5 seconds
+      const timer = setTimeout(() => {
+        setSuccessMessage("");
+      }, 5000);
+
+      // Clear navigation state to prevent re-display on reload
+      window.history.replaceState({}, document.title);
+
+      return () => clearTimeout(timer);
+    }
+  }, [location.state]);
 
   // --- HANDLERS ---
   const handleSignInChange = (e) => {
@@ -197,6 +218,8 @@ function Login() {
         setShowOTP(false);
         setIsActive(false); // Switch to login
         setShowSuccess(false);
+        // Navigate to login with state to trigger the success message
+        navigate('/student/login', { state: { fromRegister: true }, replace: true });
       }, 2500);
 
     } catch (err) {
@@ -233,6 +256,13 @@ function Login() {
           <AuthFormCard>
             <h1 className="sa-form-heading">Sign In</h1>
             <p className="sa-form-sub">Glad to see you again!</p>
+
+            {successMessage && (
+              <div className="sa-banner sa-banner--success">
+                <CheckCircle size={16} />
+                <span>{successMessage}</span>
+              </div>
+            )}
 
             {signInApiError && <p className="sa-api-error">{signInApiError}</p>}
 
