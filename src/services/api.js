@@ -4,7 +4,7 @@
  * Merged version: Includes advanced Auth (Student/Trainer/Admin) + Course Management
  */
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '';
 
 /**
  * Internal helper — wraps fetch + JSON parsing + error extraction

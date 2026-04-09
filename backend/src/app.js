@@ -8,19 +8,16 @@ import passwordRoutes from "./routes/passwordRoutes.js";
 const app = express();
 
 // ── CORS ────────────────────────────────────────────────────────────────────
-// Allow the Vite dev server and any localhost port used during development.
-const allowedOrigins = [
-  "http://localhost:5173",
-  "http://localhost:5174",
-  "http://localhost:3000",
-  process.env.FRONTEND_URL,
-].filter(Boolean);
+// Allow any localhost origin (any port) during development.
+const LOCALHOST_REGEX = /^https?:\/\/localhost(:\d+)?$/;
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (Postman, curl, same-origin)
-      if (!origin || allowedOrigins.includes(origin)) {
+      // Allow requests with no origin (Postman, curl, same-origin/proxy)
+      if (!origin || LOCALHOST_REGEX.test(origin)) {
+        callback(null, true);
+      } else if (process.env.FRONTEND_URL && origin === process.env.FRONTEND_URL) {
         callback(null, true);
       } else {
         callback(new Error(`CORS policy: origin '${origin}' not allowed`));
