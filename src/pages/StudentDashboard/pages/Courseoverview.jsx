@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { COURSE_MAP } from './data/extraCourses';
-import './Courseoverview.css';
+import './CourseOverview.css';
 
 const CourseOverview = () => {
   const location = useLocation();
