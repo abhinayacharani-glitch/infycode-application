@@ -13,6 +13,7 @@ import Materials from "./pages/Materials";
 import Attendance from "./pages/Attendance";
 import Feedback from "./pages/Feedback";
 import Messages from "./pages/Messages";
+import LiveSession from "./pages/LiveSession";
 import Logout from "./pages/Logout";
 
 const TrainerDashboard = () => {
@@ -38,6 +39,7 @@ const TrainerDashboard = () => {
             <Route path="attendance" element={<Attendance />} />
             <Route path="feedback" element={<Feedback />} />
             <Route path="messages" element={<Messages />} />
+            <Route path="live-session" element={<LiveSession />} />
             <Route path="logout" element={<Logout />} />
           </Routes>
         </main>

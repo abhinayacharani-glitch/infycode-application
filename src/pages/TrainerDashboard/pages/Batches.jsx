@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Batches = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('all');
 
   const batches = [
@@ -58,7 +60,9 @@ const Batches = () => {
       {/* BATCH CARDS – 4-column overview */}
       <div className="kpi-grid" style={{ marginBottom: '28px' }}>
         {batches.map(b => (
-          <div key={b.id} className="card" style={{ border: `1.5px solid ${b.color}22`, cursor: 'pointer', transition: 'all .25s' }}
+          <div key={b.id} className="card" 
+            style={{ border: `1.5px solid ${b.color}22`, cursor: 'pointer', transition: 'all .25s' }}
+            onClick={() => navigate("/trainer-dashboard/live-session")}
             onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-3px)'}
             onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
             <div className="card-body" style={{ padding: '20px 22px' }}>

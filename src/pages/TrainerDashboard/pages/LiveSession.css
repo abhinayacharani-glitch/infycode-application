@@ -1,0 +1,254 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+/* Container */
+.live-session-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background: #f8fafc;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* 🔥 CENTERED HEADER */
+.page-header {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.page-header h1 {
+  color: #2563eb;
+  font-size: 32px;
+  /* Bigger */
+  font-weight: 800;
+  /* Bold */
+  margin-bottom: 6px;
+}
+
+.page-header p {
+  color: #000;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Card */
+.live-session-card {
+  background: white;
+  border-radius: 20px;
+  padding: 16px;
+  width: 100%;
+  max-width: 450px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
+
+/* Image */
+.image-container {
+  height: 140px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.live-session-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Form */
+.form-group label {
+  font-weight: 600;
+  font-size: 13px;
+  color: #000;
+}
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 8px;
+  transition: all 0.3s ease-in-out;
+}
+
+.input-wrapper input {
+  border: none;
+  outline: none;
+  flex: 1;
+  transition: all 0.3s ease-in-out;
+}
+
+.input-wrapper:focus-within {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.2);
+}
+
+.input-error {
+  border-color: #ef4444;
+  animation: error-border 0.35s ease-in-out 2;
+}
+
+.error-text {
+  color: #dc2626;
+  font-size: 12px;
+  margin-top: 6px;
+  margin-bottom: 0;
+}
+
+.icon {
+  margin-right: 6px;
+}
+
+/* Time Buttons */
+.top-time-row {
+  display: flex;
+  gap: 10px;
+}
+
+.time-btn {
+  flex: 1;
+  background: #2563eb;
+  color: white;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 600;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.time-btn:hover {
+  transform: scale(1.03);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.22);
+}
+
+/* 🔥 NEW SIDE HEADING */
+.section-heading {
+  font-size: 15px;
+  font-weight: 700;
+  color: #2563eb;
+}
+
+/* Dropdown */
+.dropdown-header {
+  display: flex;
+  justify-content: space-between;
+  background: #e8f0ff;
+  padding: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #2563eb;
+  transition: all 0.3s ease-in-out;
+}
+
+.dropdown-header:hover {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+/* Schedule */
+.schedule-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.schedule-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  background: #f1f5f9;
+  padding: 8px;
+  border-radius: 10px;
+}
+
+.day {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 110px;
+  font-weight: 600;
+}
+
+.schedule-row select {
+  flex: 1;
+  padding: 6px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  transition: all 0.3s ease-in-out;
+}
+
+.schedule-row select:hover,
+.schedule-row select:focus {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.2);
+  outline: none;
+}
+
+.reason-input {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 13px;
+  resize: vertical;
+  min-height: 60px;
+  animation: fade-in 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+}
+
+.reason-input:focus {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.2);
+  outline: none;
+}
+
+/* Save */
+.save-btn {
+  margin-top: 8px;
+  padding: 12px;
+  border-radius: 12px;
+  background: linear-gradient(to right, #2563eb, #1d4ed8);
+  color: white;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.save-btn:hover:not(:disabled) {
+  transform: scale(1.03);
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.28);
+}
+
+.save-btn:disabled {
+  background: #cbd5e1;
+  cursor: not-allowed;
+}
+
+@keyframes error-border {
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+  50% {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

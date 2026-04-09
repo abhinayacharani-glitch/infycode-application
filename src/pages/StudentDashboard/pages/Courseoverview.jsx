@@ -1,13 +1,138 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { COURSE_MAP } from './data/extraCourses';
 import './CourseOverview.css';
+
+const daysOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+const parse12HourToMinutes = (time12) => {
+  if (!time12) return 0;
+  const [time, suffix] = time12.split(' ');
+  let [hour, minute] = time.split(':').map(Number);
+  if (suffix === 'PM' && hour !== 12) hour += 12;
+  if (suffix === 'AM' && hour === 12) hour = 0;
+  return (hour * 60) + minute;
+};
+
+const formatCountdown = (ms) => {
+  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  return `${String(hours).padStart(2, '0')} : ${String(minutes).padStart(2, '0')} : ${String(seconds).padStart(2, '0')}`;
+};
+
+const getDayStatus = (dayName, dayData, now) => {
+  if (dayData?.status === 'cancelled') {
+    return { state: 'cancelled', text: `Class Cancelled: ${dayData.reason || 'No reason provided'}` };
+  }
+  if (dayData?.status !== 'scheduled') return { state: 'completed', text: 'Class is Over' };
+
+  const currentDayIndex = (now.getDay() + 6) % 7;
+  const itemDayIndex = daysOrder.indexOf(dayName);
+  const startMinutes = parse12HourToMinutes(dayData.startTime);
+  const endMinutes = parse12HourToMinutes(dayData.endTime);
+  const nowMinutes = (now.getHours() * 60) + now.getMinutes();
+
+  if (itemDayIndex === currentDayIndex) {
+    if (nowMinutes >= startMinutes && nowMinutes <= endMinutes) {
+      return { state: 'live', text: 'Class is Live Now' };
+    }
+    if (nowMinutes < startMinutes) {
+      const target = new Date(now);
+      target.setHours(Math.floor(startMinutes / 60), startMinutes % 60, 0, 0);
+      return { state: 'upcoming', text: `Class starts in: ${formatCountdown(target.getTime() - now.getTime())}` };
+    }
+    return { state: 'completed', text: 'Class is Over' };
+  }
+
+  if (itemDayIndex > currentDayIndex) {
+    const target = new Date(now);
+    target.setDate(now.getDate() + (itemDayIndex - currentDayIndex));
+    target.setHours(Math.floor(startMinutes / 60), startMinutes % 60, 0, 0);
+    return { state: 'upcoming', text: `Class starts in: ${formatCountdown(target.getTime() - now.getTime())}` };
+  }
+
+  return { state: 'completed', text: 'Class is Over' };
+};
+
+const getOverallStatus = (config, now) => {
+  if (!config || !config.sessionLink) return 'no-link';
+  const liveSessionRaw = localStorage.getItem('liveSessionData');
+  const dayWiseData = liveSessionRaw ? JSON.parse(liveSessionRaw) : {};
+  const todayName = daysOrder[(now.getDay() + 6) % 7];
+  const todayStatus = getDayStatus(todayName, dayWiseData[todayName], now);
+  if (todayStatus.state === 'live') return 'live';
+  if (todayStatus.state === 'upcoming') return 'upcoming';
+  return 'ended';
+};
 
 const CourseOverview = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const courseId = location.state || 'java-fs-01';
   const course = COURSE_MAP[courseId];
+
+  const [sessionStatus, setSessionStatus] = useState('no-link');
+  const [sessionConfig, setSessionConfig] = useState(null);
+  const [dayStatuses, setDayStatuses] = useState([]);
+  const [sessionData, setSessionData] = useState({});
+
+  useEffect(() => {
+    const getData = () => {
+      const raw = localStorage.getItem('liveSessionData');
+      const data = raw ? JSON.parse(raw) : {};
+      setSessionData(data || {});
+    };
+
+    getData();
+    window.addEventListener('storage', getData);
+    return () => {
+      window.removeEventListener('storage', getData);
+    };
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const raw = localStorage.getItem('liveSessionData');
+      const data = raw ? JSON.parse(raw) : {};
+      setSessionData(data || {});
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const check = () => {
+      try {
+        const raw = localStorage.getItem('live_session_config');
+        const config = raw ? JSON.parse(raw) : null;
+        const liveSessionRaw = localStorage.getItem('liveSessionData');
+        const liveSessionData = liveSessionRaw ? JSON.parse(liveSessionRaw) : {};
+        const now = new Date();
+        const todayIndex = (now.getDay() + 6) % 7;
+        const todayName = daysOrder[todayIndex];
+        const tomorrowName = daysOrder[(todayIndex + 1) % 7];
+        const computedStatuses = [
+          { day: todayName, ...getDayStatus(todayName, liveSessionData[todayName], now) },
+          { day: tomorrowName, ...getDayStatus(tomorrowName, liveSessionData[tomorrowName], now) },
+        ];
+        setSessionConfig(config);
+        setSessionStatus(getOverallStatus(config, now));
+        setDayStatuses(computedStatuses);
+      } catch {
+        setSessionStatus('no-link');
+      }
+    };
+
+    check();
+    const timer = setInterval(check, 1000);
+    window.addEventListener('storage', check);
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener('storage', check);
+    };
+  }, []);
 
   if (!course) {
     return <div className="overview-error">Course not found.</div>;
@@ -20,6 +145,20 @@ const CourseOverview = () => {
   const handleBack = () => {
     navigate('/student-dashboard/courses');
   };
+
+  const handleJoin = () => {
+    if (sessionStatus === 'live' && sessionConfig?.sessionLink) {
+      window.open(sessionConfig.sessionLink, '_blank');
+    }
+  };
+
+  const statusLabel = {
+    'live':     { icon: '🟢', text: 'Live Now',    className: 'status-live' },
+    'upcoming': { icon: '🟡', text: sessionConfig ? `Starts at ${sessionConfig.startTime}` : 'Upcoming', className: 'status-upcoming' },
+    'ended':    { icon: '🔴', text: 'Session Ended', className: 'status-ended' },
+    'expired':  { icon: '🔴', text: 'Session Ended', className: 'status-ended' },
+    'no-link':  { icon: '⚪', text: 'Not Configured', className: 'status-none' },
+  }[sessionStatus];
 
   return (
     <div className="course-overview-page">
@@ -38,8 +177,29 @@ const CourseOverview = () => {
           <p className="co-subtitle">Explore the curriculum, meet your trainer, and get started on your learning journey.</p>
         </div>
         <div className="co-hero-right">
-          <button className="co-join-btn" onClick={() => window.open('https://meet.google.com/new', '_blank')}>
-            <div className="co-join-dot" />
+          {/* Session Status Indicator */}
+          <div className={`session-status-badge ${statusLabel.className}`}>
+            <span>{statusLabel.icon}</span>
+            <span>{statusLabel.text}</span>
+          </div>
+          {dayStatuses.length > 0 && (
+            <div className="co-day-status-list">
+              {dayStatuses.map((item) => (
+                <div key={item.day} className={`co-day-status-row ${item.state}`}>
+                  <span className="co-day-name">{item.day}</span>
+                  <span className="co-day-value">{item.text}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          {/* Join Button */}
+          <button
+            className={`co-join-btn ${sessionStatus !== 'live' ? 'disabled' : ''}`}
+            onClick={handleJoin}
+            disabled={sessionStatus !== 'live'}
+            title={sessionStatus === 'no-link' ? 'Session not configured by trainer' : undefined}
+          >
+            <div className={`co-join-dot ${sessionStatus === 'live' ? 'live' : 'inactive'}`} />
             Join Live Class
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 10 20 5 20 19 15 14" /><rect x="2" y="5" width="13" height="14" rx="2" ry="2" /></svg>
           </button>
