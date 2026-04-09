@@ -1,3 +1,4 @@
+
 /* 🔷 ROOT VARIABLES (OPTIONAL) */
 :root {
   --sidebar-bg: #3b6ff5;
@@ -8,8 +9,7 @@
 /* 🔷 NAVBAR */
 .navbar-premium {
   height: 100px;
-  background-color: var(--nav-bg-glass);
-  /* Glassmorphism base */
+  background-color: var(--nav-bg-glass); /* Glassmorphism base */
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -21,8 +21,7 @@
   top: 0;
   z-index: 100;
   font-family: 'Urbanist', sans-serif;
-  color: #ffffff;
-  /* Explicitly set white text */
+  color: #ffffff; /* Explicitly set white text */
 }
 
 /* 🔷 CONTAINER */
@@ -46,8 +45,7 @@
 .welcome-msg {
   font-size: var(--fs-h2);
   font-weight: 700;
-  color: #ffffff;
-  /* Force white text */
+  color: #ffffff; /* Force white text */
   margin: 0;
 }
 
@@ -73,8 +71,7 @@
   width: 40px;
   height: 40px;
   font-size: 1.4rem;
-  color: #ffffff;
-  /* Force white icon */
+  color: #ffffff; /* Force white icon */
   cursor: pointer;
   display: flex;
   align-items: center;
