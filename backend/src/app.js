@@ -4,6 +4,7 @@ import authRoutes from "./routes/authRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import trainerRoutes from "./routes/trainerRoutes.js";
 import passwordRoutes from "./routes/passwordRoutes.js";
+import courseRoutes from "./routes/courseRoutes.js";
 
 const app = express();
 
@@ -46,5 +47,6 @@ app.use("/api", authRoutes);              // /api/student/login, /api/student/re
 app.use("/api/admin", adminRoutes);       // /api/admin/login, /api/admin/register
 app.use("/api/trainer", trainerRoutes);   // /api/trainer/login, /api/trainer/register
 app.use("/api/password", passwordRoutes); // /api/password/forgot-password, /api/password/reset-password
+app.use("/api/courses", courseRoutes);    // /api/courses CRUD
 
 export default app;

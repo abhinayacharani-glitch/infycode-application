@@ -1,0 +1,252 @@
+@import url('https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap');
+
+/* ================= ROOT ================= */
+:root {
+  --adm-bg-white: #ffffff;
+  --adm-hover: rgba(0, 0, 0, 0.05);
+  --adm-active: rgba(0, 0, 0, 0.08);
+  --adm-accent: #3b82f6;
+  --adm-sidebar-width: 260px;
+}
+
+/* ================= SIDEBAR ================= */
+.admin-sidebar {
+  width: var(--adm-sidebar-width);
+  height: 100vh;
+  background: var(--adm-bg-white);
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 0;
+  gap: 12px;
+  font-family: 'Urbanist', sans-serif;
+  z-index: 1000;
+  border-right: 1.5px solid #dbeafe;
+  animation: admSidebarFade 0.4s ease;
+  transition: all 0.3s ease;
+}
+
+/* ================= BRAND ================= */
+.adm-brand-section {
+  padding: 12px 20px;
+}
+
+.adm-logo-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+  text-decoration: none;
+}
+
+.adm-logo-container:hover {
+  transform: scale(1.03);
+}
+
+.adm-logo-img {
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+
+.adm-brand-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.adm-title-img {
+  width: 100%;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+/* ================= USER CARD ================= */
+.adm-user-card {
+  margin: 0 16px;
+  padding: 12px;
+  border-radius: 14px;
+  background: #f0f6ff;
+  border: 1px solid #dbeafe;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: 0.3s;
+}
+
+.adm-user-card:hover {
+  background: #e8f2ff;
+}
+
+.adm-user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+}
+
+.adm-user-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.adm-user-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.adm-user-role {
+  font-size: 11px;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.adm-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #22c55e;
+  display: inline-block;
+}
+
+/* ================= NAV ================= */
+.adm-nav-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0 12px;
+  gap: 4px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #dbeafe transparent;
+}
+
+.adm-nav-body::-webkit-scrollbar {
+  width: 4px;
+}
+
+.adm-nav-body::-webkit-scrollbar-thumb {
+  background: #dbeafe;
+  border-radius: 4px;
+}
+
+/* ================= SECTION LABEL ================= */
+.adm-nav-section {
+  padding: 14px 12px 6px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+/* ================= NAV ITEM ================= */
+.adm-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #2563eb;
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+
+.adm-nav-item:hover {
+  background: var(--adm-hover);
+  transform: translateX(4px);
+  color: #1e40af;
+}
+
+.adm-nav-item.active {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-left: 4px solid #3b82f6;
+  border-radius: 4px 10px 10px 4px;
+}
+
+.adm-nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  color: inherit;
+}
+
+.adm-nav-label {
+  flex: 1;
+}
+
+.adm-nav-badge {
+  background: #2563eb;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 20px;
+}
+
+.adm-nav-badge.amber { background: #f59e0b; }
+.adm-nav-badge.green { background: #22c55e; }
+
+/* ================= FOOTER ================= */
+.adm-sidebar-footer {
+  padding: 12px 12px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.adm-logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #ef4444;
+  font-size: 13.5px;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.adm-logout-btn:hover {
+  background: #fee2e2;
+  transform: translateX(4px);
+}
+
+/* ================= ANIMATION ================= */
+@keyframes admSidebarFade {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1024px) {
+  .admin-sidebar {
+    transform: translateX(-100%);
+  }
+}

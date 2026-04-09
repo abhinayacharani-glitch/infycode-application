@@ -50,9 +50,7 @@ import AboutPage from "./pages/InternalPages/AboutPage";
 import GalleryPage from "./pages/InternalPages/GalleryPage";
 
 import CoreTestApp from "./pages/StudentDashboard/pages/core-test/CoreTest";
-import AdminPage from "./pages/CourseManagement/AdminPage";
-import CourseFeed from "./pages/CourseManagement/CourseFeed";
-import { CourseForm, CourseFeed as SocialFeed } from "./pages/CourseManagement/CourseForm";
+// Course management is now handled in AdminDashboard
 import BatchCreation from "./pages/BatchCreation";
 
 import {
@@ -187,47 +185,7 @@ function Layout({ courses, setCourses, onToggleLike, onUpdateCourse, onDeleteCou
           <Route path="/trainer-dashboard/*" element={<TrainerDashboard />} />
           <Route path="/admin-dashboard/*" element={<AdminProvider><AdminDashboard /></AdminProvider>} />
 
-          {/* ── Course Management ── */}
-          <Route
-            path="/coursepage"
-            element={
-              <CourseFeed
-                courses={courses}
-                onToggleLike={onToggleLike}
-                onUpdateCourse={onUpdateCourse}
-                onDeleteCourse={onDeleteCourse}
-              />
-            }
-          />
-          <Route
-            path="/admin"
-            element={
-              <AdminPage
-                onCoursePublished={(newCourse) =>
-                  setCourses((prev) => [newCourse, ...prev])
-                }
-              />
-            }
-          />
-          <Route
-            path="/social-feed"
-            element={
-              <div className="social-feed-page">
-                <div className="form-wrapper">
-                  <h2 style={{ marginBottom: "20px" }}>Publish Course</h2>
-                  <CourseForm
-                    onAddCourse={(c) => setCourses((prev) => [c, ...prev])}
-                  />
-                </div>
-                <SocialFeed
-                  courses={courses}
-                  onToggleLike={onToggleLike}
-                  onUpdateCourse={onUpdateCourse}
-                  onDeleteCourse={onDeleteCourse}
-                />
-              </div>
-            }
-          />
+          {/* ── Course Management ── moved to AdminDashboard ── */}
           <Route path="/batchcreation" element={<BatchCreation />} />
           <Route path="/loading" element={<LoadingPage />} />
         </Routes>

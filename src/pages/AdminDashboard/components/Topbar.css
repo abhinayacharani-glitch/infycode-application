@@ -1,0 +1,215 @@
+@import url('https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap');
+
+/* ================= TOPBAR ================= */
+.adm-topbar {
+  background: #ffffff;
+  border-bottom: 1.5px solid #dbeafe;
+  padding: 0 32px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.04);
+  font-family: 'Urbanist', sans-serif;
+}
+
+.adm-topbar-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.adm-topbar-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.adm-topbar-sub {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 400;
+  margin-top: 1px;
+}
+
+.adm-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.adm-date-chip {
+  background: #f0f6ff;
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #2563eb;
+  white-space: nowrap;
+}
+
+.adm-icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1.5px solid #dbeafe;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.18s;
+  position: relative;
+}
+
+.adm-icon-btn:hover {
+  background: #f0f6ff;
+  border-color: #99c2ff;
+}
+
+.adm-notif-dot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ef4444;
+  border: 2px solid #ffffff;
+}
+
+/* ================= NOTIFICATIONS DROPDOWN ================= */
+.adm-notif-dropdown {
+  position: absolute;
+  top: 46px;
+  right: 0;
+  width: 320px;
+  background: #ffffff;
+  border: 1.5px solid #dbeafe;
+  border-radius: 14px;
+  box-shadow: 0 16px 48px rgba(37, 99, 235, 0.12);
+  z-index: 200;
+  overflow: hidden;
+  animation: admNotifFade 0.3s ease;
+}
+
+.adm-notif-header {
+  padding: 14px 18px 12px;
+  border-bottom: 1px solid #dbeafe;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.adm-notif-header h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.adm-notif-count {
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+
+.adm-notif-list {
+  max-height: 280px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #dbeafe transparent;
+}
+
+.adm-notif-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.adm-notif-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px 18px;
+  border-bottom: 1px solid #f1f5f9;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.adm-notif-item.unread {
+  background: #eff6ff;
+}
+
+.adm-notif-item:hover {
+  background: #f8fafc;
+}
+
+.adm-notif-icon-wrap {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+}
+
+.adm-notif-icon-wrap.error { background: #fee2e2; }
+.adm-notif-icon-wrap.success { background: #dcfce7; }
+.adm-notif-icon-wrap.info { background: #e0f2fe; }
+
+.adm-notif-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.adm-notif-message {
+  font-size: 12.5px;
+  color: #334155;
+  line-height: 1.5;
+}
+
+.adm-notif-time {
+  font-size: 10.5px;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+.adm-notif-footer {
+  padding: 10px 18px;
+  border-top: 1px solid #dbeafe;
+}
+
+.adm-notif-view-all {
+  width: 100%;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1.5px solid #dbeafe;
+  background: #ffffff;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #2563eb;
+  cursor: pointer;
+  font-family: 'Urbanist', sans-serif;
+  transition: all 0.2s;
+}
+
+.adm-notif-view-all:hover {
+  background: #f0f6ff;
+  border-color: #99c2ff;
+}
+
+@keyframes admNotifFade {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

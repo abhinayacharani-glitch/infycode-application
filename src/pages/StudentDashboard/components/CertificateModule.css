@@ -201,7 +201,7 @@
   align-items: center;
   gap: 12px;
   padding: 1rem 2.5rem;
-  background: #1e3a8a;
+  background: #e6f4fb;
   color: var(--text-main);
   border: none;
   border-radius: 50px;
@@ -213,7 +213,7 @@
 }
 
 .cert-download-btn:hover {
-  background: #2563eb;
+  background: #9fbaf5;
   transform: translateY(-3px);
   box-shadow: 0 15px 30px rgba(30, 58, 138, 0.3);
 }

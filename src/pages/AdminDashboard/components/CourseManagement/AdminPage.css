@@ -419,3 +419,20 @@
   margin-bottom: 1.5rem;
   animation: ap-pop 0.3s ease forwards;
 }
+
+/* ── Embedded Mode Overrides ──────────────── */
+.ap-page.is-embedded {
+  min-height: auto;
+  background: transparent;
+  padding-top: 2rem;
+}
+
+.ap-page.is-embedded .ap-body {
+  margin: 0 auto 2rem;
+  padding: 0;
+}
+
+.ap-page.is-embedded .ap-form {
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+}

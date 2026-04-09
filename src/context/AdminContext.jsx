@@ -1,5 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { createBatch, getAdminStats } from '../services/api';
+import { 
+  createBatch, getAdminStats, getAllCourses,
+  createCourse as apiCreateCourse,
+  updateCourse as apiUpdateCourse,
+  deleteCourse as apiDeleteCourse,
+  toggleCourseLike as apiToggleCourseLike
+} from '../services/api';
 
 const AdminContext = createContext();
 
@@ -83,6 +89,53 @@ export const AdminProvider = ({ children }) => {
     }
   };
 
+  /* --- Course Actions --- */
+  const addCourse = async (courseData) => {
+    try {
+      const data = await apiCreateCourse(courseData);
+      setCourses(prev => [data.course, ...prev]);
+      fetchDashboardStats();
+      return data.course;
+    } catch (error) {
+      console.error("DEBUG: AdminContext.addCourse failed:", error);
+      throw error;
+    }
+  };
+
+  const updateCourse = async (id, fields) => {
+    try {
+      const data = await apiUpdateCourse(id, fields);
+      setCourses(prev => prev.map(c => c.id === id ? data.course : c));
+      return data.course;
+    } catch (error) {
+      console.error("Error updating course:", error);
+      throw error;
+    }
+  };
+
+  const deleteCourse = async (id) => {
+    try {
+      await apiDeleteCourse(id);
+      setCourses(prev => prev.filter(c => c.id !== id));
+      fetchDashboardStats();
+    } catch (error) {
+      console.error("Error deleting course:", error);
+      throw error;
+    }
+  };
+
+  const toggleCourseLike = async (id) => {
+    try {
+      const data = await apiToggleCourseLike(id);
+      setCourses(prev => prev.map(c => 
+        c.id === id ? { ...c, isLiked: data.isLiked, likes: data.likes } : c
+      ));
+    } catch (error) {
+      console.error("Error toggling like:", error);
+      throw error;
+    }
+  };
+
   const fetchDashboardStats = async () => {
     try {
       const data = await getAdminStats();
@@ -99,12 +152,13 @@ export const AdminProvider = ({ children }) => {
           active: apiStats?.activeTrainers || 0,
           pending: (apiTrainers?.length || 0) - (apiStats?.activeTrainers || 0)
         },
-        coursesCount: apiStats?.coursesCount || 3,
+        coursesCount: apiStats?.coursesCount || 0,
       });
 
       if (apiStudents) setStudents(apiStudents);
       if (apiTrainers) setTrainers(apiTrainers);
       if (apiBatches) setBatches(apiBatches);
+      // NOTE: courses are loaded separately via loadCourses()
 
       console.log("Frontend: Successfully synchronized with Live Firebase data.");
     } catch (error) {
@@ -112,11 +166,23 @@ export const AdminProvider = ({ children }) => {
     }
   };
 
-  useEffect(() => {
-    fetchDashboardStats(); // Fetch on mount
+  const loadCourses = async () => {
+    try {
+      const data = await getAllCourses();
+      setCourses(data.courses || []);
+    } catch (error) {
+      console.error("Frontend: Error loading courses:", error.message);
+    }
+  };
 
-    // Poll for real-time updates every 30 seconds
-    const interval = setInterval(fetchDashboardStats, 30000);
+  useEffect(() => {
+    fetchDashboardStats();
+    loadCourses(); // Load courses separately
+
+    const interval = setInterval(() => {
+      fetchDashboardStats();
+      loadCourses();
+    }, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -133,6 +199,11 @@ export const AdminProvider = ({ children }) => {
     toggleCourseStatus,
     markNotificationRead,
     addBatch,
+    addCourse,
+    updateCourse,
+    deleteCourse,
+    toggleCourseLike,
+    fetchDashboardStats,
   };
 
   return <AdminContext.Provider value={value}>{children}</AdminContext.Provider>;
