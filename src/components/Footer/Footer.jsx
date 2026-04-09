@@ -113,9 +113,9 @@ function Footer() {
 
           <div className="icons">
 
-            <div className="social-circle">
+            <Link to="/instagram" className="social-circle" onClick={() => window.scrollTo(0, 0)}>
               <i className="fa-brands fa-instagram"></i>
-            </div>
+            </Link>
 
             <div className="social-circle">
               <i className="fa-brands fa-x-twitter"></i>

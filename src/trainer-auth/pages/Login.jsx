@@ -9,19 +9,7 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  useEffect(() => {
-    const handleBack = () => {
-      window.history.pushState(null, "", window.location.href);
-      window.location.replace("/login");
-    };
-
-    window.history.pushState(null, "", window.location.href);
-    window.addEventListener("popstate", handleBack);
-
-    return () => {
-      window.removeEventListener("popstate", handleBack);
-    };
-  }, []);
+  // Remove back button interception that might interfere with navigation
 
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [errors, setErrors]     = useState({});
