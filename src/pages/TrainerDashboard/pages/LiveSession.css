@@ -10,25 +10,25 @@
   font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
-/* 🔥 CENTERED HEADER */
+/* Header */
 .page-header {
-  text-align: center;
-  margin-bottom: 16px;
+  margin-bottom: 24px;
 }
 
 .page-header h1 {
-  color: #2563eb;
-  font-size: 32px;
-  /* Bigger */
-  font-weight: 800;
-  /* Bold */
-  margin-bottom: 6px;
+  font-family: 'Urbanist', sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: #1E293B;
+  letter-spacing: 0.3px;
+  margin: 0 0 4px 0;
 }
 
 .page-header p {
-  color: #000;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 400;
+  color: #64748B;
+  margin: 0 0 20px 0;
 }
 
 /* Card */

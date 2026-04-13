@@ -72,39 +72,27 @@ const LogoutIcon = () => (
 );
 
 const Sidebar = () => {
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const userName = user.fullName || user.fullname || "Trainer";
-  const userEmail = user.email || "active.trainer@infycode.com";
-  const userInitial = userName ? userName.charAt(0).toUpperCase() : 'T';
+  const userName = "Charani";
+  const userEmail = "charani@gmail.com";
+  const userInitial = "C";
 
   return (
     <aside className="sd-sidebar">
-      {/* BRAND */}
-      <div className="sd-brand">
-        <Link to="/trainer-dashboard/dashboard" className="sd-logo-wrap">
-          <img src={icLogo} alt="InfyCode Logo" className="sd-logo" />
-          <div className="sd-brand-text">
-            <img src={bannerLogo} alt="InfyCode Banner" style={{ width: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} className="sd-title" />
-            <span className="sd-subtitle">Trainer Portal</span>
-          </div>
-        </Link>
-      </div>
-
-      {/* USER */}
-      <Link to="/trainer-dashboard/profile" className="sd-user-link">
-        <div className="sd-user">
-          <div className="sd-avatar">{userInitial}</div>
-          <div>
-            <div className="sd-name">{userName}</div>
-            <div className="sd-role">{userEmail}</div>
+      <Link to="/trainer-dashboard/profile" className="sd-profile-link">
+        <div className="sd-profile-card">
+          <div className="sd-avatar-circle">{userInitial}</div>
+          <div className="sd-user-info">
+            <div className="sd-user-name-wrapper">
+              <div className="sd-user-name">{userName}</div>
+              <span className="sd-status-dot"></span>
+            </div>
+            <div className="sd-user-role">Trainer</div>
           </div>
         </div>
       </Link>
 
       {/* NAV */}
       <div className="sd-nav">
-        <div className="nav-section-header">MAIN</div>
-
         <NavLink to="/trainer-dashboard/dashboard"
           className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
           <div className="sd-box">
@@ -138,14 +126,12 @@ const Sidebar = () => {
           </div>
         </NavLink>
 
-        <div className="nav-section-header">ACADEMIC</div>
-
         <NavLink to="/trainer-dashboard/materials"
           className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
           <div className="sd-box">
             <span className="sd-icon"><PaperclipIcon /></span>
             <span className="sd-text">Course Materials</span>
-            <span className="nav-badge green">12</span>
+            <span className="nav-badge">12</span>
           </div>
         </NavLink>
 
@@ -162,14 +148,14 @@ const Sidebar = () => {
           <div className="sd-box">
             <span className="sd-icon"><MessageIcon /></span>
             <span className="sd-text">Feedback & Ratings</span>
-            <span className="nav-badge amber">3</span>
+            <span className="nav-badge">3</span>
           </div>
         </NavLink>
       </div>
 
-      {/* FOOTER */}
+      {/* LOGOUT */}
       <div className="sd-footer">
-        <NavLink to="/trainer-dashboard/logout" className="sd-logout">
+        <NavLink to="/trainer-dashboard/logout" className="sd-logout-btn">
           <span className="sd-icon"><LogoutIcon /></span>
           <span className="sd-text">Logout</span>
         </NavLink>

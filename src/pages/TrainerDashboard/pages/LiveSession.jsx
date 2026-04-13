@@ -129,10 +129,10 @@ const LiveSession = () => {
   return (
     <div className="live-session-container">
 
-      {/* 🔥 CENTERED HEADER */}
+      {/* 🔥 HEADER */}
       <div className="page-header">
-        <h1>Live Session Manager</h1>
-        <p>Set up and control your live class schedule efficiently</p>
+        <h1>Live Session</h1>
+        <p>Manage and start your live classroom sessions</p>
       </div>
 
       <div className="live-session-card">

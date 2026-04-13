@@ -1,239 +1,416 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import {
+  Plus,
+  ChevronLeft,
+  ChevronRight,
+  X,
+  Clock,
+  Monitor,
+  Calendar,
+  ExternalLink,
+  Trash2,
+  Play,
+  Zap,
+  Filter,
+  Users
+} from 'lucide-react';
+import './Schedule.css';
+
+// --- HELPERS ---
+const getStartOfWeek = (date) => {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  return new Date(d.setDate(diff));
+};
+
+const formatDateForGrid = (date) => {
+  return date.toISOString().split('T')[0];
+};
+
+const getDayLabel = (date) => {
+  return date.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
+};
+
+const HOURS = Array.from({ length: 10 }, (_, i) => i + 9); // 9 AM to 6 PM
 
 const Schedule = () => {
-  const [calYear, setCalYear] = useState(2026);
-  const [calMonth, setCalMonth] = useState(2); // March 2026 (0-indexed)
-
-  const holidays = [
-    { m: 0, d: 1, name: "New Year's Day" },
-    { m: 0, d: 14, name: 'Makar Sankranti' },
-    { m: 0, d: 26, name: 'Republic Day' },
-    { m: 1, d: 26, name: 'Maha Shivaratri' },
-    { m: 2, d: 14, name: 'Holi' },
-    { m: 2, d: 31, name: 'Id-ul-Fitr (Eid)' },
-    { m: 3, d: 6, name: 'Ugadi' },
-    { m: 3, d: 10, name: 'Ram Navami' },
-    { m: 3, d: 14, name: 'Ambedkar Jayanti' },
-    { m: 3, d: 18, name: 'Good Friday' },
-    { m: 4, d: 1, name: 'May Day' },
-    { m: 4, d: 12, name: 'Buddha Purnima' },
-    { m: 6, d: 7, name: 'Bakrid (Eid al-Adha)' },
-    { m: 7, d: 15, name: 'Independence Day' },
-    { m: 7, d: 16, name: 'Parsi New Year' },
-    { m: 8, d: 5, name: 'Milad un-Nabi' },
-    { m: 9, d: 2, name: 'Gandhi Jayanti' },
-    { m: 9, d: 2, name: 'Dussehra' },
-    { m: 9, d: 20, name: 'Diwali' },
-    { m: 9, d: 21, name: 'Diwali Holiday' },
-    { m: 10, d: 5, name: 'Guru Nanak Jayanti' },
-    { m: 11, d: 25, name: 'Christmas' }
-  ];
-
-  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
-  const changeMonth = (dir) => {
-    let newMonth = calMonth + dir;
-    let newYear = calYear;
-    if (newMonth > 11) { newMonth = 0; newYear++; }
-    if (newMonth < 0) { newMonth = 11; newYear--; }
-    setCalMonth(newMonth);
-    setCalYear(newYear);
-  };
-
-  const isSessionDay = (year, month, day) => {
-    const dow = new Date(year, month, day).getDay();
-    return dow >= 1 && dow <= 5;
-  };
-
-  const getHolidays = (year, month, day) => {
-    return holidays.filter(h => h.m === month && h.d === day);
-  };
-
-  const renderCalendarDays = () => {
-    const firstDay = new Date(calYear, calMonth, 1).getDay();
-    const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
-    const today = new Date();
-    const cells = [];
-
-    for (let i = 0; i < firstDay; i++) {
-      cells.push(<div className="cal-day empty" key={`empty-${i}`}></div>);
+  const [currentWeekStart, setCurrentWeekStart] = useState(() => getStartOfWeek(new Date()));
+  const [activeView, setActiveView] = useState('Week');
+  
+  const [sessions, setSessions] = useState(() => {
+    const fallback = [
+      { id: 101, batchId: 'B1', topic: 'JavaScript Mastery', courseName: 'Full Stack', date: formatDateForGrid(new Date()), startTime: '09:00', duration: 120, status: 'Upcoming', mode: 'Online' },
+      { id: 102, batchId: 'B2', topic: 'Node.js Architecture', courseName: 'Backend Dev', date: formatDateForGrid(new Date()), startTime: '13:30', duration: 90, status: 'Upcoming', mode: 'Online' }
+    ];
+    try {
+      const data = localStorage.getItem('trainer_sessions_v2');
+      if (!data) return fallback;
+      const parsed = JSON.parse(data);
+      if (!Array.isArray(parsed)) return fallback;
+      
+      return parsed.map(s => {
+        // Sanitize legacy AM/PM format
+        if (s.startTime && (s.startTime.includes('AM') || s.startTime.includes('PM'))) {
+          const parts = s.startTime.split(' ');
+          const time = parts[0];
+          const modifier = parts[1];
+          let [hours, minutes] = time.split(':');
+          if (hours === '12') hours = '00';
+          if (modifier === 'PM') hours = parseInt(hours, 10) + 12;
+          return { ...s, startTime: `${hours.toString().padStart(2, '0')}:${minutes}` };
+        }
+        return s;
+      });
+    } catch (err) { 
+      console.error("Schedule Data Error:", err);
+      return fallback; 
     }
+  });
 
-    for (let d = 1; d <= daysInMonth; d++) {
-      const dow = new Date(calYear, calMonth, d).getDay();
-      const hols = getHolidays(calYear, calMonth, d);
-      const isToday = (today.getFullYear() === calYear && today.getMonth() === calMonth && today.getDate() === d);
-      const isSunday = dow === 0;
-      const session = isSessionDay(calYear, calMonth, d) && hols.length === 0;
+  const [batches] = useState(() => {
+    try {
+      const data = localStorage.getItem('trainer_batches_v2');
+      const parsed = data ? JSON.parse(data) : [];
+      return (Array.isArray(parsed) && parsed.length > 0) ? parsed : [
+        { id: 'B1', course: 'Full Stack Web Development' },
+        { id: 'B2', course: 'Python & Data Science' },
+        { id: 'B3', course: 'UI/UX Advanced Design' },
+        { id: 'B4', course: 'AWS & Cloud Architecture' }
+      ];
+    } catch { return []; }
+  });
 
-      let cls = 'cal-day';
-      if (hols.length > 0) cls += ' holiday';
-      else if (session) cls += ' session';
-      else cls += ' normal';
-      if (isToday) cls += ' today-cal';
-      if (isSunday) cls += ' sunday';
+  // UI State
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [selectedSession, setSelectedSession] = useState(null);
+  const [filters, setFilters] = useState({ batchId: '', courseName: '' });
 
-      const title = hols.length > 0 ? hols.map(h => h.name).join(', ') : (session ? 'Session Day' : (isSunday ? 'Sunday' : 'Saturday'));
-
-      cells.push(
-        <div className={cls} title={title} key={`day-${d}`}>
-          {d}
-          {hols.length > 0 && <span className="cal-dot holiday-dot"></span>}
-          {session && <span className="cal-dot session-dot"></span>}
-        </div>
-      );
+  // Persistence
+  useEffect(() => {
+    try {
+      localStorage.setItem('trainer_sessions_v2', JSON.stringify(sessions));
+    } catch (e) {
+      console.error("Failed to save sessions:", e);
     }
-    return cells;
+  }, [sessions]);
+
+  // Derived Data
+  const weekDays = useMemo(() => {
+    try {
+      const days = [];
+      const start = new Date(currentWeekStart);
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(start);
+        d.setDate(d.getDate() + i);
+        days.push(d);
+      }
+      return days;
+    } catch { return []; }
+  }, [currentWeekStart]);
+
+  const filteredSessions = useMemo(() => {
+    if (!Array.isArray(sessions)) return [];
+    return sessions.filter(s => {
+      if (!s) return false;
+      const matchesBatch = !filters.batchId || s.batchId === filters.batchId;
+      const matchesCourse = !filters.courseName || s.courseName === filters.courseName;
+      return matchesBatch && matchesCourse;
+    });
+  }, [sessions, filters]);
+
+  const todayStr = formatDateForGrid(new Date());
+  const todaySessions = useMemo(() => 
+    filteredSessions.filter(s => s.date === todayStr), 
+    [filteredSessions, todayStr]
+  );
+
+  const nextSession = useMemo(() => {
+    try {
+      const now = new Date();
+      return [...filteredSessions]
+        .filter(s => s.date && s.startTime && new Date(`${s.date}T${s.startTime}`) > now)
+        .sort((a, b) => new Date(`${a.date}T${a.startTime}`) - new Date(`${b.date}T${b.startTime}`))[0];
+    } catch { return null; }
+  }, [filteredSessions]);
+
+  // Handlers
+  const navigateWeek = (dir) => {
+    if (dir === 0) {
+      setCurrentWeekStart(getStartOfWeek(new Date()));
+      return;
+    }
+    const next = new Date(currentWeekStart);
+    next.setDate(next.getDate() + (dir * 7));
+    setCurrentWeekStart(next);
   };
 
-  const monthHolidays = holidays.filter(h => h.m === calMonth);
+  const handleAddSession = (e) => {
+    e.preventDefault();
+    try {
+      const formData = new FormData(e.target);
+      const batchId = formData.get('batchId');
+      const batch = batches.find(b => b.id === batchId);
 
-  const upcomingSessions = [
-    { date: 'Tomorrow', course: 'Full Stack Dev – React Hooks', batch: 'B12', time: '09:00 AM', mode: 'Online', color: 'var(--blue-500)' },
-    { date: 'Mar 20', course: 'Python – Machine Learning Basics', batch: 'C09', time: '12:00 PM', mode: 'Offline', color: 'var(--green)' },
-    { date: 'Mar 20', course: 'DevOps – Docker & Containers', batch: 'D02', time: '06:00 PM', mode: 'Online', color: 'var(--amber)' },
-    { date: 'Mar 21', course: 'UI/UX – Prototyping in Figma', batch: 'A05', time: '03:30 PM', mode: 'Online', color: 'var(--purple)' },
-    { date: 'Mar 22', course: 'Full Stack Dev – Node.js APIs', batch: 'B12', time: '09:00 AM', mode: 'Online', color: 'var(--blue-500)' },
-    { date: 'Mar 24', course: 'Python – Pandas & Data Analysis', batch: 'C09', time: '12:00 PM', mode: 'Offline', color: 'var(--green)' },
-  ];
+      const newSess = {
+        id: Date.now(),
+        batchId: batchId || 'GEN',
+        courseName: batch?.course || 'General',
+        topic: formData.get('topic') || 'New Session',
+        date: formData.get('date'),
+        startTime: formData.get('startTime') || '09:00',
+        duration: parseInt(formData.get('duration') || '60'),
+        mode: formData.get('mode') || 'Online',
+        status: 'Upcoming'
+      };
+
+      setSessions(prev => [...prev, newSess]);
+      setShowAddModal(false);
+    } catch (err) {
+      console.error("Add Session Error:", err);
+    }
+  };
+
+  const resetData = () => {
+    if (window.confirm("This will clear your schedule and restore defaults. Proceed?")) {
+      localStorage.removeItem('trainer_sessions_v2');
+      window.location.reload();
+    }
+  };
+
+  // Helper: Position relative to 9 AM for the WHOLE column
+  const getSessionStyle = (startTime, duration) => {
+    if (!startTime || !startTime.includes(':')) return { display: 'none' };
+    try {
+      const parts = startTime.split(':');
+      const h = parseInt(parts[0], 10);
+      const m = parseInt(parts[1], 10) || 0;
+      
+      const minutesFromStart = (h - 9) * 60 + m;
+      const top = (minutesFromStart / 60) * 80; // 80px per hour row
+      const height = (duration / 60) * 80;
+      
+      return { 
+        top: `${top}px`, 
+        height: `${height}px`,
+        visibility: minutesFromStart < 0 ? 'hidden' : 'visible'
+      };
+    } catch { return { display: 'none' }; }
+  };
 
   return (
-    <div className="page active" id="page-schedule">
-
-      {/* KPI Row */}
-      <div className="kpi-grid" style={{ marginBottom: '28px' }}>
-        <div className="kpi-card blue">
-          <div className="kpi-top"><div className="kpi-icon blue">📅</div><span className="kpi-trend up">Today</span></div>
-          <div className="kpi-val">3</div>
-          <div className="kpi-label">Sessions Today</div>
-          <div className="kpi-bar"><div className="kpi-bar-fill blue" style={{ width: '75%' }}></div></div>
+    <div className="schedule-v2-container">
+      {/* 1. HEADER */}
+      <div className="v2-page-header">
+        <div>
+          <h1 className="v2-title">Schedule</h1>
+          <p className="v2-subtitle">Manage and track your sessions and classes</p>
         </div>
-        <div className="kpi-card green">
-          <div className="kpi-top"><div className="kpi-icon green">📆</div><span className="kpi-trend up">Week</span></div>
-          <div className="kpi-val">14</div>
-          <div className="kpi-label">Sessions This Week</div>
-          <div className="kpi-bar"><div className="kpi-bar-fill green" style={{ width: '80%' }}></div></div>
-        </div>
-        <div className="kpi-card amber">
-          <div className="kpi-top"><div className="kpi-icon amber">⏱️</div><span className="kpi-trend up">Hrs</span></div>
-          <div className="kpi-val">42</div>
-          <div className="kpi-label">Hours This Month</div>
-          <div className="kpi-bar"><div className="kpi-bar-fill amber" style={{ width: '65%' }}></div></div>
-        </div>
-        <div className="kpi-card purple">
-          <div className="kpi-top"><div className="kpi-icon purple">🏖️</div><span className="kpi-trend up">Month</span></div>
-          <div className="kpi-val">{monthHolidays.length || 0}</div>
-          <div className="kpi-label">Holidays This Month</div>
-          <div className="kpi-bar"><div className="kpi-bar-fill purple" style={{ width: `${(monthHolidays.length / 5) * 100}%` }}></div></div>
+        <div className="header-actions">
+          <div className="date-pill-v2">
+            <Calendar size={16} />
+            <span>{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+          </div>
+          <button className="icon-btn-v2" onClick={() => navigateWeek(0)} title="Today"><Zap size={18} /></button>
+          <button className="icon-btn-v2" onClick={resetData} title="Reset Data" style={{opacity: 0.5}}><Trash2 size={16} /></button>
         </div>
       </div>
 
-      {/* MAIN 3-col layout: Weekly Schedule | Upcoming Sessions | Calendar */}
-      <div className="sched-layout" style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 1.4fr', gap: '24px', marginBottom: '24px' }}>
-
-        {/* Weekly Timetable */}
-        <div className="card">
-          <div className="card-header">
-            <div>
-              <div className="card-title">🗓️ Weekly Schedule</div>
-              <div className="card-sub">March 16 – March 22, 2026</div>
+      {/* 2. KPI SUMMARY */}
+      <div className="v2-summary-row">
+        <div className="kpi-card-v2">
+          <div className="kpi-icon-wrap blue"><Clock size={20} /></div>
+          <div className="kpi-data">
+            <p className="kpi-lbl">Today's Sessions</p>
+            <div className="kpi-val-group">
+              <span className="kpi-val">{todaySessions.length}</span>
+              <span className="kpi-badge active"><Zap size={10} /> Active</span>
             </div>
-          </div>
-          <div className="card-body">
-            <div style={{ display: 'grid', gridTemplateColumns: '60px repeat(5, 1fr)', gap: '4px', fontSize: '11px' }}>
-              <div></div>
-              {['Mon', 'Tue', 'Wed ●', 'Thu', 'Fri'].map((d, idx) => (
-                <div key={idx} style={{ textAlign: 'center', fontWeight: '700', color: idx === 2 ? 'var(--blue-600)' : 'var(--text-muted)', padding: '6px 0', borderBottom: idx === 2 ? '2px solid var(--blue-400)' : 'none' }}>{d}</div>
-              ))}
-            </div>
-            {[
-              { time: '09:00', slots: [null, { id: 'B12', label: 'Full Stack', color: 'var(--blue-50)', border: 'var(--blue-200)', textColor: 'var(--blue-600)' }, { id: 'B12', label: 'Full Stack', color: 'var(--blue-50)', border: 'var(--blue-200)', textColor: 'var(--blue-600)' }, null, { id: 'B12', label: 'Full Stack', color: 'var(--blue-50)', border: 'var(--blue-200)', textColor: 'var(--blue-600)' }] },
-              { time: '12:00', slots: [{ id: 'C09', label: 'Python', color: 'var(--green-light)', border: 'var(--blue-100)', textColor: 'var(--green)' }, null, { id: 'C09', label: 'Python', color: 'var(--green-light)', border: 'var(--blue-100)', textColor: 'var(--green)' }, { id: 'C09', label: 'Python', color: 'var(--green-light)', border: 'var(--blue-100)', textColor: 'var(--green)' }, null] },
-              { time: '03:30', slots: [{ id: 'A05', label: 'UI/UX', color: 'var(--purple-light)', border: 'var(--blue-100)', textColor: 'var(--purple)' }, { id: 'A05', label: 'UI/UX', color: 'var(--purple-light)', border: 'var(--blue-100)', textColor: 'var(--purple)' }, { id: 'A05', label: 'UI/UX', color: 'var(--purple-light)', border: 'var(--blue-100)', textColor: 'var(--purple)' }, null, null] },
-              { time: '06:00', slots: [null, null, { id: 'D02', label: 'DevOps', color: 'var(--amber-light)', border: 'var(--blue-100)', textColor: 'var(--amber)' }, { id: 'D02', label: 'DevOps', color: 'var(--amber-light)', border: 'var(--blue-100)', textColor: 'var(--amber)' }, { id: 'D02', label: 'DevOps', color: 'var(--amber-light)', border: 'var(--blue-100)', textColor: 'var(--amber)' }] },
-            ].map((row, ri) => (
-              <div key={ri} style={{ display: 'grid', gridTemplateColumns: '60px repeat(5, 1fr)', gap: '4px', marginTop: '6px' }}>
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: '"Urbanist", sans-serif', paddingTop: '6px' }}>{row.time}</div>
-                {row.slots.map((slot, si) => (
-                  slot ? (
-                    <div key={si} style={{ background: slot.color, border: `1px solid ${slot.border}`, borderRadius: '8px', padding: '5px 7px', fontSize: '10px' }}>
-                      <b style={{ color: slot.textColor }}>{slot.id}</b>
-                      <div style={{ color: 'var(--text-muted)' }}>{slot.label}</div>
-                    </div>
-                  ) : <div key={si}></div>
-                ))}
-              </div>
-            ))}
           </div>
         </div>
+        <div className="kpi-card-v2">
+          <div className="kpi-icon-wrap orange"><ExternalLink size={20} /></div>
+          <div className="kpi-data">
+            <p className="kpi-lbl">Next Session</p>
+            <span className="kpi-val-text">{nextSession ? nextSession.topic : 'No Upcoming'}</span>
+            <p className="kpi-sub">{nextSession ? `${nextSession.startTime} • ${nextSession.batchId}` : '--:--'}</p>
+          </div>
+        </div>
+        <div className="kpi-card-v2">
+          <div className="kpi-icon-wrap purple"><Users size={20} /></div>
+          <div className="kpi-data">
+            <p className="kpi-lbl">Weekly Classes</p>
+            <span className="kpi-val">{filteredSessions.length}</span>
+            <p className="kpi-sub">Total sessions this week</p>
+          </div>
+        </div>
+      </div>
 
-        {/* Upcoming Sessions */}
-        <div className="card">
-          <div className="card-header">
-            <div>
-              <div className="card-title">📝 Upcoming Sessions</div>
-              <div className="card-sub">Next 7 days</div>
+      {/* 3. CONTROLS */}
+      <div className="v2-controls-row">
+        <div className="v2-nav-group">
+          <button className="v2-nav-btn" onClick={() => navigateWeek(-1)}><ChevronLeft size={18} /></button>
+          <button className={`v2-nav-btn ${activeView === 'Week' ? 'active' : ''}`} onClick={() => navigateWeek(0)}>This Week</button>
+          <button className="v2-nav-btn" onClick={() => navigateWeek(1)}><ChevronRight size={18} /></button>
+        </div>
+
+        <div className="v2-range-label">
+          {weekDays[0] && weekDays[0].toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – {weekDays[6] && weekDays[6].toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+        </div>
+
+        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+          <div className="v2-toggle-pill">
+            <button className={`toggle-unit ${activeView === 'Day' ? 'active' : ''}`} onClick={() => setActiveView('Day')}>Day</button>
+            <button className={`toggle-unit ${activeView === 'Week' ? 'active' : ''}`} onClick={() => setActiveView('Week')}>Week</button>
+            <button className={`toggle-unit ${activeView === 'Month' ? 'active' : ''}`} onClick={() => setActiveView('Month')}>Month</button>
+          </div>
+          <button className="v2-add-btn" onClick={() => setShowAddModal(true)}>
+            <Plus size={18} /> <span>Add Session</span>
+          </button>
+        </div>
+      </div>
+
+      {/* 4. CALENDAR GRID */}
+      <div className="v2-grid-wrapper">
+        <div className="v2-grid-table">
+          <div className="v2-grid-head-cell time-col">TIME</div>
+          {weekDays.map((date, idx) => (
+            <div key={idx} className={`v2-grid-head-cell ${date.toDateString() === new Date().toDateString() ? 'today' : ''}`}>
+              <div className="v2-day-name">{getDayLabel(date)}</div>
+              <div className="v2-day-num">{date.getDate()}</div>
+            </div>
+          ))}
+
+          {/* BACKGROUND ROWS (Time column and grid lines) */}
+          {HOURS.map(hour => (
+            <React.Fragment key={hour}>
+              <div className="v2-grid-time-cell">
+                {hour > 12 ? `${hour - 12} PM` : hour === 12 ? '12 PM' : `${hour} AM`}
+              </div>
+              {/* Empty cells to draw the grid lines */}
+              {Array.from({ length: 7 }).map((_, i) => (
+                <div key={i} className="v2-grid-data-cell empty-cell"></div>
+              ))}
+            </React.Fragment>
+          ))}
+
+          {/* OVERLAY SESSIONS (Positioned relative to the top of the grid rows) */}
+          <div className="v2-grid-overlay-container" style={{ gridColumn: '2 / span 7', gridRow: `2 / span ${HOURS.length}`, position: 'relative' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', height: '100%', width: '100%' }}>
+              {weekDays.map((date, dayIdx) => {
+                const dayStr = formatDateForGrid(date);
+                const daySessions = filteredSessions.filter(s => s.date === dayStr);
+                return (
+                  <div key={dayIdx} style={{ position: 'relative', borderRight: '1.5px solid #F1F5F9' }}>
+                    {daySessions.map(s => (
+                      <div
+                        key={s.id}
+                        className={`v2-session-card batch-${s.batchId.toLowerCase()}`}
+                        style={getSessionStyle(s.startTime, s.duration)}
+                        onClick={() => setSelectedSession(s)}
+                      >
+                        <div className="v2-card-batch">
+                          <Zap size={10} /> {s.batchId}
+                        </div>
+                        <p className="v2-card-topic">{s.topic}</p>
+                        <div className="v2-card-meta">{s.startTime} • {s.duration}m</div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })}
             </div>
           </div>
-          <div className="card-body" style={{ padding: '12px 18px' }}>
-            {upcomingSessions.map((s, i) => (
-              <div key={i} className="schedule-item">
-                <div className="sch-time">{s.date}</div>
-                <div className="sch-dot" style={{ background: s.color }}></div>
-                <div className="sch-info">
-                  <div className="sch-course">{s.course}</div>
-                  <div className="sch-batch">Batch {s.batch} · {s.time}</div>
-                  <span className={`sch-mode ${s.mode.toLowerCase()}`}>{s.mode}</span>
+        </div>
+      </div>
+
+      {/* 5. ADD MODAL */}
+      {showAddModal && (
+        <div className="modal-overlay-v2">
+          <div className="modal-box-v2">
+            <div className="modal-hdr-v2">
+              <h2 className="modal-title-v2">Schedule New Session</h2>
+              <button onClick={() => setShowAddModal(false)} className="close-btn-v2"><X size={20} /></button>
+            </div>
+            <form onSubmit={handleAddSession} className="modal-form-v2">
+              <div className="v2-form-group">
+                <label>Select Batch</label>
+                <select name="batchId" required>
+                  <option value="">Choose Batch...</option>
+                  {batches.map(b => <option key={b.id} value={b.id}>{b.id} - {b.course}</option>)}
+                </select>
+              </div>
+              <div className="v2-form-group">
+                <label>Topic Name</label>
+                <input name="topic" type="text" placeholder="e.g. Introduction to React Hooks" required />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div className="v2-form-group">
+                  <label>Date</label>
+                  <input name="date" type="date" required defaultValue={formatDateForGrid(new Date())} />
+                </div>
+                <div className="v2-form-group">
+                  <label>Start Time</label>
+                  <input name="startTime" type="time" required defaultValue="10:00" />
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Monthly Calendar */}
-        <div className="card">
-          <div className="card-header">
-            <div>
-              <div className="card-title">📆 Monthly Calendar</div>
-              <div className="card-sub">Sessions &amp; holidays</div>
-            </div>
-            <div className="month-nav">
-              <div className="month-nav-btn" onClick={() => changeMonth(-1)}>◀</div>
-              <div className="month-nav-label">{monthNames[calMonth]} {calYear}</div>
-              <div className="month-nav-btn" onClick={() => changeMonth(1)}>▶</div>
-            </div>
-          </div>
-          <div className="card-body" style={{ padding: '12px 18px' }}>
-            <div className="cal-grid">
-              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, idx) => (
-                <div className="cal-head" key={`${day}-${idx}`}>{day}</div>
-              ))}
-            </div>
-            <div className="cal-grid" id="monthly-cal">
-              {renderCalendarDays()}
-            </div>
-            <div className="cal-legend">
-              <div className="cal-leg"><div className="cal-leg-dot" style={{ background: 'var(--blue-500)' }}></div>Session</div>
-              <div className="cal-leg"><div className="cal-leg-dot" style={{ background: 'var(--accent)' }}></div>Holiday</div>
-              <div className="cal-leg"><div className="cal-leg-dot" style={{ background: 'var(--blue-50)', border: '2px solid var(--blue-500)' }}></div>Today</div>
-            </div>
-            {monthHolidays.length > 0 && (
-              <div className="holiday-list" style={{ marginTop: '10px' }}>
-                <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: '6px' }}>🏖️ Holidays</div>
-                {monthHolidays.map((h, i) => {
-                  const dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][new Date(calYear, calMonth, h.d).getDay()];
-                  return (
-                    <div className="holiday-item" key={i}>
-                      <span className="h-date">{dayName}, {h.d}</span>
-                      <span className="h-name">{h.name}</span>
-                    </div>
-                  );
-                })}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div className="v2-form-group">
+                  <label>Duration (Minutes)</label>
+                  <input name="duration" type="number" defaultValue="60" required />
+                </div>
+                <div className="v2-form-group">
+                  <label>Class Mode</label>
+                  <select name="mode">
+                    <option value="Online">Online</option>
+                    <option value="Offline">Offline</option>
+                  </select>
+                </div>
               </div>
-            )}
+              <button type="submit" className="v2-submit-btn">Create Session</button>
+            </form>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* 6. DETAIL MODAL */}
+      {selectedSession && (
+        <div className="modal-overlay-v2">
+          <div className="modal-box-v2 mini" style={{ maxWidth: '400px' }}>
+            <div className="modal-hdr-v2">
+              <h2 className="modal-title-v2" style={{ fontSize: '18px' }}>Session Details</h2>
+              <button onClick={() => setSelectedSession(null)} className="close-btn-v2"><X size={20} /></button>
+            </div>
+            <div className={`detail-banner batch-${selectedSession.batchId.toLowerCase()}`} style={{ padding: '20px', borderRadius: '16px', marginBottom: '20px' }}>
+              <h3 style={{ margin: 0, fontSize: '20px' }}>{selectedSession.topic}</h3>
+              <p style={{ margin: '4px 0 0 0', opacity: 0.9, fontSize: '13px', fontWeight: 600 }}>{selectedSession.batchId} • {selectedSession.courseName}</p>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#475569', fontWeight: 600, fontSize: '14px' }}>
+                <Clock size={16} /> {selectedSession.date} @ {selectedSession.startTime} ({selectedSession.duration} min)
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#475569', fontWeight: 600, fontSize: '14px' }}>
+                <Monitor size={16} /> {selectedSession.mode} Session
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button className="v2-submit-btn" style={{ flex: 1, marginTop: 0 }} onClick={() => alert("Joining...")}><Play size={16} /> Start Session</button>
+              <button 
+                className="icon-btn-v2" 
+                style={{ height: '48px', width: '48px', color: '#EF4444' }}
+                onClick={() => {
+                  if (window.confirm("Delete this session?")) {
+                    setSessions(sessions.filter(s => s.id !== selectedSession.id));
+                    setSelectedSession(null);
+                  }
+                }}
+              >
+                <Trash2 size={18} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

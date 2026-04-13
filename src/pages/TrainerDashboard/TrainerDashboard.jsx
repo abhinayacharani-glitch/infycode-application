@@ -8,6 +8,7 @@ import "./TrainerDashboard.css";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import Batches from "./pages/Batches";
+import BatchDetails from "./pages/BatchDetails"; // New Page
 import Schedule from "./pages/Schedule";
 import Materials from "./pages/Materials";
 import Attendance from "./pages/Attendance";
@@ -18,22 +19,21 @@ import Logout from "./pages/Logout";
 
 const TrainerDashboard = () => {
   return (
-    <div className="trainer-dashboard-layout" style={{ display: "flex", minHeight: "100vh", background: "#f0f6ff" }}>
+    <div className="trainer-dashboard-layout">
       
       {/* Sidebar - Fixed width */}
-      <div className="sidebar-container" style={{ width: "260px", flexShrink: 0 }}>
-        <Sidebar />
-      </div>
+      <Sidebar />
 
       {/* Main Content Area */}
-      <div className="main-content-wrapper" style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+      <div className="main-content-wrapper">
         <Topbar />
-        <main className="dashboard-content" style={{ flex: 1, padding: "20px", overflowY: "auto" }}>
+        <main className="dashboard-content">
           <Routes>
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="profile" element={<Profile />} />
             <Route path="batches" element={<Batches />} />
+            <Route path="batches/:batchId" element={<BatchDetails />} />
             <Route path="schedule" element={<Schedule />} />
             <Route path="materials" element={<Materials />} />
             <Route path="attendance" element={<Attendance />} />
