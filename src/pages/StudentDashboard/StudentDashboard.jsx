@@ -12,7 +12,7 @@ import MockInterview from "./pages/MockInterview";
 import Projects from "./pages/Projects";
 import Profile from "./pages/Profile";
 import CourseExplore from "./pages/CourseExplore";
-import CourseOverview from "./pages/Courseoverview";
+import CourseOverview from "./pages/CourseOverview";
 import MentorConnection from "./pages/MentorConnection";
 import Logout from "./pages/Logout";
 function StudentDashboard() {
