@@ -4,6 +4,7 @@ import { NavLink, Link } from 'react-router-dom';
 import "./Sidebar.css";
 import icLogo from '../../../assets/infycode-final-logo4-1.png';
 import bannerLogo from '../../../assets/color-logo-3.png';
+
 const svgProps = {
   width: "18",
   height: "18",
@@ -64,56 +65,62 @@ const LogoutIcon = () => (
   </svg>
 );
 
+const MentorConnectIcon = () => (
+  <svg {...svgProps}>
+    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+  </svg>
+);
+
 const Sidebar = () => {
   const userString = localStorage.getItem('user');
-  const user = userString ? JSON.parse(userString) : { username: "Student" };
+  const user = userString ? JSON.parse(userString) : { username: "Charani", role: "STUDENT" };
 
-  const userEmail = "charani.student@gmail.com";
-  const userName = "Charani Student";
-  const userInitial = userEmail.charAt(0).toUpperCase();
+  const userName = user.username || "Charani";
+  const userRole = user.role || "STUDENT";
+  const userInitial = userName.charAt(0).toUpperCase();
 
   return (
-    <aside className="sd-sidebar">
+    <aside className="student-sd-sidebar">
 
       {/* BRAND */}
-      <div className="sd-brand">
-        <div className="sd-logo-wrap">
-          <img src={icLogo}
-            alt="logo" className="sd-logo" />
-          <div className="sd-brand-text">
-            <img src={bannerLogo} alt="InfyCode Banner" style={{ width: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} className="sd-title" />
+      <div className="student-sd-brand">
+        <div className="student-sd-logo-wrap">
+          <img src={icLogo} alt="logo" className="student-sd-logo" />
+          <div className="student-sd-brand-text">
+            <img src={bannerLogo} alt="InfyCode Banner" style={{ width: '100%', objectFit: 'contain' }} className="student-sd-title" />
           </div>
         </div>
       </div>
 
       {/* USER */}
-      <Link to="/student-dashboard/profile" className="sd-user-link">
-        <div className="sd-user">
-          <div className="sd-avatar">{userInitial}</div>
+      <Link to="/student-dashboard/profile" className="student-sd-user-link">
+        <div className="student-sd-user">
+          <div className="student-sd-avatar">{userInitial}</div>
           <div>
-            <div className="sd-name">{userName}</div>
-            <div className="sd-role">{userEmail}</div>
+            <div className="student-sd-name">{userName}</div>
+            <div className="student-sd-role">{userRole}</div>
           </div>
         </div>
       </Link>
 
       {/* NAV */}
-      <div className="sd-nav">
+      <div className="student-sd-nav">
 
         {[
           { to: "/student-dashboard/counselling", icon: <CounsellingIcon />, label: "Counselling" },
           { to: "/student-dashboard/skill-test", icon: <SkillIcon />, label: "Skill Based Test" },
           { to: "/student-dashboard/course", icon: <GraduationCap />, label: "Courses" },
           { to: "/student-dashboard/courses", icon: <CoursesIcon />, label: "Enrolled Courses" },
+          { to: "/student-dashboard/mentor-connection", icon: <MentorConnectIcon />, label: "Mentor Connect" },
           { to: "/student-dashboard/mock-interview", icon: <InterviewIcon />, label: "Mock Tests & Interviews" },
           { to: "/student-dashboard/projects", icon: <ProjectIcon />, label: "Projects & Certificates" },
           { to: "/student-dashboard/profile", icon: <ProfileIcon />, label: "My Profile" }
         ].map((item, i) => (
           <NavLink key={i} to={item.to}
-            className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
-            <div className="sd-box">
-              <span className="sd-icon">{item.icon}</span>
-              <span className="sd-text">{item.label}</span>
+            className={({ isActive }) => `student-sd-item ${isActive ? 'active' : ''}`}>
+            <div className="student-sd-box">
+              <span className="student-sd-icon">{item.icon}</span>
+              <span className="student-sd-text">{item.label}</span>
             </div>
           </NavLink>
         ))}
@@ -121,10 +128,11 @@ const Sidebar = () => {
       </div>
 
       {/* FOOTER */}
-      <div className="sd-footer">
-        <NavLink to="/student-dashboard/logout" className="sd-logout">
-          <span className="sd-icon"><LogoutIcon /></span>
-          <span className="sd-text">Logout</span>
+      <div className="student-sd-footer">
+        <div className="student-sd-logout-divider"></div>
+        <NavLink to="/student-dashboard/logout" className="student-sd-logout">
+          <span className="student-sd-icon"><LogoutIcon /></span>
+          <span className="student-sd-text">Logout</span>
         </NavLink>
       </div>
 

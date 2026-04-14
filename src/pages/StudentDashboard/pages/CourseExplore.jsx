@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { COURSE_MAP } from './data/extraCourses';
 import './CourseExplore.css';
@@ -256,443 +256,162 @@ const CourseExplore = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Handle state being either a string (courseId) or an object ({ courseId, topicId })
   const state = location.state;
   const courseId = (typeof state === 'string' ? state : state?.courseId) || 'java-fs-01';
   const course = COURSE_MAP[courseId] || COURSE_MAP['java-fs-01'];
 
-  const [openModules, setOpenModules] = useState({ [course.modules[0].topics[0].id]: true });
-  const [finalOpen, setFinalOpen] = useState(false);
+  const [openModules, setOpenModules] = useState({});
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
-
-  const [activeContent, setActiveContent] = useState(() => {
-    const passedTopicId = typeof state === 'object' ? state?.topicId : null;
-    if (passedTopicId) {
-      for (let mIdx = 0; mIdx < course.modules.length; mIdx++) {
-        const topicIdx = course.modules[mIdx].topics.findIndex(t => t.id === passedTopicId);
-        if (topicIdx !== -1) {
-          return {
-            type: 'topic_content',
-            moduleId: course.modules[mIdx].id,
-            topicId: passedTopicId,
-            topicIndex: topicIdx,
-            moduleIndex: mIdx,
-          };
-        }
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 400) {
+        setShowScrollTop(true);
+      } else {
+        setShowScrollTop(false);
       }
-    }
-    return {
-      type: 'topic_content',
-      moduleId: course.modules[0].id,
-      topicId: course.modules[0].topics[0].id,
-      topicIndex: 0,
-      moduleIndex: 0,
     };
-  });
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
-  const [completedSet, setCompletedSet] = useState(() => {
-    const saved = localStorage.getItem(`course_progress_${courseId}`);
-    return saved ? new Set(JSON.parse(saved)) : new Set();
-  });
-
-  /* Sync progress back to localStorage whenever completedSet changes */
-  React.useEffect(() => {
-    localStorage.setItem(`course_progress_${courseId}`, JSON.stringify(Array.from(completedSet)));
-  }, [completedSet, courseId]);
-
-  /* Deep linking effect */
-  React.useEffect(() => {
-    const tid = typeof state === 'object' ? state?.topicId : null;
-    if (tid) {
-      course.modules.forEach((m, mIdx) => {
-        const tIdx = m.topics.findIndex(t => t.id === tid);
-        if (tIdx !== -1) {
-          goTo({ type: 'topic_content', moduleId: m.id, topicId: tid, moduleIndex: mIdx, topicIndex: tIdx });
-        }
-      });
-    }
-  }, [location.state?.topicId]);
-
-  const toggleModule = (modId) => setOpenModules(prev => ({ ...prev, [modId]: !prev[modId] }));
-
-  const activeModule = course.modules.find(m => m.id === activeContent.moduleId);
-  const activeTopic = activeModule?.topics?.find(t => t.id === activeContent.topicId);
-  const isFinal = activeContent.type === 'final';
-
-  const isFirstTopicGlobally = (mi, ti) => mi === 0 && ti === 0;
-  const contentKey = (type, modId, topicId) => `${type}::${modId}::${topicId}`;
-
-  const navList = [];
-  course.modules.forEach((m, mIdx) => {
-    m.topics.forEach((t, tIdx) => {
-      navList.push({ type: 'topic_content', moduleId: m.id, topicId: t.id, moduleIndex: mIdx, topicIndex: tIdx });
-      if (isFirstTopicGlobally(mIdx, tIdx))
-        navList.push({ type: 'topic_practice', moduleId: m.id, topicId: t.id, moduleIndex: mIdx, topicIndex: tIdx });
-      navList.push({ type: 'topic_assignment', moduleId: m.id, topicId: t.id, moduleIndex: mIdx, topicIndex: tIdx });
-    });
-  });
-  navList.push({ type: 'final', moduleId: 'final', topicId: 'final', moduleIndex: -1, topicIndex: -1 });
-
-  const currentNavIdx = navList.findIndex(
-    n => n.type === activeContent.type && n.moduleId === activeContent.moduleId && n.topicId === activeContent.topicId
-  );
-
-  const goTo = (n) => {
-    setActiveContent(n);
-    if (n.type !== 'final') {
-      setOpenModules(prev => ({ ...prev, [n.topicId]: true }));
-    }
-  };
-  const handlePrev = () => { if (currentNavIdx > 0) goTo(navList[currentNavIdx - 1]); };
-  const handleNext = () => { if (currentNavIdx < navList.length - 1) goTo(navList[currentNavIdx + 1]); };
-
-  const handleSetActive = (type, moduleId, topicId, mIdx, tIdx) => {
-    goTo({ type, moduleId, topicId, moduleIndex: mIdx, topicIndex: tIdx });
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  /* Mark complete AND auto-navigate to next */
-  const handleMarkComplete = () => {
-    const key = isFinal ? 'final::final::final' : contentKey(activeContent.type, activeContent.moduleId, activeContent.topicId);
-    setCompletedSet(prev => new Set([...prev, key]));
+  const toggleModule = (id) =>
+    setOpenModules(prev => ({ ...prev, [id]: !prev[id] }));
 
-    // If not already done, show green state for a moment before navigating
-    if (!currentIsDone && currentNavIdx < navList.length - 1) {
-      setTimeout(() => {
-        goTo(navList[currentNavIdx + 1]);
-      }, 600);
-    } else if (currentNavIdx < navList.length - 1) {
-      // If already done, navigate immediately
-      goTo(navList[currentNavIdx + 1]);
-    }
-  };
-
-
-  const isDone = (type, modId, topicId) => {
-    if (isFinal) return completedSet.has('final::final::final');
-    return completedSet.has(contentKey(type, modId, topicId));
-  };
-  const currentIsDone = isFinal
-    ? completedSet.has('final::final::final')
-    : completedSet.has(contentKey(activeContent.type, activeContent.moduleId, activeContent.topicId));
-
-  const progress = Math.round((completedSet.size / navList.length) * 100);
+  const totalTopics = course.modules.reduce((sum, m) => sum + m.topics.length, 0);
+  const totalModules = course.modules.length;
 
   return (
-    <div className="lv-root">
-      {/* ─── OUTPUTS MODAL ─── */}
+    <div className="curr-page">
 
-
-      {/* ─── SIDEBAR ─── */}
-      <aside className="lv-sidebar">
-        <div className="lv-sidebar-header">
-          <button className="lv-back-btn" onClick={() => navigate('/student-dashboard/courses')}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" /></svg>
-            Back to Courses
-          </button>
-
-          <div className="lv-sidebar-tabs">
-            <button className="lv-tab active">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></svg>
-              Curriculum
+      {/* ── TOP NAV & HERO ── */}
+      <div className="curr-hero">
+        <div className="curr-hero-inner">
+          <div className="curr-hero-top-action">
+            <button className="curr-back-action" onClick={() => navigate('/student-dashboard/courses')}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+              <span>Back to Courses</span>
             </button>
           </div>
-
-          <div className="lv-progress-container">
-            <div className="lv-progress-info">
-              <span className="lv-progress-label">Course Progress</span>
-              <span className="lv-progress-percentage">{progress}%</span>
-            </div>
-            <div className="lv-progress-track">
-              <div className="lv-progress-bar" style={{ width: `${progress}%` }}></div>
-            </div>
+          
+          <div className="curr-hero-badge">
+             <span className="pulse-dot"></span>
+             Advanced Curriculum
           </div>
-        </div>
-
-        <div className="lv-curriculum">
-          <div className="lv-section-label">COURSE CONTENT</div>
-
-          {(() => {
-            let globalModIndex = 1;
-            return course.modules.flatMap((m) =>
-              m.topics.map((t, tIdx) => {
-                const currentModId = t.id;
-                const isModOpen = !!openModules[currentModId];
-                const isTopicActive = activeContent.topicId === t.id && activeContent.type === 'topic_content';
-                const learningPoints = getKeyPoints(t);
-
-                return (
-                  <div key={t.id} className={`lv-module-block-wrapper ${isModOpen ? 'is-expanded' : ''} ${isTopicActive ? 'is-active-module' : ''}`}>
-                    <button className={`lv-module-header ${isModOpen ? 'is-open' : ''}`} onClick={() => toggleModule(currentModId)}>
-                      <div className="lv-module-header-text">
-                        <span className="lv-module-title">Module {globalModIndex++}: {t.title}</span>
-                      </div>
-                      <svg className={`lv-module-chevron ${isModOpen ? 'rotated' : ''}`} xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9" /></svg>
-                    </button>
-
-                    {isModOpen && (
-                      <div className="lv-module-dropdown-content">
-                        {/* Auto-load theory if module is clicked (optional but helpful) */}
-                        <ul className="lv-topic-list">
-                          {learningPoints.map((point, pIdx) => (
-                            <li key={pIdx} className="lv-topic-li">
-                              <button
-                                className="lv-topic-link"
-                                onClick={() => handleSetActive('topic_content', m.id, t.id, course.modules.indexOf(m), tIdx)}
-                              >
-                                <span className="lv-bullet" style={{ minWidth: '18px' }}>{pIdx + 1}.</span>
-                                <span className="lv-topic-name">{point}</span>
-                              </button>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                );
-              })
-            );
-          })()}
-
-          {/* Final Assignment */}
-          <div className="lv-module-block-wrapper final-project-wrapper">
-            <button className={`lv-module-header ${finalOpen ? 'is-open' : ''}`} onClick={() => setFinalOpen(!finalOpen)}>
-              <div className="lv-module-header-text">
-                <span className="lv-module-title">Final Assignment</span>
-              </div>
-              <svg className={`lv-module-chevron ${finalOpen ? 'rotated' : ''}`} xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9" /></svg>
-            </button>
-            {finalOpen && (
-              <div className="lv-module-dropdown-content">
-                <ul className="lv-topic-list">
-                  <li className="lv-topic-li">
-                    <button
-                      className={`lv-topic-link ${activeContent.type === 'final' ? 'is-active' : ''}`}
-                      onClick={() => setActiveContent({ type: 'final', moduleId: 'final', topicId: 'final' })}
-                    >
-                      <span className="lv-bullet">•</span>
-                      <span className="lv-topic-name">Take Assignment</span>
-                    </button>
-                  </li>
-                </ul>
-              </div>
-            )}
-          </div>
-        </div>
-      </aside>
-
-      {/* ─── MAIN CONTENT ─── */}
-      <main className="lv-main">
-        <div className="lv-main-header">
-          {(() => {
-            if (isFinal) return <div className="lv-mod-badge" style={{ color: '#f59e0b', background: '#fffbeb' }}>Final Assessment</div>;
-
-            // Find global index of active topic
-            let gIdx = 0;
-            let currentModFound = false;
-            for (const m of course.modules) {
-              for (const t of m.topics) {
-                gIdx++;
-                if (t.id === activeContent.topicId) {
-                  currentModFound = true;
-                  break;
-                }
-              }
-              if (currentModFound) break;
-            }
-
-            return (
-              <div className="lv-mod-badge" style={{ color: activeModule?.color || '#2563eb', background: `${activeModule?.color || '#2563eb'}18` }}>
-                Module {gIdx}: {activeTopic?.title}
-              </div>
-            );
-          })()}
-
-          <h1 className="lv-main-title">
-            {isFinal ? (course.finalAssignment.title || "Final Project Capstone") : activeTopic?.title || 'Select a topic'}
+          
+          <h1 className="curr-hero-title">
+            <span style={{ color: '#2563eb' }}>{course.title || 'Course Overview'}</span>
           </h1>
-          {!isFinal && (
-            <span className="lv-view-label">
-              {activeContent.type === 'topic_content' && 'Reading Material'}
-              {activeContent.type === 'topic_practice' && 'Practice Lab'}
-              {activeContent.type === 'topic_assignment' && 'Assignment'}
-            </span>
-          )}
-
-          <div className="lv-main-header-actions" style={{ marginLeft: 'auto', display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <p className="curr-hero-sub">{course.description || 'Master every concept through structured modules designed by industry experts.'}</p>
+          
+          <div className="curr-hero-stats">
+            <div className="curr-stat">
+              <div className="curr-stat-icon blue">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+              </div>
+              <div>
+                <div className="curr-stat-val">{totalModules}</div>
+                <div className="curr-stat-label">Modules</div>
+              </div>
+            </div>
+            <div className="curr-stat">
+              <div className="curr-stat-icon green">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+              </div>
+              <div>
+                <div className="curr-stat-val">{totalTopics}</div>
+                <div className="curr-stat-label">Topics</div>
+              </div>
+            </div>
+            <div className="curr-stat">
+              <div className="curr-stat-icon purple">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              </div>
+              <div>
+                <div className="curr-stat-val">Self-paced</div>
+                <div className="curr-stat-label">Learning</div>
+              </div>
+            </div>
           </div>
         </div>
+      </div>
 
-        <div className="lv-main-body">
-          {/* Topic Content */}
-          {activeContent.type === 'topic_content' && activeTopic && (
-            <div className="lv-reading-grid">
-              <div className="lv-reading-main">
-                <div className="lv-reading-card">
-                  <div className="lv-reading-material">
-                    <div className="lv-depth-section">
-                      <h3 className="lv-depth-title">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /></svg>
-                        Reading Material
-                      </h3>
-                      <p className="lv-topic-intro">
-                        This session covers the core essentials of <strong>{activeTopic.title}</strong>, providing you with a deep understanding of its architecture and practical implementation.
-                      </p>
-                      <div className="lv-topic-rich-content" dangerouslySetInnerHTML={{ __html: getDetailedContent(activeTopic) }} />
-                    </div>
+      {/* ── MODULE ACCORDION ── */}
+      <div className="curr-body">
+        <div className="curr-container">
+          <div className="curr-section-label">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Complete Syllabus
+          </div>
 
-                    <p className="lv-content-footer">
-                      Professional Course Material · Last Updated March 2026
-                    </p>
-                  </div>
-                </div>
-              </div>
+          <div className="curr-accordion">
+            {course.modules.map((m, mIdx) => {
+              const isOpen = !!openModules[m.id];
+              const topics = m.topics || [];
 
-              {/* Clear Learn Sidebar */}
-              <div className="lv-reading-sidebar">
-                {(() => {
-                  const sidebar = getSidebarData(activeTopic);
-                  return (
-                    <div className="lv-sidebar-block">
-                      <div className="lv-sb-section">
-                        <h4 className="lv-sb-title">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
-                          Key Takeaways
-                        </h4>
-                        <ul className="lv-sb-list">
-                          {sidebar.takeaways.map((t, i) => <li key={i}>{t}</li>)}
-                        </ul>
+              return (
+                <div key={m.id} className={`curr-module ${isOpen ? 'open' : ''}`}>
+                  <button className="curr-module-header" onClick={() => toggleModule(m.id)}>
+                    <div className="curr-module-left">
+                      <div className="curr-module-number">
+                        {mIdx + 1}
                       </div>
-
-                      <div className="lv-sb-divider" />
-
-                      <div className="lv-sb-section">
-                        <h4 className="lv-sb-title">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" /><rect x="8" y="2" width="8" height="4" rx="1" ry="1" /></svg>
-                          Quick Reference
-                        </h4>
-                        <div className="lv-sb-code">
-                          <code>{sidebar.reference}</code>
-                        </div>
-                      </div>
-
-                      <div className="lv-sb-divider" />
-
-                      <div className="lv-sb-section">
-                        <h4 className="lv-sb-title">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
-                          Industry Context
-                        </h4>
-                        <p className="lv-sb-text">{sidebar.context}</p>
+                      <div className="curr-module-info">
+                        <span className="curr-module-label" style={{ color: m.color || '#374151' }}>{m.label}</span>
+                        <h2 className="curr-module-title">{m.subtitle}</h2>
+                        <span className="curr-module-meta">{m.duration} • {m.topics.length} Topics</span>
                       </div>
                     </div>
-                  );
-                })()}
-              </div>
-            </div>
-          )}
-
-          {activeContent.type === 'topic_practice' && <PracticeWidget />}
-
-          {activeContent.type === 'topic_assignment' && activeTopic && (
-            <div className="lv-assignment-card">
-              <div className="lv-ac-header">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
-                <h4>Assignment Task: {activeTopic.title}</h4>
-              </div>
-              <div className="lv-ac-body">
-                <div className="lv-ac-module-note">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg>
-                  This assignment accounts for 15% of your module score. Please ensure your solution follows the course coding standards and best practices.
-                </div>
-
-                <div className="lv-assignment-code-section">
-                  <div className="practice-widget">
-                    <div className="practice-widget-header">
-                      <div className="practice-widget-left">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.5"><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></svg>
-                        <span>Professional Assignment IDE</span>
-                      </div>
+                    <div className={`curr-chevron ${isOpen ? 'open' : ''}`}>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                     </div>
-
-                    <div style={{ padding: '24px' }}>
-                      <p className="practice-question" style={{ padding: 0, marginBottom: '20px' }}>
-                        <strong>Assignment Specification:</strong> Implement the solution requirements for "{activeTopic.title}". Your solution will be evaluated based on efficiency, readability, and adherence to requirements.
-                      </p>
-
-                      <div className="code-editor-shell" style={{ margin: 0 }}>
-                        <div className="editor-topbar">
-                          <div className="editor-dots"><span style={{ background: '#ff5f56' }} /><span style={{ background: '#ffbd2e' }} /><span style={{ background: '#27c93f' }} /></div>
-                          <span className="editor-filename">Solution.java</span>
-                        </div>
-                        <textarea
-                          className="code-textarea"
-                          defaultValue={'// Write your professional solution here...\n\npublic class Solution {\n    public static void main(String[] args) {\n        \n    }\n}'}
-                          spellCheck="false"
-                          rows={12}
-                        />
-                      </div>
-
-                      <div className="practice-actions" style={{ padding: '16px 0 0' }}>
-                        <button className="lv-btn lv-btn-primary lv-btn-sm" style={{ background: '#2563eb', color: 'white', borderColor: '#2563eb' }} onClick={() => alert('Running tests...')}>Run Tests</button>
-                        <button className="lv-btn lv-btn-success lv-btn-sm" onClick={() => alert('Solution submitted successfully!')}>Submit Solution</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-          )}
-
-          {/* Final Assessment */}
-          {isFinal && (
-            <div className="lv-final-view">
-              <div className="lv-final-hero">
-                <div className="lv-final-badge">FINAL ASSESSMENT</div>
-                <h2>{course.finalAssignment.title || "Capstone Project Implementation"}</h2>
-                <p>{course.finalAssignment.description}</p>
-              </div>
-              <div className="lv-final-body" style={{ display: 'block' }}>
-                <div className="lv-final-action-area" style={{ padding: '48px', textAlign: 'center', alignItems: 'center' }}>
-                  <div style={{ background: '#f0f9ff', padding: '24px', borderRadius: '50%', marginBottom: '24px' }}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#0369a1" strokeWidth="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><path d="M9 15l2 2 4-4" /></svg>
-                  </div>
-                  <h3 style={{ fontSize: '1.5rem', marginBottom: '12px' }}>Final Course Assignment</h3>
-                  <p style={{ maxWidth: '480px', margin: '0 auto 32px', fontSize: '1rem' }}>
-                    This final assessment evaluates your proficiency across all modules. You will be required to implement a full-stack solution based on the course requirements.
-                  </p>
-
-                  <button className="lv-take-assessment-btn" style={{ maxWidth: '320px' }} onClick={() => alert('Assessment environment will open here.')}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /></svg>
-                    Take Assignment
                   </button>
+                  <div className={`curr-module-body-wrapper ${isOpen ? 'open' : ''}`}>
+                    <div className="curr-module-body">
+                      <div className="curr-topics-header">
+                        Learning Content
+                      </div>
+                      <div className="curr-topics-list">
+                        {m.topics.map((t) => (
+                          <div key={t.id} className="curr-topic-item">
+                            <div className="curr-topic-header">
+                              <div className="curr-topic-bullet"></div>
+                              <h3 className="curr-topic-title">{t.title}</h3>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {m.assignment && (
+                        <div className="curr-assignment-box">
+                          <div className="curr-assignment-header">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                            Module Assignment
+                          </div>
+                          <p className="curr-assignment-desc">{m.assignment}</p>
+                          <button className="curr-submit-btn">Mark as Completed</button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Action Bar */}
-        <footer className="lv-action-bar">
-          <button className="lv-btn lv-btn-outline" onClick={handlePrev} disabled={currentNavIdx === 0}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6" /></svg>
-            Previous
-          </button>
-
-          <div style={{ display: 'flex', gap: '12px' }}>
-            <button
-              className={`lv-btn ${currentIsDone ? 'lv-btn-done' : 'lv-btn-primary'}`}
-              onClick={handleMarkComplete}
-            >
-              {currentIsDone ? (
-                <><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg> Completed & Next</>
-              ) : (
-                'Mark as Complete & Next'
-              )}
-            </button>
+              );
+            })}
           </div>
-        </footer>
-      </main>
+        </div>
+      </div>
+
+      {/* Floating Scroll Top Button */}
+      {showScrollTop && (
+        <button className="curr-scroll-top" onClick={scrollToTop} title="Scroll to top">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+        </button>
+      )}
+
     </div>
   );
 };

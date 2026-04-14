@@ -13,6 +13,7 @@ import Projects from "./pages/Projects";
 import Profile from "./pages/Profile";
 import CourseExplore from "./pages/CourseExplore";
 import CourseOverview from "./pages/CourseOverview";
+import MentorConnection from "./pages/MentorConnection";
 import Logout from "./pages/Logout";
 function StudentDashboard() {
   const navigate = useNavigate();
@@ -26,19 +27,19 @@ function StudentDashboard() {
   };
 
   return (
-    <div className="student-dashboard-layout" style={{ display: "flex", minHeight: "100vh", fontFamily: "'Urbanist', sans-serif" }}>
+    <div className="student-dashboard-layout" style={{ display: "flex", height: "100vh", overflow: "hidden", fontFamily: "'Urbanist', sans-serif" }}>
       
       {/* Conditionally render Sidebar */}
       {!isCourseExplore && (
-        <div className="sidebar-container" style={{ width: "250px", flexShrink: 0 }}>
+        <div className="sidebar-container" style={{ width: "250px", flexShrink: 0, height: "100vh", overflowY: "auto" }}>
           <Sidebar />
         </div>
       )}
 
       {/* Main Content Area */}
-      <div className="main-content-wrapper" style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+      <div className="main-content-wrapper" style={{ flex: 1, display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden" }}>
         {!isCourseExplore && <Navbar />}
-        <main className="dashboard-content" style={{ flex: 1, padding: isCourseExplore ? "0" : "20px", overflowY: "auto", background: "#f8fafc" }}>
+        <main className="dashboard-content" style={{ flex: 1, padding: isCourseExplore ? "0" : "20px", overflowY: isCourseExplore ? "hidden" : "auto", background: "#f8fafc", height: isCourseExplore ? "100%" : "auto" }}>
           <Routes>
             <Route index element={<Navigate to="courses" replace />} />
             <Route path="counselling" element={<Counselling />} />
@@ -51,6 +52,7 @@ function StudentDashboard() {
             <Route path="projects" element={<Projects />} />
             <Route path="profile" element={<Profile />} />
             <Route path="course-explore" element={<CourseExplore />} />
+            <Route path="mentor-connection" element={<MentorConnection />} />
             <Route path="logout" element={<Logout />} />
           </Routes>
         </main>
