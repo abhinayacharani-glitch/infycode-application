@@ -12,7 +12,7 @@ import imgJava from "../../assets/course/java.jpeg";
 import imgAI from "../../assets/course/AI.jpeg";
 import imgDataScience from "../../assets/course/DataScience.jpeg";
 import imgCloud from "../../assets/course/cloud.jpeg";
-import imgUIUX from "../../assets/course/UI & UX.jpeg";
+import imgUIUX from "../../assets/course/UI-UX.jpeg";
 
 const CATEGORIES = ["All", "Web Dev", "Python", "Java", "AI & Data", "Cybersecurity", "Cloud"];
 
