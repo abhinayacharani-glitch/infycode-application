@@ -18,15 +18,27 @@ import LiveSession from "./pages/LiveSession";
 import Logout from "./pages/Logout";
 
 const TrainerDashboard = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
+
   return (
     <div className="trainer-dashboard-layout">
       
       {/* Sidebar - Fixed width */}
-      <Sidebar />
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
       {/* Main Content Area */}
       <div className="main-content-wrapper">
         <Topbar />
+        
+        {/* Mobile Menu Toggle */}
+        <button 
+          className="menu-toggle" 
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          aria-label="Toggle Menu"
+        >
+          {isSidebarOpen ? "✕" : "☰"}
+        </button>
+
         <main className="dashboard-content">
           <Routes>
             <Route index element={<Navigate to="dashboard" replace />} />

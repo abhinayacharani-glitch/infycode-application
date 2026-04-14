@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Plus,
   ChevronLeft,
@@ -12,7 +13,9 @@ import {
   Play,
   Zap,
   Filter,
-  Users
+  Users,
+  CheckCircle,
+  Circle
 } from 'lucide-react';
 import './Schedule.css';
 
@@ -24,6 +27,32 @@ const getStartOfWeek = (date) => {
   return new Date(d.setDate(diff));
 };
 
+const CountdownTimer = ({ targetDate, startTime }) => {
+  const [timeLeft, setTimeLeft] = useState('');
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const now = new Date();
+      const target = new Date(`${targetDate}T${startTime}`);
+      const diff = target - now;
+
+      if (diff <= 0) {
+        setTimeLeft('Live Now');
+        clearInterval(timer);
+        return;
+      }
+
+      const h = Math.floor(diff / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      setTimeLeft(`${h}h ${m}m ${s}s`);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [targetDate, startTime]);
+
+  return <span className="countdown-txt">{timeLeft}</span>;
+};
+
 const formatDateForGrid = (date) => {
   return date.toISOString().split('T')[0];
 };
@@ -32,20 +61,110 @@ const getDayLabel = (date) => {
   return date.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
 };
 
+const computeSessionStatus = (dateStr, startTime, duration = 60) => {
+    const today = new Date().toISOString().split('T')[0];
+    if (dateStr < today) return 'completed';
+    if (dateStr > today) return 'planned';
+    
+    // It's today, check time
+    const now = new Date();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    
+    if (!startTime || !startTime.includes(':')) return 'planned';
+    
+    const [h, m] = startTime.split(':').map(Number);
+    const startMinutes = h * 60 + m;
+    const endMinutes = startMinutes + duration;
+    
+    if (currentMinutes >= startMinutes && currentMinutes <= endMinutes) return 'active';
+    if (currentMinutes > endMinutes) return 'completed';
+    return 'planned';
+};
+
+const generateDummySessions = () => {
+    const sessions = [];
+    const now = new Date();
+    
+    // Past Sessions (Last 7 days)
+    const pastTopics = [
+        { title: "Introduction to HTML", batch: "B1", time: "09:00", dur: 120 },
+        { title: "Introduction to CSS", batch: "B1", time: "11:30", dur: 90 },
+        { title: "HTML Forms & Tables", batch: "B2", time: "10:00", dur: 120 },
+        { title: "CSS Flexbox & Grid", batch: "B2", time: "14:00", dur: 120 },
+        { title: "Introduction to JavaScript", batch: "B1", time: "09:00", dur: 120 },
+        { title: "JS DOM Manipulation", batch: "B3", time: "10:00", dur: 120 },
+        { title: "Introduction to UI Design", batch: "B3", time: "15:00", dur: 90 }
+    ];
+
+    for (let i = 1; i <= 7; i++) {
+        const d = new Date();
+        d.setDate(now.getDate() - i);
+        const dateStr = d.toISOString().split('T')[0];
+        const topic = pastTopics[i % pastTopics.length];
+        
+        sessions.push({
+            id: `past-${i}`,
+            title: topic.title,
+            topic: topic.title,
+            date: dateStr,
+            startTime: topic.time,
+            endTime: "", 
+            duration: topic.dur,
+            batchId: topic.batch,
+            courseName: topic.batch === 'B1' ? 'Full Stack Web' : topic.batch === 'B2' ? 'Node.js Backend' : 'UI/UX Design',
+            status: computeSessionStatus(dateStr),
+            mode: "Online"
+        });
+    }
+
+    // Upcoming Sessions (Today + Next 7 days)
+    const upcomingTopics = [
+        { title: "React Components & Props", batch: "B1", time: "09:00", dur: 120 },
+        { title: "Node.js Express Middleware", batch: "B2", time: "11:00", dur: 120 },
+        { title: "Advanced Figma Prototyping", batch: "B3", time: "14:00", dur: 120 },
+        { title: "React State & Hooks", batch: "B1", time: "10:00", dur: 150 },
+        { title: "MongoDB Schema Design", batch: "B2", time: "09:30", dur: 120 }
+    ];
+
+    for (let i = 0; i <= 7; i++) {
+        const d = new Date();
+        d.setDate(now.getDate() + i);
+        const dateStr = d.toISOString().split('T')[0];
+        const topic = upcomingTopics[i % upcomingTopics.length];
+        
+        sessions.push({
+            id: `future-${i}`,
+            title: topic.title,
+            topic: topic.title,
+            date: dateStr,
+            startTime: topic.time,
+            endTime: "",
+            duration: topic.dur,
+            batchId: topic.batch,
+            courseName: topic.batch === 'B1' ? 'Full Stack Web' : topic.batch === 'B2' ? 'Node.js Backend' : 'UI/UX Design',
+            status: computeSessionStatus(dateStr),
+            mode: "Online"
+        });
+    }
+
+    return sessions;
+};
+
 const HOURS = Array.from({ length: 10 }, (_, i) => i + 9); // 9 AM to 6 PM
 
 const Schedule = () => {
+  const navigate = useNavigate();
   const [currentWeekStart, setCurrentWeekStart] = useState(() => getStartOfWeek(new Date()));
   const [activeView, setActiveView] = useState('Week');
   
   const [sessions, setSessions] = useState(() => {
-    const fallback = [
-      { id: 101, batchId: 'B1', topic: 'JavaScript Mastery', courseName: 'Full Stack', date: formatDateForGrid(new Date()), startTime: '09:00', duration: 120, status: 'Upcoming', mode: 'Online' },
-      { id: 102, batchId: 'B2', topic: 'Node.js Architecture', courseName: 'Backend Dev', date: formatDateForGrid(new Date()), startTime: '13:30', duration: 90, status: 'Upcoming', mode: 'Online' }
-    ];
+    const fallback = generateDummySessions();
     try {
-      const data = localStorage.getItem('trainer_sessions_v2');
-      if (!data) return fallback;
+      const data = localStorage.getItem('trainer_sessions');
+      if (!data) {
+          localStorage.setItem('trainer_sessions', JSON.stringify(fallback));
+          return fallback;
+      }
       const parsed = JSON.parse(data);
       if (!Array.isArray(parsed)) return fallback;
       
@@ -86,10 +205,21 @@ const Schedule = () => {
   const [selectedSession, setSelectedSession] = useState(null);
   const [filters, setFilters] = useState({ batchId: '', courseName: '' });
 
-  // Persistence
+  // Persistence & Auto-Status Update
   useEffect(() => {
     try {
-      localStorage.setItem('trainer_sessions_v2', JSON.stringify(sessions));
+      // Auto-recalculate statuses based on the current date
+      const updated = sessions.map(s => {
+          const newStatus = computeSessionStatus(s.date, s.startTime, s.duration);
+          return s.status !== newStatus ? { ...s, status: newStatus } : s;
+      });
+      
+      const hasChanged = updated.some((s, idx) => s.status !== sessions[idx].status);
+      if (hasChanged) {
+          setSessions(updated);
+      }
+
+      localStorage.setItem('trainer_sessions', JSON.stringify(updated));
     } catch (e) {
       console.error("Failed to save sessions:", e);
     }
@@ -121,7 +251,7 @@ const Schedule = () => {
 
   const todayStr = formatDateForGrid(new Date());
   const todaySessions = useMemo(() => 
-    filteredSessions.filter(s => s.date === todayStr), 
+    filteredSessions.filter(s => s.date === todayStr && s.status !== 'completed'), 
     [filteredSessions, todayStr]
   );
 
@@ -129,7 +259,7 @@ const Schedule = () => {
     try {
       const now = new Date();
       return [...filteredSessions]
-        .filter(s => s.date && s.startTime && new Date(`${s.date}T${s.startTime}`) > now)
+        .filter(s => s.date && s.startTime && s.status !== 'completed' && new Date(`${s.date}T${s.startTime}`) > now)
         .sort((a, b) => new Date(`${a.date}T${a.startTime}`) - new Date(`${b.date}T${b.startTime}`))[0];
     } catch { return null; }
   }, [filteredSessions]);
@@ -152,16 +282,26 @@ const Schedule = () => {
       const batchId = formData.get('batchId');
       const batch = batches.find(b => b.id === batchId);
 
+      const startTime = formData.get('startTime') || '09:00';
+      const endTime = formData.get('endTime') || '10:00';
+      
+      // Calculate duration dynamically for the visual schedule grid
+      const [sh, sm] = startTime.split(':').map(Number);
+      const [eh, em] = endTime.split(':').map(Number);
+      const durationMins = ((eh * 60 + em) - (sh * 60 + sm)) > 0 ? ((eh * 60 + em) - (sh * 60 + sm)) : 60;
+
       const newSess = {
         id: Date.now(),
         batchId: batchId || 'GEN',
         courseName: batch?.course || 'General',
-        topic: formData.get('topic') || 'New Session',
+        title: formData.get('topic') || 'New Session', // as requested
+        topic: formData.get('topic') || 'New Session', // legacy for intact UI
         date: formData.get('date'),
-        startTime: formData.get('startTime') || '09:00',
-        duration: parseInt(formData.get('duration') || '60'),
+        startTime: startTime,
+        endTime: endTime, // as requested
+        duration: durationMins, // legacy visual grid needs this
         mode: formData.get('mode') || 'Online',
-        status: 'Upcoming'
+        status: computeSessionStatus(formData.get('date'))
       };
 
       setSessions(prev => [...prev, newSess]);
@@ -173,7 +313,7 @@ const Schedule = () => {
 
   const resetData = () => {
     if (window.confirm("This will clear your schedule and restore defaults. Proceed?")) {
-      localStorage.removeItem('trainer_sessions_v2');
+      localStorage.removeItem('trainer_sessions');
       window.location.reload();
     }
   };
@@ -233,7 +373,13 @@ const Schedule = () => {
           <div className="kpi-data">
             <p className="kpi-lbl">Next Session</p>
             <span className="kpi-val-text">{nextSession ? nextSession.topic : 'No Upcoming'}</span>
-            <p className="kpi-sub">{nextSession ? `${nextSession.startTime} • ${nextSession.batchId}` : '--:--'}</p>
+            <p className="kpi-sub">
+              {nextSession ? (
+                <>
+                  {nextSession.startTime} • <CountdownTimer targetDate={nextSession.date} startTime={nextSession.startTime} />
+                </>
+              ) : '--:--'}
+            </p>
           </div>
         </div>
         <div className="kpi-card-v2">
@@ -305,15 +451,23 @@ const Schedule = () => {
                     {daySessions.map(s => (
                       <div
                         key={s.id}
-                        className={`v2-session-card batch-${s.batchId.toLowerCase()}`}
+                        className={`v2-session-card batch-${s.batchId.toLowerCase()} ${s.status === 'completed' ? 'completed' : ''}`}
                         style={getSessionStyle(s.startTime, s.duration)}
                         onClick={() => setSelectedSession(s)}
                       >
-                        <div className="v2-card-batch">
+                         <div className="v2-card-batch">
                           <Zap size={10} /> {s.batchId}
+                          <span className="card-status-icon">
+                            {s.status === 'completed' && <CheckCircle size={10} style={{ color: '#10B981' }} />}
+                            {s.status === 'active' && <Circle size={10} fill="#3B82F6" stroke="none" />}
+                            {s.status === 'planned' && <Clock size={10} style={{ color: '#F59E0B' }} />}
+                          </span>
                         </div>
                         <p className="v2-card-topic">{s.topic}</p>
-                        <div className="v2-card-meta">{s.startTime} • {s.duration}m</div>
+                        <div className="v2-card-meta">
+                          {s.status === 'completed' && <span className="completed-label-v2">Completed</span>}
+                          {s.startTime} • {s.duration}m
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -356,8 +510,8 @@ const Schedule = () => {
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div className="v2-form-group">
-                  <label>Duration (Minutes)</label>
-                  <input name="duration" type="number" defaultValue="60" required />
+                  <label>End Time</label>
+                  <input name="endTime" type="time" defaultValue="11:00" required />
                 </div>
                 <div className="v2-form-group">
                   <label>Class Mode</label>
@@ -394,7 +548,19 @@ const Schedule = () => {
               </div>
             </div>
             <div style={{ display: 'flex', gap: '12px' }}>
-              <button className="v2-submit-btn" style={{ flex: 1, marginTop: 0 }} onClick={() => alert("Joining...")}><Play size={16} /> Start Session</button>
+              <button 
+                className="v2-submit-btn" 
+                style={{ flex: 1, marginTop: 0 }} 
+                onClick={() => navigate("/trainer-dashboard/live-session", { 
+                  state: { 
+                    topic: selectedSession.topic, 
+                    date: selectedSession.date, 
+                    time: selectedSession.startTime 
+                  } 
+                })}
+              >
+                <Play size={16} fill="currentColor" /> Start Session
+              </button>
               <button 
                 className="icon-btn-v2" 
                 style={{ height: '48px', width: '48px', color: '#EF4444' }}

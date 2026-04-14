@@ -140,13 +140,8 @@
   width: 100%;
 }
 
-.page {
-  display: none;
+.page-wrapper {
   animation: fadeIn .35s ease;
-}
-
-.page.active {
-  display: block;
 }
 
 @keyframes fadeIn {
@@ -1428,17 +1423,18 @@ button.badge:disabled {
   justify-content: center;
 }
 
-@media(max-width:900px) {
-  .sidebar {
+@media(max-width:1024px) {
+  .sd-sidebar {
     transform: translateX(-100%);
+    transition: transform 0.3s ease;
   }
 
-  .sidebar.open {
+  .sd-sidebar.open {
     transform: translateX(0);
   }
 
-  .main {
-    margin-left: 0;
+  .main-content-wrapper {
+    margin-left: 0 !important;
   }
 
   .kpi-grid {

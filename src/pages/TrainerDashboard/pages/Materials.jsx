@@ -54,6 +54,7 @@ const Materials = () => {
   const [previewItem, setPreviewItem] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('all'); // all, uploaded, pending
+  const [filterType, setFilterType] = useState('all'); // all, PDF, VID, DOC
 
   // Form State
   const [uploadData, setUploadData] = useState({
@@ -172,19 +173,22 @@ const Materials = () => {
       const showUploaded = filterStatus === 'all' || filterStatus === 'uploaded';
       const showPending = filterStatus === 'all' || filterStatus === 'pending';
 
-      const finalUploaded = showUploaded ? filteredUploaded : [];
+      const finalUploadedTyped = filterType === 'all' 
+        ? filteredUploaded 
+        : filteredUploaded.filter(item => item.type === filterType);
+
       const finalPending = showPending ? filteredPending : [];
 
-      if (finalUploaded.length === 0 && finalPending.length === 0) return null;
+      if (finalUploadedTyped.length === 0 && finalPending.length === 0) return null;
 
       // If filterStatus is 'uploaded', only return if there are uploaded items
-      if (filterStatus === 'uploaded' && finalUploaded.length === 0) return null;
+      if (filterStatus === 'uploaded' && finalUploadedTyped.length === 0) return null;
       // If filterStatus is 'pending', only return if there are pending items
       if (filterStatus === 'pending' && finalPending.length === 0) return null;
 
-      return { ...batch, uploaded: finalUploaded, pending: finalPending };
+      return { ...batch, uploaded: showUploaded ? finalUploadedTyped : [], pending: finalPending };
     }).filter(Boolean);
-  }, [batches, searchQuery, filterStatus]);
+  }, [batches, searchQuery, filterStatus, filterType]);
 
   // Derived state for Modal topic dropdown
   const selectedBatchPendingTopics = useMemo(() => {
@@ -223,6 +227,20 @@ const Materials = () => {
               <option value="all">All</option>
               <option value="uploaded">Uploaded</option>
               <option value="pending">Pending</option>
+            </select>
+          </div>
+          <div className="mat-filter-wrapper">
+            <span className="mat-filter-label">File Type</span>
+            <select 
+              className="mat-select-field"
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value)}
+            >
+              <option value="all">All Types</option>
+              <option value="PDF">PDF Documents</option>
+              <option value="VID">Video Lessons</option>
+              <option value="DOC">Word Docs</option>
+              <option value="ZIP">Zip Archives</option>
             </select>
           </div>
           <button className="mat-btn-primary header-btn" onClick={openGeneralUpload}>

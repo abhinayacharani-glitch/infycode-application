@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
 import "./LiveSession.css";
 
 const timeOptions = Array.from({ length: 14 }, (_, i) => {
@@ -14,6 +15,9 @@ const days = [
 ];
 
 const LiveSession = () => {
+  const location = useLocation();
+  const { topic, date, time } = location.state || {};
+
   const getTodayName = () => days[(new Date().getDay() + 6) % 7];
   const todayName = getTodayName();
   const [meetingLink, setMeetingLink] = useState("");
@@ -132,7 +136,39 @@ const LiveSession = () => {
       {/* 🔥 HEADER */}
       <div className="page-header">
         <h1>Live Session</h1>
-        <p>Manage and start your live classroom sessions</p>
+        <p>
+          Manage and start your live classroom sessions
+        </p>
+      </div>
+
+      {/* 🔥 SESSION OUTPUT BANNER */}
+      <div className={`session-output-banner ${topic ? 'active' : 'inactive'}`}>
+        <div className="banner-left">
+          <div className="status-indicator">
+            <span className="pulse-dot"></span>
+            {topic ? "Live Content" : "No Session Selected"}
+          </div>
+          <h2 className="banner-topic">{topic || "No Active Session Overview"}</h2>
+          <div className="banner-meta">
+            <div className="meta-item">
+              <span className="meta-icon">📅</span>
+              <span>{date || "-- -- --"}</span>
+            </div>
+            <div className="meta-item">
+              <span className="meta-icon">⏰</span>
+              <span>{time || "-- : --"}</span>
+            </div>
+          </div>
+        </div>
+        <div className="banner-right">
+          <button
+            className="banner-cta"
+            disabled={!meetingLink || isMeetingLinkInvalid}
+            onClick={() => window.open(meetingLink, '_blank')}
+          >
+            Launch Classroom
+          </button>
+        </div>
       </div>
 
       <div className="live-session-card">
@@ -260,6 +296,8 @@ const LiveSession = () => {
         )}
 
       </div>
+
+
     </div>
   );
 };

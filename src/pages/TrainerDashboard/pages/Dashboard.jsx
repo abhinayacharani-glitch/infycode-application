@@ -72,11 +72,47 @@ const Dashboard = () => {
     { label: 'Avg Attendance', value: 92, trend: '+3%', icon: <CheckCircle size={20} />, color: 'purple', suffix: '%' }
   ];
 
-  const schedule = [
-    { time: '09:00 AM', course: 'Full Stack Development', batch: 'B12', students: 32, duration: '2h', mode: 'Online', status: 'Completed' },
-    { time: '12:00 PM', course: 'Python & Data Science', batch: 'C09', students: 28, duration: '1.5h', mode: 'Offline', status: 'In Progress', active: true },
-    { time: '03:30 PM', course: 'UI/UX Design Basics', batch: 'A05', students: 24, duration: '2h', mode: 'Online', status: 'Upcoming' },
-  ];
+  const [schedule, setSchedule] = useState(() => {
+    const fallback = [
+      { id: 1, time: '09:00 AM', course: 'Full Stack Development', batch: 'B12', students: 32, duration: '2h', mode: 'Online', status: 'Completed' },
+      { id: 2, time: '12:00 PM', course: 'Python & Data Science', batch: 'C09', students: 28, duration: '1.5h', mode: 'Offline', status: 'In Progress', active: true },
+      { id: 3, time: '03:30 PM', course: 'UI/UX Design Basics', batch: 'A05', students: 24, duration: '2h', mode: 'Online', status: 'Upcoming' },
+    ];
+    try {
+      const computeSessionStatus = (dateStr) => {
+          const today = new Date().toISOString().split('T')[0];
+          if (dateStr < today) return 'completed';
+          if (dateStr === today) return 'active';
+          return 'planned';
+      };
+      const data = localStorage.getItem('trainer_sessions');
+      if (data) {
+        const parsed = JSON.parse(data);
+        const todayStr = new Date().toISOString().split('T')[0];
+        const allForToday = parsed
+          .filter(s => s.date === todayStr)
+          .sort((a, b) => a.startTime.localeCompare(b.startTime));
+
+        const activeSess = allForToday.filter(s => computeSessionStatus(s.date) === 'active');
+        const nextPlanned = allForToday.filter(s => computeSessionStatus(s.date) === 'planned').slice(0, 1);
+        
+        const todaySess = [...activeSess, ...nextPlanned].map(s => ({
+            id: s.id,
+            time: s.startTime,
+            course: s.courseName || s.topic,
+            batch: s.batchId,
+            duration: `${s.duration}m`,
+            mode: s.mode,
+            status: computeSessionStatus(s.date),
+            active: computeSessionStatus(s.date) === 'active'
+        }));
+        if (todaySess.length > 0) return todaySess;
+      }
+      return fallback;
+    } catch {
+      return fallback;
+    }
+  });
 
   const activities = [
     { type: 'attendance', msg: 'Attendance marked for Batch B12', time: '2 hours ago' },
@@ -170,7 +206,7 @@ const Dashboard = () => {
           <section className="dashboard-section">
             <h2 className="section-title">Quick Actions</h2>
             <div className="quick-actions-blocks">
-              <button className="qa-block" onClick={() => navigate('/trainer-dashboard/live')}>
+              <button className="qa-block" onClick={() => navigate('/trainer-dashboard/live-session')}>
                 <Play size={20} />
                 <span>Start Class</span>
               </button>

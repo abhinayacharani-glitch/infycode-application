@@ -33,7 +33,13 @@ const LiveSessionCard = ({ session, onStatusChange }) => {
     setIsActive(true);
     if (onStatusChange) onStatusChange(session.id, 'Live');
     // Navigate to global session manager
-    navigate('/trainer-dashboard/live-session');
+    navigate('/trainer-dashboard/live-session', { 
+      state: { 
+        topic: session.course || session.topic, 
+        date: session.date || new Date().toISOString().split('T')[0], 
+        time: session.time 
+      } 
+    });
   };
 
   const handleEnd = () => {
@@ -99,7 +105,7 @@ const LiveSessionCard = ({ session, onStatusChange }) => {
             {(currentStatus === 'Live' || currentStatus === 'In Progress') && (
               <>
                 <button className="action-btn-sm pulse" onClick={() => window.open(session.link, '_blank')}>
-                  Join
+                  Join Now
                 </button>
                 <button className="action-btn-sm danger" onClick={handleEnd}>
                   End

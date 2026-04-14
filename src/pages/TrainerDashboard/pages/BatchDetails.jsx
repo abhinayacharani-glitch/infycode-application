@@ -4,19 +4,19 @@ import {
   Users, CheckCircle, Clock, Calendar,
   BookOpen, Play, History as HistoryIcon,
   MessageSquare, Plus, X, Search, ChevronRight,
-  Monitor, Layout, Database, Zap
+  Monitor, Layout, Database, Zap, AlertCircle,
+  Edit2, Trash2, Circle
 } from 'lucide-react';
 import './BatchDetails.css';
 
-// 0. CENTRALIZED DATA SOURCE
-const batchesData = {
+// 0. CENTRALIZED DATA SOURCE with DYNAMIC content
+const baseBatchesData = {
   B1: {
     title: "Full Stack Development",
+    batchName: "Batch B1",
     startDate: "2026-01-10",
     endDate: "2026-04-10",
-    duration: "3 Months",
     mode: "Online",
-    students: 32,
     progress: 45,
     totalSessions: 20,
     completedSessions: 9,
@@ -24,15 +24,26 @@ const batchesData = {
       topic: "React Context API",
       date: "2026-04-12",
       time: "10:00 AM"
-    }
+    },
+    syllabus: [
+      { id: 1, name: "JavaScript Basics", module: "Module 1" },
+      { id: 2, name: "ES6 Features", module: "Module 1" },
+      { id: 3, name: "React Fundamentals", module: "Module 2" },
+      { id: 4, name: "Components & Props", module: "Module 2" },
+      { id: 5, name: "React Hooks", module: "Module 2" },
+      { id: 6, name: "State Management", module: "Module 3" },
+      { id: 7, name: "Node.js & Express", module: "Module 4" },
+      { id: 8, name: "Database Design", module: "Module 4" },
+      { id: 9, name: "RESTful APIs", module: "Module 4" },
+      { id: 10, name: "Authentication & Auth", module: "Module 5" }
+    ]
   },
   B2: {
     title: "Python & Data Science",
+    batchName: "Batch B2",
     startDate: "2026-02-15",
     endDate: "2026-06-15",
-    duration: "4 Months",
     mode: "Offline",
-    students: 28,
     progress: 30,
     totalSessions: 25,
     completedSessions: 7,
@@ -40,15 +51,26 @@ const batchesData = {
       topic: "Pandas Basics",
       date: "2026-04-13",
       time: "11:30 AM"
-    }
+    },
+    syllabus: [
+      { id: 1, name: "Python Basics", module: "Module 1" },
+      { id: 2, name: "Data Types & Structures", module: "Module 1" },
+      { id: 3, name: "NumPy Fundamentals", module: "Module 2" },
+      { id: 4, name: "Pandas Basics", module: "Module 2" },
+      { id: 5, name: "Data Cleaning", module: "Module 2" },
+      { id: 6, name: "Data Visualization", module: "Module 3" },
+      { id: 7, name: "Statistical Analysis", module: "Module 3" },
+      { id: 8, name: "Machine Learning Intro", module: "Module 4" },
+      { id: 9, name: "Regression Models", module: "Module 4" },
+      { id: 10, name: "Classification Models", module: "Module 4" }
+    ]
   },
   B3: {
     title: "UI/UX Design Basics",
+    batchName: "Batch B3",
     startDate: "2026-03-01",
     endDate: "2026-05-01",
-    duration: "2 Months",
     mode: "Online",
-    students: 24,
     progress: 60,
     totalSessions: 15,
     completedSessions: 9,
@@ -56,15 +78,24 @@ const batchesData = {
       topic: "Wireframing",
       date: "2026-04-11",
       time: "02:00 PM"
-    }
+    },
+    syllabus: [
+      { id: 1, name: "Design Principles", module: "Module 1" },
+      { id: 2, name: "User Research", module: "Module 1" },
+      { id: 3, name: "Wireframing Basics", module: "Module 2" },
+      { id: 4, name: "Prototyping", module: "Module 2" },
+      { id: 5, name: "Typography & Color", module: "Module 2" },
+      { id: 6, name: "Visual Design", module: "Module 3" },
+      { id: 7, name: "Usability Testing", module: "Module 3" },
+      { id: 8, name: "Design Tools (Figma)", module: "Module 3" }
+    ]
   },
   B4: {
     title: "Cloud Architecture",
+    batchName: "Batch B4",
     startDate: "2026-03-10",
     endDate: "2026-05-10",
-    duration: "2 Months",
     mode: "Online",
-    students: 18,
     progress: 20,
     totalSessions: 12,
     completedSessions: 3,
@@ -72,7 +103,17 @@ const batchesData = {
       topic: "AWS EC2",
       date: "2026-04-14",
       time: "09:00 AM"
-    }
+    },
+    syllabus: [
+      { id: 1, name: "Cloud Computing Basics", module: "Module 1" },
+      { id: 2, name: "AWS Overview", module: "Module 1" },
+      { id: 3, name: "EC2 Instances", module: "Module 2" },
+      { id: 4, name: "Storage Services", module: "Module 2" },
+      { id: 5, name: "Networking & VPC", module: "Module 2" },
+      { id: 6, name: "Databases", module: "Module 3" },
+      { id: 7, name: "Security Best Practices", module: "Module 3" },
+      { id: 8, name: "Monitoring & Logging", module: "Module 3" }
+    ]
   }
 };
 
@@ -99,80 +140,121 @@ const formatTimeAgo = (timestamp) => {
   const seconds = Math.floor(diff / 1000);
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
 
   if (seconds < 60) return "Just now";
   if (minutes < 60) return `${minutes}m ago`;
   if (hours < 24) return `${hours}h ago`;
+  if (days < 7) return `${days}d ago`;
   return new Date(timestamp).toLocaleDateString();
 };
+
+// Generate unique Student ID
+const generateStudentId = (existingCount) => {
+  const paddedNumber = String(1001 + existingCount).slice(-3);
+  return `STD${paddedNumber}`;
+};
+
 
 const BatchDetails = () => {
   const { batchId } = useParams();
   const navigate = useNavigate();
-  const batch = batchesData[batchId];
+
+  const handleJoinSession = () => {
+    // Use the session that's actually being displayed in the 'Next Session' card
+    const currentNextSession = batchSessions?.find(s => s.status === 'planned' || s.status === 'active');
+
+    const sessionData = {
+      topic: currentNextSession?.topic || baseBatch?.nextSession?.topic,
+      date: currentNextSession?.date || baseBatch?.nextSession?.date,
+      time: currentNextSession?.time || baseBatch?.nextSession?.time,
+    };
+    navigate("/trainer-dashboard/live-session", { state: sessionData });
+  };
+
+  const baseBatch = baseBatchesData[batchId];
 
   const [activeTab, setActiveTab] = useState('Overview');
   const [showAddSessionModal, setShowAddSessionModal] = useState(false);
   const [showAddStudentModal, setShowAddStudentModal] = useState(false);
+  const [showSyllabusPanel, setShowSyllabusPanel] = useState(false);
   const [studentSearch, setStudentSearch] = useState('');
+  const [updateTimeAgo, setUpdateTimeAgo] = useState('Just now');
+  const timeIntervalRef = useRef(null);
 
-  const [sessionForm, setSessionForm] = useState({
-    title: '',
-    date: '',
-    time: '',
-    duration: '',
-    status: 'Planned'
+  // Syllabus topic status tracking
+  const [syllabusTopicStatus, setSyllabusTopicStatus] = useState(() => {
+    try {
+      const stored = localStorage.getItem(`batch_syllabus_status_${batchId}`);
+      if (stored) return JSON.parse(stored);
+      // Initialize all topics as not completed
+      const initialStatus = {};
+      baseBatch.syllabus?.forEach(topic => {
+        initialStatus[topic.id] = false;
+      });
+      return initialStatus;
+    } catch { return {}; }
   });
 
-
-  const handleSessionSubmit = (e) => {
-    e.preventDefault();
-    console.log("Saving session:", sessionForm);
-    setShowAddSessionModal(false);
-    // Reset form
-    setSessionForm({ title: '', date: '', time: '', duration: '', status: 'Planned' });
-  };
-
-  if (!batch) {
-    return (
-      <div className="batch-details-production">
-        <div className="main-content">
-          <div className="card-production" style={{ textAlign: 'center', padding: '60px' }}>
-            <h2 className="title-bold">Batch Not Found</h2>
-            <p className="subtitle-gray">The batch ID "{batchId}" does not exist in our records.</p>
-            <button className="add-student-btn-prod" onClick={() => navigate('/trainer-dashboard/batches')} style={{ margin: '20px auto' }}>
-              Back to Batches
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // 1. DATA INITIALIZATION (Students/Sessions/History with Dummy Data Defaults)
   const [students, setStudents] = useState(() => {
+    const dummyStudents = [
+      { id: "STD1001", name: "Arjun Sharma", email: "arjun.sharma@infycode.com", joined: "2026-04-10" },
+      { id: "STD1002", name: "Priya Patel", email: "priya.patel@infycode.com", joined: "2026-04-10" },
+      { id: "STD1003", name: "Rahul Verma", email: "rahul.verma@infycode.com", joined: "2026-04-10" },
+      { id: "STD1004", name: "Anjali Gupta", email: "anjali.gupta@infycode.com", joined: "2026-04-10" },
+    ];
     try {
       const stored = localStorage.getItem(`batch_students_v3_${batchId}`);
-      if (stored) return JSON.parse(stored);
-      return [
-        { id: "ST-101", name: "John Doe", email: "john@example.com", joined: "2026-01-10" },
-        { id: "ST-102", name: "Alice Smith", email: "alice@example.com", joined: "2026-01-11" },
-        { id: "ST-103", name: "Bob Wilson", email: "bob@example.com", joined: "2026-01-12" },
-        { id: "ST-104", name: "Charlie Day", email: "charlie@example.com", joined: "2026-01-13" },
-      ];
-    } catch { return []; }
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        return parsed.length > 0 ? parsed : dummyStudents;
+      }
+      return dummyStudents;
+    } catch { return dummyStudents; }
   });
 
-  const [batchSessions, setBatchSessions] = useState(() => {
+
+
+  // Track last update time
+  const [lastUpdated, setLastUpdated] = useState(() => {
     try {
-      const stored = localStorage.getItem(`batch_sessions_v3_${batchId}`);
-      if (stored) return JSON.parse(stored);
-      return [
-        { id: 1, topic: "React Context API", date: "2026-04-10", time: "09:00 AM", duration: "2h", status: "Completed" },
-        { id: 2, topic: "Redux State Management", date: "2026-04-11", time: "10:00 AM", duration: "2h", status: "Planned" },
-        { id: 3, topic: "Node.js Express Basics", date: "2026-04-12", time: "09:00 AM", duration: "2.5h", status: "Planned" }
-      ];
-    } catch { return []; }
+      const stored = localStorage.getItem(`batch_lastUpdated_${batchId}`);
+      return stored ? new Date(stored) : new Date();
+    } catch { return new Date(); }
+  });
+
+  const computeSessionStatus = (dateStr) => {
+    const today = new Date().toISOString().split('T')[0];
+    if (dateStr < today) return 'completed';
+    if (dateStr === today) return 'active';
+    return 'planned';
+  };
+
+  // Use global schedule storage filtered by batchId
+  const [batchSessions, setBatchSessions] = useState(() => {
+    const fallback = [
+        { id: 1, topic: "React Context API", date: "2026-04-15", time: "09:00 AM", duration: "2h", status: computeSessionStatus("2026-04-15") },
+        { id: 2, topic: "Redux State Management", date: "2026-04-16", time: "10:00 AM", duration: "2h", status: computeSessionStatus("2026-04-16") },
+        { id: 3, topic: "Node.js Express Basics", date: "2026-04-17", time: "11:00 AM", duration: "2.5h", status: computeSessionStatus("2026-04-17") }
+    ];
+    try {
+      const stored = localStorage.getItem('trainer_sessions');
+      if (stored) {
+         const allSessions = JSON.parse(stored);
+         const mySessions = allSessions.filter(s => s.batchId === batchId);
+         if (mySessions.length > 0) {
+           return mySessions.map(s => ({
+              id: s.id,
+              topic: s.topic,
+              date: s.date,
+              time: s.startTime,
+              duration: `${s.duration}m`,
+              status: computeSessionStatus(s.date)
+           })).sort((a, b) => new Date(`${a.date} ${a.time}`) - new Date(`${b.date} ${b.time}`));
+         }
+      }
+      return fallback;
+    } catch { return fallback; }
   });
 
   const [history, setHistory] = useState(() => {
@@ -191,16 +273,163 @@ const BatchDetails = () => {
   const [isSaving, setIsSaving] = useState(false);
   const saveTimeoutRef = useRef(null);
 
-  useEffect(() => {
-    localStorage.setItem(`batch_students_v3_${batchId}`, JSON.stringify(students));
-    localStorage.setItem(`batch_sessions_v3_${batchId}`, JSON.stringify(batchSessions));
-    localStorage.setItem(`batch_history_v3_${batchId}`, JSON.stringify(history));
-  }, [students, batchSessions, history, batchId]);
+  const [newStudentForm, setNewStudentForm] = useState({
+    studentId: '',
+    name: '',
+    email: '',
+    autoGenerate: true
+  });
 
-  // 2. LOGIC Helper
-  const progressPct = batch.progress;
-  const nextSession = batchSessions.find(s => s.status === 'Planned');
-  const lastCompleted = [...batchSessions].reverse().find(s => s.status === 'Completed');
+  // ===== EFFECTS =====
+  useEffect(() => {
+    // Auto-update batch session statuses locally
+    const updated = batchSessions.map(s => {
+        const newStatus = computeSessionStatus(s.date);
+        return s.status !== newStatus ? { ...s, status: newStatus } : s;
+    });
+    const changed = updated.some((s, i) => s.status !== batchSessions[i].status);
+    if (changed) setBatchSessions(updated);
+
+    localStorage.setItem(`batch_students_v3_${batchId}`, JSON.stringify(students));
+    localStorage.setItem(`batch_history_v3_${batchId}`, JSON.stringify(history));
+    localStorage.setItem(`batch_syllabus_status_${batchId}`, JSON.stringify(syllabusTopicStatus));
+    localStorage.setItem(`batch_lastUpdated_${batchId}`, new Date().toISOString());
+    setLastUpdated(new Date());
+  }, [students, history, syllabusTopicStatus, batchId]);
+
+  // Update time-ago display every minute
+  useEffect(() => {
+    setUpdateTimeAgo(formatTimeAgo(lastUpdated));
+
+    timeIntervalRef.current = setInterval(() => {
+      setUpdateTimeAgo(formatTimeAgo(lastUpdated));
+    }, 60000); // Update every minute
+
+    return () => {
+      if (timeIntervalRef.current) clearInterval(timeIntervalRef.current);
+    };
+  }, [lastUpdated]);
+
+  // ===== HANDLERS =====
+  const handleAddStudent = (e) => {
+    e.preventDefault();
+
+    const finalStudentId = newStudentForm.autoGenerate
+      ? generateStudentId(students.length)
+      : newStudentForm.studentId.trim();
+
+    if (!finalStudentId) {
+      alert('Student ID is required');
+      return;
+    }
+
+    // Check for duplicate Student ID
+    if (students.some(s => s.id === finalStudentId)) {
+      alert('This Student ID already exists. Please choose a different one.');
+      return;
+    }
+
+    if (!newStudentForm.name.trim()) {
+      alert('Student name is required');
+      return;
+    }
+
+    if (!newStudentForm.email.trim()) {
+      alert('Student email is required');
+      return;
+    }
+
+    const newStudent = {
+      id: finalStudentId,
+      name: newStudentForm.name.trim(),
+      email: newStudentForm.email.trim(),
+      joined: new Date().toISOString().split('T')[0]
+    };
+
+    setStudents([...students, newStudent]);
+
+    // Add history entry
+    setHistory([{
+      id: Date.now(),
+      type: "STUDENT",
+      message: `${newStudent.name} added to batch`,
+      time: "Just now"
+    }, ...history]);
+
+    setNewStudentForm({ studentId: '', name: '', email: '', autoGenerate: true });
+    setShowAddStudentModal(false);
+  };
+
+  const handleSessionSubmit = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    
+    // Convert 24hr time (14:30) to 12hr AM/PM (02:30 PM) display string
+    let formattedTime = formData.get('time');
+    if (formattedTime) {
+      let [hours, minutes] = formattedTime.split(':');
+      let h = parseInt(hours, 10);
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      h = h % 12 || 12;
+      formattedTime = `${h.toString().padStart(2, '0')}:${minutes} ${ampm}`;
+    }
+
+    // 1. Create local batch session object
+    const newSession = {
+      id: Date.now(),
+      topic: formData.get('topic'),
+      date: formData.get('date'),
+      time: formattedTime,
+      duration: formData.get('duration'),
+      status: formData.get('status')
+    };
+
+    setBatchSessions(prev => [...prev, newSession]);
+
+    // Add history entry for the new session
+    setHistory(prev => [{
+      id: Date.now(),
+      type: "SESSION",
+      message: `Scheduled new session: ${newSession.topic}`,
+      time: "Just now"
+    }, ...prev]);
+
+    // 2. Sync to global schedule (trainer_sessions)
+    try {
+      const globalSessionsStr = localStorage.getItem('trainer_sessions');
+      let globalSessions = [];
+      if (globalSessionsStr) {
+        globalSessions = JSON.parse(globalSessionsStr);
+      }
+      if (!Array.isArray(globalSessions)) globalSessions = [];
+      
+      let durationStr = formData.get('duration');
+      let durationMins = parseInt(durationStr) || 60;
+      if (durationStr.toLowerCase().includes('h')) {
+          durationMins = parseFloat(durationStr) * 60;
+      }
+
+      const newGlobalSession = {
+        id: newSession.id,
+        batchId: batchId,
+        courseName: baseBatch?.title || 'General Course',
+        topic: newSession.topic,
+        date: newSession.date,
+        startTime: formattedTime || newSession.time,
+        duration: durationMins,
+        mode: baseBatch?.mode || 'Online',
+        status: newSession.status === 'Completed' ? 'Completed' : 'Upcoming',
+        endTime: "" // Placeholder per requirement
+      };
+
+      globalSessions.push(newGlobalSession);
+      localStorage.setItem('trainer_sessions', JSON.stringify(globalSessions));
+    } catch (err) {
+      console.error("Failed to sync session to global schedule:", err);
+    }
+
+    setShowAddSessionModal(false);
+  };
 
   const handleNotesChange = (val) => {
     setNotes(val);
@@ -209,6 +438,34 @@ const BatchDetails = () => {
     setIsSaving(true);
     saveTimeoutRef.current = setTimeout(() => setIsSaving(false), 1500);
   };
+
+  // Syllabus Handlers
+  const handleToggleTopicStatus = (topicId, isCompleted) => {
+    setSyllabusTopicStatus(prev => ({
+      ...prev,
+      [topicId]: isCompleted
+    }));
+  };
+
+  const handleOpenSyllabusPanel = () => {
+    setShowSyllabusPanel(!showSyllabusPanel);
+  };
+
+  // ===== CALCULATIONS =====
+  // Calculate progress from syllabus - with safe null checks
+  const syllabusTopics = baseBatch?.syllabus || [];
+  const completedCount = Object.values(syllabusTopicStatus).filter(status => status === true).length;
+  const totalTopicsCount = syllabusTopics?.length || 0;
+  const syllabusProgressPct = totalTopicsCount > 0 ? Math.round((completedCount / totalTopicsCount) * 100) : 0;
+
+  const displayStudentCount = Math.max(students?.length || 0, 4);
+  const nextSession = batchSessions?.find(s => s.status === 'Planned');
+  const lastCompleted = [...(batchSessions || [])].reverse().find(s => s.status === 'Completed');
+  const duration = baseBatch ? calculateDuration(baseBatch.startDate, baseBatch.endDate) : 'Unknown';
+
+  // Get completed and pending topics
+  const completedTopics = syllabusTopics?.filter(t => syllabusTopicStatus?.[t.id] === true) || [];
+  const pendingTopics = syllabusTopics?.filter(t => syllabusTopicStatus?.[t.id] !== true) || [];
 
   const CircularProgress = ({ pct }) => {
     const radius = 35;
@@ -225,31 +482,57 @@ const BatchDetails = () => {
     );
   };
 
+  // Early safety check
+  if (!baseBatch) {
+    return (
+      <div className="batch-details-production">
+        <div className="main-content">
+          <div className="card-production" style={{ textAlign: 'center', padding: '60px' }}>
+            <h2 className="title-bold">Batch Not Found</h2>
+            <p className="subtitle-gray">The batch ID "{batchId}" does not exist in our records.</p>
+            <button className="add-student-btn-prod" onClick={() => navigate('/trainer-dashboard/batches')} style={{ margin: '20px auto' }}>
+              Back to Batches
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="batch-details-production">
       <div className="main-content">
 
-        {/* HEADER GRID */}
+        {/* DYNAMIC HEADER SECTION */}
         <div className="header-container-grid">
           <div className="header-left">
-            <h1 className="title-bold">{batch.title}</h1>
-            <p className="subtitle-gray">Batch {batchId} • Trainer Overview</p>
+            <h1 className="title-bold">{baseBatch?.title || 'Batch'}</h1>
+            <p className="subtitle-gray">{baseBatch?.batchName || 'Unknown'} • Trainer Overview</p>
           </div>
 
           <div className="header-info-structured">
             <div className="info-top-row">
-              <div className="info-item-prod"><Calendar size={14} /> {batch.startDate} — {batch.endDate}</div>
-              <div className="info-item-prod"><Clock size={14} /> {batch.duration}</div>
-              <div className="info-item-prod"><Monitor size={14} /> {batch.mode}</div>
-              <div className="info-item-prod"><Users size={14} /> {students.length} Students</div>
+              <div className="info-item-prod header-badge-hover">
+                <Calendar size={14} />
+                {baseBatch?.startDate || 'N/A'} — {baseBatch?.endDate || 'N/A'}
+              </div>
+              <div className="info-item-prod header-badge-hover">
+                <Clock size={14} />
+                {duration}
+              </div>
+              <div className="info-item-prod header-badge-hover">
+                <Monitor size={14} />
+                {baseBatch?.mode || 'N/A'}
+              </div>
+              <div className="info-item-prod header-badge-hover students-badge">
+                <Users size={14} />
+                {displayStudentCount} Students
+              </div>
             </div>
 
             <div className="info-bottom-row">
-              <div className="status-badge-prod next">
-                Next: <b>{nextSession ? `${nextSession.date}` : 'No upcoming'}</b>
-              </div>
               <div className="status-badge-prod updated">
-                Updated: <b>36m ago</b>
+                Updated: <b>{updateTimeAgo}</b>
               </div>
               <button className="add-student-btn-prod" onClick={() => setShowAddStudentModal(true)}>
                 <Plus size={16} /> Add Student
@@ -277,22 +560,35 @@ const BatchDetails = () => {
           {activeTab === 'Overview' && (
             <div className="overview-container-grid">
               <div className="column-left">
-                <div className="card-production progress-card animate-fade">
-                  <div className="progress-top-row">
-                    <div>
-                      <h3 className="card-title-prod">Course Progress</h3>
-                      <p className="card-lbl-gray">Syllabus Completion</p>
+                {syllabusTopics && syllabusTopics.length > 0 ? (
+                  <div className="card-production progress-card animate-fade cursor-pointer">
+                    <div className="progress-top-row">
+                      <div>
+                        <h3 className="card-title-prod">Course Progress</h3>
+                        <p className="card-lbl-gray">Syllabus Completion</p>
+                      </div>
+                      <div className="progress-value-accent">{syllabusProgressPct}%</div>
                     </div>
-                    <div className="progress-value-accent">{progressPct}%</div>
-                  </div>
-                  <div className="progress-body-flex">
-                    <CircularProgress pct={progressPct} />
-                    <div className="progress-stats-prod">
-                      <div className="st-row"><span className="dot blue"></span> <span>{batch.completedSessions} Completed</span></div>
-                      <div className="st-row"><span className="dot gray"></span> <span>{batch.totalSessions} Total</span></div>
+                    <div className="progress-body-flex">
+                      <CircularProgress pct={syllabusProgressPct} />
+                      <div className="progress-stats-prod">
+                        <div className="st-row"><span className="dot blue"></span> <span>{completedCount} Completed</span></div>
+                        <div className="st-row"><span className="dot gray"></span> <span>{totalTopicsCount} Total</span></div>
+                      </div>
+                    </div>
+                    <div className="progress-expand-hint" onClick={handleOpenSyllabusPanel}>
+                      <span>Click to view syllabus</span>
                     </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="card-production progress-card animate-fade">
+                    <h3 className="card-title-prod">Course Progress</h3>
+                    <p className="card-lbl-gray">Syllabus Completion</p>
+                    <div className="empty-state-card">
+                      <p>No syllabus available</p>
+                    </div>
+                  </div>
+                )}
 
                 <div className="card-production tracker-card-v5">
                   <h3 className="card-title-prod">Smart Session Tracker</h3>
@@ -304,7 +600,7 @@ const BatchDetails = () => {
                     <div className="v-divider-v5"></div>
                     <div className="tracker-box-v5 next">
                       <p className="tiny-lbl">NEXT UPCOMING</p>
-                      <p className="box-val">{nextSession ? nextSession.topic : 'None'}</p>
+                      <p className="box-val">{nextSession ? nextSession.topic : (pendingTopics[0]?.name || 'None')}</p>
                     </div>
                   </div>
                 </div>
@@ -326,9 +622,30 @@ const BatchDetails = () => {
                         <span><Calendar size={14} /> {nextSession.date}</span>
                         <span><Clock size={14} /> {nextSession.time}</span>
                       </div>
-                      <button className="join-session-btn-v5">Join Session Now</button>
+                      <div className="join-session-button-container">
+                        <button className="join-session-btn-v5" onClick={handleJoinSession}>
+                          Join Session Now
+                        </button>
+                      </div>
                     </div>
-                  ) : <div className="empty-state-v5">No sessions scheduled</div>}
+                  ) : (
+                    <div className="empty-state-v5">
+                      <p className="no-sess-msg">No sessions scheduled for today</p>
+                      {pendingTopics.length > 0 && (
+                        <div className="tentative-topics-v5">
+                          <p className="tentative-lbl">UPCOMING TOPICS:</p>
+                          <ul className="tentative-list">
+                            {pendingTopics.slice(0, 2).map(t => (
+                              <li key={t.id}>• {t.name}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      <button className="join-session-btn-v5 secondary-btn-prod" onClick={handleJoinSession} style={{ marginTop: '16px' }}>
+                        Join Now
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 <div className="card-production notes-card-v5">
@@ -347,6 +664,106 @@ const BatchDetails = () => {
             </div>
           )}
 
+          {/* SYLLABUS PANEL - INLINE EXPANSION */}
+          {activeTab === 'Overview' && showSyllabusPanel && (
+            <div className="syllabus-panel-expansion animate-fade-down">
+              <div className="syllabus-header">
+                <div>
+                  <h3 className="syllabus-title">📚 Full Syllabus</h3>
+                  <p className="syllabus-subtitle">Track each topic's completion status</p>
+                </div>
+              </div>
+
+              {/* Progress Bar */}
+              <div className="syllabus-progress-section">
+                <div className="progress-bar-container">
+                  <div className="progress-bar-label">
+                    <span>{completedCount} of {totalTopicsCount} topics completed</span>
+                    <span className="progress-percentage">{syllabusProgressPct}%</span>
+                  </div>
+                  <div className="progress-bar-track">
+                    <div
+                      className="progress-bar-fill"
+                      style={{ width: `${syllabusProgressPct}%` }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* All Topics */}
+              <div className="syllabus-topics-section">
+                <h4 className="syllabus-section-subtitle">All Topics</h4>
+                <div className="syllabus-topics-list">
+                  {syllabusTopics && syllabusTopics.length > 0 ? syllabusTopics.map(topic => (
+                    <div key={topic.id} className="syllabus-topic-row">
+                      <div className="topic-info-section">
+                        <div className="topic-name-large">{topic.name}</div>
+                        {topic.module && <div className="topic-module-badge">{topic.module}</div>}
+                      </div>
+                      <div className="topic-action-buttons">
+                        <button
+                          className={`topic-status-btn completed ${syllabusTopicStatus[topic.id] === true ? 'active' : ''}`}
+                          onClick={() => handleToggleTopicStatus(topic.id, true)}
+                          title="Mark as completed"
+                        >
+                          <CheckCircle size={16} />
+                          Completed
+                        </button>
+                        <button
+                          className={`topic-status-btn pending ${syllabusTopicStatus[topic.id] !== true ? 'active' : ''}`}
+                          onClick={() => handleToggleTopicStatus(topic.id, false)}
+                          title="Mark as pending"
+                        >
+                          <Clock size={16} />
+                          Not Completed
+                        </button>
+                      </div>
+                    </div>
+                  )) : (
+                    <div className="empty-state-syllabus">
+                      <p>No topics available for this syllabus.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Completed Topics Section */}
+              {completedTopics && completedTopics.length > 0 && (
+                <div className="syllabus-topics-section">
+                  <h4 className="syllabus-section-subtitle">✅ Completed Topics ({completedCount})</h4>
+                  <div className="syllabus-topics-summary">
+                    {completedTopics?.map(topic => (
+                      <div key={topic.id} className="summary-topic-badge completed-topic">
+                        <CheckCircle size={14} />
+                        {topic.name}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Pending Topics Section */}
+              {pendingTopics && pendingTopics.length > 0 && (
+                <div className="syllabus-topics-section">
+                  <h4 className="syllabus-section-subtitle">⏳ Pending Topics ({pendingTopics.length})</h4>
+                  <div className="syllabus-topics-summary">
+                    {pendingTopics?.map(topic => (
+                      <div key={topic.id} className="summary-topic-badge pending-topic">
+                        <Clock size={14} />
+                        {topic.name}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Close Button */}
+              <button className="syllabus-close-btn" onClick={handleOpenSyllabusPanel}>
+                Collapse Syllabus
+              </button>
+            </div>
+          )}
+
           {/* STUDENTS TAB */}
           {activeTab === 'Students' && (
             <div className="students-tab-v5 animate-fade">
@@ -355,7 +772,7 @@ const BatchDetails = () => {
                   <Search size={18} />
                   <input
                     type="text"
-                    placeholder="Search students..."
+                    placeholder="Search students by name or ID..."
                     value={studentSearch}
                     onChange={e => setStudentSearch(e.target.value)}
                   />
@@ -365,9 +782,12 @@ const BatchDetails = () => {
                 </button>
               </div>
 
-              {students.length > 0 ? (
+              {students && students.length > 0 ? (
                 <div className="students-grid-v5">
-                  {students.filter(s => s.name.toLowerCase().includes(studentSearch.toLowerCase())).map(student => (
+                  {students?.filter(s =>
+                    s.name.toLowerCase().includes(studentSearch.toLowerCase()) ||
+                    s.id.toLowerCase().includes(studentSearch.toLowerCase())
+                  ).map(student => (
                     <div key={student.id} className="student-card-v5">
                       <div className="st-card-hdr">
                         <div className="st-avatar-v5">{student.name.charAt(0)}</div>
@@ -375,10 +795,10 @@ const BatchDetails = () => {
                           <p className="st-name-v5">{student.name}</p>
                           <p className="st-email-v5">{student.email}</p>
                         </div>
-                        <button className="st-menu-btn"><ChevronRight size={18} /></button>
+
                       </div>
                       <div className="st-card-footer">
-                        <span className="st-id-v5">ID: {student.id}</span>
+                        <span className="st-id-v5 badge-student-id">ID: {student.id}</span>
                         <span className="st-date-v5">Joined {student.joined}</span>
                       </div>
                     </div>
@@ -402,29 +822,74 @@ const BatchDetails = () => {
                   <Plus size={16} /> Add Session
                 </button>
               </div>
-              <div className="schedule-list-v5">
-                {batchSessions.length > 0 ? batchSessions.map(session => (
-                  <div key={session.id} className="schedule-card-v5">
-                    <div className="sch-timeline-point"></div>
-                    <div className="sch-card-content">
-                      <div className="sch-left-v5">
-                        <p className="sch-time-v5">{session.time}</p>
-                        <div className="sch-info-v5">
-                          <p className="sch-topic-v5">{session.topic}</p>
-                          <p className="sch-meta-v5"><Clock size={12} /> {session.duration} • {session.date}</p>
+              
+              <div className="schedule-sections-v5">
+                {/* UPCOMING SECTION */}
+                <div className="schedule-section-v5">
+                  <div className="section-header-v5 upcoming">
+                    <span className="section-title-v5">Upcoming Sessions</span>
+                    <span className="section-count-v5">{batchSessions.filter(s => s.status !== 'completed').length}</span>
+                  </div>
+                  <div className="schedule-list-v5">
+                    {batchSessions.filter(s => s.status !== 'completed').length > 0 ? 
+                      batchSessions.filter(s => s.status !== 'completed').map(session => (
+                        <div key={session.id} className={`schedule-card-v5 ${session.status === 'completed' ? 'completed' : ''}`}>
+                          <div className="sch-timeline-point"></div>
+                          <div className="sch-card-content">
+                            <div className="sch-left-v5">
+                              <p className="sch-time-v5">{session.time}</p>
+                              <div className="sch-info-v5">
+                                <p className="sch-topic-v5">{session.topic}</p>
+                                <p className="sch-meta-v5">
+                                  {session.status === 'completed' && <CheckCircle size={12} style={{ color: '#10B981', marginRight: '4px' }} />}
+                                  {session.status === 'active' && <Circle size={10} fill="#3B82F6" stroke="none" style={{ marginRight: '6px' }} />}
+                                  {session.status === 'planned' && <Clock size={12} style={{ color: '#F59E0B', marginRight: '4px' }} />}
+                                  {session.duration} • {session.date}
+                                </p>
+                              </div>
+                            </div>
+                            <span className={`sch-badge-v5 ${session.status.toLowerCase()}`}>
+                              {session.status === 'active' ? '🔵 Active' : session.status === 'planned' ? '⏳ Planned' : '✅ Completed'}
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                      <span className={`sch-badge-v5 ${session.status.toLowerCase()}`}>
-                        {session.status}
-                      </span>
-                    </div>
+                      )) : (
+                        <div className="empty-state-mini">No upcoming sessions</div>
+                      )
+                    }
                   </div>
-                )) : (
-                  <div className="empty-state-container">
-                    <Calendar size={48} />
-                    <p>No sessions scheduled available.</p>
+                </div>
+
+                {/* COMPLETED SECTION */}
+                <div className="schedule-section-v5">
+                  <div className="section-header-v5 completed">
+                    <span className="section-title-v5">Completed History</span>
+                    <span className="section-count-v5">{batchSessions.filter(s => s.status === 'completed').length}</span>
                   </div>
-                )}
+                  <div className="schedule-list-v5">
+                    {batchSessions.filter(s => s.status === 'completed').length > 0 ? 
+                      batchSessions.filter(s => s.status === 'completed').map(session => (
+                        <div key={session.id} className={`schedule-card-v5 completed`}>
+                          <div className="sch-timeline-point"></div>
+                          <div className="sch-card-content">
+                            <div className="sch-left-v5">
+                              <p className="sch-time-v5">{session.time}</p>
+                              <div className="sch-info-v5">
+                                <p className="sch-topic-v5">{session.topic}</p>
+                                <p className="sch-meta-v5"><Clock size={12} /> {session.duration} • {session.date}</p>
+                              </div>
+                            </div>
+                            <span className={`sch-badge-v5 completed`}>
+                              Completed
+                            </span>
+                          </div>
+                        </div>
+                      )) : (
+                        <div className="empty-state-mini">No completed sessions yet</div>
+                      )
+                    }
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -461,24 +926,79 @@ const BatchDetails = () => {
         </div>
       </div>
 
-      {/* ADD STUDENT MODAL */}
+      {/* ADD STUDENT MODAL - ENHANCED with Student ID */}
       {showAddStudentModal && (
         <div className="modal-overlay-prod animate-fade">
-          <div className="modal-box-prod">
+          <div className="modal-box-prod modal-add-student-enhanced">
             <div className="modal-hdr">
               <h3>Add New Student</h3>
-              <button onClick={() => setShowAddStudentModal(false)}><X size={20} /></button>
+              <button onClick={() => setShowAddStudentModal(false)} className="close-modal-btn"><X size={20} /></button>
             </div>
-            <form onSubmit={(e) => { e.preventDefault(); setShowAddStudentModal(false); }} className="prod-form">
-              <div className="input-group-v5">
-                <label>Full Name</label>
-                <input type="text" placeholder="e.g. John Doe" required />
+            <form onSubmit={handleAddStudent} className="prod-form">
+
+              {/* STUDENT ID SECTION */}
+              <div className="student-id-section">
+                <div className="section-title">Student ID</div>
+                <div className="auto-generate-toggle">
+                  <label className="toggle-label">
+                    <input
+                      type="checkbox"
+                      checked={newStudentForm.autoGenerate}
+                      onChange={(e) => setNewStudentForm({ ...newStudentForm, autoGenerate: e.target.checked })}
+                    />
+                    <span>Auto-generate Student ID</span>
+                  </label>
+                  {newStudentForm.autoGenerate && (
+                    <p className="auto-gen-hint">
+                      Will be: <strong>{generateStudentId(students.length)}</strong>
+                    </p>
+                  )}
+                </div>
+
+                {!newStudentForm.autoGenerate && (
+                  <div className="input-group-v5">
+                    <label>Student ID *</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. STD001"
+                      value={newStudentForm.studentId}
+                      onChange={(e) => setNewStudentForm({ ...newStudentForm, studentId: e.target.value })}
+                      maxLength={10}
+                    />
+                    <p className="field-hint">Format: STD followed by numbers (e.g., STD001, STD123)</p>
+                  </div>
+                )}
               </div>
-              <div className="input-group-v5">
-                <label>Email Address</label>
-                <input type="email" placeholder="john@example.com" required />
+
+              {/* STUDENT INFO SECTION */}
+              <div className="student-info-section">
+                <div className="section-title">Student Information</div>
+                <div className="input-group-v5">
+                  <label>Full Name *</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. John Doe"
+                    value={newStudentForm.name}
+                    onChange={(e) => setNewStudentForm({ ...newStudentForm, name: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="input-group-v5">
+                  <label>Email Address *</label>
+                  <input
+                    type="email"
+                    placeholder="john@example.com"
+                    value={newStudentForm.email}
+                    onChange={(e) => setNewStudentForm({ ...newStudentForm, email: e.target.value })}
+                    required
+                  />
+                </div>
               </div>
-              <button type="submit" className="prod-btn-primary-v5 full-width">Enroll Student</button>
+
+              <div className="modal-footer-student">
+                <button type="button" className="btn-cancel-v5" onClick={() => setShowAddStudentModal(false)}>Cancel</button>
+                <button type="submit" className="btn-enroll-student">Enroll Student</button>
+              </div>
             </form>
           </div>
         </div>
@@ -496,50 +1016,30 @@ const BatchDetails = () => {
               <div className="input-group-v5">
                 <label>Session Title</label>
                 <input
+                  name="topic"
                   type="text"
                   placeholder="e.g. Intro to Node.js"
-                  value={sessionForm.title}
-                  onChange={e => setSessionForm({ ...sessionForm, title: e.target.value })}
                   required
                 />
               </div>
               <div className="form-row-grid">
                 <div className="input-group-v5">
                   <label>Date</label>
-                  <input
-                    type="date"
-                    value={sessionForm.date}
-                    onChange={e => setSessionForm({ ...sessionForm, date: e.target.value })}
-                    required
-                  />
+                  <input name="date" type="date" required />
                 </div>
                 <div className="input-group-v5">
                   <label>Time</label>
-                  <input
-                    type="time"
-                    value={sessionForm.time}
-                    onChange={e => setSessionForm({ ...sessionForm, time: e.target.value })}
-                    required
-                  />
+                  <input name="time" type="time" required />
                 </div>
               </div>
               <div className="form-row-grid">
                 <div className="input-group-v5">
                   <label>Duration</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. 2h"
-                    value={sessionForm.duration}
-                    onChange={e => setSessionForm({ ...sessionForm, duration: e.target.value })}
-                    required
-                  />
+                  <input name="duration" type="text" placeholder="e.g. 2h or 120" required />
                 </div>
                 <div className="input-group-v5">
                   <label>Status</label>
-                  <select
-                    value={sessionForm.status}
-                    onChange={e => setSessionForm({ ...sessionForm, status: e.target.value })}
-                  >
+                  <select name="status">
                     <option value="Planned">Planned</option>
                     <option value="Completed">Completed</option>
                   </select>
@@ -553,6 +1053,7 @@ const BatchDetails = () => {
           </div>
         </div>
       )}
+
 
     </div>
   );

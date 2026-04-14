@@ -1,5 +1,6 @@
 :root {
-  --sd-bg: rgb(51, 42, 42); /* Restoring previous dark background */
+  --sd-bg: #3b3b45;
+  /* Restoring previous dark background */
   --sd-text-primary: #FFFFFF;
   --sd-text-secondary: #E5E7EB;
   --sd-active-bg: rgba(255, 255, 255, 0.1);
@@ -91,7 +92,8 @@
 .sd-user-name {
   font-size: 13.5px;
   font-weight: 800;
-  color: #1F2937; /* Dark text for the light profile card */
+  color: #1F2937;
+  /* Dark text for the light profile card */
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -157,7 +159,8 @@
   color: #3B82F6;
   border-left: 4px solid #3B82F6;
   border-radius: 0 10px 10px 0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Soft shadow for white on dark */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  /* Soft shadow for white on dark */
 }
 
 .sd-item.active .sd-icon {
