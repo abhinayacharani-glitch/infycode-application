@@ -2,7 +2,7 @@
 
 .why {
   padding: 70px 20px;
-  background: #f9fafc;
+  background: #F0F0F0;
   text-align: center;
   font-family: 'Urbanist', sans-serif;
 }
@@ -10,14 +10,14 @@
 .why-title {
   font-size: 36px;
   font-weight: 800;
-  color: var(--text-main);
+  color: rgb(12, 12, 12);
 }
 
 .why-sub {
   font-size: 18px;
   font-weight: 800px;
   margin: 10px 0 60px;
-  color: black;
+  color: rgb(7, 7, 7);
 }
 
 /* OPTIONS */
