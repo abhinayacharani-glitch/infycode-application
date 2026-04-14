@@ -11,12 +11,10 @@
 
 /* ================= SIDEBAR ================= */
 .admin-sidebar {
-  width: var(--adm-sidebar-width);
-  height: 100vh;
-  background: var(--adm-bg-white);
-  position: fixed;
-  top: 0;
-  left: 0;
+  width: 100%;
+  height: 100%;
+  background:  #3b3b45;
+  position: relative;
   display: flex;
   flex-direction: column;
   padding: 12px 0;
@@ -28,102 +26,55 @@
   transition: all 0.3s ease;
 }
 
-/* ================= BRAND ================= */
-.adm-brand-section {
-  padding: 12px 20px;
-}
-
-.adm-logo-container {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  transition: 0.3s;
-  text-decoration: none;
-}
-
-.adm-logo-container:hover {
-  transform: scale(1.03);
-}
-
-.adm-logo-img {
-  flex-shrink: 0;
-  width: 60px;
-  height: 60px;
-  object-fit: contain;
-}
-
-.adm-brand-text {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-.adm-title-img {
-  width: 100%;
-  object-fit: contain;
-  mix-blend-mode: multiply;
-}
 
 /* ================= USER CARD ================= */
 .adm-user-card {
-  margin: 0 16px;
-  padding: 12px;
-  border-radius: 14px;
-  background: #f0f6ff;
-  border: 1px solid #dbeafe;
+  margin: 0 16px 20px;
+  padding: 10px 0;
+  background: transparent;
+  border: none;
   display: flex;
   align-items: center;
-  gap: 12px;
-  transition: 0.3s;
-}
-
-.adm-user-card:hover {
-  background: #e8f2ff;
+  gap: 16px;
 }
 
 .adm-user-avatar {
-  width: 40px;
-  height: 40px;
+  width: 65px;
+  height: 65px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #2563eb, #1e40af);
+  overflow: hidden;
+  background: #2563eb;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
-  font-weight: 700;
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+  flex-shrink: 0;
+}
+
+.adm-user-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .adm-user-info {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  gap: 4px;
 }
 
 .adm-user-name {
-  font-size: 13px;
-  font-weight: 700;
-  color: #0f172a;
+  font-size: 20px;
+  font-weight: 500;
+  color: #ffffff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .adm-user-role {
-  font-size: 11px;
-  color: #64748b;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.adm-status-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #22c55e;
-  display: inline-block;
+  font-size: 13.5px;
+  color: #94a3b8;
 }
 
 /* ================= NAV ================= */
@@ -164,18 +115,18 @@
   gap: 12px;
   padding: 10px 14px;
   border-radius: 10px;
-  font-size: 13.5px;
+  font-size: 16px;
   font-weight: 600;
-  color: #2563eb;
+  color: #f3f3f5;
   text-decoration: none;
   transition: all 0.25s ease;
 }
 
-.adm-nav-item:hover {
+/* .adm-nav-item:hover {
   background: var(--adm-hover);
   transform: translateX(4px);
   color: #1e40af;
-}
+} */
 
 .adm-nav-item.active {
   background: #eff6ff;
@@ -188,7 +139,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
+  width: 24px;
   color: inherit;
 }
 
@@ -207,6 +158,71 @@
 
 .adm-nav-badge.amber { background: #f59e0b; }
 .adm-nav-badge.green { background: #22c55e; }
+
+/* ================= DROPDOWN ================= */
+.adm-nav-dropdown-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dropdown-trigger {
+  cursor: pointer;
+  user-select: none;
+}
+
+.adm-dropdown-chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+  color: #94a3b8;
+}
+
+.adm-dropdown-chevron.rotated {
+  transform: rotate(180deg);
+  color: #f3f3f5;
+}
+
+.adm-nav-dropdown-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-left: 28px;
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.3s ease-in-out;
+  opacity: 0;
+}
+
+.adm-nav-dropdown-wrap.open .adm-nav-dropdown-content {
+  max-height: 200px;
+  opacity: 1;
+  padding-top: 4px;
+  padding-bottom: 8px;
+}
+
+.adm-dropdown-item {
+  padding: 8px 14px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #cbd5e1;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.adm-dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  transform: translateX(4px);
+}
+
+.adm-dropdown-item.active {
+  background: rgba(37, 99, 235, 0.1);
+  color: #60a5fa;
+  font-weight: 600;
+}
 
 /* ================= FOOTER ================= */
 .adm-sidebar-footer {

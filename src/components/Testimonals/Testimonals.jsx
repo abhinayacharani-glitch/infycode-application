@@ -1,141 +1,150 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./Testimonals.css";
 
-function Testimonals(){
+function Testimonals() {
+  const original = [
+    {
+      name: "Akash",
+      role: "- Student",
+      img: "https://randomuser.me/api/portraits/men/32.jpg",
+      text: "There is nothing more important than continuous learning and improving your skills.",
+      stars: 5,
+      color: "#e8f5e9"
+    },
+    {
+      name: "Jeevan",
+      role: "- Student",
+      img: "https://randomuser.me/api/portraits/women/44.jpg",
+      text: "Learning new skills consistently helps build a strong and successful career.",
+      stars: 5,
+      color: "#e3f2fd"
+    },
+    {
+      name: "Srinivas",
+      role: "- Student",
+      img: "https://randomuser.me/api/portraits/women/65.jpg",
+      text: "With the right guidance and practice, anyone can achieve their goals.",
+      stars: 5,
+      color: "#fce4ec"
+    },
+    {
+      name: "Chandra",
+      role: "-Student",
+      img: "https://randomuser.me/api/portraits/women/68.jpg",
+      text: "A great learning experience with practical knowledge and expert support.",
+      stars: 5,
+      color: "#fff3e0"
+    }
+  ];
 
-const original = [
-{
-name:"Akash",
-role:"Student",
-img:"https://randomuser.me/api/portraits/men/32.jpg",
-text:"There is nothing more important than continuous learning and improving your skills."
-},
-{
-name:"Jeevan",
-role:"Student",
-img:"https://randomuser.me/api/portraits/men/44.jpg",
-text:"Learning new skills consistently helps build a strong and successful career."
-},
-{
-name:"Srinivas",
-role:"Student",
-img:"https://randomuser.me/api/portraits/men/46.jpg",
-text:"With the right guidance and practice, anyone can achieve their goals."
-},
-{
-name:"Chandra",
-role:"Student",
-img:"https://randomuser.me/api/portraits/men/55.jpg",
-text:"A great learning experience with practical knowledge and expert support."
-}
-];
+  // Duplicate cards for seamless loop
+  const testimonials = [...original, ...original, ...original];
 
-/* duplicate cards for seamless loop */
-const testimonials=[...original,...original,...original];
+  const [index, setIndex] = useState(original.length);
+  const [isTransitioning, setIsTransitioning] = useState(true);
+  const trackRef = useRef(null);
 
-const [index,setIndex]=useState(original.length);
-const trackRef=useRef(null);
+  // Auto scroll
+  useEffect(() => {
+    const interval = setInterval(() => {
+      next();
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [index]);
 
+  // Handle seamless reset
+  useEffect(() => {
+    if (index >= original.length * 2) {
+      setTimeout(() => {
+        setIsTransitioning(false);
+        setIndex(original.length);
+      }, 600);
+    } else if (index < original.length) {
+      setTimeout(() => {
+        setIsTransitioning(false);
+        setIndex(original.length * 2 - 1);
+      }, 600);
+    } else {
+      setIsTransitioning(true);
+    }
+  }, [index, original.length]);
 
-/* AUTO SCROLL */
-useEffect(()=>{
+  const next = () => {
+    setIndex((prev) => prev + 1);
+  };
 
-const interval=setInterval(()=>{
-setIndex(prev=>prev+1);
-},2000);
+  const prev = () => {
+    setIndex((prev) => prev - 1);
+  };
 
-return()=>clearInterval(interval);
+  return (
+    <section id="testimonials" className="testimonials">
+      <div className="testimonials-bg-overlay"></div>
 
-},[]);
+      <div className="testimonials-header">
+        <h2>Testimonals</h2>
+        {/* <p>Hear from our satisfied customers</p> */}
+      </div>
 
+      <div className="testimonial-container">
+        <button className="nav-arrow prev" onClick={prev} aria-label="Previous testimonial">
+          <span className="arrow-icon">❮</span>
+        </button>
 
-/* HANDLE INVISIBLE RESET */
-useEffect(()=>{
+        <div className="testimonial-viewport">
+          <div
+            ref={trackRef}
+            className="testimonial-track"
+            style={{
+              transform: `translateX(calc(-${index * (100 / 3)}%))`,
+              transition: isTransitioning ? "transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)" : "none"
+            }}
+          >
+            {testimonials.map((t, i) => {
+              const isActive = i === index + 1; // Assuming 3 cards visible, center is index + 1
+              return (
+                <div key={i} className={`testimonial-card ${isActive ? "active" : ""}`}>
+                  <div className="card-glass">
+                    <div className="card-body">
+                      <div className="stars">
+                        {[...Array(t.stars)].map((_, si) => (
+                          <span key={si}>★</span>
+                        ))}
+                      </div>
+                      <p className="quote">{t.text}</p>
+                    </div>
+                    <div className="user-info" style={{ backgroundColor: t.color }}>
+                      <div className="avatar-wrapper">
+                        <img src={t.img} alt={t.name} />
+                      </div>
+                      <div className="user-details">
+                        <h3>{t.name}</h3>
+                        <p className="role">{t.role}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
 
-const track=trackRef.current;
+        <button className="nav-arrow next" onClick={next} aria-label="Next testimonial">
+          <span className="arrow-icon">❯</span>
+        </button>
+      </div>
 
-if(index>=original.length*2){
-setTimeout(()=>{
-track.style.transition="none";
-setIndex(original.length);
-},600);
-}
-
-track.style.transition="transform 0.6s ease";
-
-},[index,original.length]);
-
-
-/* ARROWS */
-
-const next=()=>{
-setIndex(prev=>prev+1);
-};
-
-const prev=()=>{
-setIndex(prev=>prev-1);
-};
-
-
-return(
-
-<section id="testimonials" className="testimonials">
-
-<h2>Testimonials</h2>
-
-<div className="testimonial-wrapper">
-
-<button className="arrow left" onClick={prev}>❮</button>
-
-<div
-ref={trackRef}
-className="testimonial-track"
-style={{transform:`translateX(-${index*33.33}%)`}}
->
-
-{testimonials.map((t,i)=>{
-
-let cls="testimonial-card dim";
-
-if(i===index){
-cls="testimonial-card active";
-}
-
-return(
-
-<div className={cls} key={i}>
-
-<div className="student-info">
-
-<img src={t.img} alt="student"/>
-
-<div>
-<h3>{t.name}</h3>
-<p className="role">{t.role}</p>
-</div>
-
-</div>
-
-<p className="text">{t.text}</p>
-
-<div className="stars">★★★★★</div>
-
-</div>
-
-);
-
-})}
-
-</div>
-
-<button className="arrow right" onClick={next}>❯</button>
-
-</div>
-
-</section>
-
-);
-
+      <div className="pagination-dots">
+        {original.map((_, i) => (
+          <span
+            key={i}
+            className={`dot ${(index % original.length) === i ? "active" : ""}`}
+            onClick={() => setIndex(original.length + i)}
+          ></span>
+        ))}
+      </div>
+    </section>
+  );
 }
 
 export default Testimonals;
