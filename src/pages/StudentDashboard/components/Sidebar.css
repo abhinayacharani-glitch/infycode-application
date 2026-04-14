@@ -1,7 +1,8 @@
 /* ================= ROOT ================= */
 
 :root {
-  --student-sd-bg: #2b2725; /* Adjusted to match the image precisely */
+  --student-sd-bg: #2b2725;
+  /* Adjusted to match the image precisely */
   --student-sd-hover: rgba(255, 255, 255, 0.05);
   --student-sd-active: #ffffff;
   --student-sd-accent: #3b82f6;
@@ -102,7 +103,8 @@
   width: 44px;
   height: 44px;
 
-  border-radius: 10px; /* Squircle shape from image */
+  border-radius: 10px;
+  /* Squircle shape from image */
   background: #3b82f6;
 
   display: flex;
@@ -207,7 +209,7 @@
   font-weight: 700;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
 .student-sd-item.active .student-sd-box::before {

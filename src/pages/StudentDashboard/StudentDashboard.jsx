@@ -27,19 +27,15 @@ function StudentDashboard() {
   };
 
   return (
-    <div className="student-dashboard-layout" style={{ display: "flex", height: "100vh", overflow: "hidden", fontFamily: "'Urbanist', sans-serif" }}>
+    <div className="student-dashboard-layout" style={{ display: "flex", width: "100%", height: "100vh", overflow: "hidden", fontFamily: "'Urbanist', sans-serif" }}>
       
       {/* Conditionally render Sidebar */}
-      {!isCourseExplore && (
-        <div className="sidebar-container" style={{ width: "250px", flexShrink: 0, height: "100vh", overflowY: "auto" }}>
-          <Sidebar />
-        </div>
-      )}
+      {!isCourseExplore && <Sidebar />}
 
       {/* Main Content Area */}
-      <div className="main-content-wrapper" style={{ flex: 1, display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden" }}>
+      <div className="main-content-wrapper" style={{ flex: 1, display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden", background: "#f8fafc" }}>
         {!isCourseExplore && <Navbar />}
-        <main className="dashboard-content" style={{ flex: 1, padding: isCourseExplore ? "0" : "20px", overflowY: isCourseExplore ? "hidden" : "auto", background: "#f8fafc", height: isCourseExplore ? "100%" : "auto" }}>
+        <main className="dashboard-content" style={{ flex: 1, padding: isCourseExplore ? "0" : "1.5rem", overflowY: isCourseExplore ? "hidden" : "auto", height: isCourseExplore ? "100%" : "auto" }}>
           <Routes>
             <Route index element={<Navigate to="courses" replace />} />
             <Route path="counselling" element={<Counselling />} />
