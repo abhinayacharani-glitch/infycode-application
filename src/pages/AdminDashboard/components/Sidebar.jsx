@@ -129,6 +129,32 @@ const Sidebar = () => {
           <span className="adm-nav-label">Reports &amp; Logs</span>
         </NavLink>
 
+        {/* SETTINGS */}
+        <div className="adm-nav-section" style={{ marginTop: '20px', fontSize: '11px', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '1px', padding: '0 12px' }}>Account Settings</div>
+
+        <NavLink
+          to="/admin-dashboard/settings/account"
+          className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`}
+        >
+          <span className="adm-nav-icon"><Settings2 size={22} /></span>
+          <span className="adm-nav-label">Profile Info</span>
+        </NavLink>
+
+        <NavLink
+          to="/admin-dashboard/settings/security"
+          className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`}
+        >
+          <span className="adm-nav-icon"><Settings2 size={22} /></span>
+          <span className="adm-nav-label">Security</span>
+        </NavLink>
+
+        <NavLink
+          to="/admin-dashboard/settings/preferences"
+          className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`}
+        >
+          <span className="adm-nav-icon"><Settings2 size={22} /></span>
+          <span className="adm-nav-label">Preferences</span>
+        </NavLink>
       </nav>
 
       {/* ── Footer / Logout ── */}

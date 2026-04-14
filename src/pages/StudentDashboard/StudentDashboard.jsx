@@ -38,6 +38,7 @@ function StudentDashboard() {
         <main className="dashboard-content" style={{ flex: 1, padding: isCourseExplore ? "0" : "1.5rem", overflowY: isCourseExplore ? "hidden" : "auto", height: isCourseExplore ? "100%" : "auto" }}>
           <Routes>
             <Route index element={<Navigate to="courses" replace />} />
+            <Route path="dashboard" element={<Navigate to="courses" replace />} />
             <Route path="counselling" element={<Counselling />} />
             <Route path="skill-test" element={<SkillTest />} />
             <Route path="course" element={<CourseDiscovery />} />
