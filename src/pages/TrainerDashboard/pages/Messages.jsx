@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './Messages.css';
 
 const Messages = () => {
   const [selected, setSelected] = useState(0);
@@ -40,6 +41,10 @@ const Messages = () => {
 
   return (
     <div className="page active" id="page-messages">
+      <div className="messages-header">
+        <h1 className="messages-title">Messages</h1>
+        <p className="messages-subtitle">Communicate with your students and coordinators</p>
+      </div>
 
       {/* KPI Row */}
       <div className="kpi-grid" style={{ marginBottom: '28px' }}>

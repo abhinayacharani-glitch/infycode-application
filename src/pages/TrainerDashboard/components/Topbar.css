@@ -1,0 +1,312 @@
+  /* ================================================
+    TRAINER TOPBAR – PREMIUM SaaS DASHBOARD NAVBAR
+    Font: Urbanist | Theme: Light Blue & White
+    ================================================ */
+
+  @import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&display=swap');
+
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 80px;
+    padding: 0 24px;
+    /* Consistent premium padding */
+    background: #FFFFFF;
+    border-bottom: 1px solid #E2E8F0;
+    font-family: 'Urbanist', sans-serif;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 1100;
+    box-sizing: border-box;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  }
+
+  .navbar * {
+    font-family: 'Urbanist', sans-serif;
+  }
+
+  /* ========================
+    LEFT: BRAND SECTION
+    ======================== */
+  .navbar-content-left {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+  }
+
+  .brand-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    padding: 4px 0;
+  }
+
+  .logo {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+  }
+
+  .brand-name {
+    font-size: 24px;
+    font-weight: 900;
+    color: #1E293B;
+    letter-spacing: -0.3px;
+    transition: color 0.3s ease-in-out;
+    position: relative;
+  }
+
+  /* Underline Animation */
+  .brand-name::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: #3B82F6;
+    transition: width 0.3s ease-in-out;
+  }
+
+  .brand-tagline {
+    font-size: 15px;
+    font-weight: 600;
+    color: #64748B;
+    opacity: 0.7;
+    /* Initial opacity */
+    transition: opacity 0.3s ease-in-out;
+    margin-top: 1px;
+  }
+
+  /* Brand Hover Micro-interactions */
+  .brand-wrapper:hover .logo {
+    transform: scale(1.05);
+  }
+
+  .brand-wrapper:hover .brand-name {
+    color: #3B82F6;
+    text-shadow: 0 0 10px rgba(59, 130, 246, 0.1);
+  }
+
+  .brand-wrapper:hover .brand-name::after {
+    width: 100%;
+  }
+
+  .brand-wrapper:hover .brand-tagline {
+    opacity: 1;
+  }
+
+  /* SEPARATOR */
+  .nav-separator {
+    width: 1px;
+    height: 38px;
+    background: #F1F5F9;
+    flex-shrink: 0;
+  }
+
+  /* INFO SECTION */
+  .nav-info-section {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .nav-breadcrumb-trail {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 500;
+    color: #94A3B8;
+  }
+
+  .breadcrumb-root {
+    color: #64748B;
+    font-weight: 600;
+  }
+
+  .breadcrumb-sep {
+    margin: 0 3px;
+    color: #CBD5E1;
+  }
+
+  .breadcrumb-current {
+    color: #3B82F6;
+    font-weight: 600;
+  }
+
+  .navbar-main-title {
+    font-size: 23px;
+    font-weight: 800;
+    color: #0F172A;
+    letter-spacing: -0.5px;
+    margin: 0;
+    line-height: 1;
+  }
+
+  .navbar-page-sub {
+    font-size: 12px;
+    font-weight: 400;
+    color: #94A3B8;
+    margin: 0;
+    margin-top: 1px;
+  }
+
+  /* ========================
+    RIGHT: SEARCH & ACTIONS
+    ======================== */
+  .navbar-actions-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  /* SEARCH BAR */
+  .search-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 320px;
+    height: 44px;
+    padding: 0 20px;
+    background: #F1F5F9;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    transition: all 0.2s ease-in-out;
+    box-sizing: border-box;
+    position: relative;
+    top: 11px;
+  }
+
+  .search-container:focus-within {
+    background: #f1f2f3;
+    border-color: #3B82F6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  }
+
+  .search-icon {
+    color: #94A3B8;
+    display: flex;
+    align-items: center;
+  }
+
+  .search-input {
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 14.5px;
+    font-weight: 500;
+    color: #334155;
+    width: 100%;
+  }
+
+  .search-input::placeholder {
+    color: #94A3B8;
+    font-weight: 400;
+  }
+
+  /* DATE PILL */
+  .date-pill {
+    background: #EFF6FF;
+    color: #3B82F6;
+    padding: 0 22px;
+    height: 44px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    white-space: nowrap;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+
+  .date-pill:hover {
+    filter: brightness(1.05);
+  }
+
+  /* ICON BUTTONS */
+  .icon-utility {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    color: #64748B;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    position: relative;
+    box-sizing: border-box;
+  }
+
+  .icon-utility:hover {
+    background: #EFF6FF;
+    border-color: #DBEAFE;
+    color: #3B82F6;
+    transform: scale(1.05);
+  }
+
+  .icon-utility:hover {
+    background: #EFF6FF;
+    border-color: #DBEAFE;
+    color: #3B82F6;
+    transform: scale(1.1);
+  }
+
+  /* NOTIFICATION BADGE */
+  .notif-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    min-width: 18px;
+    height: 18px;
+    background: #EF4444;
+    color: #FFFFFF;
+    font-size: 10px;
+    font-weight: 800;
+    border-radius: 50%;
+    border: 2px solid #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+  }
+
+  /* ========================
+    RESPONSIVE
+    ======================== */
+  @media (max-width: 1200px) {
+    .search-container {
+      width: 220px;
+    }
+  }
+
+  @media (max-width: 1024px) {
+
+    .brand-tagline,
+    .nav-separator,
+    .navbar-page-sub {
+      display: none;
+    }
+
+    .search-box-wrapper {
+      display: none;
+    }
+  }
