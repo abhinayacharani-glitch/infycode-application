@@ -1,177 +1,267 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
+import { 
+  Star, 
+  Search, 
+  Filter, 
+  ThumbsUp, 
+  MessageSquare, 
+  Send,
+  ChevronDown
+} from 'lucide-react';
+import './Feedback.css';
+
+const initialReviews = [
+  {
+    id: 1,
+    studentName: 'Rahul Kumar',
+    initials: 'RK',
+    rating: 5,
+    date: '2026-04-10',
+    comment: 'The way you explained async/await and Promises was incredibly clear. I had been struggling with this concept for weeks, and your examples made it click.',
+    helpfulCount: 12,
+    reply: null,
+    course: 'Full Stack JavaScript'
+  },
+  {
+    id: 2,
+    studentName: 'Priya Anand',
+    initials: 'PA',
+    rating: 4,
+    date: '2026-04-09',
+    comment: 'Great teaching style! The concepts are explained clearly. Could use a few more real-world project examples to make it even more practical.',
+    helpfulCount: 8,
+    reply: 'Thank you Priya! I will include more architectural patterns in the next module.',
+    course: 'Node.js Mastery'
+  },
+  {
+    id: 3,
+    studentName: 'Suresh Menon',
+    initials: 'SM',
+    rating: 5,
+    date: '2026-04-07',
+    comment: 'The mock interview sessions have genuinely improved my confidence. The questions are industry-relevant and the feedback is very specific and actionable.',
+    helpfulCount: 15,
+    reply: null,
+    course: 'Interview Preparation'
+  },
+  {
+    id: 4,
+    studentName: 'Ananya Mishra',
+    initials: 'AM',
+    rating: 3,
+    date: '2026-04-05',
+    comment: 'The topics were a bit rushed. I would appreciate if we could slow down on closures and scoping. The exercises are helpful but need more beginner-friendly examples.',
+    helpfulCount: 4,
+    reply: null,
+    course: 'JS Fundamentals'
+  },
+  {
+    id: 5,
+    studentName: 'Vikram K.',
+    initials: 'VK',
+    rating: 5,
+    date: '2026-04-02',
+    comment: 'Highly engaging sessions. The project-based approach is exactly what I needed to understand advanced React concepts.',
+    helpfulCount: 9,
+    reply: 'Glad to hear that, Vikram! React advanced topics are indeed best learned through building.',
+    course: 'React Advanced'
+  }
+];
 
 const Feedback = () => {
-  const reviews = [
-    { name: 'Priya Sharma', batch: 'B12', course: 'Full Stack Dev', stars: 5, date: 'Mar 12, 2026', text: 'Ravi sir explains complex topics with real-world examples. Best trainer I\'ve had. The Full Stack course was incredibly practical and hands-on.', avatar: 'PS', color: '#2563eb' },
-    { name: 'Arjun Kumar', batch: 'C09', course: 'Python & DS', stars: 5, date: 'Mar 10, 2026', text: 'Excellent teaching methodology. Python and ML concepts were made very easy to understand. Very approachable and always ready to help.', avatar: 'AK', color: '#38bdf8' },
-    { name: 'Nisha Reddy', batch: 'A05', course: 'UI/UX Design', stars: 4, date: 'Mar 08, 2026', text: 'Great sessions! The UI/UX fundamentals were well structured. Would love more practice projects in the curriculum.', avatar: 'NR', color: '#7dd3fc' },
-    { name: 'Rahul Mehta', batch: 'B12', course: 'Full Stack Dev', stars: 5, date: 'Mar 07, 2026', text: 'The best coding trainer! Node.js sessions were crystal clear. Ravi sir always ensures every student understands before moving forward.', avatar: 'RM', color: '#93c5fd' },
-    { name: 'Sneha Patel', batch: 'C09', course: 'Python & DS', stars: 5, date: 'Mar 05, 2026', text: 'Amazing depth of knowledge. The data science modules were industry-focused and extremely relevant. Highly recommend!', avatar: 'SP', color: '#60a5fa' },
-    { name: 'Vikram Singh', batch: 'D02', course: 'DevOps', stars: 4, date: 'Mar 03, 2026', text: 'Very informative and well structured course. DevOps concepts explained with live demos make it much easier to grasp.', avatar: 'VS', color: '#3b82f6' },
-  ];
+  const [reviews, setReviews] = useState(initialReviews);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterRating, setFilterRating] = useState('All');
+  const [sortBy, setSortBy] = useState('latest');
+  const [replyText, setReplyText] = useState({}); // { reviewId: text }
+  const [activeReplyId, setActiveReplyId] = useState(null);
 
-  const renderStars = (n) => '★'.repeat(n) + '☆'.repeat(5 - n);
+  // Stats Calculation
+  const stats = useMemo(() => {
+    const total = reviews.length;
+    const avg = (reviews.reduce((acc, r) => acc + r.rating, 0) / total).toFixed(1);
+    const distribution = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+    reviews.forEach(r => distribution[r.rating]++);
+    
+    return { avg, total, distribution };
+  }, [reviews]);
 
-  const courseRatings = [
-    { name: 'Full Stack Development', batch: 'B12', rating: 4.9, reviews: 32, color: 'var(--blue-500)' },
-    { name: 'Python & Data Science', batch: 'C09', rating: 4.8, reviews: 28, color: 'var(--green)' },
-    { name: 'UI/UX Design Basics', batch: 'A05', rating: 4.6, reviews: 24, color: 'var(--purple)' },
-    { name: 'DevOps Fundamentals', batch: 'D02', rating: 4.7, reviews: 20, color: 'var(--amber)' },
-  ];
+  // Filter and Sort Logic
+  const filteredReviews = useMemo(() => {
+    return reviews
+      .filter(r => {
+        const matchesSearch = r.studentName.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                            r.comment.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesRating = filterRating === 'All' || r.rating === parseInt(filterRating);
+        return matchesSearch && matchesRating;
+      })
+      .sort((a, b) => {
+        if (sortBy === 'latest') return new Date(b.date) - new Date(a.date);
+        if (sortBy === 'highest') return b.rating - a.rating;
+        return 0;
+      });
+  }, [reviews, searchTerm, filterRating, sortBy]);
+
+  const toggleHelpful = (id) => {
+    setReviews(prev => prev.map(r => r.id === id ? { ...r, helpfulCount: r.helpfulCount + 1 } : r));
+  };
+
+  const submitReply = (id) => {
+    if (!replyText[id]) return;
+    setReviews(prev => prev.map(r => r.id === id ? { ...r, reply: replyText[id] } : r));
+    setReplyText(prev => ({ ...prev, [id]: '' }));
+    setActiveReplyId(null);
+  };
+
+  const renderStars = (rating) => {
+    return (
+      <div className="star-container">
+        {[...Array(5)].map((_, i) => (
+          <Star 
+            key={i} 
+            size={16} 
+            fill={i < rating ? "#FFB800" : "none"} 
+            color={i < rating ? "#FFB800" : "#CBD5E1"} 
+          />
+        ))}
+      </div>
+    );
+  };
 
   return (
-    <div className="page active" id="page-feedback">
-
-      {/* KPI Row */}
-      <div className="kpi-grid" style={{ marginBottom: '28px' }}>
-        <div className="kpi-card blue">
-          <div className="kpi-top"><div className="kpi-icon blue">⭐</div><span className="kpi-trend up">↑ 0.1</span></div>
-          <div className="kpi-val">4.8</div>
-          <div className="kpi-label">Overall Rating</div>
-          <div className="kpi-bar"><div className="kpi-bar-fill blue" style={{ width: '96%' }}></div></div>
-        </div>
-        <div className="kpi-card green">
-          <div className="kpi-top"><div className="kpi-icon green">📝</div><span className="kpi-trend up">↑ 14</span></div>
-          <div className="kpi-val">128</div>
-          <div className="kpi-label">Total Reviews</div>
-          <div className="kpi-bar"><div className="kpi-bar-fill green" style={{ width: '78%' }}></div></div>
-        </div>
-        <div className="kpi-card amber">
-          <div className="kpi-top"><div className="kpi-icon amber">🏆</div><span className="kpi-trend up">Top 5%</span></div>
-          <div className="kpi-val">78%</div>
-          <div className="kpi-label">5-Star Reviews</div>
-          <div className="kpi-bar"><div className="kpi-bar-fill amber" style={{ width: '78%' }}></div></div>
-        </div>
-        <div className="kpi-card purple">
-          <div className="kpi-top"><div className="kpi-icon purple">📣</div><span className="kpi-trend up">NPS</span></div>
-          <div className="kpi-val">94</div>
-          <div className="kpi-label">Recommend Score</div>
-          <div className="kpi-bar"><div className="kpi-bar-fill purple" style={{ width: '94%' }}></div></div>
+    <div className="fb-container animate-fade-in">
+      {/* HEADER */}
+      <div className="fb-header">
+        <div>
+          <h1 className="fb-title">Feedback & Ratings</h1>
+          <p className="fb-subtitle">See what students are saying</p>
         </div>
       </div>
 
-      {/* 2-col top section: Rating overview + Course ratings */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: '24px', marginBottom: '24px' }}>
-
-        {/* Rating Overview */}
-        <div className="card">
-          <div className="card-header">
-            <div>
-              <div className="card-title">🌟 Rating Overview</div>
-              <div className="card-sub">Student reviews breakdown</div>
-            </div>
+      {/* RATING SUMMARY & CONTROLS ROW */}
+      <div className="fb-summary-grid">
+        <div className="fb-summary-card main-stats">
+          <div className="big-rating-box">
+            <span className="big-num">{stats.avg}</span>
+            {renderStars(Math.round(stats.avg))}
+            <span className="total-label">Based on 60 student reviews</span>
           </div>
-          <div className="card-body">
-            <div className="rating-overview" style={{ flexDirection: 'column', gap: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-                <div style={{ textAlign: 'center' }}>
-                  <div className="big-rating">4.8</div>
-                  <div style={{ color: 'var(--blue-400)', fontSize: '22px', letterSpacing: '2px' }}>★★★★★</div>
-                  <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>128 reviews</div>
+          <div className="rating-dist-list">
+            {[5, 4, 3, 2, 1].map(num => (
+              <div key={num} className="dist-row">
+                <span className="dist-label">{num} <Star size={11} fill="#94A3B8" color="#94A3B8" /></span>
+                <div className="dist-track">
+                  <div 
+                    className="dist-fill" 
+                    style={{ width: `${(stats.distribution[num] / stats.total) * 100}%` }}
+                  ></div>
                 </div>
-                <div className="rating-bars" style={{ flex: 1 }}>
-                  {[{ star: 5, pct: 78 }, { star: 4, pct: 15 }, { star: 3, pct: 5 }, { star: 2, pct: 2 }, { star: 1, pct: 0 }].map((r) => (
-                    <div key={r.star} className="rbar-row">
-                      <span className="rbar-label">{r.star}★</span>
-                      <div className="rbar-track"><div className="rbar-fill" style={{ width: `${r.pct}%` }}></div></div>
-                      <span style={{ fontSize: '11px', color: 'var(--text-muted)', width: '30px', textAlign: 'right' }}>{r.pct}%</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-            {/* Achievements */}
-            <div style={{ marginTop: '20px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-              {[
-                { icon: '🏅', label: 'Top Trainer', sub: 'March 2026' },
-                { icon: '🎯', label: 'Perfect Score', sub: '3 Batches' },
-                { icon: '💬', label: 'Most Engaging', sub: 'Student Poll' },
-                { icon: '📚', label: 'Best Content', sub: 'Material Award' },
-              ].map((a, i) => (
-                <div key={i} style={{ padding: '10px 12px', background: 'var(--blue-50)', borderRadius: '10px', border: '1px solid var(--blue-100)', textAlign: 'center' }}>
-                  <div style={{ fontSize: '22px', marginBottom: '4px' }}>{a.icon}</div>
-                  <div style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-dark)' }}>{a.label}</div>
-                  <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{a.sub}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Course Ratings */}
-        <div className="card">
-          <div className="card-header">
-            <div>
-              <div className="card-title">📊 Course-wise Ratings</div>
-              <div className="card-sub">Per batch performance</div>
-            </div>
-          </div>
-          <div className="card-body">
-            {courseRatings.map((c, i) => (
-              <div key={i} style={{ marginBottom: i < courseRatings.length - 1 ? '20px' : '0' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                  <div>
-                    <span style={{ fontWeight: '700', color: c.color, fontSize: '13px' }}>{c.batch}</span>
-                    <span style={{ color: 'var(--text-dark)', fontWeight: '600', fontSize: '13px' }}> – {c.name}</span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ fontSize: '18px', fontWeight: '800', color: c.color }}>{c.rating}</span>
-                    <span style={{ color: 'var(--blue-400)', fontSize: '14px' }}>★</span>
-                  </div>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div className="prog-bar" style={{ flex: 1 }}>
-                    <div className="prog-fill" style={{ width: `${(c.rating / 5) * 100}%`, background: c.color }}></div>
-                  </div>
-                  <span style={{ fontSize: '11px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{c.reviews} reviews</span>
-                </div>
-              </div>
-            ))}
-
-            {/* Monthly rating trend */}
-            <div style={{ marginTop: '24px', padding: '16px', background: 'var(--blue-50)', borderRadius: '12px', border: '1px solid var(--blue-100)' }}>
-              <div style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-dark)', marginBottom: '10px' }}>📈 Rating Trend (6 Months)</div>
-              <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end', height: '50px' }}>
-                {[4.5, 4.6, 4.5, 4.7, 4.7, 4.8].map((v, i) => (
-                  <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-                    <div style={{ flex: 1, width: '100%', background: i === 5 ? 'var(--blue-500)' : 'var(--blue-200)', borderRadius: '4px 4px 0 0', height: `${((v - 4) / 1) * 50}px` }} title={`${v}`}></div>
-                    <div style={{ fontSize: '9px', color: 'var(--text-muted)' }}>{['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'][i]}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Full-width Reviews */}
-      <div className="card">
-        <div className="card-header">
-          <div>
-            <div className="card-title">💬 Student Reviews</div>
-            <div className="card-sub">Recent feedback from your students</div>
-          </div>
-        </div>
-        <div className="card-body">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
-            {reviews.map((r, i) => (
-              <div key={i} className="feedback-item" style={{ margin: 0, borderRadius: '12px', border: '1.5px solid var(--border)', background: 'var(--white)', padding: '16px', transition: 'all .2s' }}
-                onMouseEnter={e => e.currentTarget.style.boxShadow = '0 8px 24px rgba(37,99,235,0.09)'}
-                onMouseLeave={e => e.currentTarget.style.boxShadow = 'none'}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
-                  <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: r.color, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '12px', fontWeight: '700', flexShrink: 0 }}>{r.avatar}</div>
-                  <div>
-                    <div style={{ fontWeight: '700', color: 'var(--text-dark)', fontSize: '13px' }}>{r.name}</div>
-                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{r.course} · Batch {r.batch}</div>
-                  </div>
-                  <div style={{ marginLeft: 'auto', fontSize: '10px', color: 'var(--text-muted)', flexShrink: 0 }}>{r.date}</div>
-                </div>
-                <div className="stars" style={{ fontSize: '14px', color: 'var(--blue-400)', marginBottom: '8px', letterSpacing: '1px' }}>{renderStars(r.stars)}</div>
-                <div className="fb-text" style={{ fontSize: '12.5px', color: 'var(--text-mid)', lineHeight: '1.5' }}>{r.text}</div>
+                <span className="dist-pct">{Math.round((stats.distribution[num] / stats.total) * 100)}%</span>
               </div>
             ))}
           </div>
         </div>
+
+        {/* CONTROLS (WITHOUT SEARCH) */}
+        <div className="fb-controls-card">
+           <div className="fb-filter-row-top">
+              <span className="filter-lbl">Filter by rating</span>
+              <div className="sort-dropdown-wrapper">
+                 <select className="fb-sort-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                    <option value="latest">Latest First</option>
+                    <option value="highest">Highest Rated</option>
+                 </select>
+                 <ChevronDown size={14} className="dropdown-icon" />
+              </div>
+           </div>
+           
+           <div className="filter-pill-container">
+            {['All', '5', '4', '3'].map(r => (
+              <button 
+                key={r} 
+                className={`filter-pill ${filterRating === r ? 'active' : ''}`}
+                onClick={() => setFilterRating(r)}
+              >
+                {r === 'All' ? 'All Reviews' : `${r} Star`}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* REVIEWS LIST */}
+      <div className="reviews-list">
+        {filteredReviews.length > 0 ? (
+          filteredReviews.map(review => (
+            <div key={review.id} className="review-card">
+              <div className="rev-header">
+                <div className="rev-st-info">
+                  <div className={`rev-avatar av-${review.id % 5}`}>{review.initials}</div>
+                  <div className="rev-name-box">
+                    <h3 className="rev-name">{review.studentName}</h3>
+                    <p className="rev-meta">{new Date(review.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} · {review.course}</p>
+                  </div>
+                </div>
+                <div className="rev-rating-box">
+                  {renderStars(review.rating)}
+                  {review.rating >= 4 && <span className="positive-tag">Highly Rated</span>}
+                </div>
+              </div>
+
+              <div className="rev-body">
+                <p className="rev-comment">"{review.comment}"</p>
+              </div>
+
+              {review.reply && (
+                <div className="rev-reply-box">
+                  <div className="reply-indicator">
+                    <MessageSquare size={14} />
+                    <span>Your Reply</span>
+                  </div>
+                  <p className="reply-text">{review.reply}</p>
+                </div>
+              )}
+
+              <div className="rev-footer">
+                <div className="rev-actions">
+                  <button className="action-btn helpful" onClick={() => toggleHelpful(review.id)}>
+                    <ThumbsUp size={16} />
+                    <span>Helpful ({review.helpfulCount})</span>
+                  </button>
+                  <button className="action-btn reply" onClick={() => setActiveReplyId(review.id)}>
+                    <MessageSquare size={16} />
+                    <span>{review.reply ? 'Update Reply' : 'Reply'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {activeReplyId === review.id && (
+                <div className="reply-input-section animate-slide-down">
+                  <textarea 
+                    className="reply-textarea" 
+                    placeholder="Type your response here..."
+                    value={replyText[review.id] || ''}
+                    onChange={(e) => setReplyText({ ...replyText, [review.id]: e.target.value })}
+                  />
+                  <div className="reply-actions">
+                    <button className="btn-cancel" onClick={() => setActiveReplyId(null)}>Cancel</button>
+                    <button className="btn-send" onClick={() => submitReply(review.id)}>
+                      <Send size={14} />
+                      Submit Reply
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))
+        ) : (
+          <div className="fb-empty-state">
+            <Filter size={48} />
+            <h2>No reviews found</h2>
+            <p>No student sentiment matches your current filters.</p>
+            <button className="reset-btn" onClick={() => { setFilterRating('All'); }}>Clear All Filters</button>
+          </div>
+        )}
       </div>
     </div>
   );

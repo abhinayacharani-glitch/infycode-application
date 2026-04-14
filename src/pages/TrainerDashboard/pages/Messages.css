@@ -1,0 +1,20 @@
+/* Messages.css */
+.messages-header {
+  margin-bottom: 24px;
+}
+
+.messages-title {
+  font-family: 'Urbanist', sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: #1E293B;
+  letter-spacing: 0.3px;
+  margin: 0 0 4px 0;
+}
+
+.messages-subtitle {
+  font-size: 14px;
+  font-weight: 400;
+  color: #64748B;
+  margin: 0 0 20px 0;
+}

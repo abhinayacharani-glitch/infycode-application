@@ -1,0 +1,557 @@
+.profile-saas-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px 0 40px;
+  background: #F8FAFC;
+  animation: slideUpProfile 0.3s ease-out;
+}
+
+/* Header */
+.profile-header {
+  margin-bottom: 24px;
+  text-align: left;
+  /* Ensure it's not centered if it was in the blue box */
+}
+
+.profile-title {
+  font-family: 'Urbanist', sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: #1E293B;
+  letter-spacing: 0.3px;
+  margin: 0 0 4px 0;
+}
+
+.profile-subtitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: #475569;
+  margin: 4px 0 0 0;
+}
+
+@keyframes slideUpProfile {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 1. HEADER CARD (Proportional Refinement) */
+.profile-header-card.minimal {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 32px;
+  /* Increased padding */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+  max-width: 380px;
+  /* Specific Width */
+  width: 100%;
+  margin: 0 auto 32px auto;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.profile-header-card.minimal:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+  border-color: #3B82F6;
+}
+
+/* Subtle Top Highlight Strip */
+.profile-header-card.minimal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #113d7e;
+  opacity: 0.8;
+}
+
+.profile-image-container-minimal {
+  position: relative;
+  width: 110px;
+  /* Increased size */
+  height: 110px;
+  margin-bottom: 16px;
+  /* Image -> Name: 16px */
+  cursor: pointer;
+}
+
+.profile-img-centered {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.profile-img-centered:hover {
+  transform: scale(1.02);
+}
+
+.camera-overlay-minimal {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  background: #3B82F6;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.profile-identity-centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.trainer-name-centered {
+  font-size: 22px;
+  /* Increased size */
+  font-weight: 700;
+  color: #0F172A;
+  margin: 0 0 8px 0;
+  /* Name -> Role: 8px */
+  letter-spacing: -0.01em;
+}
+
+.trainer-role-minimal {
+  font-size: 13px;
+  color: #3B82F6;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  /* Role -> Email: 8px */
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.trainer-email-centered {
+  font-size: 14px;
+  color: #64748B;
+  margin: 0 0 6px 0;
+  /* Email -> ID: 6px */
+  font-weight: 500;
+}
+
+.trainer-id-status-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 0;
+}
+
+.trainer-id-centered {
+  font-size: 12px;
+  color: #94A3B8;
+  font-weight: 600;
+}
+
+.trainer-status-pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #16A34A;
+  background: #F0FDF4;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.status-dot-green {
+  width: 6px;
+  height: 6px;
+  background: #16A34A;
+  border-radius: 50%;
+}
+
+.profile-header-actions-minimal {
+  margin-top: 16px;
+  /* ID -> Button: 16px */
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.btn-edit-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 36px;
+  /* Increased width */
+  border-radius: 999px;
+  font-size: 13.5px;
+  font-weight: 700;
+  background: #3B82F6;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+  width: auto;
+  min-width: 180px;
+  /* Proportional width */
+}
+
+.btn-edit-primary:hover {
+  background: #2563EB;
+  transform: scale(1.03);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.3);
+}
+
+.profile-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 8px;
+  /* Tighter spacing to bottom */
+}
+
+/* Standardized Stat Card Styles */
+.stat-card-min {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid #E2E8F0;
+  transition: transform 0.2s, box-shadow 0.2s;
+  min-height: 85px;
+  /* Same height */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.stat-card-min:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+
+.btn-save-saas {
+  background: #3B82F6;
+  color: white;
+}
+
+.btn-save-saas:hover {
+  background: #2563EB;
+  transform: translateY(-2px) scale(1.03);
+}
+
+.btn-cancel-saas {
+  background: transparent;
+  color: #64748B;
+  border: 1.5px solid #E2E8F0;
+}
+
+.btn-cancel-saas:hover {
+  background: #F1F5F9;
+  transform: translateY(-1px);
+}
+
+/* 2. STATS ROW */
+.profile-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.stat-card-min {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border: 1px solid #E2E8F0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.stat-card-min::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.02) 0%, transparent 100%);
+  /* Subtle Gradient Overlay */
+  pointer-events: none;
+}
+
+.stat-card-min::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: #3B82F6;
+  /* Thin Blue Accent Line */
+  opacity: 0.1;
+  transition: opacity 0.3s;
+}
+
+.stat-card-min:hover {
+  transform: translateY(-4px);
+  /* Lift Card */
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+  /* Increased Shadow */
+  border-color: #3B82F6;
+}
+
+.stat-card-min:hover::after {
+  opacity: 1;
+}
+
+.stat-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-icon-box.blue {
+  background: #eff6ff;
+  color: #3b82f6;
+}
+
+.stat-icon-box.green {
+  background: #ecfdf5;
+  color: #10b981;
+}
+
+.stat-icon-box.purple {
+  background: #f5f3ff;
+  color: #8b5cf6;
+}
+
+.stat-value-min {
+  font-size: 24px;
+  /* Larger */
+  font-weight: 800;
+  color: #0F172A;
+  margin: 0;
+  line-height: 1;
+}
+
+.stat-label-min {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748B;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 4px 0 0;
+}
+
+/* 3. DETAILS GRID */
+.profile-details-grid-saas {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.details-card-saas {
+  background: #ffffff;
+  padding: 28px;
+  border-radius: 12px;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  /* Soft Shadow */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.details-card-saas:hover {
+  transform: translateY(-2px);
+  border-color: #3B82F6;
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.06);
+}
+
+.details-card-saas.full-width {
+  grid-column: span 2;
+}
+
+.details-title-saas {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0F172A;
+  margin-bottom: 24px;
+  /* More spacing */
+  position: relative;
+  display: inline-block;
+}
+
+.info-list-items {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  /* Increased row spacing */
+}
+
+.info-item-saas {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.item-label-saas {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748B;
+  /* Light Gray Labels */
+  text-transform: uppercase;
+  /* Uppercase Small */
+  letter-spacing: 0.08em;
+}
+
+.item-value-saas {
+  font-size: 15px;
+  font-weight: 600;
+  /* Medium weight */
+  color: #0F172A;
+  /* Dark Value */
+}
+
+.item-value-saas.text-blue {
+  color: #3B82F6;
+}
+
+.about-text-saas {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #334155;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* EDIT INPUTS */
+.edit-input-saas {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1.5px solid #CBD5E1;
+  background: #F8FAFC;
+  font-family: 'Urbanist', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: #0F172A;
+  transition: all 0.2s;
+  outline: none;
+}
+
+.edit-input-saas:focus {
+  border-color: #3B82F6;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  /* Glow */
+}
+
+.edit-textarea-saas {
+  width: 100%;
+  padding: 16px;
+  border-radius: 10px;
+  border: 1.5px solid #CBD5E1;
+  background: #F8FAFC;
+  font-family: 'Urbanist', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: #0F172A;
+  resize: none;
+  transition: all 0.2s;
+  outline: none;
+}
+
+.edit-textarea-saas:focus {
+  border-color: #3B82F6;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+@media (max-width: 768px) {
+  .profile-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-details-grid-saas {
+    grid-template-columns: 1fr;
+  }
+
+  .details-card-saas.full-width {
+    grid-column: span 1;
+  }
+
+  .profile-header-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    padding: 32px;
+  }
+
+  .header-actions-right {
+    width: 100%;
+  }
+
+  .btn-edit-mode,
+  .edit-mode-btns {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+.profile-header {
+  background: transparent;
+  padding: 0;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+
+}
+
+.profile-title {
+  font-family: 'Urbanist', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1E293B;
+  letter-spacing: 0.3px;
+  margin: 0 0 6px 0;
+}
+
+.profile-subtitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: #475569;
+  margin: 0;
+}

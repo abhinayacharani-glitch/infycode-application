@@ -1,221 +1,417 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import {
+  Calendar as CalendarIcon,
+  CheckCircle,
+  Clock,
+  AlertCircle,
+  Bell,
+  Search,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  TrendingUp,
+  XCircle,
+  Clock3
+} from 'lucide-react';
+import './Attendance.css';
+
+// --- DATA SOURCE (Simulated from other modules) ---
+const batches = [
+  { id: 'B1', title: 'JavaScript Fundamentals', totalStudents: 32, rate: 91 },
+  { id: 'B2', title: 'Node.js Basics', totalStudents: 28, rate: 95 },
+  { id: 'B3', title: 'Interview Prep', totalStudents: 24, rate: 93 },
+  { id: 'B4', title: 'React Advanced', totalStudents: 18, rate: 88 }
+];
+
+const studentData = {
+  B1: [
+    { id: 1, name: 'Rahul Kumar', initial: 'RK' },
+    { id: 2, name: 'Priya Anand', initial: 'PA' },
+    { id: 3, name: 'Suresh Menon', initial: 'SM' },
+    { id: 4, name: 'Ananya Mishra', initial: 'AM' },
+    { id: 5, name: 'Vikram K.', initial: 'VK' }
+  ],
+  B2: [
+    { id: 6, name: 'Amit Shah', initial: 'AS' },
+    { id: 7, name: 'Neha Gupta', initial: 'NG' },
+    { id: 8, name: 'Sandeep V.', initial: 'SV' },
+    { id: 9, name: 'Megha R.', initial: 'MR' }
+  ],
+  B3: [
+    { id: 10, name: 'Pooja T.', initial: 'PT' },
+    { id: 11, name: 'Rohan M.', initial: 'RM' }
+  ],
+  B4: [
+    { id: 12, name: 'Ishita S.', initial: 'IS' },
+    { id: 13, name: 'Kartik A.', initial: 'KA' }
+  ]
+};
 
 const Attendance = () => {
-  const [students, setStudents] = useState([
-    { n: 'Priya Sharma', present: true, roll: 'BS001' },
-    { n: 'Arjun Kumar', present: true, roll: 'BS002' },
-    { n: 'Nisha Reddy', present: false, roll: 'BS003' },
-    { n: 'Rahul Mehta', present: true, roll: 'BS004' },
-    { n: 'Sneha Patel', present: true, roll: 'BS005' },
-    { n: 'Vikram Singh', present: true, roll: 'BS006' },
-    { n: 'Ananya Iyer', present: true, roll: 'BS007' },
-    { n: 'Rohan Das', present: false, roll: 'BS008' },
-  ]);
+  const [selectedBatchId, setSelectedBatchId] = useState('B1');
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [viewDate, setViewDate] = useState(new Date()); // For Calendar Month Navigation
+  const [markedRecords, setMarkedRecords] = useState({}); // { [date_batchId]: { studentId: 'present'|'absent'|'late' } }
+  const [showToast, setShowToast] = useState(false);
 
-  const handleStudentChange = (index) => {
-    const newStudents = [...students];
-    newStudents[index].present = !newStudents[index].present;
-    setStudents(newStudents);
+  useEffect(() => {
+    // Initial dummy records
+    const initialRecords = {
+      [`2026-04-10_B1`]: { 1: 'present', 2: 'present', 3: 'present', 4: 'absent', 5: 'present' },
+      [`2026-04-09_B1`]: { 1: 'present', 2: 'present', 3: 'present', 4: 'present', 5: 'present' }
+    };
+    setMarkedRecords(initialRecords);
+  }, []);
+
+  const currentStudents = useMemo(() => studentData[selectedBatchId] || [], [selectedBatchId]);
+  const currentAttendance = useMemo(() => markedRecords[`${selectedDate}_${selectedBatchId}`] || {}, [selectedDate, selectedBatchId, markedRecords]);
+
+  // History Summary Calculation
+  const attStats = useMemo(() => {
+    const stats = { present: 0, absent: 0, late: 0 };
+    Object.values(currentAttendance).forEach(val => {
+      if (val === 'present') stats.present++;
+      else if (val === 'absent') stats.absent++;
+      else if (val === 'late') stats.late++;
+    });
+    return stats;
+  }, [currentAttendance]);
+
+  const handleStatusChange = (studentId, status) => {
+    const key = `${selectedDate}_${selectedBatchId}`;
+    setMarkedRecords(prev => ({
+      ...prev,
+      [key]: {
+        ...(prev[key] || {}),
+        [studentId]: status
+      }
+    }));
   };
 
-  const types = ['empty', 'empty', 'present', 'present', 'present', 'present', 'present',
-    'present', 'present', 'holiday', 'present', 'present', 'present', 'present',
-    'absent', 'present', 'present', 'today', 'present', 'present', 'present',
-    'present', 'present', 'present', 'present', 'present', 'present', 'present',
-    'present', 'present', 'present'];
+  const handleSubmit = () => {
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+  };
 
-  const presentCount = students.filter(s => s.present).length;
-  const absentCount = students.length - presentCount;
-  const pct = Math.round((presentCount / students.length) * 100);
+  const calculateOverallRate = () => {
+    const total = batches.reduce((acc, b) => acc + b.rate, 0);
+    return Math.round(total / batches.length);
+  };
 
-  const batchStats = [
-    { id: 'B12', name: 'Full Stack Development', today: '09:00 AM', present: 29, total: 32, pct: 91, color: 'var(--blue-500)' },
-    { id: 'C09', name: 'Python & Data Science', today: '12:00 PM', present: 24, total: 28, pct: 86, color: 'var(--green)' },
-    { id: 'A05', name: 'UI/UX Design Basics', today: '03:30 PM', present: 22, total: 24, pct: 92, color: 'var(--purple)' },
-    { id: 'D02', name: 'DevOps Fundamentals', today: '06:00 PM', present: 16, total: 20, pct: 80, color: 'var(--amber)' },
-  ];
+  const isTodayMarked = useMemo(() => {
+    const todayStr = new Date().toISOString().split('T')[0];
+    const key = `${todayStr}_${selectedBatchId}`;
+    return markedRecords[key] && Object.keys(markedRecords[key]).length > 0;
+  }, [markedRecords, selectedBatchId]);
+
+  // Calendar Helper Logic
+  const calendarDays = useMemo(() => {
+    const year = viewDate.getFullYear();
+    const month = viewDate.getMonth();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const firstDay = new Date(year, month, 1).getDay(); // 0 (Sun) to 6 (Sat)
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    // Adjust for Monday start: [M, T, W, T, F, S, S]
+    // Standard getDay prefix: Sun=0, Mon=1...
+    // Mon prefix = (firstDay + 6) % 7
+    const prefixCount = (firstDay + 6) % 7;
+
+    const days = [];
+    for (let i = 1; i <= daysInMonth; i++) {
+      const date = new Date(year, month, i);
+      const dateStr = date.toISOString().split('T')[0];
+      const isMarked = markedRecords[`${dateStr}_${selectedBatchId}`];
+      const isToday = date.toDateString() === today.toDateString();
+      const isUpcoming = date > today && date.getDay() !== 0; // Not Sunday
+
+      let status = 'empty';
+      if (isMarked) status = 'marked';
+      else if (isToday) status = 'today';
+      else if (isUpcoming) status = 'upcoming';
+
+      days.push({ day: i, dateStr, status });
+    }
+    return { prefix: prefixCount, days };
+  }, [viewDate, markedRecords, selectedBatchId]);
+
+  const changeMonth = (offset) => {
+    const newDate = new Date(viewDate.getFullYear(), viewDate.getMonth() + offset, 1);
+    setViewDate(newDate);
+  };
+
+  const handleDateClick = (dateStr) => {
+    setSelectedDate(dateStr);
+  };
+
+  const formatViewMonth = () => {
+    return viewDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+  };
 
   return (
-    <div className="page active" id="page-attendance">
+    <div className="attendance-page-saas">
+      {showToast && (
+        <div className="attendance-toast">
+          <CheckCircle size={18} />
+          <span>Attendance submitted successfully!</span>
+        </div>
+      )}
 
-      {/* KPI Row */}
-      <div className="kpi-grid" style={{ marginBottom: '28px' }}>
-        <div className="kpi-card blue">
-          <div className="kpi-top"><div className="kpi-icon blue">👥</div><span className="kpi-trend up">Today</span></div>
-          <div className="kpi-val">91</div>
-          <div className="kpi-label">Present Students</div>
-          <div className="kpi-bar"><div className="kpi-bar-fill blue" style={{ width: '91%' }}></div></div>
+      {/* HEADER */}
+      <div className="att-header-row">
+        <div className="hdr-left">
+          <h1 className="att-title">Attendance</h1>
+
+          <p className="att-subtitle">Manage and track student attendance records</p>
+
         </div>
-        <div className="kpi-card green">
-          <div className="kpi-top"><div className="kpi-icon green">📈</div><span className="kpi-trend up">↑ 2%</span></div>
-          <div className="kpi-val">89%</div>
-          <div className="kpi-label">Avg Attendance Rate</div>
-          <div className="kpi-bar"><div className="kpi-bar-fill green" style={{ width: '89%' }}></div></div>
-        </div>
-        <div className="kpi-card amber">
-          <div className="kpi-top"><div className="kpi-icon amber">⚠️</div><span className="kpi-trend down">↓ Low</span></div>
-          <div className="kpi-val">12</div>
-          <div className="kpi-label">Below 75% Attendance</div>
-          <div className="kpi-bar"><div className="kpi-bar-fill amber" style={{ width: '12%' }}></div></div>
-        </div>
-        <div className="kpi-card purple">
-          <div className="kpi-top"><div className="kpi-icon purple">🏖️</div><span className="kpi-trend up">Month</span></div>
-          <div className="kpi-val">15</div>
-          <div className="kpi-label">Days Present (Mar)</div>
-          <div className="kpi-bar"><div className="kpi-bar-fill purple" style={{ width: '75%' }}></div></div>
+        <div className="hdr-right">
+          <div className="date-display-pill">
+            <CalendarIcon size={16} />
+            <span>Today, {new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+          </div>
         </div>
       </div>
 
-      {/* 3-col layout: Calendar | Batch Overview | Mark Attendance */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr 1fr', gap: '24px', marginBottom: '24px' }}>
+      <div className="attendance-main-grid">
+        {/* LEFT COLUMN - MARKING & HISTORY */}
+        <div className="att-marking-section">
+          <div className="att-card mark-card animate-fade-up">
+            <div className="card-hdr flex-between">
+              <div>
+                <h2 className="card-title">Mark Attendance</h2>
+                <p className="card-desc">Session records for {new Date(selectedDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'long' })}</p>
+              </div>
+              <div className="quick-jump">
+                <label>Jump to Date</label>
+                <input
+                  type="date"
+                  value={selectedDate}
+                  onChange={(e) => handleDateClick(e.target.value)}
+                  className="quick-jump-input"
+                />
+              </div>
+            </div>
 
-        {/* Attendance Calendar */}
-        <div className="card">
-          <div className="card-header">
-            <div>
-              <div className="card-title">🗓️ March 2026 – Record</div>
-              <div className="card-sub">Your session attendance</div>
+            <div className="marking-controls">
+              <div className="input-group">
+                <label>Select Batch</label>
+                <select
+                  className="att-select"
+                  value={selectedBatchId}
+                  onChange={(e) => setSelectedBatchId(e.target.value)}
+                >
+                  {batches.map(b => (
+                    <option key={b.id} value={b.id}>{b.id} – {b.title}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="input-group">
+                <label>Selected Session</label>
+                <div className="date-display-box">
+                  <CalendarIcon size={14} />
+                  <span>{new Date(selectedDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="student-list-container">
+              {currentStudents.length > 0 ? (
+                <>
+                  <table className="student-table">
+                    <thead>
+                      <tr>
+                        <th>STUDENT</th>
+                        <th className="text-center">PRESENT</th>
+                        <th className="text-center">ABSENT</th>
+                        <th className="text-center">LATE</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {currentStudents.map(student => (
+                        <tr key={student.id}>
+                          <td>
+                            <div className="st-info">
+                              <div className={`st-avatar av-${student.id % 5}`}>{student.initial}</div>
+                              <span className="st-name">{student.name}</span>
+                            </div>
+                          </td>
+                          <td className="text-center">
+                            <label className="radio-btn">
+                              <input
+                                type="radio"
+                                name={`status-${student.id}`}
+                                checked={currentAttendance[student.id] === 'present'}
+                                onChange={() => handleStatusChange(student.id, 'present')}
+                              />
+                              <span className="checkmark"></span>
+                            </label>
+                          </td>
+                          <td className="text-center">
+                            <label className="radio-btn">
+                              <input
+                                type="radio"
+                                name={`status-${student.id}`}
+                                checked={currentAttendance[student.id] === 'absent'}
+                                onChange={() => handleStatusChange(student.id, 'absent')}
+                              />
+                              <span className="checkmark"></span>
+                            </label>
+                          </td>
+                          <td className="text-center">
+                            <label className="radio-btn">
+                              <input
+                                type="radio"
+                                name={`status-${student.id}`}
+                                checked={currentAttendance[student.id] === 'late'}
+                                onChange={() => handleStatusChange(student.id, 'late')}
+                              />
+                              <span className="checkmark"></span>
+                            </label>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <div className="mark-card-footer">
+                    <button className="att-btn-primary" onClick={handleSubmit}>Submit Attendance</button>
+                  </div>
+                </>
+              ) : (
+                <div className="att-empty-state">
+                  <AlertCircle size={32} />
+                  <p>No students assigned to this batch</p>
+                </div>
+              )}
             </div>
           </div>
-          <div className="card-body">
-            <div className="att-legend">
-              <div className="att-leg"><div className="att-dot" style={{ background: 'var(--blue-50)', border: '1px solid var(--blue-400)' }}></div>Present</div>
-              <div className="att-leg"><div className="att-dot" style={{ background: 'var(--blue-100)', border: '1px solid var(--blue-300)' }}></div>Absent</div>
-              <div className="att-leg"><div className="att-dot" style={{ background: 'var(--accent-light)', border: '1px solid var(--accent)' }}></div>Holiday</div>
+
+          {/* HISTORY SUMMARY SECTION */}
+          <div className={`att-card history-summary-card animate-fade-up ${Object.keys(currentAttendance).length === 0 ? 'no-data' : ''}`}>
+            <div className="card-hdr">
+              <h2 className="card-title">Attendance Details – {new Date(selectedDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</h2>
+              <p className="card-desc">Historical data breakdown for this session</p>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px', marginBottom: '6px' }}>
-              {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, idx) => (
-                <div key={`${d}-${idx}`} style={{ textAlign: 'center', fontSize: '10px', fontWeight: '700', color: 'var(--text-muted)' }}>{d}</div>
-              ))}
-            </div>
-            <div className="att-grid">
-              {types.map((t, i) => (
-                <div
-                  key={i}
-                  className={`att-day${t === 'today' ? ' present today' : t === 'empty' ? ' empty' : ' ' + t}`}
-                  title={t !== 'empty' ? t : ''}
-                >
-                  {t === 'empty' ? '' : i - 1}
+
+            {Object.keys(currentAttendance).length > 0 ? (
+              <div className="history-stats-grid">
+                <div className="h-stat-item present">
+                  <div className="h-icon"><TrendingUp size={16} /></div>
+                  <div className="h-info">
+                    <span className="h-label">Present</span>
+                    <span className="h-val">{attStats.present}</span>
+                  </div>
                 </div>
-              ))}
-            </div>
-            <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
-              <div style={{ flex: 1, padding: '12px', background: 'var(--blue-50)', borderRadius: '10px', textAlign: 'center' }}>
-                <div style={{ fontSize: '22px', fontWeight: '800', color: 'var(--blue-500)' }}>15</div>
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Present</div>
+                <div className="h-stat-item absent">
+                  <div className="h-icon"><XCircle size={16} /></div>
+                  <div className="h-info">
+                    <span className="h-label">Absent</span>
+                    <span className="h-val">{attStats.absent}</span>
+                  </div>
+                </div>
+                <div className="h-stat-item late">
+                  <div className="h-icon"><Clock3 size={16} /></div>
+                  <div className="h-info">
+                    <span className="h-label">Late</span>
+                    <span className="h-val">{attStats.late}</span>
+                  </div>
+                </div>
               </div>
-              <div style={{ flex: 1, padding: '12px', background: 'var(--blue-100)', borderRadius: '10px', textAlign: 'center' }}>
-                <div style={{ fontSize: '22px', fontWeight: '800', color: 'var(--blue-400)' }}>1</div>
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Absent</div>
+            ) : (
+              <div className="history-empty">
+                <p>No attendance recorded for this date</p>
               </div>
-              <div style={{ flex: 1, padding: '12px', background: 'var(--accent-light)', borderRadius: '10px', textAlign: 'center' }}>
-                <div style={{ fontSize: '22px', fontWeight: '800', color: 'var(--accent)' }}>2</div>
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Holidays</div>
-              </div>
-            </div>
+            )}
           </div>
         </div>
 
-        {/* Batch Attendance Overview */}
-        <div className="card">
-          <div className="card-header">
-            <div>
-              <div className="card-title">📊 Batch Overview</div>
-              <div className="card-sub">Today's attendance per batch</div>
+        {/* RIGHT COLUMN - STATS & CALENDAR */}
+        <div className="att-stats-section">
+          <div className="stats-cards-row">
+            <div className="att-card stats-card animate-fade-up" style={{ animationDelay: '0.1s' }}>
+              <div className="stats-icon-wrapper green">
+                <CheckCircle size={20} />
+              </div>
+              <div className="stats-content">
+                <h3 className="stats-val">{calculateOverallRate()}%</h3>
+                <p className="stats-lbl">Overall Attendance</p>
+              </div>
+            </div>
+
+            <div className={`att-card stats-card animate-fade-up ${isTodayMarked ? 'marked' : 'pending'}`} style={{ animationDelay: '0.2s' }}>
+              <div className={`stats-icon-wrapper ${isTodayMarked ? 'green' : 'orange'}`}>
+                {isTodayMarked ? <Check size={20} /> : <Clock size={20} />}
+              </div>
+              <div className="stats-content">
+                <h3 className={`stats-val ${isTodayMarked ? 'text-green' : 'text-orange'}`}>
+                  {isTodayMarked ? 'Marked' : 'Pending'}
+                </h3>
+                <p className="stats-lbl">Today's Status</p>
+              </div>
             </div>
           </div>
-          <div className="card-body">
-            {batchStats.map((b, i) => (
-              <div key={i} style={{ marginBottom: i < batchStats.length - 1 ? '20px' : '0' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                  <div>
-                    <span style={{ fontWeight: '700', color: b.color, fontSize: '13px' }}>{b.id}</span>
-                    <span style={{ color: 'var(--text-dark)', fontWeight: '600', fontSize: '13px' }}> – {b.name}</span>
-                  </div>
-                  <span style={{ fontSize: '12px', fontWeight: '800', color: b.color }}>{b.pct}%</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div className="prog-bar" style={{ flex: 1 }}>
-                    <div className="prog-fill" style={{ width: `${b.pct}%`, background: b.color }}></div>
-                  </div>
-                  <span style={{ fontSize: '11px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{b.present}/{b.total} students</span>
-                </div>
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>Session at {b.today}</div>
+
+          <div className="att-card calendar-card animate-fade-up" style={{ animationDelay: '0.3s' }}>
+            <div className="card-hdr calendar-nav-hdr">
+              <div className="nav-title-box">
+                <h2 className="card-title">{formatViewMonth()}</h2>
+                <p className="card-desc">Attendance Overview</p>
               </div>
-            ))}
-            {/* Monthly trend summary */}
-            <div style={{ marginTop: '20px', padding: '14px', background: 'var(--blue-50)', borderRadius: '12px', border: '1px solid var(--blue-100)' }}>
-              <div style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-dark)', marginBottom: '6px' }}>📅 Monthly Trend</div>
-              <div style={{ display: 'flex', gap: '6px', alignItems: 'flex-end', height: '40px' }}>
-                {[72, 80, 88, 85, 91, 89, 93, 87, 90, 92].map((v, i) => (
-                  <div key={i} style={{ flex: 1, background: i === 9 ? 'var(--blue-500)' : 'var(--blue-200)', borderRadius: '4px 4px 0 0', height: `${(v / 100) * 40}px`, transition: 'all .3s' }} title={`${v}%`}></div>
+              <div className="calendar-nav-controls">
+                <button onClick={() => changeMonth(-1)}><ChevronLeft size={20} /></button>
+                <button onClick={() => changeMonth(1)}><ChevronRight size={20} /></button>
+              </div>
+            </div>
+
+            <div className="calendar-grid-wrapper">
+              <div className="calendar-days-header">
+                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(d => <span key={d}>{d}</span>)}
+              </div>
+              <div className="calendar-days-grid">
+                {[...Array(calendarDays.prefix)].map((_, i) => <div key={`empty-${i}`} className="cal-day other-month"></div>)}
+                {calendarDays.days.map((d, i) => (
+                  <div
+                    key={i}
+                    className={`cal-day ${d.status} ${selectedDate === d.dateStr ? 'selected' : ''}`}
+                    onClick={() => handleDateClick(d.dateStr)}
+                    title={d.status === 'marked' ? 'Attendance Marked' : 'Not Marked'}
+                  >
+                    {d.day}
+                  </div>
                 ))}
               </div>
-              <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '4px', textAlign: 'right' }}>Last 10 sessions</div>
+              <div className="calendar-legend-new">
+                <div className="leg-item"><span className="leg-dot marked"></span> Marked</div>
+                <div className="leg-item"><span className="leg-dot today"></span> Today</div>
+                <div className="leg-item"><span className="leg-dot upcoming"></span> Upcoming</div>
+                <div className="leg-item"><span className="leg-dot empty"></span> Not Marked</div>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Mark Attendance */}
-        <div className="card">
-          <div className="card-header">
-            <div>
-              <div className="card-title">📋 Mark Attendance</div>
-              <div className="card-sub">For today's session</div>
+          <div className="att-card performance-card animate-fade-up" style={{ animationDelay: '0.4s' }}>
+            <div className="card-hdr">
+              <h2 className="card-title">Attendance by Batch</h2>
             </div>
-          </div>
-          <div className="card-body">
-            <div style={{ marginBottom: '12px' }}>
-              <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: '6px' }}>Select Batch</div>
-              <select style={{ width: '100%', padding: '10px 12px', border: '1.5px solid var(--border)', borderRadius: '8px', fontFamily: '"Urbanist", sans-serif', fontSize: '13px', color: 'var(--text-dark)', background: 'var(--white)', cursor: 'pointer' }}>
-                <option>Batch B12 – Full Stack Dev (09:00 AM)</option>
-                <option>Batch C09 – Python & DS (12:00 PM)</option>
-                <option>Batch A05 – UI/UX (03:30 PM)</option>
-                <option>Batch D02 – DevOps (06:00 PM)</option>
-              </select>
+            <div className="batch-performance-list">
+              {batches.map((batch, idx) => (
+                <div key={batch.id} className="batch-perf-card">
+                  <div className="perf-info">
+                    <div className="perf-name-box">
+                      <span className={`perf-dot dot-${idx}`}></span>
+                      <span className="perf-name">{batch.id} – {batch.title}</span>
+                    </div>
+                    <span className="perf-val">{batch.rate}%</span>
+                  </div>
+                  <div className="perf-bar-track">
+                    <div className="perf-bar-fill" style={{ width: `${batch.rate}%` }}></div>
+                  </div>
+                </div>
+              ))}
             </div>
-            {/* Quick stats */}
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-              <div style={{ flex: 1, padding: '10px', background: 'var(--blue-50)', borderRadius: '8px', textAlign: 'center' }}>
-                <div style={{ fontSize: '18px', fontWeight: '800', color: 'var(--blue-500)' }}>{presentCount}</div>
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Present</div>
-              </div>
-              <div style={{ flex: 1, padding: '10px', background: 'var(--blue-100)', borderRadius: '8px', textAlign: 'center' }}>
-                <div style={{ fontSize: '18px', fontWeight: '800', color: 'var(--blue-400)' }}>{absentCount}</div>
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Absent</div>
-              </div>
-              <div style={{ flex: 1, padding: '10px', background: 'var(--green-light)', borderRadius: '8px', textAlign: 'center' }}>
-                <div style={{ fontSize: '18px', fontWeight: '800', color: 'var(--green)' }}>{pct}%</div>
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Rate</div>
-              </div>
-            </div>
-            <div style={{ maxHeight: '220px', overflowY: 'auto' }}>
-              <table className="batch-table">
-                <thead><tr><th>Roll</th><th>Student</th><th>Status</th></tr></thead>
-                <tbody>
-                  {students.map((s, i) => (
-                    <tr key={i}>
-                      <td style={{ fontFamily: '"Urbanist", sans-serif', fontSize: '11px', color: 'var(--text-muted)' }}>{s.roll}</td>
-                      <td>{s.n}</td>
-                      <td>
-                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                          <input
-                            type="checkbox"
-                            checked={s.present}
-                            onChange={() => handleStudentChange(i)}
-                            style={{ accentColor: 'var(--blue-500)', width: '16px', height: '16px' }}
-                          />
-                          <span style={{ fontSize: '12px', color: s.present ? 'var(--blue-500)' : 'var(--blue-300)', fontWeight: '600' }}>
-                            {s.present ? 'Present' : 'Absent'}
-                          </span>
-                        </label>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <button style={{ width: '100%', marginTop: '14px', padding: '12px', background: 'linear-gradient(135deg,var(--blue-500),var(--blue-600))', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '13.5px', fontWeight: '700', cursor: 'pointer', fontFamily: '"Urbanist", sans-serif' }}>💾 Submit Attendance</button>
           </div>
         </div>
       </div>

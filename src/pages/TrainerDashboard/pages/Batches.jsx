@@ -1,163 +1,278 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  Users,
+  Layers,
+  Clock,
+  Monitor,
+  Search,
+  Plus,
+  X,
+  Calendar,
+  TrendingUp,
+  ArrowRight
+} from 'lucide-react';
+import './Batches.css';
+
+// --- HELPERS ---
+const calculateDuration = (start, end) => {
+  if (!start || !end) return "Unknown";
+  const s = new Date(start);
+  const e = new Date(end);
+  const diffTime = Math.abs(e - s);
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  const months = Math.floor(diffDays / 30);
+  const remainingDays = diffDays % 30;
+
+  if (months > 0) {
+    return `${months} Month${months > 1 ? 's' : ''}${remainingDays > 0 ? ` ${remainingDays}d` : ''}`;
+  }
+  return `${diffDays} Day${diffDays > 1 ? 's' : ''}`;
+};
+
+const formatTimeAgo = (timestamp) => {
+  if (!timestamp) return "Never updated";
+  const now = new Date();
+  const diff = now - new Date(timestamp);
+  const seconds = Math.floor(diff / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+
+  if (seconds < 60) return "Just now";
+  if (minutes < 60) return `${minutes}m ago`;
+  if (hours < 24) return `${hours}h ago`;
+  return new Date(timestamp).toLocaleDateString();
+};
+
+// Global History Helper
+const addHistoryEntry = (batchId, type, title) => {
+  const key = `batch_history_v2_${batchId}`;
+  const existing = JSON.parse(localStorage.getItem(key) || '[]');
+  const newEntry = {
+    id: Date.now(),
+    type, // 'System', 'Session', 'Student'
+    title,
+    timestamp: new Date().toISOString()
+  };
+  localStorage.setItem(key, JSON.stringify([newEntry, ...existing]));
+};
 
 const Batches = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showModal, setShowModal] = useState(false);
 
-  const batches = [
-    { id: 'B12', course: 'Full Stack Development', students: 32, start: 'Jan 10', end: 'Apr 10', mode: 'Online', progress: 75, status: 'active', color: 'var(--blue-500)', icon: '💻' },
-    { id: 'C09', course: 'Python & Data Science', students: 28, start: 'Feb 01', end: 'May 01', mode: 'Offline', progress: 60, status: 'active', color: 'var(--green)', icon: '🐍' },
-    { id: 'A05', course: 'UI/UX Design Basics', students: 24, start: 'Dec 15', end: 'Mar 25', mode: 'Online', progress: 90, status: 'active', color: 'var(--purple)', icon: '🎨' },
-    { id: 'D02', course: 'DevOps Fundamentals', students: 20, start: 'Mar 15', end: 'Jun 15', mode: 'Online', progress: 30, status: 'new', color: 'var(--amber)', icon: '⚙️' },
-  ];
+  // Dynamic State for Batches
+  const [batches, setBatches] = useState(() => {
+    try {
+      const saved = localStorage.getItem('trainer_batches_v2');
+      if (saved) {
+        const data = JSON.parse(saved);
+        return Array.isArray(data) ? data : [];
+      }
+    } catch (e) { console.error("Data Load Error", e); }
 
-  const filtered = activeTab === 'all' ? batches : batches.filter(b => b.status === activeTab);
+    return [
+      { id: 'B1', course: 'Full Stack Web Development (MERN)', students: 32, startDate: '2026-01-10', endDate: '2026-04-10', mode: 'Online', lastUpdated: new Date().toISOString() },
+      { id: 'B2', course: 'Python & Data Science Bootcamp', students: 28, startDate: '2026-02-15', endDate: '2026-06-15', mode: 'Offline', lastUpdated: new Date(Date.now() - 3600000 * 2).toISOString() },
+      { id: 'B3', course: 'UI/UX Advanced Design Basics', students: 24, startDate: '2026-03-01', endDate: '2026-05-01', mode: 'Online', lastUpdated: new Date(Date.now() - 86400000).toISOString() },
+      { id: 'B4', course: 'AWS & Cloud Architecture Pro', students: 18, startDate: '2026-03-10', endDate: '2026-05-10', mode: 'Online', lastUpdated: new Date(Date.now() - 3600000 * 5).toISOString() },
+    ];
+  });
+
+  const [newBatch, setNewBatch] = useState({
+    id: '',
+    course: '',
+    startDate: '',
+    endDate: '',
+    mode: 'Online',
+    students: ''
+  });
+
+  useEffect(() => {
+    localStorage.setItem('trainer_batches_v2', JSON.stringify(batches));
+
+    // Pre-populate some initial history if not exists
+    batches.forEach(b => {
+      const key = `batch_history_v2_${b.id}`;
+      if (!localStorage.getItem(key)) {
+        const initial = [
+          { id: Date.now() - 1000, type: 'System', title: `Batch ${b.id} initialized`, timestamp: b.lastUpdated }
+        ];
+        localStorage.setItem(key, JSON.stringify(initial));
+      }
+    });
+  }, [batches]);
+
+  const handleAddBatch = (e) => {
+    e.preventDefault();
+    const batchToAdd = {
+      ...newBatch,
+      students: parseInt(newBatch.students) || 0,
+      lastUpdated: new Date().toISOString()
+    };
+
+    setBatches([...batches, batchToAdd]);
+    addHistoryEntry(batchToAdd.id, 'System', `Batch ${batchToAdd.id} created`);
+
+    setShowModal(false);
+    setNewBatch({ id: '', course: '', startDate: '', endDate: '', mode: 'Online', students: '' });
+  };
+
+  const filteredBatches = batches.filter(b =>
+    b.course.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    b.id.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const totalStudents = batches.reduce((acc, b) => acc + (parseInt(b.students) || 0), 0);
 
   return (
-    <div className="page active" id="page-batches">
+    <div className="batches-page-production">
+      <div className="main-content">
+        {/* 0. HEADER */}
+        <div className="batches-header">
+          <h1 className="batches-title">Batches</h1>
+          <p className="batches-subtitle">Overview of all your active and upcoming batches</p>
+        </div>
 
-      {/* KPI GRID – 4 columns like dashboard */}
-      <div className="kpi-grid" style={{ marginBottom: '28px' }}>
-        <div className="kpi-card blue">
-          <div className="kpi-top">
-            <div className="kpi-icon blue">📚</div>
-            <span className="kpi-trend up">Active</span>
-          </div>
-          <div className="kpi-val">4</div>
-          <div className="kpi-label">Total Batches</div>
-          <div className="kpi-bar"><div className="kpi-bar-fill blue" style={{ width: '100%' }}></div></div>
-        </div>
-        <div className="kpi-card green">
-          <div className="kpi-top">
-            <div className="kpi-icon green">👥</div>
-            <span className="kpi-trend up">↑ 4</span>
-          </div>
-          <div className="kpi-val">128</div>
-          <div className="kpi-label">Total Students</div>
-          <div className="kpi-bar"><div className="kpi-bar-fill green" style={{ width: '85%' }}></div></div>
-        </div>
-        <div className="kpi-card amber">
-          <div className="kpi-top">
-            <div className="kpi-icon amber">🗓️</div>
-            <span className="kpi-trend up">Today</span>
-          </div>
-          <div className="kpi-val">3</div>
-          <div className="kpi-label">Sessions Today</div>
-          <div className="kpi-bar"><div className="kpi-bar-fill amber" style={{ width: '75%' }}></div></div>
-        </div>
-        <div className="kpi-card purple">
-          <div className="kpi-top">
-            <div className="kpi-icon purple">📋</div>
-            <span className="kpi-trend up">↑ 2%</span>
-          </div>
-          <div className="kpi-val">89%</div>
-          <div className="kpi-label">Avg Attendance</div>
-          <div className="kpi-bar"><div className="kpi-bar-fill purple" style={{ width: '89%' }}></div></div>
-        </div>
-      </div>
-
-      {/* BATCH CARDS – 4-column overview */}
-      <div className="kpi-grid" style={{ marginBottom: '28px' }}>
-        {batches.map(b => (
-          <div key={b.id} className="card" 
-            style={{ border: `1.5px solid ${b.color}22`, cursor: 'pointer', transition: 'all .25s' }}
-            onClick={() => navigate("/trainer-dashboard/live-session")}
-            onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-3px)'}
-            onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
-            <div className="card-body" style={{ padding: '20px 22px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-                <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: `${b.color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px' }}>{b.icon}</div>
-                <span className={`badge ${b.status === 'active' ? 'active-b' : 'upcoming'}`}>{b.status === 'active' ? 'Active' : 'New'}</span>
+        {/* 1. KPI SECTION */}
+        <div className="batches-kpi-row-saas">
+          <div className="kpi-card-saas blue">
+            <div className="kpi-icon-saas"><Layers size={22} /></div>
+            <div className="kpi-content-saas">
+              <div className="kpi-val-row-saas">
+                <h3 className="kpi-value-saas">{batches.length}</h3>
+                <span className="kpi-trend-saas"><TrendingUp size={12} /> +1 this week</span>
               </div>
-              <div style={{ fontSize: '15px', fontWeight: '800', color: 'var(--text-dark)', marginBottom: '4px' }}>{b.id} – {b.course}</div>
-              <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '14px' }}>{b.students} students · {b.mode}</div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'var(--text-muted)', marginBottom: '6px' }}>
-                <span>{b.start} → {b.end}</span>
-                <span style={{ fontWeight: '700', color: b.color }}>{b.progress}%</span>
-              </div>
-              <div className="prog-bar"><div className="prog-fill" style={{ width: `${b.progress}%`, background: b.color }}></div></div>
+              <p className="kpi-label-saas">Total Batches</p>
             </div>
           </div>
-        ))}
-      </div>
+          <div className="kpi-card-saas green">
+            <div className="kpi-icon-saas"><Users size={22} /></div>
+            <div className="kpi-content-saas">
+              <div className="kpi-val-row-saas">
+                <h3 className="kpi-value-saas">{totalStudents}</h3>
+                <span className="kpi-trend-saas"><TrendingUp size={12} /> +12 this month</span>
+              </div>
+              <p className="kpi-label-saas">Total Students</p>
+            </div>
+          </div>
+        </div>
 
-      {/* FULL-WIDTH BATCH TABLE */}
-      <div className="card" style={{ width: '100%' }}>
-        <div className="card-header">
-          <div>
-            <div className="card-title">📖 All Batches</div>
-            <div className="card-sub">Complete batch management overview</div>
+        {/* 2. ACTIONS HEADER */}
+        <div className="batches-actions-header-saas">
+          <div className="search-bar-saas">
+            <Search size={18} />
+            <input
+              type="text"
+              placeholder="Search your batches..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
-          <div style={{ display: 'flex', gap: '8px' }}>
-            {['all', 'active', 'new'].map(tab => (
-              <button key={tab} onClick={() => setActiveTab(tab)}
-                style={{ padding: '6px 14px', borderRadius: '8px', border: `1.5px solid ${activeTab === tab ? 'var(--blue-500)' : 'var(--border)'}`, background: activeTab === tab ? 'var(--blue-50)' : 'transparent', color: activeTab === tab ? 'var(--blue-600)' : 'var(--text-muted)', fontSize: '12px', fontWeight: '600', cursor: 'pointer', fontFamily: '"Urbanist", sans-serif', textTransform: 'capitalize' }}>
-                {tab === 'all' ? 'All' : tab.charAt(0).toUpperCase() + tab.slice(1)}
-              </button>
-            ))}
+          <button className="btn-add-batch-saas" onClick={() => setShowModal(true)}>
+            <Plus size={18} />
+            <span>New Batch</span>
+          </button>
+        </div>
+
+        {/* 3. BATCH CARDS GRID */}
+        <div className="batches-grid-saas">
+          {filteredBatches.map((batch) => (
+            <div
+              key={batch.id}
+              className="batch-card-saas-v3"
+              onClick={() => navigate(`/trainer-dashboard/batches/${batch.id}`)}
+            >
+              <div className="batch-card-accent-border"></div>
+
+              <div className="batch-card-body-saas">
+                <div className="batch-card-header-v3">
+                  <span className="batch-id-pill-v3">{batch.id}</span>
+                  <span className="last-updated-saas">{formatTimeAgo(batch.lastUpdated)}</span>
+                </div>
+
+                <h2 className="batch-card-title-v3">{batch.course}</h2>
+
+                <div className="batch-card-dates-v3">
+                  <Calendar size={14} />
+                  <span>{batch.startDate} — {batch.endDate}</span>
+                </div>
+
+                <div className="batch-card-meta-v3">
+                  <div className="meta-item-saas">
+                    <Clock size={14} />
+                    <span>{calculateDuration(batch.startDate, batch.endDate)}</span>
+                  </div>
+                  <div className="meta-item-saas">
+                    <Monitor size={14} />
+                    <span>{batch.mode}</span>
+                  </div>
+                  <div className="meta-item-saas">
+                    <Users size={14} />
+                    <span>{batch.students} Students</span>
+                  </div>
+                </div>
+
+                <div className="card-divider-saas"></div>
+
+                <div className="batch-card-footer-v3">
+                  <span className="view-details-v3">View Overview</span>
+                  <ArrowRight size={16} />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* 4. NEW BATCH MODAL */}
+        {showModal && (
+          <div className="modal-overlay-saas">
+            <div className="modal-content-saas">
+              <div className="modal-header-saas">
+                <h2 className="modal-title-saas">Create New Batch</h2>
+                <button className="close-btn-saas" onClick={() => setShowModal(false)}><X size={20} /></button>
+              </div>
+
+              <form className="modal-form-saas" onSubmit={handleAddBatch}>
+                <div className="form-grid-saas">
+                  <div className="form-group-saas">
+                    <label>Batch ID</label>
+                    <input type="text" placeholder="e.g. B5" value={newBatch.id} onChange={e => setNewBatch({ ...newBatch, id: e.target.value })} required />
+                  </div>
+                  <div className="form-group-saas full">
+                    <label>Course Name</label>
+                    <input type="text" placeholder="Full Stack Web Dev" value={newBatch.course} onChange={e => setNewBatch({ ...newBatch, course: e.target.value })} required />
+                  </div>
+                  <div className="form-group-saas">
+                    <label>Start Date</label>
+                    <input type="date" value={newBatch.startDate} onChange={e => setNewBatch({ ...newBatch, startDate: e.target.value })} required />
+                  </div>
+                  <div className="form-group-saas">
+                    <label>End Date</label>
+                    <input type="date" value={newBatch.endDate} onChange={e => setNewBatch({ ...newBatch, endDate: e.target.value })} required />
+                  </div>
+                  <div className="form-group-saas">
+                    <label>Students Count</label>
+                    <input type="number" placeholder="0" value={newBatch.students} onChange={e => setNewBatch({ ...newBatch, students: e.target.value })} required />
+                  </div>
+                  <div className="form-group-saas">
+                    <label>Mode</label>
+                    <select value={newBatch.mode} onChange={e => setNewBatch({ ...newBatch, mode: e.target.value })}>
+                      <option value="Online">Online</option>
+                      <option value="Offline">Offline</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="modal-actions-saas">
+                  <button type="button" className="btn-cancel-saas" onClick={() => setShowModal(false)}>Cancel</button>
+                  <button type="submit" className="btn-submit-saas">Create Batch</button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
-        <div className="card-body" style={{ padding: 0 }}>
-          <table className="batch-table" style={{ margin: 0 }}>
-            <thead>
-              <tr>
-                <th style={{ padding: '14px 18px' }}>Batch ID</th>
-                <th>Course</th>
-                <th>Students</th>
-                <th>Start Date</th>
-                <th>End Date</th>
-                <th>Mode</th>
-                <th>Progress</th>
-                <th>Avg Attendance</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map(b => (
-                <tr key={b.id}>
-                  <td style={{ paddingLeft: '18px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontSize: '16px' }}>{b.icon}</span>
-                      <b style={{ color: 'var(--blue-600)' }}>{b.id}</b>
-                    </div>
-                  </td>
-                  <td><span style={{ fontWeight: '600', color: 'var(--text-dark)' }}>{b.course}</span></td>
-                  <td>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span style={{ fontSize: '13px' }}>👥</span>
-                      <span>{b.students}</span>
-                    </div>
-                  </td>
-                  <td><span style={{ fontFamily: '"Urbanist", sans-serif', fontSize: '12px' }}>{b.start}</span></td>
-                  <td><span style={{ fontFamily: '"Urbanist", sans-serif', fontSize: '12px' }}>{b.end}</span></td>
-                  <td><span className={`sch-mode ${b.mode.toLowerCase()}`} style={{ margin: 0 }}>{b.mode}</span></td>
-                  <td style={{ minWidth: '130px' }}>
-                    <div className="progress-wrap">
-                      <div className="prog-bar"><div className="prog-fill" style={{ width: `${b.progress}%` }}></div></div>
-                      <span className="prog-pct">{b.progress}%</span>
-                    </div>
-                  </td>
-                  <td>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span style={{ fontWeight: '700', color: 'var(--blue-600)', fontSize: '13px' }}>
-                        {b.id === 'B12' ? '92%' : b.id === 'C09' ? '86%' : b.id === 'A05' ? '91%' : '78%'}
-                      </span>
-                    </div>
-                  </td>
-                  <td><span className={`badge ${b.status === 'active' ? 'active-b' : 'upcoming'}`}>{b.status === 'active' ? 'Active' : 'New'}</span></td>
-                  <td>
-                    <div style={{ display: 'flex', gap: '6px' }}>
-                      <button style={{ padding: '4px 10px', borderRadius: '6px', border: '1.5px solid var(--blue-200)', background: 'var(--blue-50)', color: 'var(--blue-600)', fontSize: '11px', fontWeight: '600', cursor: 'pointer', fontFamily: '"Urbanist", sans-serif' }}>View</button>
-                      <button style={{ padding: '4px 10px', borderRadius: '6px', border: '1.5px solid var(--border)', background: 'transparent', color: 'var(--text-muted)', fontSize: '11px', fontWeight: '600', cursor: 'pointer', fontFamily: '"Urbanist", sans-serif' }}>Edit</button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        )}
       </div>
     </div>
   );
