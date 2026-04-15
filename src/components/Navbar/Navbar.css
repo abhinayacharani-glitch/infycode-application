@@ -67,7 +67,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 60px;
+  padding: 12px clamp(20px, 4vw, 60px);
   width: 100%;
   background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(16px);
@@ -152,8 +152,8 @@ body {
 .nav-links span {
   display: block;
   text-align: center;
-  font-size: 18px;
-  line-height: 1;
+  font-size: 15px;
+  line-height: 1.2;
 }
 
 .nav-links .nav-link:hover,
@@ -187,7 +187,7 @@ body {
 
 .dropdown-menu .nav-link {
   color: black;
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 500;
   flex-direction: row;
   justify-content: center;

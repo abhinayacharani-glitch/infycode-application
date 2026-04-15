@@ -14,9 +14,8 @@ overflow:hidden;
   position: absolute;
   right: 0;
   top: 0;
-  height: calc(100vh);/* ✅ remove gap */
   width: 65%;
-   height: 80vh; /* ✅ full height */
+  height: 100%;
   object-fit: cover;
   object-position: right center;
   transition: all 0.8s ease;
@@ -37,9 +36,9 @@ max-width:750px;
 /* ================= HEADING ================= */
 
 .hero-text h1{
-font-size:65px;
+font-size: clamp(38px, 6vw, 65px);
 font-weight:700;
-line-height:1.0;
+line-height:1.1;
 color:#222;
 }
 
