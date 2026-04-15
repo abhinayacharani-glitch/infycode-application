@@ -2,7 +2,6 @@ import React from "react";
 import { Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
-// Sub-pages from the 'pages' subdirectory
 import Counselling from "./pages/Counselling";
 import SkillTest from "./pages/SkillTest";
 import CourseDiscovery from "./pages/Course";
@@ -15,27 +14,29 @@ import CourseExplore from "./pages/CourseExplore";
 import CourseOverview from "./pages/Courseoverview";
 import MentorConnection from "./pages/MentorConnection";
 import Logout from "./pages/Logout";
+import "./StudentDashboard.css"; // We'll create this to store the layout styles
+
 function StudentDashboard() {
   const navigate = useNavigate();
   const location = useLocation();
 
   const isCourseExplore = location.pathname.includes('/course-explore');
-  const isFullPage = isCourseExplore;
 
   const handleNavigate = (path, state) => {
     navigate(path, { state });
   };
 
   return (
-    <div className="student-dashboard-layout" style={{ display: "flex", width: "100%", height: "100vh", overflow: "hidden", fontFamily: "'Urbanist', sans-serif" }}>
+    <div className={`student-dashboard-layout ${isCourseExplore ? 'full-screen' : ''}`}>
       
-      {/* Conditionally render Sidebar */}
+      {/* Sidebar - Positioned naturally in the flex flow */}
       {!isCourseExplore && <Sidebar />}
 
       {/* Main Content Area */}
-      <div className="main-content-wrapper" style={{ flex: 1, display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden", background: "#f8fafc" }}>
+      <div className="main-content-wrapper">
         {!isCourseExplore && <Navbar />}
-        <main className="dashboard-content" style={{ flex: 1, padding: isCourseExplore ? "0" : "1.5rem", overflowY: isCourseExplore ? "hidden" : "auto", height: isCourseExplore ? "100%" : "auto" }}>
+        
+        <main className={`dashboard-content ${isCourseExplore ? 'course-view' : ''}`}>
           <Routes>
             <Route index element={<Navigate to="courses" replace />} />
             <Route path="dashboard" element={<Navigate to="courses" replace />} />
@@ -59,4 +60,4 @@ function StudentDashboard() {
   );
 }
 
-export default StudentDashboard;
+export default StudentDashboard;

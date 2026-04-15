@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useLocation, NavLink } from 'react-router-dom';
+import { useLocation, NavLink, useNavigate } from 'react-router-dom';
 import { useAdmin } from '../../../context/AdminContext';
 import './Topbar.css';
 
@@ -100,6 +100,16 @@ const Topbar = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
   const [searchValue, setSearchValue] = useState('');
+  const [showLogoLogoutModal, setShowLogoLogoutModal] = useState(false);
+  
+  const navigate = useNavigate();
+  
+  const handleLogoLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    localStorage.removeItem("loggedUser");
+    navigate('/');
+  };
 
   const notifRef = useRef(null);
   const settingsRef = useRef(null);
@@ -139,7 +149,7 @@ const Topbar = () => {
 
       {/* ── Brand / Logo (Moved from Sidebar) ── */}
       <div className="adm-brand-section-tb">
-        <div className="adm-logo-container">
+        <div className="adm-logo-container" onClick={() => setShowLogoLogoutModal(true)} style={{cursor: 'pointer'}}>
           <img
             src={icLogo}
             alt="InfyCode Logo"
@@ -301,6 +311,36 @@ const Topbar = () => {
         </div>
 
       </div>
+      
+      {/* ── RED LOGOUT CONFIRMATION MODAL ── */}
+      {showLogoLogoutModal && (
+        <div className="adm-modal-overlay" onClick={() => setShowLogoLogoutModal(false)}>
+          <div className="adm-modal-card" onClick={e => e.stopPropagation()}>
+
+            <div className="adm-red-icon-wrap">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+            </div>
+
+            <h2 className="adm-modal-title">Logout</h2>
+            <p className="adm-modal-subtitle">Are you sure you want to log out?</p>
+
+            <div className="adm-modal-actions">
+              <button className="adm-modal-out-cancel" onClick={() => setShowLogoLogoutModal(false)}>
+                Cancel
+              </button>
+              <button className="adm-modal-out-ok" onClick={handleLogoLogout}>
+                OK, Logout
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
     </header>
   );
 };

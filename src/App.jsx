@@ -122,7 +122,16 @@ function HomePage() {
 }
 
 function ProtectedRoute({ children }) {
-  const token = localStorage.getItem("token");
+  const userStr = localStorage.getItem("user");
+  let token = null;
+  if (userStr) {
+    try {
+      token = JSON.parse(userStr).token;
+    } catch (err) {
+      console.error("Failed to parse user from localStorage", err);
+    }
+  }
+  
   if (!token) return <Navigate to="/login" replace />;
   return children;
 }

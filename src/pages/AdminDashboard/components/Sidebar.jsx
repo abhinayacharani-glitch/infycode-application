@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import "./Sidebar.css";
 import icLogo from '../../../assets/infycode-final-logo4-1.png';
 import bannerLogo from '../../../assets/color-logo-3.png';
@@ -21,11 +21,21 @@ import {
 
 const Sidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const loggedUser = JSON.parse(localStorage.getItem("user") || "{}");
   const userName = loggedUser.fullName || loggedUser.fullname || loggedUser.username || "Admin";
   const userInitial = userName ? userName.charAt(0).toUpperCase() : 'A';
+  const profileImage = loggedUser.profileImage || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=3b82f6&color=fff&size=150`;
 
   const isSettingsActive = location.pathname.includes('/settings/');
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    localStorage.removeItem("loggedUser");
+    navigate("/login");
+  };
 
   return (
     <aside className="admin-sidebar" id="admin-sidebar">
@@ -33,7 +43,7 @@ const Sidebar = () => {
       {/* ── Admin User Card ── */}
       <div className="adm-user-card">
         <div className="adm-user-avatar">
-          <img src={loggedUser.profileImage || "https://i.pravatar.cc/150?img=5"} alt="Profile" className="adm-user-avatar-img" />
+          <img src={profileImage} alt="Profile" className="adm-user-avatar-img" />
         </div>
         <div className="adm-user-info">
           <div className="adm-user-name">{userName}</div>
@@ -159,11 +169,37 @@ const Sidebar = () => {
 
       {/* ── Footer / Logout ── */}
       <div className="adm-sidebar-footer">
-        <NavLink to="/admin-dashboard/logout" className="adm-logout-btn">
+        <button onClick={() => setShowLogoutModal(true)} className="adm-logout-btn" style={{border: 'none', background: 'transparent', width: '100%', cursor: 'pointer'}}>
           <LogOut size={22} />
           <span>Logout</span>
-        </NavLink>
+        </button>
       </div>
+
+      {/* ── BLUE LOGOUT CONFIRMATION MODAL ── */}
+      {showLogoutModal && (
+        <div className="adm-modal-overlay" onClick={() => setShowLogoutModal(false)}>
+          <div className="adm-modal-card" onClick={e => e.stopPropagation()}>
+
+            {/* Profile Photo at top */}
+            <div className="adm-modal-profile-wrap">
+              <img src={profileImage} alt="User" />
+            </div>
+
+            <h2 className="adm-modal-title">Are you sure you want to logout?</h2>
+            <p className="adm-modal-subtitle">You will be redirected to the main page.</p>
+
+            <div className="adm-modal-actions">
+              <button className="adm-modal-cancel" onClick={() => setShowLogoutModal(false)}>
+                Cancel
+              </button>
+              <button className="adm-modal-logout" onClick={handleLogout}>
+                OK
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
 
     </aside>
   );
