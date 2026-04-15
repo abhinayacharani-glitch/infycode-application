@@ -390,7 +390,8 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .lv-main-header {
@@ -1148,4 +1149,990 @@
 
 .output-terminal.warning pre {
   color: #92400e;
+}
+
+/* ─────────────── SIDEBAR BRANDING & PROFILE ─────────────── */
+
+.ce-sidebar-brand {
+    padding: 24px 20px 20px;
+    background: white;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.ce-logo-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ce-logo-icon {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+}
+
+.ce-logo-banner {
+    height: 32px;
+    width: auto;
+    object-fit: contain;
+    mix-blend-mode: multiply;
+}
+
+/* User Profile Card */
+.ce-user-profile-link {
+    text-decoration: none;
+    display: block;
+    margin: 16px 20px 4px;
+}
+
+.ce-user-profile {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    background: #f8fbff;
+    border: 1px solid #e1efff;
+    border-radius: 16px;
+    transition: all 0.3s ease;
+}
+
+.ce-user-profile:hover {
+    background: #eff6ff;
+    border-color: #3b82f640;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.08);
+}
+
+.ce-avatar {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+    color: white;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    box-shadow: 0 4px 10px rgba(124, 58, 237, 0.2);
+}
+
+.ce-user-info {
+    overflow: hidden;
+}
+
+.ce-user-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ce-user-email {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: #64748b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Topic Icon Alignment */
+.lv-topic-icon {
+    color: #94a3b8;
+    margin-top: 2px;
+    flex-shrink: 0;
+    transition: all 0.2s;
+}
+
+.lv-topic-link:hover .lv-topic-icon {
+    color: #3b82f6;
+    transform: scale(1.1);
+}
+
+.lv-topic-link.is-active .lv-topic-icon {
+    color: #2563eb;
+}
+
+.lv-topic-name {
+    margin-top: 0 !important;
+    display: flex;
+    align-items: center;
+}
+
+/* ====================================================
+   COURSE EXPLORE — MODERN OVERHAUL STYLES
+   ==================================================== */
+
+/* 1. MAIN LAYOUT */
+.ce-overview-container,
+.ce-lesson-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    animation: ceFadeIn 0.5s ease-out;
+    padding: 20px;
+}
+
+@keyframes ceFadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* 2. HEADER SECTION (MATCH SCREENSHOT) */
+.ce-main-header {
+    margin-bottom: 32px;
+    text-align: left;
+}
+
+.ce-back-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: none;
+    color: #64748b;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 12px;
+    transition: color 0.2s;
+}
+
+.ce-back-link:hover {
+    color: #3b82f6;
+}
+
+.ce-category-badge {
+    background: #eff6ff;
+    color: #3b82f6;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    width: fit-content;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+}
+
+.ce-main-display-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 10px;
+    line-height: 1.2;
+}
+
+.ce-main-subtitle {
+    font-size: 1rem;
+    color: #64748b;
+    max-width: 700px;
+    line-height: 1.5;
+}
+
+/* 3. PROFESSIONAL INFO CARDS (v2) */
+.ce-info-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 40px;
+    align-items: stretch;
+}
+
+.ce-info-card {
+    background: white;
+    border: 1px solid #f1f5f9;
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+    display: flex;
+    flex-direction: column;
+}
+
+.ce-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    color: #0f172a;
+    font-weight: 800;
+    font-size: 0.95rem;
+}
+
+.ce-header-icon-box {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+}
+
+.ce-trainer-card-v2 .ce-header-icon-box {
+    background: #eff6ff;
+}
+
+.ce-batch-card-v2 .ce-header-icon-box {
+    background: #f0fdf4;
+}
+
+.ce-header-icon {
+    font-size: 16px;
+}
+
+.ce-trainer-card-v2 .ce-header-icon { color: #3b82f6; }
+.ce-batch-card-v2 .ce-header-icon { color: #22c55e; }
+
+/* Trainer Profile Styles */
+.ce-trainer-primary {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #eff6ff;
+    padding: 16px 20px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+}
+
+.ce-trainer-avatar {
+    width: 44px;
+    height: 44px;
+    background: #2563eb;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+.ce-trainer-info h4 {
+    margin: 0;
+    font-size: 1rem;
+    color: #0f172a;
+    font-weight: 800;
+}
+
+.ce-trainer-info p {
+    margin: 2px 0 0;
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+.ce-trainer-stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+/* Generic Detail Box */
+.ce-stat-box {
+    background: #f8fafc;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1px solid #f1f5f9;
+}
+
+.ce-batch-grid-item {
+    background: #f8fbff;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid #f1f5f9;
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    height: 100%;
+}
+
+.ce-stat-box label, .ce-batch-grid-item label {
+    display: block;
+    font-size: 0.62rem;
+    font-weight: 700;
+    color: #94a3b8;
+    margin-bottom: 2px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.ce-stat-box span, .ce-batch-grid-item span {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+/* Batch Grid Specifics */
+.ce-batch-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.ce-batch-grid-item {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.ce-grid-icon {
+    color: #3b82f6;
+    opacity: 0.7;
+}
+
+.ce-grid-content label {
+    margin-bottom: 2px;
+}
+
+@media (max-width: 1000px) {
+    .ce-info-cards {
+        grid-template-columns: 1fr;
+    }
+}
+
+.ce-info-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 24px;
+    padding: 32px;
+    display: flex;
+    gap: 20px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+.ce-info-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+    border-color: #3b82f640;
+}
+
+.ce-card-icon {
+    width: 60px;
+    height: 60px;
+    background: #eff6ff;
+    color: #2563eb;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.ce-card-lbl {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+}
+
+/* Trainer Specific */
+.ce-trainer-name {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 2px;
+}
+
+.ce-trainer-meta {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 8px;
+}
+
+.ce-trainer-exp {
+    font-size: 0.88rem;
+    color: #3b82f6;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.ce-trainer-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.ce-tag {
+    padding: 4px 10px;
+    background: #f1f5f9;
+    color: #475569;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+/* Batch Specific */
+.ce-batch-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.ce-grid-lbl {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #94a3b8;
+    margin-bottom: 2px;
+}
+
+.ce-grid-val {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.ce-batch-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #10b981;
+    background: #f0fdf4;
+    padding: 8px 14px;
+    border-radius: 10px;
+    width: fit-content;
+}
+
+/* 4. OBJECTIVE SECTION */
+.ce-objective-section {
+    margin-bottom: 60px;
+}
+
+.ce-section-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ce-section-title::before {
+    content: "";
+    width: 4px;
+    height: 24px;
+    background: #3b82f6;
+    border-radius: 4px;
+}
+
+.ce-objective-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 24px;
+    padding: 40px;
+    line-height: 1.8;
+    color: #334155;
+    font-size: 1.1rem;
+}
+
+.ce-benefits-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-top: 40px;
+    padding-top: 32px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.ce-benefit-item {
+    display: flex;
+    gap: 16px;
+}
+
+.ce-benefit-dot {
+    width: 8px;
+    height: 8px;
+    background: #3b82f6;
+    border-radius: 50%;
+    margin-top: 8px;
+    flex-shrink: 0;
+}
+
+.ce-benefit-item strong {
+    color: #1e293b;
+    font-size: 1rem;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.ce-benefit-item p {
+    font-size: 0.88rem;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.ce-grid-icon {
+    color: #3b82f6;
+    opacity: 0.7;
+}
+
+.ce-grid-content label {
+    margin-bottom: 2px;
+}
+
+@media (max-width: 1000px) {
+    .ce-info-cards {
+        grid-template-columns: 1fr;
+    }
+}
+
+.ce-info-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 24px;
+    padding: 32px;
+    display: flex;
+    gap: 20px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+.ce-info-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+    border-color: #3b82f640;
+}
+
+.ce-card-icon {
+    width: 60px;
+    height: 60px;
+    background: #eff6ff;
+    color: #2563eb;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.ce-card-lbl {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+}
+
+/* Trainer Specific */
+.ce-trainer-name {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 2px;
+}
+
+.ce-trainer-meta {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 8px;
+}
+
+.ce-trainer-exp {
+    font-size: 0.88rem;
+    color: #3b82f6;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.ce-trainer-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.ce-tag {
+    padding: 4px 10px;
+    background: #f1f5f9;
+    color: #475569;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+/* Batch Specific */
+.ce-batch-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.ce-grid-lbl {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #94a3b8;
+    margin-bottom: 2px;
+}
+
+.ce-grid-val {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.ce-batch-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #10b981;
+    background: #f0fdf4;
+    padding: 8px 14px;
+    border-radius: 10px;
+    width: fit-content;
+}
+
+/* 4. OBJECTIVE SECTION */
+.ce-objective-section {
+    margin-bottom: 60px;
+}
+
+.ce-section-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ce-section-title::before {
+    content: "";
+    width: 4px;
+    height: 24px;
+    background: #3b82f6;
+    border-radius: 4px;
+}
+
+.ce-objective-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 24px;
+    padding: 40px;
+    line-height: 1.8;
+    color: #334155;
+    font-size: 1.1rem;
+}
+
+.ce-benefits-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-top: 40px;
+    padding-top: 32px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.ce-benefit-item {
+    display: flex;
+    gap: 16px;
+}
+
+.ce-benefit-dot {
+    width: 8px;
+    height: 8px;
+    background: #3b82f6;
+    border-radius: 50%;
+    margin-top: 8px;
+    flex-shrink: 0;
+}
+
+.ce-benefit-item strong {
+    color: #1e293b;
+    font-size: 1rem;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.ce-benefit-item p {
+    font-size: 0.88rem;
+    color: #64748b;
+    margin: 0;
+}
+
+/* 5. SIDEBAR — MODERN THREE-TIER */
+/* ─────────────── SIDEBAR & CURRICULUM RESTORED ─────────────── */
+.ce-level-block {
+    border-bottom: 1px solid #f1f5f9;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.ce-level-block.is-open {
+    background: #f8fafc20;
+}
+
+.ce-level-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 24px;
+    background: white;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.ce-level-header:hover {
+    background: #f8fafc;
+}
+
+.ce-level-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.ce-level-symbol {
+    width: 32px;
+    height: 32px;
+    background: #f8fafc;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.ce-level-title {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #1e293b;
+}
+
+.ce-level-duration {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #94a3b8;
+}
+
+.ce-lvl-chevron {
+    color: #94a3b8;
+    transition: transform 0.3s;
+}
+
+.ce-lvl-chevron.rotated {
+    transform: rotate(180deg);
+}
+
+.ce-level-content {
+    background: #f8fafc;
+    padding: 4px 0;
+}
+
+.ce-topic-group {
+    margin: 4px 16px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.ce-topic-group-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+}
+
+.ce-topic-group-header.is-open {
+    background: #eff6ff40;
+}
+
+.ce-topic-group-title {
+    flex: 1;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #2563eb;
+}
+
+.ce-subtopic-list {
+    padding: 4px 8px 12px 32px;
+}
+
+.ce-subtopic-item {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: left;
+    margin-bottom: 4px;
+    transition: all 0.2s;
+}
+
+.ce-subtopic-item:hover, .ce-subtopic-item.active {
+    background: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.ce-subtopic-icon {
+    margin-top: 3px;
+    color: #94a3b8;
+    flex-shrink: 0;
+}
+
+.ce-subtopic-item.active .ce-subtopic-icon {
+    color: #2563eb;
+}
+
+.ce-subtopic-text-stack {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    gap: 2px;
+}
+
+.ce-subtopic-title {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #000000; /* Black as requested */
+    line-height: 1.4;
+}
+
+.ce-subtopic-duration {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: #94a3b8;
+}
+
+/* 6. LESSON VIEW RESTORED */
+.ce-lesson-container {
+    padding: 40px;
+}
+
+.ce-lesson-header {
+    margin-bottom: 32px;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.ce-lesson-title {
+    font-size: 2.22rem;
+    font-weight: 900;
+    color: #0f172a;
+    margin: 0;
+}
+
+.ce-back-to-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: none;
+    padding: 0;
+    border-radius: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #3b82f6;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.ce-back-to-info:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+    transform: translateX(-4px);
+}
+
+.ce-lesson-body {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 40px;
+}
+
+/* ─────────────── EXAMPLES SECTION ─────────────── */
+.ce-examples-section {
+    margin-top: 60px;
+    padding-top: 40px;
+    border-top: 2px solid #f1f5f9;
+}
+
+.ce-examples-section h3 {
+    color: #1e293b;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.ce-example-box {
+    background: #fdfdfe;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+}
+
+.ce-example-header {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+    margin-top: 24px;
+}
+
+.ce-example-header:first-child {
+    margin-top: 0;
+}
+
+.ce-code-block {
+    background: #0f172a;
+    color: #e2e8f0;
+    padding: 20px;
+    border-radius: 12px;
+    font-family: 'Fira Code', 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    overflow-x: auto;
+    margin: 8px 0 20px;
+    border: 1px solid #1e293b;
+}
+
+.ce-code-block code {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.ce-takeaways-card h4 {
+    margin: 0 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1rem;
+    color: #1e3a8a;
 }

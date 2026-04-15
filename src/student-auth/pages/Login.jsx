@@ -146,6 +146,7 @@ function Login() {
     try {
       const data = await studentLogin(signInForm.email.trim(), signInForm.password);
 
+      localStorage.setItem("token", data.token); // Add this line for App.jsx compatibility
       localStorage.setItem("user", JSON.stringify({
         token: data.token,
         fullname: data.fullname || data.fullName,

@@ -1,288 +1,599 @@
 export const COURSE_MAP = {
-  'java-fs-01': {
-    id: 'java-fs-01',
-    title: "Java Full Stack",
-    description: "Master the complete Java ecosystem from core fundamentals to enterprise Spring Boot and React integration.",
-    duration: "6 Months",
-    students: 12500,
+  // POPULAR COURSES
+  'cid-108': {
+    id: 'cid-108',
+    title: "Full-Stack React & Next.js Masterclass",
+    description: "Master React 18, Next.js 14, and the complete T3 stack to build high-performance web applications.",
+    duration: "12 Weeks",
+    students: "2.4k",
     rating: 4.9,
     level: "Intermediate",
-    progress: 95,
+    progress: 0,
+    category: "Development",
     trainer: {
       name: "Mohan Krishna",
-      role: "Senior Java Architect",
-      experience: "12+ Years",
-      specialization: "Spring Boot, Microservices, React"
+      role: "Senior Full-Stack Developer",
+      experience: "8+ Years",
+      specialization: "React, Next.js, Node.js"
     },
     batch: {
-      name: "Weekend Batch",
-      id: "BID-JAVA-2026-01",
+      name: "Regular Batch",
+      id: "CR-108",
       startDate: "Jan 15, 2026",
-      timing: "Sat, Sun — 10:00 AM to 1:00 PM",
-      duration: "6 Months · Online Live"
+      timing: "Mon, Wed, Fri — 10:00 AM to 12:00 PM",
+      duration: "12 Weeks · Online Live"
     },
-    objective: "This program is designed to transform you into a highly skilled Java Fullstack Developer, capable of architecting and building enterprise-grade applications from scratch. You will go through a structured curriculum spanning backend development with Spring Boot, RESTful API design, cloud deployment, and modern frontend development with React — all taught by industry veterans with real-world experience.",
+    objective: "Master the most in-demand frontend technologies. From React fundamentals and advanced hooks to Next.js Server Components and App Router, you'll build 3 production-ready projects including a full-scale AI-SaaS platform.",
     benefits: [
-      { icon: "learning", label: "Flexible Learning", desc: "Weekend batches fit your schedule" },
-      { icon: "trainer", label: "Expert Trainers", desc: "Industry professionals with 10+ years" },
-      { icon: "access", label: "Lifetime Access", desc: "Revisit all recordings anytime" },
-      { icon: "projects", label: "Real Projects", desc: "Build production-ready applications" }
+      { icon: "learning", label: "Project Based", desc: "Build & deploy 3 real-world apps" },
+      { icon: "trainer", label: "Live Mentorship", desc: "Weekly 1:1 doubt clearing sessions" },
+      { icon: "access", label: "T3 Stack", desc: "Master Typescript, tRPC, and Tailwind" },
+      { icon: "projects", label: "Job Ready", desc: "Portfolio reviews and mock interviews" }
     ],
     modules: [
       {
         id: 'beginner',
-        label: "Module 1",
-        subtitle: "Java Basics",
-        duration: "4 Weeks",
-        color: "#10b981",
-        topics: [
-          { id: 'intro', title: "Introduction to Java & JVM", content: "<p>Learn how to set up JDK, IntelliJ IDEA, and understand JVM architecture, bytecode, and the compilation process.</p>" },
-          { id: 'variables', title: "Variables & Data Types", content: "<p>Deep dive into primitives, wrappers, type casting, and memory allocation on the stack and heap.</p>" },
-          { id: 'control', title: "Control Statements & Loops", content: "<p>Master if-else conditions, switch-cases, for/while/do-while loops, and break/continue.</p>" },
-          { id: 'arrays', title: "Arrays & Strings", content: "<p>Working with single and multi-dimensional arrays, String methods, StringBuilder, and StringBuffer.</p>" },
-          { id: 'methods', title: "Methods & Recursion", content: "<p>Defining methods, passing parameters, return types, method overloading, and recursive problem-solving.</p>" },
-          { id: 'exception', title: "Exception Handling", content: "<p>Try-catch-finally blocks, custom exceptions, checked vs unchecked exceptions.</p>" },
-          { id: 'io', title: "File I/O & Scanner", content: "<p>Reading and writing files using FileReader, BufferedReader, and Scanner for user input.</p>" },
-          { id: 'packages', title: "Packages & Access Modifiers", content: "<p>Organizing code with packages, understanding public, private, protected, and default access.</p>" }
-        ],
-        assignment: "Build a console-based calculator using control flow statements."
-      },
-      {
-        id: 'intermediate',
-        label: "Module 2",
-        subtitle: "Core OOP",
-        duration: "6 Weeks",
-        color: "#2563eb",
-        topics: [
-          { id: 'oops-basics', title: "Object-Oriented Programming: Classes & Objects", content: "<p>Understanding the fundamentals of OOP — classes, objects, constructors, and instance variables.</p>" },
-          { id: 'encapsulation', title: "Encapsulation & Inheritance", content: "<p>Protecting data with getters/setters, using extends, and understanding the inheritance chain.</p>" },
-          { id: 'polymorphism', title: "Polymorphism & Abstraction", content: "<p>Method overriding, abstract classes, interface implementation, and runtime polymorphism.</p>" },
-          { id: 'interfaces', title: "Interfaces & Functional Interfaces", content: "<p>Designing contracts with interfaces, Java 8 default methods, and functional interface patterns.</p>" },
-          { id: 'generics', title: "Generics & Type Safety", content: "<p>Writing reusable, type-safe code with generic classes, methods, and bounded type parameters.</p>" },
-          { id: 'collections', title: "Java Collections Framework", content: "<p>Using ArrayList, LinkedList, HashMap, HashSet, TreeMap — with real use-case scenarios.</p>" },
-          { id: 'streams', title: "Lambda Expressions & Streams API", content: "<p>Functional-style programming using lambdas, Stream operations like filter, map, reduce, and collect.</p>" },
-          { id: 'threads', title: "Multithreading & Concurrency", content: "<p>Thread lifecycle, synchronization, Executor framework, and basic concurrent data structures.</p>" }
-        ],
-        assignment: "Create a hierarchical Bank Account Management system with full OOP principles."
-      },
-      {
-        id: 'advanced',
-        label: "Module 3",
-        subtitle: "Spring Framework",
-        duration: "8 Weeks",
-        color: "#8b5cf6",
-        topics: [
-          { id: 'spring-core', title: "Spring Core & Dependency Injection", content: "<p>Understanding the Spring IoC container, bean lifecycle, and annotation-based configuration.</p>" },
-          { id: 'spring-boot', title: "Spring Boot Fundamentals", content: "<p>Bootstrapping REST APIs using Spring Boot, auto-configuration, and embedded server setup.</p>" },
-          { id: 'jpa', title: "Spring Data JPA & Hibernate", content: "<p>ORM with Hibernate, entities, repositories, JPQL queries, and database relationships.</p>" },
-          { id: 'security', title: "Spring Security & JWT Auth", content: "<p>Securing APIs using JWT tokens, role-based access, and OAuth2 integration.</p>" },
-          { id: 'react-basics', title: "React for Java Backends", content: "<p>Building React components, managing state with hooks, and consuming REST APIs.</p>" },
-          { id: 'react-advanced', title: "React Router & Context API", content: "<p>Multi-page SPAs using React Router and state management with Context and Redux basics.</p>" },
-          { id: 'docker', title: "Docker & Containerization", content: "<p>Creating Dockerfiles, building images, running containers, and Docker Compose basics.</p>" },
-          { id: 'microservices', title: "Microservices Architecture", content: "<p>Service decomposition, inter-service communication, API gateways, and service discovery.</p>" }
-        ],
-        assignment: "Develop a full REST API for a Library system with JWT auth and a React frontend."
-      }
-    ],
-    finalAssignment: {
-      title: "",
-      description: "Build a scalable, secure, and production-ready e-commerce backend with a React storefront.",
-      requirements: [
-        "React frontend with Redux state management",
-        "Spring Boot REST APIs with JWT Authentication",
-        "MySQL database with Hibernate ORM",
-        "Docker containerization",
-        "Responsive UI design"
-      ]
-    }
-  },
-  'python-fs-01': {
-    id: 'python-fs-01',
-    title: "Python Fullstack Bootcamp",
-    description: "Learn Python, Django, and React to build robust, scalable web applications.",
-    duration: "5 Months",
-    students: 12200,
-    rating: 4.8,
-    level: "Beginner",
-    progress: 10,
-    trainer: {
-      name: "Sarah Williams",
-      role: "Lead Python Developer",
-      experience: "9+ Years",
-      specialization: "Python, Django, Data Science"
-    },
-    batch: {
-      name: "Morning Weekday Batch",
-      id: "BID-PY-2026-02",
-      startDate: "Feb 1, 2026",
-      timing: "Mon–Fri — 7:00 AM to 9:00 AM",
-      duration: "5 Months · Online Live"
-    },
-    objective: "This bootcamp takes you from Python fundamentals to building production-grade web applications using Django and React. You will learn backend engineering, database design, RESTful API architecture, and seamlessly integrate with a React frontend. By the end, you will have the skills to build and deploy full-stack Python applications.",
-    benefits: [
-      { icon: "🎓", label: "Beginner Friendly", desc: "No prior coding needed" },
-      { icon: "👨‍💻", label: "Industry Mentors", desc: "Learn from working developers" },
-      { icon: "♾️", label: "Lifetime Access", desc: "All recordings included" },
-      { icon: "🚀", label: "Portfolio Ready", desc: "Ship a real Django + React app" }
-    ],
-    modules: [
-      {
-        id: 'beginner',
-        label: "Module 1",
-        subtitle: "Python Basics",
+        title: "Beginner Level",
         duration: "3 Weeks",
-        color: "#10b981",
-        topics: [
-          { id: 'py-intro', title: "Python Installation & Setup", content: "<p>Install Python, configure VS Code, and write your first Python script.</p>" },
-          { id: 'py-syntax', title: "Python Syntax & Variables", content: "<p>Understanding indentation, variable types, and dynamic typing.</p>" },
-          { id: 'py-data', title: "Data Structures", content: "<p>Lists, Dictionaries, Sets, Tuples — creation, access, and manipulation.</p>" },
-          { id: 'py-control', title: "Control Flow & Loops", content: "<p>Conditional statements, for/while loops, list comprehensions.</p>" },
-          { id: 'py-func', title: "Functions & Scope", content: "<p>Defining functions, *args and **kwargs, closures, and decorators.</p>" },
-          { id: 'py-modules', title: "Modules & Packages", content: "<p>Importing standard library modules, pip, and creating your own packages.</p>" },
-          { id: 'py-files', title: "File Handling", content: "<p>Reading and writing text/CSV files using built-in functions.</p>" }
-        ],
-        assignment: "Write scripts that manipulate text data and basic data collections."
+        mainTopicGroups: [
+          {
+            title: "React Foundations",
+            subtopics: [
+              { id: 'react-intro', title: "Why React? & Setup", duration: "45 min" },
+              { id: 'react-jsx', title: "JSX & Component Architecture", duration: "60 min" },
+              { id: 'react-props', title: "Props & State Management", duration: "50 min" }
+            ]
+          }
+        ]
       },
       {
         id: 'intermediate',
-        label: "Module 2",
-        subtitle: "OOP & Django",
-        duration: "5 Weeks",
-        color: "#2563eb",
-        topics: [
-          { id: 'py-oop', title: "Object Oriented Python", content: "<p>Classes, inheritance, dunder methods, and polymorphism in Python.</p>" },
-          { id: 'py-advanced', title: "Advanced Python Concepts", content: "<p>Generators, iterators, context managers, and async programming basics.</p>" },
-          { id: 'py-django', title: "Intro to Django Framework", content: "<p>Project setup, apps, URL routing, views, and the Django ORM.</p>" },
-          { id: 'py-models', title: "Django Models & Migrations", content: "<p>Designing database schemas, running migrations, and admin interface setup.</p>" },
-          { id: 'py-views', title: "Django Views & Templates", content: "<p>Class-based and function-based views, Django template language.</p>" },
-          { id: 'py-forms', title: "Django Forms & Authentication", content: "<p>Form validation, CSRF protection, built-in user authentication system.</p>" },
-          { id: 'py-staticfiles', title: "Static Files & Media", content: "<p>Serving images, JavaScript, and CSS in development and production.</p>" }
-        ],
-        assignment: "Create a URL shortener web app in Django with user authentication."
+        title: "Intermediate Level",
+        duration: "4 Weeks",
+        mainTopicGroups: [
+          {
+            title: "Advanced Patterns & Hooks",
+            subtopics: [
+              { id: 'react-hooks-adv', title: "Mastering useEffect & Custom Hooks", duration: "75 min" },
+              { id: 'react-context', title: "Global State with Context API", duration: "90 min" },
+              { id: 'react-perf', title: "Performance Optimization Patterns", duration: "65 min" }
+            ]
+          }
+        ]
       },
       {
         id: 'advanced',
-        label: "Module 3",
-        subtitle: "DRF & React",
-        duration: "6 Weeks",
-        color: "#8b5cf6",
-        topics: [
-          { id: 'py-drf', title: "Django REST Framework Basics", content: "<p>Serializers, viewsets, routers, and building your first API endpoint.</p>" },
-          { id: 'py-drf-adv', title: "DRF Authentication & Permissions", content: "<p>Token auth, JWT integration, and fine-grained permission classes.</p>" },
-          { id: 'py-react', title: "React & Django Integration", content: "<p>Consuming DRF APIs in a React app, handling CORS, and Axios setup.</p>" },
-          { id: 'py-celery', title: "Background Tasks with Celery", content: "<p>Setting up Celery with Redis for asynchronous task handling.</p>" },
-          { id: 'py-postgres', title: "PostgreSQL & Advanced Queries", content: "<p>Migrating from SQLite to PostgreSQL, raw queries, and optimizations.</p>" },
-          { id: 'py-deploy', title: "Deployment with Railway/Heroku", content: "<p>Configuring production environment variables and deploying your fullstack app.</p>" },
-          { id: 'py-testing', title: "Testing Django Applications", content: "<p>Unit and integration tests using Django's test client and pytest.</p>" }
-        ],
-        assignment: "Build a full Blog API with DRF and consume it in a React frontend."
+        title: "Advanced Level",
+        duration: "5 Weeks",
+        mainTopicGroups: [
+          {
+            title: "Next.js 14 & Enterprise Deployment",
+            subtopics: [
+              { id: 'next-router', title: "App Router & Server Components", duration: "120 min" },
+              { id: 'next-actions', title: "Server Actions & T3 Stack", duration: "90 min" },
+              { id: 'ai-saas', title: "Building an AI SaaS with Stripe", duration: "180 min" }
+            ]
+          }
+        ]
       }
-    ],
-    finalAssignment: {
-      title: "Social Media Dashboard",
-      description: "A comprehensive dashboard for managing posts, followers, and analytics.",
-      requirements: [
-        "Django backend with DRF",
-        "React Frontend with charts",
-        "PostgreSQL integration",
-        "JWT user auth flow",
-        "Deployed to production"
-      ]
-    }
+    ]
   },
 
-  'cloud-comp-01': {
-    id: 'cloud-comp-01',
-    title: "Cloud Computing Mastery",
-    description: "Master AWS, Azure, and Google Cloud and deploy enterprise applications at scale.",
-    duration: "4 Months",
-    students: 9800,
-    rating: 4.7,
-    level: "Intermediate",
-    progress: 75,
+  'cid-109': {
+    id: 'cid-109',
+    title: "Advanced Python for Data Engineering",
+    description: "Architect scalable data pipelines, master ETL processes, and handle Big Data with Python and Spark.",
+    duration: "8 Weeks",
+    students: "1.8k",
+    rating: 4.8,
+    level: "Advanced",
+    progress: 0,
     trainer: {
-      name: "Michael Chang",
-      role: "Cloud Solutions Architect",
-      experience: "14+ Years",
-      specialization: "AWS, Terraform, Kubernetes"
+      name: "Sarah Williams",
+      role: "Data Engineering Lead",
+      experience: "9+ Years",
+      specialization: "Python, Apache Spark, Airflow"
     },
     batch: {
-      name: "Evening Batch",
-      id: "BID-CLOUD-2026-01",
-      startDate: "Jan 20, 2026",
-      timing: "Mon, Wed, Fri — 7:00 PM to 9:30 PM",
-      duration: "4 Months · Online Live"
+      name: "Expert Batch",
+      id: "CR-109",
+      startDate: "Feb 10, 2026",
+      timing: "Tue, Thu — 7:00 PM to 9:00 PM",
+      duration: "8 Weeks · Online Live"
     },
-    objective: "Gain comprehensive expertise in cloud infrastructure across AWS, Azure, and GCP. You will learn how to design highly available, fault-tolerant architectures, implement infrastructure as code using Terraform, secure cloud environments, and orchestrate containers with Kubernetes — preparing you for top cloud certification exams.",
+    objective: "Master complex data processing. Learn to build production-grade ETL pipelines using Airflow, process massive datasets with Spark, and implement data quality checks.",
     benefits: [
-      { icon: "☁️", label: "Multi-Cloud", desc: "AWS, Azure & GCP covered" },
-      { icon: "👨‍💻", label: "Certified Trainers", desc: "AWS & GCP certified experts" },
-      { icon: "♾️", label: "Lifetime Access", desc: "Labs stay active indefinitely" },
-      { icon: "🚀", label: "Hands-on Labs", desc: "100+ real cloud lab exercises" }
+      { icon: "data", label: "Big Data Tech", desc: "Spark, Kafka, and Airflow" },
+      { icon: "cloud", label: "Cloud Native", desc: "Deploy to AWS & Snowflake" }
     ],
     modules: [
       {
         id: 'beginner',
-        label: "Module 1",
-        subtitle: "Cloud Fundamentals",
-        duration: "3 Weeks",
-        color: "#10b981",
-        topics: [
-          { id: 'cloud-models', title: "Cloud Models: IaaS, PaaS, SaaS", content: "<p>Understanding service and deployment models across cloud providers.</p>" },
-          { id: 'cloud-intro', title: "Intro to AWS Console", content: "<p>Navigating the AWS management console, IAM basics, and billing setup.</p>" },
-          { id: 'ec2', title: "EC2 & Virtual Machines", content: "<p>Launching EC2 instances, choosing instance types, and SSH access.</p>" },
-          { id: 's3', title: "S3 & Object Storage", content: "<p>Buckets, object lifecycle, versioning, static website hosting.</p>" },
-          { id: 'vpc', title: "VPC & Networking Basics", content: "<p>Subnets, Internet Gateways, route tables, and security groups.</p>" },
-          { id: 'rds', title: "RDS & Managed Databases", content: "<p>Setting up MySQL/PostgreSQL on RDS with automated backups.</p>" },
-          { id: 'cloudwatch', title: "CloudWatch Monitoring", content: "<p>Setting up dashboards, alarms, and log insights for AWS resources.</p>" }
-        ],
-        assignment: "Launch a static website hosted on S3 with CloudFront distribution."
+        title: "Beginner Level",
+        duration: "2 Weeks",
+        mainTopicGroups: [
+          {
+            title: "Python for Data Core",
+            subtopics: [
+              { id: 'py-basics', title: "Advanced Data Structures in Python", duration: "45 min" },
+              { id: 'py-file', title: "Efficient File Handling & Serialization", duration: "60 min" }
+            ]
+          }
+        ]
       },
       {
         id: 'intermediate',
-        label: "Module 2",
-        subtitle: "Infra & Security",
-        duration: "5 Weeks",
-        color: "#2563eb",
-        topics: [
-          { id: 'iam', title: "IAM: Users, Roles & Policies", content: "<p>Least-privilege access, policy documents, role assumption, and MFA.</p>" },
-          { id: 'cloud-network', title: "Advanced VPC & Peering", content: "<p>Multi-AZ VPC design, VPC peering, transit gateway, and Direct Connect.</p>" },
-          { id: 'elb', title: "Load Balancers & Auto Scaling", content: "<p>ALB, NLB, target groups, launch templates, and auto-scaling groups.</p>" },
-          { id: 'ecs', title: "ECS & Container Services", content: "<p>Running Docker containers on ECS Fargate with task definitions.</p>" },
-          { id: 'cloud-iam', title: "Security Best Practices", content: "<p>AWS Config, GuardDuty, AWS WAF, and Security Hub overview.</p>" },
-          { id: 'route53', title: "Route 53 & DNS", content: "<p>Domain registration, routing policies, health checks, and failover.</p>" },
-          { id: 'sns-sqs', title: "SNS, SQS & Messaging", content: "<p>Decoupled architectures using message queues and pub-sub patterns.</p>" }
-        ],
-        assignment: "Deploy a multi-tier web app across a custom VPC with auto-scaling."
+        title: "Intermediate Level",
+        duration: "3 Weeks",
+        mainTopicGroups: [
+          {
+            title: "Big Data & ETL Foundations",
+            subtopics: [
+              { id: 'py-etl', title: "Building ETL Pipelines with Pandas", duration: "75 min" },
+              { id: 'spark-intro', title: "Introduction to Apache Spark", duration: "90 min" }
+            ]
+          }
+        ]
       },
       {
         id: 'advanced',
-        label: "Module 3",
-        subtitle: "IaC & Kubernetes",
-        duration: "6 Weeks",
-        color: "#8b5cf6",
-        topics: [
-          { id: 'terraform-basics', title: "Terraform Fundamentals", content: "<p>Providers, resources, variables, state management, and workspaces.</p>" },
-          { id: 'terraform-adv', title: "Advanced Terraform Patterns", content: "<p>Modules, remote state with S3 backend, and Terragrunt basics.</p>" },
-          { id: 'k8s-cloud', title: "Amazon EKS & Kubernetes", content: "<p>Deploying and managing Kubernetes clusters on AWS EKS.</p>" },
-          { id: 'cloud-iac', title: "CloudFormation & CDK", content: "<p>Native AWS IaC with CloudFormation templates and CDK in TypeScript.</p>" },
-          { id: 'cloud-serverless', title: "Serverless with Lambda & API Gateway", content: "<p>Building event-driven functions, REST APIs with Lambda + API Gateway.</p>" },
-          { id: 'cicd-cloud', title: "CI/CD with CodePipeline", content: "<p>Automated deployments using CodeBuild, CodeDeploy, and CodePipeline.</p>" },
-          { id: 'cost-opt', title: "Cost Optimization & FinOps", content: "<p>Reserved instances, Savings Plans, Cost Explorer, and budget alerts.</p>" }
-        ],
-        assignment: "Provision a multi-region infrastructure with Terraform and deploy via EKS."
+        title: "Advanced Level",
+        duration: "3 Weeks",
+        mainTopicGroups: [
+          {
+            title: "Data Orchestration",
+            subtopics: [
+              { id: 'airflow-core', title: "Orchestrating Dags with Airflow", duration: "120 min" },
+              { id: 'cloud-data', title: "Scalable Data Warehousing", duration: "100 min" }
+            ]
+          }
+        ]
       }
+    ]
+  },
+
+  'cid-110': {
+    id: 'cid-110',
+    title: "Enterprise Java Spring Boot Architecture",
+    description: "Design and build microservices-based enterprise architectures with Spring Boot and Cloud.",
+    duration: "10 Weeks",
+    students: "950+",
+    rating: 4.9,
+    level: "Expert",
+    progress: 0,
+    trainer: {
+      name: "Amit Patel",
+      role: "Enterprise Architect",
+      experience: "15+ Years",
+      specialization: "Java, Spring Cloud, Docker"
+    },
+    batch: {
+      name: "Architect Batch",
+      id: "CR-110",
+      startDate: "March 5, 2026",
+      timing: "Saturday — 10:00 AM to 2:00 PM",
+      duration: "10 Weeks · Online Live"
+    },
+    objective: "Deep dive into enterprise systems. Master Spring Cloud, Microservices, and high-performance database design.",
+    benefits: [
+      { icon: "arch", label: "Architecture focus", desc: "Learn system design patterns" },
+      { icon: "scale", label: "Scalability", desc: "Build for millions of users" }
     ],
-    finalAssignment: {
-      title: "Highly Available Web Architecture",
-      description: "Design and deploy a multi-region highly available application on AWS.",
-      requirements: [
-        "Multi-AZ, multi-region deployment",
-        "Auto-scaling and load balancers",
-        "Full infrastructure via Terraform",
-        "Kubernetes deployment on EKS",
-        "CI/CD pipeline with CodePipeline"
-      ]
-    }
+    modules: [
+      {
+        id: 'beginner',
+        title: "Beginner Level",
+        duration: "3 Weeks",
+        mainTopicGroups: [
+          {
+            title: "Java Core & Spring Intro",
+            subtopics: [
+              { id: 'java-intro', title: "Java JVM Architecture & Setup", duration: "90 min" },
+              { id: 'spring-intro', title: "Spring Core & Dependency Injection", duration: "75 min" }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'intermediate',
+        title: "Intermediate Level",
+        duration: "3 Weeks",
+        mainTopicGroups: [
+          {
+            title: "Microservices Development",
+            subtopics: [
+              { id: 'sb-rest', title: "Building REST APIs with Spring Boot", duration: "120 min" },
+              { id: 'sb-data', title: "Spring Data JPA & Hibernate", duration: "100 min" }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'advanced',
+        title: "Advanced Level",
+        duration: "4 Weeks",
+        mainTopicGroups: [
+          {
+            title: "Cloud Native Java",
+            subtopics: [
+              { id: 'sc-eureka', title: "Service Discovery with Eureka", duration: "120 min" },
+              { id: 'sb-docker', title: "Dockerizing Java Applications", duration: "90 min" }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+
+  'cid-111': {
+    id: 'cid-111',
+    title: "Generative AI & LLM Systems Design",
+    description: "Build intelligence into your apps using GPT-4, LangChain, and Vector Databases.",
+    duration: "6 Weeks",
+    students: "1.2k",
+    rating: 5.0,
+    level: "Intermediate",
+    progress: 0,
+    trainer: { name: "Anish Kumar", role: "AI Researcher", experience: "6 Years", specialization: "NLP, PyTorch" },
+    batch: { id: "CR-111", startDate: "Feb 20, 2026", timing: "Weekend", duration: "6 Weeks" },
+    objective: "Master the architecture of modern AI systems. Learn to leverage LLMs for real-world automation, from prompt engineering to building autonomous agents.",
+    benefits: [
+      { icon: "ai", label: "LLM Mastery", desc: "Work with GPT-4 and Llama 3" },
+      { icon: "rag", label: "RAG Pipeline", desc: "Build searchable knowledge bases" }
+    ],
+    modules: [
+      {
+        id: 'beginner',
+        title: "Beginner Level",
+        duration: "1.5 Weeks",
+        mainTopicGroups: [
+          {
+            title: "Foundations of GenAI",
+            subtopics: [
+              { id: 'ai-intro', title: "How Transformers Work", duration: "45 min" },
+              { id: 'prompt-eng', title: "Professional Prompt Engineering", duration: "60 min" }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'intermediate',
+        title: "Intermediate Level",
+        duration: "2 Weeks",
+        mainTopicGroups: [
+          {
+            title: "AI App Development",
+            subtopics: [
+              { id: 'langchain', title: "LangChain Orchestration", duration: "120 min" },
+              { id: 'vector-db', title: "Pinecone & Vector DB Implementation", duration: "90 min" }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'advanced',
+        title: "Advanced Level",
+        duration: "2.5 Weeks",
+        mainTopicGroups: [
+          {
+            title: "Production AI Systems",
+            subtopics: [
+              { id: 'fine-tune', title: "Fine-tuning Small Language Models", duration: "180 min" },
+              { id: 'ai-agents', title: "Building Autonomous Task Agents", duration: "150 min" }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  
+  'cid-112': {
+    id: 'cid-112',
+    title: "Modern Data Analytics with Power BI",
+    description: "Data visualization and business intelligence for the modern era.",
+    duration: "4 Weeks",
+    students: "3.5k",
+    rating: 4.8,
+    level: "Beginner",
+    progress: 0,
+    trainer: { name: "Rajesh S.", role: "BI Lead", experience: "10 Years", specialization: "Power BI, SQL" },
+    batch: { id: "CR-112", startDate: "March 1, 2026", duration: "4 Weeks" },
+    objective: "Transform raw data into actionable insights. Master data cleaning, modeling, and storytelling through interactive dashboards.",
+    benefits: [
+      { icon: "viz", label: "Impactful Viz", desc: "Create high-end business reports" },
+      { icon: "dax", label: "DAX Mastery", desc: "Complex calculations made easy" }
+    ],
+    modules: [
+      {
+        id: 'beginner',
+        title: "Beginner Level",
+        duration: "1 Week",
+        mainTopicGroups: [
+          {
+            title: "Data Loading & ETL",
+            subtopics: [
+              { id: 'pq-intro', title: "Power Query Fundamentals", duration: "60 min" },
+              { id: 'bi-connect', title: "Connecting to diverse Data Sources", duration: "45 min" }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'intermediate',
+        title: "Intermediate Level",
+        duration: "1.5 Weeks",
+        mainTopicGroups: [
+          {
+            title: "Data Modeling & DAX",
+            subtopics: [
+              { id: 'bi-model', title: "Star Schema & Data Relationships", duration: "90 min" },
+              { id: 'bi-dax', title: "Calculated Columns vs Measures", duration: "120 min" }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'advanced',
+        title: "Advanced Level",
+        duration: "1.5 Weeks",
+        mainTopicGroups: [
+          {
+            title: "Reporting & Security",
+            subtopics: [
+              { id: 'bi-rls', title: "Implementing Row-Level Security", duration: "75 min" },
+              { id: 'bi-service', title: "Power BI Service & Automation", duration: "60 min" }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+
+  'cid-113': {
+    id: 'cid-113',
+    title: "Cloud Infrastructure Specialist (AWS)",
+    description: "Master AWS services and infrastructure as code.",
+    duration: "8 Weeks",
+    students: "800+",
+    rating: 4.7,
+    level: "Intermediate",
+    progress: 0,
+    trainer: { name: "Michael Chang", role: "Cloud Architect", experience: "14 Years", specialization: "AWS, Terraform" },
+    batch: { id: "CR-113", startDate: "Jan 25, 2026", duration: "8 Weeks" },
+    objective: "Build resilient cloud architectures. Master core AWS services and learn to manage infrastructure as code using Terraform.",
+    benefits: [
+      { icon: "cloud", label: "AWS SAA-C03", desc: "Prepare for Architect Certification" },
+      { icon: "iac", label: "IaC focus", desc: "Terraform & CloudFormation" }
+    ],
+    modules: [
+      {
+        id: 'beginner',
+        title: "Beginner Level",
+        duration: "2 Weeks",
+        mainTopicGroups: [
+          {
+            title: "Global Infrastructure",
+            subtopics: [
+              { id: 'aws-compute', title: "EC2 & Autoscaling Basics", duration: "90 min" },
+              { id: 'aws-storage', title: "S3 & EFS Storage Solutions", duration: "75 min" }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'intermediate',
+        title: "Intermediate Level",
+        duration: "3 Weeks",
+        mainTopicGroups: [
+          {
+            title: "Networking & Databases",
+            subtopics: [
+              { id: 'aws-vpc', title: "VPC Design & Route 53", duration: "120 min" },
+              { id: 'aws-rds', title: "RDS & DynamoDB Management", duration: "90 min" }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'advanced',
+        title: "Advanced Level",
+        duration: "3 Weeks",
+        mainTopicGroups: [
+          {
+            title: "Advanced Ops",
+            subtopics: [
+              { id: 'aws-lambda', title: "Serverless with AWS Lambda", duration: "100 min" },
+              { id: 'aws-cicd', title: "AWS CodePipeline & DevOps", duration: "120 min" }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+
+  'cid-114': {
+    id: 'cid-114',
+    title: "Responsive Web Design Professional",
+    description: "HTML5, CSS3, and Modern Layouts with a focus on mobile-first design.",
+    duration: "6 Weeks",
+    students: "5.6k",
+    rating: 4.9,
+    level: "Beginner",
+    progress: 0,
+    trainer: { name: "Sneha P.", role: "Frontend UI Lead", experience: "7 Years", specialization: "CSS, Animations" },
+    batch: { id: "CR-114", startDate: "Feb 5, 2026", duration: "6 Weeks" },
+    objective: "Master the art of creating pixel-perfect, responsive websites. Learn modern layouts like Flexbox and CSS Grid.",
+    benefits: [
+      { icon: "ui", label: "UI Focus", desc: "Animations and Micro-interactions" },
+      { icon: "mobile", label: "Mobile First", desc: "Perfect on all device sizes" }
+    ],
+    modules: [
+      {
+        id: 'beginner',
+        title: "Beginner Level",
+        duration: "2 Weeks",
+        mainTopicGroups: [
+          {
+            title: "Modern HTML & CSS",
+            subtopics: [
+              { id: 'css-box', title: "The Modern Box Model", duration: "60 min" },
+              { id: 'css-flex', title: "Flexbox Layout Mastery", duration: "90 min" }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'intermediate',
+        title: "Intermediate Level",
+        duration: "2 Weeks",
+        mainTopicGroups: [
+          {
+            title: "Responsive Structures",
+            subtopics: [
+              { id: 'css-grid', title: "CSS Grid & Area Layouts", duration: "100 min" },
+              { id: 'css-media', title: "Responsive Media Queries", duration: "75 min" }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'advanced',
+        title: "Advanced Level",
+        duration: "2 Weeks",
+        mainTopicGroups: [
+          {
+            title: "Polished UX",
+            subtopics: [
+              { id: 'css-anim', title: "Keyframe Animations & Transitions", duration: "90 min" },
+              { id: 'css-perf', title: "Web Performance & Accessibility", duration: "120 min" }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+
+  'cid-115': {
+    id: 'cid-115',
+    title: "UX Research & Product Design Strategy",
+    description: "Master user research, wireframing, and product flows using industry standard tools.",
+    duration: "8 Weeks",
+    students: "2.1k",
+    rating: 4.8,
+    level: "Intermediate",
+    progress: 0,
+    trainer: { name: "David K.", role: "Product Designer", experience: "12 Years", specialization: "UX Research, Figma" },
+    batch: { id: "CR-115", startDate: "April 1, 2026", duration: "8 Weeks" },
+    objective: "Master the user-centric design process. Learn to conduct professional user research and build high-fidelity prototypes.",
+    benefits: [
+      { icon: "figma", label: "Figma Pro", desc: "Design Systems & Collaboration" },
+      { icon: "ux", label: "UX Research", desc: "Case studies & User Testing" }
+    ],
+    modules: [
+      {
+        id: 'beginner',
+        title: "Beginner Level",
+        duration: "2 Weeks",
+        mainTopicGroups: [
+          {
+            title: "Design Thinking",
+            subtopics: [
+              { id: 'ux-empathy', title: "Empathy Maps & User Personas", duration: "75 min" },
+              { id: 'ux-story', title: "User Stories & Journey Mapping", duration: "60 min" }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'intermediate',
+        title: "Intermediate Level",
+        duration: "3 Weeks",
+        mainTopicGroups: [
+          {
+            title: "Visual Design & Figma",
+            subtopics: [
+              { id: 'figma-basics', title: "Getting started with Figma", duration: "120 min" },
+              { id: 'figma-proto', title: "Interactive Prototyping", duration: "90 min" }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'advanced',
+        title: "Advanced Level",
+        duration: "3 Weeks",
+        mainTopicGroups: [
+          {
+            title: "Product Strategy",
+            subtopics: [
+              { id: 'ux-test', title: "Usability Testing & Iteration", duration: "100 min" },
+              { id: 'ux-hand', title: "Design Handoff & Documentation", duration: "90 min" }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+
+  'cid-116': {
+    id: 'cid-116',
+    title: "Python for Financial Modeling",
+    description: "Quant finance, data analysis, and algorithmic trading foundations.",
+    duration: "5 Weeks",
+    students: "1.5k",
+    rating: 4.7,
+    level: "Advanced",
+    progress: 0,
+    trainer: { name: "Dr. Arvan P.", role: "Quant Tech Lead", experience: "10 Years", specialization: "Pandas, NumPy, Finance" },
+    batch: { id: "CR-116", startDate: "Feb 15, 2026", duration: "5 Weeks" },
+    objective: "Apply Python to the world of finance. Learn to analyze stock data, build risk models, and backtest trading strategies.",
+    benefits: [
+      { icon: "quant", label: "Quant Finance", desc: "Financial math & ML" },
+      { icon: "trade", label: "Algo Trading", desc: "Live strategy backtesting" }
+    ],
+    modules: [
+      {
+        id: 'beginner',
+        title: "Beginner Level",
+        duration: "1 Week",
+        mainTopicGroups: [
+          {
+            title: "Data Core for Finance",
+            subtopics: [
+              { id: 'fin-numpy', title: "NumPy for Financial Calculation", duration: "90 min" },
+              { id: 'fin-pandas', title: "Pandas DataFrames for Stock Data", duration: "120 min" }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'intermediate',
+        title: "Intermediate Level",
+        duration: "2 Weeks",
+        mainTopicGroups: [
+          {
+            title: "Analysis & Metrics",
+            subtopics: [
+              { id: 'fin-stats', title: "Statistical Analysis of Returns", duration: "100 min" },
+              { id: 'fin-risk', title: "Risk Metrics: VAR & Sharpe Ratio", duration: "90 min" }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'advanced',
+        title: "Advanced Level",
+        duration: "2 Weeks",
+        mainTopicGroups: [
+          {
+            title: "Trading Strategies",
+            subtopics: [
+              { id: 'fin-back', title: "Backtesting Strategy Frameworks", duration: "180 min" },
+              { id: 'fin-ml', title: "Intro to ML for Asset Pricing", duration: "150 min" }
+            ]
+          }
+        ]
+      }
+    ]
   }
 };

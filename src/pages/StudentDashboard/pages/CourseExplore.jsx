@@ -1,6 +1,27 @@
-import React, { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { COURSE_MAP } from './data/extraCourses';
+import icLogo from '../../../assets/infycode-final-logo4-1.png';
+import bannerLogo from '../../../assets/color-logo-3.png';
+import { 
+  ChevronLeft, 
+  ChevronDown, 
+  ChevronRight, 
+  User, 
+  BookOpen, 
+  Clock, 
+  Target, 
+  CheckCircle2,
+  Calendar,
+  Hash,
+  ArrowRight,
+  Zap,
+  Layers,
+  Award,
+  Notebook,
+  Book,
+  Cloud
+} from 'lucide-react';
 import './CourseExplore.css';
 
 /* ── Topic key-points generator ── */
@@ -115,6 +136,16 @@ const getDetailedContent = (topic) => {
             <li><strong>Heap Memory:</strong> Stores all objects and instance variables. This is where the <strong>Garbage Collector (GC)</strong> operates, reclaiming memory from unused objects.</li>
           </ul>
         </section>
+
+        <section class="reading-section ce-examples-section">
+          <h3>Practical Examples</h3>
+          <div class="ce-example-box">
+            <div class="ce-example-header">Check Java Installation</div>
+            <pre class="ce-code-block"><code>$ java -version\njava version "17.0.1" 2021-10-19 LTS\nJava(TM) SE Runtime Environment (build 17.0.1+12-LTS-39)</code></pre>
+            <div class="ce-example-header">Compile and Run HelloWorld</div>
+            <pre class="ce-code-block"><code>// HelloWorld.java\npublic class HelloWorld {\n    public static void main(String[] args) {\n        System.out.println("Hello, InfyCode!");\n    }\n}\n\n$ javac HelloWorld.java\n$ java HelloWorld\nHello, InfyCode!</code></pre>
+          </div>
+        </section>
       </div>
     `;
   }
@@ -149,6 +180,16 @@ const getDetailedContent = (topic) => {
           <h3>3. Scope and Lifecycle</h3>
           <p>Variable scope determines visibility and lifetime. Variables declared inside a method (local) are destroyed when the method finishes. Instance variables (fields) live as long as their containing object exists.</p>
         </section>
+
+        <section class="reading-section ce-examples-section">
+          <h3>Practical Examples</h3>
+          <div class="ce-example-box">
+            <div class="ce-example-header">Declaring Variables</div>
+            <pre class="ce-code-block"><code>int age = 25; // Simple integer\ndouble salary = 55000.50; // Floating point\nboolean isCloudReady = true; // Boolean logic\nchar grade = 'A'; // Single character</code></pre>
+            <div class="ce-example-header">Working with Wrapper Classes</div>
+            <pre class="ce-code-block"><code>Integer myInt = 100; // Autoboxing\nint val = myInt; // Unboxing\nString numStr = "500";\nint converted = Integer.parseInt(numStr); // Parsing</code></pre>
+          </div>
+        </section>
       </div>
     `;
   }
@@ -174,6 +215,96 @@ const getDetailedContent = (topic) => {
           <h3>3. Optimization: Break and Continue</h3>
           <p>These jump statements provide granular control. <code>break</code> terminates the innermost loop, whereas <code>continue</code> skips to the next check. Overuse can make code harder to follow—always prefer clear exit conditions over frequent breaks.</p>
         </section>
+
+        <section class="reading-section ce-examples-section">
+          <h3>Practical Examples</h3>
+          <div class="ce-example-box">
+            <div class="ce-example-header">If-Else Example</div>
+            <pre class="ce-code-block"><code>int score = 85;\nif (score >= 90) {\n    System.out.println("Grade: A+");\n} else if (score >= 80) {\n    System.out.println("Grade: A");\n} else {\n    System.out.println("Keep learning!");\n}</code></pre>
+            <div class="ce-example-header">For-Loop (Iteration)</div>
+            <pre class="ce-code-block"><code>for (int i = 1; i <= 5; i++) {\n    System.out.println("Processing Batch #" + i);\n}</code></pre>
+          </div>
+        </section>
+      </div>
+    `;
+  }
+
+  if (title.includes('react') || title.includes('jsx') || title.includes('hook')) {
+    return `
+      <div class="rich-reading-content">
+        <section class="reading-section">
+          <h3>Architecture of ${topic.title}</h3>
+          <p>This module focuses on building dynamic user interfaces using ${topic.title}. We explore the component-based architecture and how React manages the lifecycle of your application.</p>
+        </section>
+
+        <section class="reading-section ce-examples-section">
+          <h3>Practical Examples</h3>
+          <div class="ce-example-box">
+            <div class="ce-example-header">Functional Component with State</div>
+            <pre class="ce-code-block"><code>import React, { useState } from 'react';\n\nfunction Counter() {\n  const [count, setCount] = useState(0);\n\n  return (\n    <div>\n      <p>Click count: {count}</p>\n      <button onClick={() => setCount(count + 1)}>Increment</button>\n    </div>\n  );\n}</code></pre>
+            <div class="ce-example-header">Mapping Data to UI</div>
+            <pre class="ce-code-block"><code>const courses = ['Java', 'React', 'Python'];\n\nreturn (\n  <ul>\n    {courses.map(course => (\n      <li key={course}>{course}</li>\n    ))}\n  </ul>\n);</code></pre>
+          </div>
+        </section>
+      </div>
+    `;
+  }
+
+  if (title.includes('python') || title.includes('numpy') || title.includes('pandas')) {
+    return `
+      <div class="rich-reading-content">
+        <section class="reading-section">
+          <h3>Data Engineering with ${topic.title}</h3>
+          <p>Mastering ${topic.title} is essential for modern data engineering and financial modeling. We cover efficient syntax and powerful libraries for data manipulation.</p>
+        </section>
+
+        <section class="reading-section ce-examples-section">
+          <h3>Practical Examples</h3>
+          <div class="ce-example-box">
+            <div class="ce-example-header">Python List Comprehension</div>
+            <pre class="ce-code-block"><code># Create a list of squares\nnumbers = [1, 2, 3, 4, 5]\nsquares = [n**2 for n in numbers]\nprint(squares) # Output: [1, 4, 9, 16, 25]</code></pre>
+            <div class="ce-example-header">Pandas DataFrame Basics</div>
+            <pre class="ce-code-block"><code>import pandas as pd\n\ndata = {'Course': ['Java', 'Python'], 'Level': ['Expert', 'Advanced']}\ndf = pd.DataFrame(data)\nprint(df.head())</code></pre>
+          </div>
+        </section>
+      </div>
+    `;
+  }
+
+  if (title.includes('ai') || title.includes('transformer') || title.includes('llm')) {
+    return `
+      <div class="rich-reading-content">
+        <section class="reading-section">
+          <h3>Generative AI: ${topic.title}</h3>
+          <p>Understanding ${topic.title} allows you to build next-generation intelligent applications. We explore prompt engineering and agentic workflows.</p>
+        </section>
+
+        <section class="reading-section ce-examples-section">
+          <h3>Practical Examples</h3>
+          <div class="ce-example-box">
+            <div class="ce-example-header">LLM Prompt Template</div>
+            <pre class="ce-code-block"><code># Example of a system prompt\nsystem_prompt = """\nYou are an expert coding assistant.\nHelp the user solve their programming task efficiently.\n"""\n\nuser_input = "Write a React hook for fetching data."</code></pre>
+          </div>
+        </section>
+      </div>
+    `;
+  }
+
+  if (title.includes('aws') || title.includes('cloud') || title.includes('deployment')) {
+    return `
+      <div class="rich-reading-content">
+        <section class="reading-section">
+          <h3>Cloud Infrastructure: ${topic.title}</h3>
+          <p>Deploying and scaling applications on the cloud is a critical skill. ${topic.title} covers the core services needed for resilient architecture.</p>
+        </section>
+
+        <section class="reading-section ce-examples-section">
+          <h3>Practical Examples</h3>
+          <div class="ce-example-box">
+            <div class="ce-example-header">AWS CLI - List Bucket Contents</div>
+            <pre class="ce-code-block"><code>$ aws s3 ls s3://my-infycode-assets/\n2026-04-15 10:00:00        1024 index.html\n2026-04-15 10:00:05        4096 styles.css</code></pre>
+          </div>
+        </section>
       </div>
     `;
   }
@@ -197,9 +328,17 @@ const getDetailedContent = (topic) => {
 
       <section class="reading-section">
         <h3>Industry Implementation</h3>
-        <p>${topic.content.replace(/<p>|<\/p>/g, '')}</p>
+        <p>${(topic.content || 'Detailed research and implementation documentation for this topic is currently being refined to meet enterprise standards.').replace(/<p>|<\/p>/g, '')}</p>
         <div class="info-callout">
           <strong>Best Practice:</strong> Always validate inputs and handle edge cases at the entry point of your ${topic.title} implementation.
+        </div>
+      </section>
+
+      <section class="reading-section ce-examples-section">
+        <h3>Practical Examples</h3>
+        <div class="ce-example-box">
+          <div class="ce-example-header">Standard Implementation for ${topic.title}</div>
+          <p>Implementation examples and industry-standard boilerplate for <strong>${topic.title}</strong> are being integrated. Check the project documentation for early-access snippets.</p>
         </div>
       </section>
     </div>
@@ -251,447 +390,314 @@ const PracticeWidget = () => {
   );
 };
 
+
+/* ── Sidebar Data Logic ── */
+const groupTopicsInThree = (topics) => {
+  if (!topics || topics.length === 0) return [];
+  const chunkSize = Math.ceil(topics.length / 3);
+  const titles = ["Core Fundamentals", "Logic & Advanced Patterns", "Integration & Mastery"];
+  
+  return [
+    { title: titles[0], subtopics: topics.slice(0, chunkSize) },
+    { title: titles[1], subtopics: topics.slice(chunkSize, chunkSize * 2) },
+    { title: titles[2], subtopics: topics.slice(chunkSize * 2) },
+  ].filter(group => group.subtopics.length > 0);
+};
+
 /* ── Main Component ── */
 const CourseExplore = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Handle state being either a string (courseId) or an object ({ courseId, topicId })
-  const state = location.state;
-  const courseId = (typeof state === 'string' ? state : state?.courseId) || 'java-fs-01';
-  const course = COURSE_MAP[courseId] || COURSE_MAP['java-fs-01'];
+  // Retrieve user info for the profile card with safe parsing
+  let user = { fullname: "Student", email: "student@infycode.com" };
+  try {
+    const userString = localStorage.getItem('user');
+    if (userString) user = JSON.parse(userString);
+  } catch (err) {
+    console.error("Dashboard: Error parsing user state", err);
+  }
+  const userInitial = (user.fullname || user.fullName || "S").charAt(0).toUpperCase();
 
-  const [openModules, setOpenModules] = useState({ [course.modules[0].topics[0].id]: true });
-  const [finalOpen, setFinalOpen] = useState(false);
+  // Safe access to state with fallbacks
+  const { courseId = 'cid-108', courseTitle, category } = location.state || {};
+  
+  const course = COURSE_MAP[courseId];
+  
+  // State for curriculum exploration
+  const [activeSubtopic, setActiveSubtopic] = useState(null);
+  const [openLevels, setOpenLevels] = useState({});
+  const [openMainTopics, setOpenMainTopics] = useState({});
 
+  // Reset exploration when course changes
+  useEffect(() => {
+    setActiveSubtopic(null);
+    setOpenLevels({ beginner: true });
+    setOpenMainTopics({});
+  }, [courseId]);
 
-  const [activeContent, setActiveContent] = useState(() => {
-    const passedTopicId = typeof state === 'object' ? state?.topicId : null;
-    if (passedTopicId) {
-      for (let mIdx = 0; mIdx < course.modules.length; mIdx++) {
-        const topicIdx = course.modules[mIdx].topics.findIndex(t => t.id === passedTopicId);
-        if (topicIdx !== -1) {
-          return {
-            type: 'topic_content',
-            moduleId: course.modules[mIdx].id,
-            topicId: passedTopicId,
-            topicIndex: topicIdx,
-            moduleIndex: mIdx,
-          };
-        }
-      }
-    }
-    return {
-      type: 'topic_content',
-      moduleId: course.modules[0].id,
-      topicId: course.modules[0].topics[0].id,
-      topicIndex: 0,
-      moduleIndex: 0,
-    };
-  });
+  // If course not found in map, we'll show a fallback or basic info
+  const displayTitle = course?.title || courseTitle || "Explore Course";
+  const displayDesc = course?.description || "Curriculum details for this professional certification are being finalized.";
 
-  const [completedSet, setCompletedSet] = useState(() => {
-    const saved = localStorage.getItem(`course_progress_${courseId}`);
-    return saved ? new Set(JSON.parse(saved)) : new Set();
-  });
+  const toggleLevel = (lvlId) => setOpenLevels(prev => ({ ...prev, [lvlId]: !prev[lvlId] }));
+  const toggleMainTopic = (key) => setOpenMainTopics(prev => ({ ...prev, [key]: !prev[key] }));
 
-  /* Sync progress back to localStorage whenever completedSet changes */
-  React.useEffect(() => {
-    localStorage.setItem(`course_progress_${courseId}`, JSON.stringify(Array.from(completedSet)));
-  }, [completedSet, courseId]);
-
-  /* Deep linking effect */
-  React.useEffect(() => {
-    const tid = typeof state === 'object' ? state?.topicId : null;
-    if (tid) {
-      course.modules.forEach((m, mIdx) => {
-        const tIdx = m.topics.findIndex(t => t.id === tid);
-        if (tIdx !== -1) {
-          goTo({ type: 'topic_content', moduleId: m.id, topicId: tid, moduleIndex: mIdx, topicIndex: tIdx });
-        }
-      });
-    }
-  }, [location.state?.topicId]);
-
-  const toggleModule = (modId) => setOpenModules(prev => ({ ...prev, [modId]: !prev[modId] }));
-
-  const activeModule = course.modules.find(m => m.id === activeContent.moduleId);
-  const activeTopic = activeModule?.topics?.find(t => t.id === activeContent.topicId);
-  const isFinal = activeContent.type === 'final';
-
-  const isFirstTopicGlobally = (mi, ti) => mi === 0 && ti === 0;
-  const contentKey = (type, modId, topicId) => `${type}::${modId}::${topicId}`;
-
-  const navList = [];
-  course.modules.forEach((m, mIdx) => {
-    m.topics.forEach((t, tIdx) => {
-      navList.push({ type: 'topic_content', moduleId: m.id, topicId: t.id, moduleIndex: mIdx, topicIndex: tIdx });
-      if (isFirstTopicGlobally(mIdx, tIdx))
-        navList.push({ type: 'topic_practice', moduleId: m.id, topicId: t.id, moduleIndex: mIdx, topicIndex: tIdx });
-      navList.push({ type: 'topic_assignment', moduleId: m.id, topicId: t.id, moduleIndex: mIdx, topicIndex: tIdx });
+  const handleSubtopicClick = (subtopic, levelId, mainTopicTitle) => {
+    setActiveSubtopic({
+      ...subtopic,
+      levelId,
+      mainTopicTitle
     });
-  });
-  navList.push({ type: 'final', moduleId: 'final', topicId: 'final', moduleIndex: -1, topicIndex: -1 });
-
-  const currentNavIdx = navList.findIndex(
-    n => n.type === activeContent.type && n.moduleId === activeContent.moduleId && n.topicId === activeContent.topicId
-  );
-
-  const goTo = (n) => {
-    setActiveContent(n);
-    if (n.type !== 'final') {
-      setOpenModules(prev => ({ ...prev, [n.topicId]: true }));
-    }
-  };
-  const handlePrev = () => { if (currentNavIdx > 0) goTo(navList[currentNavIdx - 1]); };
-  const handleNext = () => { if (currentNavIdx < navList.length - 1) goTo(navList[currentNavIdx + 1]); };
-
-  const handleSetActive = (type, moduleId, topicId, mIdx, tIdx) => {
-    goTo({ type, moduleId, topicId, moduleIndex: mIdx, topicIndex: tIdx });
   };
 
-  /* Mark complete AND auto-navigate to next */
-  const handleMarkComplete = () => {
-    const key = isFinal ? 'final::final::final' : contentKey(activeContent.type, activeContent.moduleId, activeContent.topicId);
-    setCompletedSet(prev => new Set([...prev, key]));
+  const resetToOverview = () => setActiveSubtopic(null);
 
-    // If not already done, show green state for a moment before navigating
-    if (!currentIsDone && currentNavIdx < navList.length - 1) {
-      setTimeout(() => {
-        goTo(navList[currentNavIdx + 1]);
-      }, 600);
-    } else if (currentNavIdx < navList.length - 1) {
-      // If already done, navigate immediately
-      goTo(navList[currentNavIdx + 1]);
-    }
-  };
-
-
-  const isDone = (type, modId, topicId) => {
-    if (isFinal) return completedSet.has('final::final::final');
-    return completedSet.has(contentKey(type, modId, topicId));
-  };
-  const currentIsDone = isFinal
-    ? completedSet.has('final::final::final')
-    : completedSet.has(contentKey(activeContent.type, activeContent.moduleId, activeContent.topicId));
-
-  const progress = Math.round((completedSet.size / navList.length) * 100);
+  // Handle empty or missing modules (Coming Soon state)
+  const hasCurriculum = course?.modules && course.modules.length > 0;
 
   return (
     <div className="lv-root">
-      {/* ─── OUTPUTS MODAL ─── */}
-
-
       {/* ─── SIDEBAR ─── */}
       <aside className="lv-sidebar">
-        <div className="lv-sidebar-header">
-          <button className="lv-back-btn" onClick={() => navigate('/student-dashboard/courses')}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" /></svg>
-            Back to Courses
-          </button>
-
-          <div className="lv-sidebar-tabs">
-            <button className="lv-tab active">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></svg>
-              Curriculum
-            </button>
-          </div>
-
-          <div className="lv-progress-container">
-            <div className="lv-progress-info">
-              <span className="lv-progress-label">Course Progress</span>
-              <span className="lv-progress-percentage">{progress}%</span>
-            </div>
-            <div className="lv-progress-track">
-              <div className="lv-progress-bar" style={{ width: `${progress}%` }}></div>
+        {/* BRAND SECTION */}
+        <div className="ce-sidebar-brand">
+          <div className="ce-logo-wrap">
+            <img src={icLogo} alt="logo" className="ce-logo-icon" />
+            <div className="ce-brand-text">
+              <img src={bannerLogo} alt="InfyCode" className="ce-logo-banner" />
             </div>
           </div>
         </div>
 
-        <div className="lv-curriculum">
-          <div className="lv-section-label">COURSE CONTENT</div>
-
-          {(() => {
-            let globalModIndex = 1;
-            return course.modules.flatMap((m) =>
-              m.topics.map((t, tIdx) => {
-                const currentModId = t.id;
-                const isModOpen = !!openModules[currentModId];
-                const isTopicActive = activeContent.topicId === t.id && activeContent.type === 'topic_content';
-                const learningPoints = getKeyPoints(t);
-
-                return (
-                  <div key={t.id} className={`lv-module-block-wrapper ${isModOpen ? 'is-expanded' : ''} ${isTopicActive ? 'is-active-module' : ''}`}>
-                    <button className={`lv-module-header ${isModOpen ? 'is-open' : ''}`} onClick={() => toggleModule(currentModId)}>
-                      <div className="lv-module-header-text">
-                        <span className="lv-module-title">Module {globalModIndex++}: {t.title}</span>
-                      </div>
-                      <svg className={`lv-module-chevron ${isModOpen ? 'rotated' : ''}`} xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9" /></svg>
-                    </button>
-
-                    {isModOpen && (
-                      <div className="lv-module-dropdown-content">
-                        {/* Auto-load theory if module is clicked (optional but helpful) */}
-                        <ul className="lv-topic-list">
-                          {learningPoints.map((point, pIdx) => (
-                            <li key={pIdx} className="lv-topic-li">
-                              <button
-                                className="lv-topic-link"
-                                onClick={() => handleSetActive('topic_content', m.id, t.id, course.modules.indexOf(m), tIdx)}
-                              >
-                                <span className="lv-bullet" style={{ minWidth: '18px' }}>{pIdx + 1}.</span>
-                                <span className="lv-topic-name">{point}</span>
-                              </button>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                );
-              })
-            );
-          })()}
-
-          {/* Final Assignment */}
-          <div className="lv-module-block-wrapper final-project-wrapper">
-            <button className={`lv-module-header ${finalOpen ? 'is-open' : ''}`} onClick={() => setFinalOpen(!finalOpen)}>
-              <div className="lv-module-header-text">
-                <span className="lv-module-title">Final Assignment</span>
-              </div>
-              <svg className={`lv-module-chevron ${finalOpen ? 'rotated' : ''}`} xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9" /></svg>
-            </button>
-            {finalOpen && (
-              <div className="lv-module-dropdown-content">
-                <ul className="lv-topic-list">
-                  <li className="lv-topic-li">
-                    <button
-                      className={`lv-topic-link ${activeContent.type === 'final' ? 'is-active' : ''}`}
-                      onClick={() => setActiveContent({ type: 'final', moduleId: 'final', topicId: 'final' })}
-                    >
-                      <span className="lv-bullet">•</span>
-                      <span className="lv-topic-name">Take Assignment</span>
-                    </button>
-                  </li>
-                </ul>
-              </div>
-            )}
+        {/* USER PROFILE SECTION */}
+        <Link to="/student-dashboard/profile" className="ce-user-profile-link">
+          <div className="ce-user-profile">
+            <div className="ce-avatar">{userInitial}</div>
+            <div className="ce-user-info">
+              <div className="ce-user-name">{user.fullname || user.fullName || "Student"}</div>
+              <div className="ce-user-email">{user.email || "student@gmail.com"}</div>
+            </div>
           </div>
+        </Link>
+
+
+        <div className="lv-curriculum-modern">
+          <div className="lv-section-label">COURSE SYLLABUS</div>
+          
+          {hasCurriculum ? (
+            course.modules.map((level) => {
+              const isLvlOpen = !!openLevels[level.id];
+              const mainTopicGroups = level.mainTopicGroups || groupTopicsInThree(level.topics);
+              
+              const levelConfig = {
+                beginner: { color: '#f97316', icon: <Zap size={16} />, label: 'Beginner Level' },
+                intermediate: { color: '#3b82f6', icon: <Target size={16} />, label: 'Intermediate Level' },
+                advanced: { color: '#8b5cf6', icon: <Award size={16} />, label: 'Advanced Level' }
+              }[level.id] || { color: '#64748b', icon: <BookOpen size={16} />, label: level.title };
+
+              return (
+                <div 
+                  key={level.id} 
+                  className={`ce-level-block ${isLvlOpen ? 'is-open' : ''}`}
+                  style={{ '--level-accent': levelConfig.color }}
+                >
+                  <button 
+                    className="ce-level-header" 
+                    onClick={() => toggleLevel(level.id)}
+                  >
+                    <div className="ce-level-title-wrap">
+                      <span className="ce-level-symbol" style={{ color: levelConfig.color }}>
+                        {levelConfig.icon}
+                      </span>
+                      <div className="ce-level-text-stack">
+                        <span className="ce-level-title">{levelConfig.label}</span>
+                        <span className="ce-level-duration">{level.duration || "4 Weeks"}</span>
+                      </div>
+                    </div>
+                    <ChevronDown size={18} className={`ce-lvl-chevron ${isLvlOpen ? 'rotated' : ''}`} />
+                  </button>
+
+                  {isLvlOpen && (
+                    <div className="ce-level-content">
+                      {mainTopicGroups.map((group, gIdx) => {
+                        const groupKey = `${level.id}-${gIdx}`;
+                        const isGroupOpen = !!openMainTopics[groupKey];
+                        return (
+                          <div key={groupKey} className="ce-topic-group">
+                            <button className={`ce-topic-group-header ${isGroupOpen ? 'is-open' : ''}`} onClick={() => toggleMainTopic(groupKey)}>
+                              <Book size={14} className="ce-topic-group-icon" />
+                              <span className="ce-topic-group-title">{group.title}</span>
+                              <ChevronRight size={14} className={`ce-topic-chevron ${isGroupOpen ? 'rotated' : ''}`} />
+                            </button>
+
+                            {isGroupOpen && (
+                              <div className="ce-subtopic-list">
+                                {group.subtopics.map((sub, sIdx) => {
+                                  const isActive = activeSubtopic?.id === sub.id;
+                                  return (
+                                    <button 
+                                      key={sub.id} 
+                                      className={`ce-subtopic-item ${isActive ? 'active' : ''}`}
+                                      onClick={() => handleSubtopicClick(sub, level.id, group.title)}
+                                    >
+                                      <BookOpen size={14} className="ce-subtopic-icon" />
+                                      <div className="ce-subtopic-text-stack">
+                                        <span className="ce-subtopic-title">{sub.title}</span>
+                                        <span className="ce-subtopic-duration">{sub.duration || "15 min"}</span>
+                                      </div>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          ) : (
+            <div className="ce-curriculum-placeholder">
+              <div className="ce-placeholder-icon"><Cloud size={32} /></div>
+              <h4>Curriculum Coming Soon</h4>
+              <p>We are currently updating the curriculum for this course. Please check back later.</p>
+            </div>
+          )}
         </div>
       </aside>
 
       {/* ─── MAIN CONTENT ─── */}
       <main className="lv-main">
-        <div className="lv-main-header">
-          {(() => {
-            if (isFinal) return <div className="lv-mod-badge" style={{ color: '#f59e0b', background: '#fffbeb' }}>Final Assessment</div>;
-
-            // Find global index of active topic
-            let gIdx = 0;
-            let currentModFound = false;
-            for (const m of course.modules) {
-              for (const t of m.topics) {
-                gIdx++;
-                if (t.id === activeContent.topicId) {
-                  currentModFound = true;
-                  break;
-                }
-              }
-              if (currentModFound) break;
-            }
-
-            return (
-              <div className="lv-mod-badge" style={{ color: activeModule?.color || '#2563eb', background: `${activeModule?.color || '#2563eb'}18` }}>
-                Module {gIdx}: {activeTopic?.title}
+        {!activeSubtopic ? (
+          /* COURSE OVERVIEW VIEW */
+          <div className="ce-overview-container">
+            <header className="ce-main-header">
+              <div className="ce-header-top-row">
+                <button className="ce-back-link" onClick={() => navigate('/student-dashboard/courses')}>
+                  <ChevronLeft size={16} /> Back to Courses
+                </button>
               </div>
-            );
-          })()}
+              <div className="ce-category-badge">{course?.category || category || "Professional"}</div>
+              <h1 className="ce-main-display-title">{displayTitle}</h1>
+              <p className="ce-main-subtitle">{displayDesc}</p>
+            </header>
 
-          <h1 className="lv-main-title">
-            {isFinal ? (course.finalAssignment.title || "Final Project Capstone") : activeTopic?.title || 'Select a topic'}
-          </h1>
-          {!isFinal && (
-            <span className="lv-view-label">
-              {activeContent.type === 'topic_content' && 'Reading Material'}
-              {activeContent.type === 'topic_practice' && 'Practice Lab'}
-              {activeContent.type === 'topic_assignment' && 'Assignment'}
-            </span>
-          )}
+            <div className="ce-info-cards">
+              {/* TRAINER CARD (Refactored) */}
+              <div className="ce-info-card ce-trainer-card-v2">
+                <div className="ce-card-header">
+                  <div className="ce-header-icon-box">
+                    <User size={16} className="ce-header-icon" />
+                  </div>
+                  <span>Trainer Details</span>
+                </div>
+                
+                <div className="ce-trainer-primary">
+                  <div className="ce-trainer-avatar">
+                    {(course?.trainer?.name || "I").charAt(0)}
+                  </div>
+                  <div className="ce-trainer-info">
+                    <h4>{course?.trainer?.name || "Industry Expert"}</h4>
+                    <p>{course?.trainer?.role || "Lead Instructor"}</p>
+                  </div>
+                </div>
 
-          <div className="lv-main-header-actions" style={{ marginLeft: 'auto', display: 'flex', gap: '10px', alignItems: 'center' }}>
-          </div>
-        </div>
-
-        <div className="lv-main-body">
-          {/* Topic Content */}
-          {activeContent.type === 'topic_content' && activeTopic && (
-            <div className="lv-reading-grid">
-              <div className="lv-reading-main">
-                <div className="lv-reading-card">
-                  <div className="lv-reading-material">
-                    <div className="lv-depth-section">
-                      <h3 className="lv-depth-title">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /></svg>
-                        Reading Material
-                      </h3>
-                      <p className="lv-topic-intro">
-                        This session covers the core essentials of <strong>{activeTopic.title}</strong>, providing you with a deep understanding of its architecture and practical implementation.
-                      </p>
-                      <div className="lv-topic-rich-content" dangerouslySetInnerHTML={{ __html: getDetailedContent(activeTopic) }} />
-                    </div>
-
-                    <p className="lv-content-footer">
-                      Professional Course Material · Last Updated March 2026
-                    </p>
+                <div className="ce-trainer-stats-row">
+                  <div className="ce-stat-box">
+                    <label>EXPERIENCE</label>
+                    <span>{course?.trainer?.experience || "10+ Years"}</span>
+                  </div>
+                  <div className="ce-stat-box">
+                    <label>SPECIALIZATION</label>
+                    <span>{course?.trainer?.specialization || "Full Stack Development"}</span>
                   </div>
                 </div>
               </div>
 
-              {/* Clear Learn Sidebar */}
-              <div className="lv-reading-sidebar">
-                {(() => {
-                  const sidebar = getSidebarData(activeTopic);
-                  return (
-                    <div className="lv-sidebar-block">
-                      <div className="lv-sb-section">
-                        <h4 className="lv-sb-title">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
-                          Key Takeaways
-                        </h4>
-                        <ul className="lv-sb-list">
-                          {sidebar.takeaways.map((t, i) => <li key={i}>{t}</li>)}
-                        </ul>
-                      </div>
+              {/* BATCH CARD (Refactored) */}
+              <div className="ce-info-card ce-batch-card-v2">
+                <div className="ce-card-header">
+                  <div className="ce-header-icon-box">
+                    <Calendar size={16} className="ce-header-icon" />
+                  </div>
+                  <span>Batch Details</span>
+                </div>
 
-                      <div className="lv-sb-divider" />
+                <div className="ce-batch-details-grid">
+                  <div className="ce-batch-grid-item">
+                    <Hash size={16} className="ce-grid-icon" />
+                    <div className="ce-grid-content">
+                      <label>BATCH ID</label>
+                      <span>{course?.batch?.id || "TBD"}</span>
+                    </div>
+                  </div>
+                  <div className="ce-batch-grid-item">
+                    <Clock size={16} className="ce-grid-icon" />
+                    <div className="ce-grid-content">
+                      <label>TIMING</label>
+                      <span>{course?.batch?.timing || "Flexible Schedule"}</span>
+                    </div>
+                  </div>
+                  <div className="ce-batch-grid-item">
+                    <Calendar size={16} className="ce-grid-icon" />
+                    <div className="ce-grid-content">
+                      <label>START DATE</label>
+                      <span>{course?.batch?.startDate || "TBD"}</span>
+                    </div>
+                  </div>
+                  <div className="ce-batch-grid-item">
+                    <Layers size={16} className="ce-grid-icon" />
+                    <div className="ce-grid-content">
+                      <label>DURATION · MODE</label>
+                      <span>{course?.batch?.duration || "Self-Paced / Live"}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-                      <div className="lv-sb-section">
-                        <h4 className="lv-sb-title">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" /><rect x="8" y="2" width="8" height="4" rx="1" ry="1" /></svg>
-                          Quick Reference
-                        </h4>
-                        <div className="lv-sb-code">
-                          <code>{sidebar.reference}</code>
+            <section className="ce-objective-section">
+              <h3 className="ce-section-title">Course Objective</h3>
+              <div className="ce-objective-card">
+                <p>{course?.objective || "Master the foundations and advanced concepts of this specialization through hands-on labs and real-world projects."}</p>
+                {course?.benefits && course.benefits.length > 0 && (
+                  <div className="ce-benefits-grid">
+                    {course.benefits.map((b, i) => (
+                        <div key={i} className="ce-benefit-item">
+                          <div className="ce-benefit-dot" />
+                          <div>
+                              <strong>{b.label}</strong>
+                              <p>{b.desc}</p>
+                          </div>
                         </div>
-                      </div>
-
-                      <div className="lv-sb-divider" />
-
-                      <div className="lv-sb-section">
-                        <h4 className="lv-sb-title">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
-                          Industry Context
-                        </h4>
-                        <p className="lv-sb-text">{sidebar.context}</p>
-                      </div>
-                    </div>
-                  );
-                })()}
-              </div>
-            </div>
-          )}
-
-          {activeContent.type === 'topic_practice' && <PracticeWidget />}
-
-          {activeContent.type === 'topic_assignment' && activeTopic && (
-            <div className="lv-assignment-card">
-              <div className="lv-ac-header">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
-                <h4>Assignment Task: {activeTopic.title}</h4>
-              </div>
-              <div className="lv-ac-body">
-                <div className="lv-ac-module-note">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg>
-                  This assignment accounts for 15% of your module score. Please ensure your solution follows the course coding standards and best practices.
-                </div>
-
-                <div className="lv-assignment-code-section">
-                  <div className="practice-widget">
-                    <div className="practice-widget-header">
-                      <div className="practice-widget-left">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.5"><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></svg>
-                        <span>Professional Assignment IDE</span>
-                      </div>
-                    </div>
-
-                    <div style={{ padding: '24px' }}>
-                      <p className="practice-question" style={{ padding: 0, marginBottom: '20px' }}>
-                        <strong>Assignment Specification:</strong> Implement the solution requirements for "{activeTopic.title}". Your solution will be evaluated based on efficiency, readability, and adherence to requirements.
-                      </p>
-
-                      <div className="code-editor-shell" style={{ margin: 0 }}>
-                        <div className="editor-topbar">
-                          <div className="editor-dots"><span style={{ background: '#ff5f56' }} /><span style={{ background: '#ffbd2e' }} /><span style={{ background: '#27c93f' }} /></div>
-                          <span className="editor-filename">Solution.java</span>
-                        </div>
-                        <textarea
-                          className="code-textarea"
-                          defaultValue={'// Write your professional solution here...\n\npublic class Solution {\n    public static void main(String[] args) {\n        \n    }\n}'}
-                          spellCheck="false"
-                          rows={12}
-                        />
-                      </div>
-
-                      <div className="practice-actions" style={{ padding: '16px 0 0' }}>
-                        <button className="lv-btn lv-btn-primary lv-btn-sm" style={{ background: '#2563eb', color: 'white', borderColor: '#2563eb' }} onClick={() => alert('Running tests...')}>Run Tests</button>
-                        <button className="lv-btn lv-btn-success lv-btn-sm" onClick={() => alert('Solution submitted successfully!')}>Submit Solution</button>
-                      </div>
-                    </div>
+                    ))}
                   </div>
-                </div>
-
+                )}
               </div>
-            </div>
-          )}
-
-          {/* Final Assessment */}
-          {isFinal && (
-            <div className="lv-final-view">
-              <div className="lv-final-hero">
-                <div className="lv-final-badge">FINAL ASSESSMENT</div>
-                <h2>{course.finalAssignment.title || "Capstone Project Implementation"}</h2>
-                <p>{course.finalAssignment.description}</p>
-              </div>
-              <div className="lv-final-body" style={{ display: 'block' }}>
-                <div className="lv-final-action-area" style={{ padding: '48px', textAlign: 'center', alignItems: 'center' }}>
-                  <div style={{ background: '#f0f9ff', padding: '24px', borderRadius: '50%', marginBottom: '24px' }}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#0369a1" strokeWidth="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><path d="M9 15l2 2 4-4" /></svg>
-                  </div>
-                  <h3 style={{ fontSize: '1.5rem', marginBottom: '12px' }}>Final Course Assignment</h3>
-                  <p style={{ maxWidth: '480px', margin: '0 auto 32px', fontSize: '1rem' }}>
-                    This final assessment evaluates your proficiency across all modules. You will be required to implement a full-stack solution based on the course requirements.
-                  </p>
-
-                  <button className="lv-take-assessment-btn" style={{ maxWidth: '320px' }} onClick={() => alert('Assessment environment will open here.')}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /></svg>
-                    Take Assignment
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Action Bar */}
-        <footer className="lv-action-bar">
-          <button className="lv-btn lv-btn-outline" onClick={handlePrev} disabled={currentNavIdx === 0}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6" /></svg>
-            Previous
-          </button>
-
-          <div style={{ display: 'flex', gap: '12px' }}>
-            <button
-              className={`lv-btn ${currentIsDone ? 'lv-btn-done' : 'lv-btn-primary'}`}
-              onClick={handleMarkComplete}
-            >
-              {currentIsDone ? (
-                <><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg> Completed & Next</>
-              ) : (
-                'Mark as Complete & Next'
-              )}
-            </button>
+            </section>
           </div>
-        </footer>
+        ) : (
+          /* LESSON CONTENT VIEW */
+          <div className="ce-lesson-container">
+            <header className="ce-lesson-header">
+              <h1 className="ce-lesson-title">{activeSubtopic.title}</h1>
+              <div className="ce-lesson-actions">
+                 <button className="ce-back-to-info" onClick={resetToOverview}>
+                    <ChevronLeft size={16} /> Back to {((activeSubtopic.levelId || "level").charAt(0).toUpperCase() + (activeSubtopic.levelId || "level").slice(1))}
+                 </button>
+              </div>
+            </header>
+
+            <div className="ce-lesson-body">
+               <div className="ce-reading-card">
+                  <div className="lv-topic-rich-content" dangerouslySetInnerHTML={{ __html: getDetailedContent(activeSubtopic) }} />
+               </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

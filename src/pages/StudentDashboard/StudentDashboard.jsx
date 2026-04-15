@@ -45,7 +45,7 @@ function StudentDashboard() {
             <Route path="skill-test" element={<SkillTest />} />
             <Route path="course" element={<CourseDiscovery />} />
             <Route path="course-topics" element={<CourseTopics />} />
-            <Route path="courses" element={<Courses onNavigate={handleNavigate} />} />
+            <Route path="courses" element={<Courses />} />
             <Route path="course-overview" element={<CourseOverview />} />
             <Route path="mock-interview" element={<MockInterview />} />
             <Route path="projects" element={<Projects />} />
