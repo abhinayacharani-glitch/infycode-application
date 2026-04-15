@@ -20,19 +20,7 @@ const ForgotPassword = () => {
     emailRef.current?.focus();
   }, []);
 
-  useEffect(() => {
-    const handleBack = () => {
-      window.history.pushState(null, "", window.location.href);
-      window.location.replace("/admin/login");
-    };
 
-    window.history.pushState(null, "", window.location.href);
-    window.addEventListener("popstate", handleBack);
-
-    return () => {
-      window.removeEventListener("popstate", handleBack);
-    };
-  }, []);
 
   const handleChange = (e) => {
     setEmail(e.target.value);
@@ -114,7 +102,7 @@ const ForgotPassword = () => {
 
             <div className="admin-form-footer" style={{ display: 'block', marginTop: '16px' }}>
               Remember your password?{' '}
-              <Link to="/admin/login">Sign In</Link>
+              <Link to="/admin/login" onClick={(e) => { e.preventDefault(); navigate(-1); }}>Sign In</Link>
             </div>
           </div>
         </div>
@@ -127,7 +115,7 @@ const ForgotPassword = () => {
               Reset your credentials and regain full control of your InfyCode admin dashboard.
             </p>
             <button 
-              onClick={() => navigate("/admin/login", { replace: true })} 
+              onClick={() => navigate(-1)} 
               className="admin-panel-btn"
               style={{ background: 'white', color: '#2563eb', border: 'none', padding: '12px 24px', borderRadius: '12px', fontWeight: '600', cursor: 'pointer', textAlign: 'center', width: 'fit-content' }}
             >

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, User, Phone } from 'lucide-react';
 import { adminRegister } from '../../services/api';
 import './adminAuth.css';
@@ -14,6 +14,7 @@ const validatePassword = (password) => ({
 
 const AdminSignup = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -212,7 +213,17 @@ const AdminSignup = () => {
             <p className="admin-panel-sub">
               Access the command center to oversee your platform's entire ecosystem.
             </p>
-            <Link to="/admin/login" className="admin-panel-btn">
+            <Link 
+              to="/admin/login" 
+              className="admin-panel-btn"
+              state={{ fromSignup: true }}
+              onClick={(e) => {
+                if (location.state?.fromLogin) {
+                  e.preventDefault();
+                  navigate(-1);
+                }
+              }}
+            >
               Sign In
             </Link>
           </div>
