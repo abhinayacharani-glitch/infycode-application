@@ -12,7 +12,7 @@ function Testimonals() {
       color: "#e8f5e9"
     },
     {
-      name: "Jeevan",
+      name: "Jyothi",
       role: "- Student",
       img: "https://randomuser.me/api/portraits/women/44.jpg",
       text: "Learning new skills consistently helps build a strong and successful career.",
@@ -20,7 +20,7 @@ function Testimonals() {
       color: "#e3f2fd"
     },
     {
-      name: "Srinivas",
+      name: "Archana",
       role: "- Student",
       img: "https://randomuser.me/api/portraits/women/65.jpg",
       text: "With the right guidance and practice, anyone can achieve their goals.",
@@ -28,7 +28,7 @@ function Testimonals() {
       color: "#fce4ec"
     },
     {
-      name: "Chandra",
+      name: "Supraja",
       role: "-Student",
       img: "https://randomuser.me/api/portraits/women/68.jpg",
       text: "A great learning experience with practical knowledge and expert support.",

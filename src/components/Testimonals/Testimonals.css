@@ -1,7 +1,6 @@
 .testimonials {
   position: relative;
-  padding: 80px 40px 30px;
-  /* ✅ Increased top padding */
+  padding: 40px 40px 20px;
   background: #021234;
   color: white;
   text-align: center;
@@ -25,7 +24,6 @@
   position: relative;
   z-index: 2;
   margin-top: 20px;
-  /* ✅ Push heading down slightly */
   margin-bottom: 40px;
 }
 
@@ -33,11 +31,7 @@
   font-size: 2.8rem;
   font-weight: 700;
   margin-bottom: 8px;
-  background: linear-gradient(90deg, #ffffff, #cfe3ff);
-  /* ✅ subtle professional gradient */
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #ffffff;
 }
 
 .testimonials-header p {
@@ -80,7 +74,6 @@
 .testimonial-card.active {
   opacity: 1;
   transform: scale(1.08);
-  /* ✅ slightly reduced for better balance */
   z-index: 10;
   filter: blur(0);
 }
@@ -96,13 +89,15 @@
   overflow: hidden;
 }
 
+
 .testimonial-card.active .card-glass {
   box-shadow: 0 10px 35px rgba(0, 0, 0, 0.15);
 }
 
 .card-body {
   padding: 36px 30px 24px;
-  text-align: left;
+  display: flex;
+  flex-direction: column;
   flex: 1;
 }
 
@@ -120,8 +115,10 @@
   margin: 0;
 }
 
+/* ✅ KEEP THIS SAME (bottom color section untouched) */
 .user-info {
   display: flex;
+  flex-direction: row;
   align-items: center;
   gap: 16px;
   padding: 20px 24px;
@@ -223,8 +220,7 @@
 
 @media (max-width: 768px) {
   .testimonials {
-    padding: 60px 20px 20px;
-    /* ✅ mobile spacing fix */
+    padding: 30px 20px 10px;
   }
 
   .testimonials-header h2 {
@@ -241,5 +237,12 @@
 
   .testimonial-card.active {
     transform: scale(1);
+  }
+
+  /* ✅ mobile layout */
+  .card-body {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
 }

@@ -176,14 +176,14 @@
 
 .cf-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.75rem;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.5rem;
 }
 
 /* ── Card ─────────────────────────────── */
 .cf-card {
   background: #fff;
-  border-radius: 18px;
+  border-radius: 14px;
   overflow: hidden;
   border: 1px solid #e2e8f0;
   display: flex;
@@ -198,7 +198,7 @@
 
 .cf-card-img {
   position: relative;
-  height: 190px;
+  height: 80px;
   overflow: hidden;
 }
 .cf-card-img img {
@@ -225,7 +225,7 @@
 }
 
 .cf-card-body {
-  padding: 1.25rem 1.25rem 0;
+  padding: 0.75rem 0.75rem 0;
   flex: 1;
 }
 
@@ -260,21 +260,21 @@
   font-weight: 800;
   color: #0f172a;
   line-height: 1.35;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 .cf-card-desc {
   font-size: 0.875rem;
   color: #64748b;
   line-height: 1.55;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .cf-meta {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding-top: 0.75rem;
+  padding-top: 0.5rem;
   border-top: 1px solid #f1f5f9;
   flex-wrap: wrap;
   margin-bottom: 0.25rem;
@@ -299,7 +299,7 @@
 }
 
 .cf-card-footer {
-  padding: 0.875rem 1.25rem 1.25rem;
+  padding: 0.6rem 0.75rem 1rem;
 }
 
 .cf-enroll-btn {

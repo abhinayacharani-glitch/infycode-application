@@ -18,6 +18,7 @@ import Logout from "./pages/Logout";
 import AccountSettings from "./pages/AccountSettings";
 import SecuritySettings from "./pages/SecuritySettings";
 import PreferenceSettings from "./pages/PreferenceSettings";
+import AdminProfile from "./pages/AdminProfile";
 
 const AdminDashboard = () => {
   return (
@@ -28,7 +29,7 @@ const AdminDashboard = () => {
       <div className="admin-bottom-container">
         {/* ── Sticky Sidebar Container ── */}
         <div className="admin-sidebar-container">
-          <Sidebar />
+          <Sidebar isCollapsed={false} />
         </div>
 
         {/* ── Main Content ── */}
@@ -49,6 +50,7 @@ const AdminDashboard = () => {
               <Route path="settings/security"    element={<SecuritySettings />} />
               <Route path="settings/preferences" element={<PreferenceSettings />} />
               <Route path="logout"               element={<Logout />} />
+              <Route path="profile"              element={<AdminProfile />} />
             </Routes>
           </main>
         </div>

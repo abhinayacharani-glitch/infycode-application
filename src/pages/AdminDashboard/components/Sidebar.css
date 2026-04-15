@@ -13,7 +13,7 @@
 .admin-sidebar {
   width: 100%;
   height: 100%;
-  background:  #3b3b45;
+  background: #3b3b45;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -23,27 +23,100 @@
   z-index: 1000;
   border-right: 1.5px solid #dbeafe;
   animation: admSidebarFade 0.4s ease;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.admin-sidebar.collapsed {
+  padding: 12px 0px;
+}
+
+.admin-sidebar.collapsed .adm-user-card {
+  margin: 0 12px 20px;
+  padding: 10px 0;
+  justify-content: center;
+}
+
+.admin-sidebar.collapsed .adm-nav-item {
+  justify-content: center;
+  padding: 10px 0;
+  border-radius: 8px;
+  position: relative;
+}
+
+.admin-sidebar.collapsed .adm-nav-item::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: calc(100% + 15px);
+  top: 50%;
+  transform: translateY(-50%) translateX(-10px);
+  background: #1e293b;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  pointer-events: none;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.admin-sidebar.collapsed .adm-nav-item::before {
+  content: '';
+  position: absolute;
+  left: calc(100% + 5px);
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent #1e293b transparent transparent;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.admin-sidebar.collapsed .adm-nav-item:hover::after,
+.admin-sidebar.collapsed .adm-nav-item:hover::before {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(-50%) translateX(0);
+}
+
+.admin-sidebar.collapsed .adm-logout-btn {
+  justify-content: center;
+  padding: 10px 0;
 }
 
 
 /* ================= USER CARD ================= */
 .adm-user-card {
-  margin: 0 16px 20px;
-  padding: 10px 0;
-  background: transparent;
+  margin: 0 24px 20px;
+  padding: 14px 20px;
+  background: var(--adm-bg-white, #ffffff);
   border: none;
   display: flex;
   align-items: center;
   gap: 16px;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.adm-user-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .adm-user-avatar {
-  width: 65px;
-  height: 65px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   overflow: hidden;
-  background: #2563eb;
+  background: #3b82f6;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -54,27 +127,42 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: inherit;
 }
 
 .adm-user-info {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  gap: 4px;
+  gap: 2px;
 }
 
 .adm-user-name {
-  font-size: 20px;
-  font-weight: 500;
-  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.adm-user-status-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #22c55e;
+  border-radius: 50%;
+  display: inline-block;
 }
 
 .adm-user-role {
-  font-size: 13.5px;
-  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 /* ================= NAV ================= */
@@ -113,7 +201,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 14px;
+  padding: 12px 18px;
   border-radius: 10px;
   font-size: 16px;
   font-weight: 600;
@@ -129,7 +217,7 @@
 } */
 
 .adm-nav-item.active {
-  background: #eff6ff;
+  background: #ffffff;
   color: #1d4ed8;
   border-left: 4px solid #3b82f6;
   border-radius: 4px 10px 10px 4px;
@@ -156,8 +244,13 @@
   border-radius: 20px;
 }
 
-.adm-nav-badge.amber { background: #f59e0b; }
-.adm-nav-badge.green { background: #22c55e; }
+.adm-nav-badge.amber {
+  background: #f59e0b;
+}
+
+.adm-nav-badge.green {
+  background: #22c55e;
+}
 
 /* ================= DROPDOWN ================= */
 .adm-nav-dropdown-wrap {
@@ -234,13 +327,14 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 14px;
-  border-radius: 10px;
+  padding: 14px 18px;
+  border-radius: 12px;
   text-decoration: none;
   color: #ef4444;
-  font-size: 13.5px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 800;
   transition: all 0.25s ease;
+  cursor: pointer;
 }
 
 .adm-logout-btn:hover {
@@ -254,6 +348,7 @@
     opacity: 0;
     transform: translateX(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -267,152 +362,344 @@
   }
 }
 
-/* ================= MODALS COMMON ================= */
-.adm-modal-overlay {
+/* ================= AVATAR CAMERA HOVER OVERLAY ================= */
+.adm-avatar-hover-wrap {
+  position: relative;
+}
+
+.adm-avatar-edit-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  color: #fff;
+  cursor: pointer;
+}
+
+.adm-user-card:hover .adm-avatar-edit-overlay {
+  opacity: 1;
+}
+
+/* ================= PROFILE EDIT MODAL ================= */
+.adm-profile-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(30, 41, 59, 0.5);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  animation: adm-overlay-in 0.2s ease;
+  animation: admProfileFadeIn 0.25s ease;
 }
 
-@keyframes adm-overlay-in {
+@keyframes admProfileFadeIn {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
 
-.adm-modal-card {
+.adm-profile-modal {
   background: #ffffff;
-  border-radius: 16px;
-  padding: 40px 60px;
-  width: auto;
-  min-width: 460px;
+  border-radius: 20px;
+  width: 420px;
   max-width: 92vw;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15), 0 6px 16px rgba(0, 0, 0, 0.08);
-  text-align: center;
+  padding: 28px 28px 24px;
+  box-shadow: 0 32px 80px rgba(15, 23, 42, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: admProfileSlide 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: 'Urbanist', sans-serif;
+}
+
+@keyframes admProfileSlide {
+  from { opacity: 0; transform: translateY(-18px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.adm-profile-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.adm-profile-modal-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.adm-profile-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 8px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.adm-profile-close:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+/* Photo section */
+.adm-profile-photo-section {
   display: flex;
   flex-direction: column;
   align-items: center;
-  animation: adm-card-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  gap: 10px;
 }
 
-@keyframes adm-card-in {
-  from { opacity: 0; transform: scale(0.88) translateY(16px); }
-  to   { opacity: 1; transform: scale(1) translateY(0); }
+.adm-profile-photo-wrap {
+  position: relative;
+  width: 100px;
+  height: 100px;
 }
 
-.adm-modal-title {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #1e293b;
-  margin: 0 0 12px;
-  letter-spacing: -0.01em;
-}
-
-.adm-modal-subtitle {
-  font-size: 1rem;
-  font-weight: 400;
-  color: #64748b;
-  margin: 0 0 32px;
-}
-
-.adm-modal-actions {
-  display: flex;
-  gap: 16px;
-  width: 100%;
-}
-
-/* --- BLUE MODAL SPECIFIC (Sidebar) --- */
-.adm-modal-profile-wrap {
-  width: 72px;
-  height: 72px;
+.adm-profile-photo-img {
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
-  overflow: hidden;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-
-.adm-modal-profile-wrap img {
-  width: 100%;
-  height: 100%;
   object-fit: cover;
+  border: 3px solid #e2e8f0;
 }
 
-.adm-modal-cancel,
-.adm-modal-logout {
-  flex: 1;
-  padding: 14px 20px;
-  border-radius: 12px;
-  border: none;
-  background: #3b82f6;
-  color: #ffffff;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: inherit;
-}
-
-.adm-modal-cancel:hover,
-.adm-modal-logout:hover {
-  background: #2563eb;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-
-/* --- RED MODAL SPECIFIC (Topbar Logo Click) --- */
-.adm-red-icon-wrap {
-  width: 68px;
-  height: 68px;
+.adm-profile-photo-btn {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  background: #fef2f2;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  color: #fff;
+  border: 2px solid #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 20px;
-}
-
-.adm-modal-out-cancel {
-  flex: 1;
-  padding: 12px 20px;
-  border-radius: 10px;
-  border: 1.5px solid #e5e7eb;
-  background: #ffffff;
-  color: #374151;
-  font-size: 0.95rem;
-  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
-  font-family: inherit;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.adm-modal-out-cancel:hover {
-  background: #f9fafb;
-  border-color: #d1d5db;
-  color: #111827;
+.adm-profile-photo-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.45);
 }
 
-.adm-modal-out-ok {
-  flex: 1;
-  padding: 12px 20px;
+.adm-profile-photo-hint {
+  font-size: 12px;
+  color: #94a3b8;
+  margin: 0;
+}
+
+/* Fields */
+.adm-profile-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.adm-profile-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.adm-profile-field label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.adm-profile-field input {
+  padding: 10px 14px;
+  border: 1.5px solid #e2e8f0;
   border-radius: 10px;
-  border: none;
-  background: #ef4444;
-  color: #ffffff;
-  font-size: 0.95rem;
+  font-size: 14px;
+  color: #0f172a;
+  background: #f8fafc;
+  font-family: 'Urbanist', sans-serif;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+
+.adm-profile-field input:focus {
+  border-color: #2563eb;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Actions */
+.adm-profile-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.adm-profile-cancel {
+  flex: 1;
+  padding: 11px 0;
+  border-radius: 10px;
+  border: 1.5px solid #e2e8f0;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 14px;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s;
-  font-family: inherit;
+  font-family: 'Urbanist', sans-serif;
+  transition: background 0.2s;
 }
 
-.adm-modal-out-ok:hover {
-  background: #dc2626;
+.adm-profile-cancel:hover {
+  background: #e2e8f0;
+}
+
+.adm-profile-save {
+  flex: 1;
+  padding: 11px 0;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Urbanist', sans-serif;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.adm-profile-save:hover {
+  opacity: 0.88;
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.35);
+}
+
+/* ================= LOGOUT MODAL ================= */
+.adm-logout-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: admLogoutFadeIn 0.25s ease;
+}
+
+@keyframes admLogoutFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.adm-logout-modal {
+  background: #ffffff;
+  border-radius: 20px;
+  width: 400px;
+  max-width: 90vw;
+  padding: 32px 28px 24px;
+  box-shadow: 0 32px 80px rgba(15, 23, 42, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  animation: admLogoutSlide 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: 'Urbanist', sans-serif;
+  text-align: center;
+}
+
+@keyframes admLogoutSlide {
+  from { opacity: 0; transform: translateY(-18px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.adm-logout-photo-section {
+  margin-bottom: 8px;
+}
+
+.adm-logout-photo-img {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #e2e8f0;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.15);
+}
+
+.adm-logout-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.adm-logout-subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+}
+
+.adm-logout-actions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.adm-logout-cancel {
+  flex: 1;
+  padding: 11px 0;
+  border-radius: 10px;
+  border: 1.5px solid #e2e8f0;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Urbanist', sans-serif;
+  transition: background 0.2s;
+}
+
+.adm-logout-cancel:hover {
+  background: #e2e8f0;
+}
+
+.adm-logout-confirm {
+  flex: 1;
+  padding: 11px 0;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Urbanist', sans-serif;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.adm-logout-confirm:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+/* Fix button styling since changed from NavLink to button */
+.adm-sidebar-footer .adm-logout-btn {
+  border: none;
+  background: none;
+  width: 100%;
+  font-family: 'Urbanist', sans-serif;
 }

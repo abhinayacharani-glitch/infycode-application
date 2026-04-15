@@ -38,7 +38,8 @@
   --adm-shadow-lg: 0 20px 50px rgba(37, 99, 235, 0.12);
   --adm-radius: 16px;
   --adm-radius-sm: 10px;
-  --adm-sidebar-w: 320px; /* Aligned with Student Dashboard */
+  --adm-sidebar-w: 320px;
+  --adm-sidebar-collapsed-w: 80px;
 
   font-family: 'Urbanist', sans-serif;
   background: var(--adm-bg);
@@ -71,6 +72,13 @@
   overflow: hidden;
   flex-basis: var(--adm-sidebar-w);
   flex-grow: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.admin-dashboard-layout .admin-sidebar-container.collapsed {
+  width: var(--adm-sidebar-collapsed-w);
+  min-width: var(--adm-sidebar-collapsed-w);
+  flex-basis: var(--adm-sidebar-collapsed-w);
 }
 
 .admin-dashboard-layout .admin-main-wrapper {

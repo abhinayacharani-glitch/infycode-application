@@ -2,7 +2,13 @@ import React, { useState } from 'react';
 import { useAdmin } from '../../../context/AdminContext';
 import AdminPage from '../components/CourseManagement/AdminPage';
 import CourseFeed from '../components/CourseManagement/CourseFeed';
-import { CheckCircle2 } from 'lucide-react';
+const CheckCircleIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
+);
+
+const PartyIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#15803d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5.8 11.3 2 22l10.7-3.8" /><path d="M4 14.2c.4-.8.8-1.5 1.3-2.2" /><path d="M11 18c.8.5 1.5.9 2.2 1.3" /><path d="m19 10-1.5 1.5" /><path d="m21 12-1.5 1.5" /><path d="m21.2 8.4-1.2 1.2" /><path d="m18.4 11.2-1.2 1.2" /><circle cx="11" cy="4" r="2" /><circle cx="15" cy="9" r="2" /><circle cx="20" cy="5" r="2" /></svg>
+);
 
 const CourseConfig = () => {
   const {
@@ -89,8 +95,8 @@ const CourseConfig = () => {
           boxShadow: '0 2px 8px rgba(22,163,74,0.10)',
           animation: 'slideInBanner 0.3s ease-out'
         }}>
-          <CheckCircle2 size={20} color="#16a34a" />
-          <span>🎉 <strong>"{publishedTitle}"</strong> was published successfully and is now live in the feed!</span>
+          <CheckCircleIcon />
+          <span><PartyIcon /> <strong>"{publishedTitle}"</strong> was published successfully and is now live in the feed!</span>
         </div>
       )}
 
