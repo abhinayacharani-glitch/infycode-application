@@ -12,7 +12,7 @@ import MockInterview from "./pages/MockInterview";
 import Projects from "./pages/Projects";
 import Profile from "./pages/Profile";
 import CourseExplore from "./pages/CourseExplore";
-import CourseOverview from "./pages/CourseOverview";
+import CourseOverview from "./pages/Courseoverview";
 import MentorConnection from "./pages/MentorConnection";
 import Logout from "./pages/Logout";
 function StudentDashboard() {
@@ -38,6 +38,7 @@ function StudentDashboard() {
         <main className="dashboard-content" style={{ flex: 1, padding: isCourseExplore ? "0" : "1.5rem", overflowY: isCourseExplore ? "hidden" : "auto", height: isCourseExplore ? "100%" : "auto" }}>
           <Routes>
             <Route index element={<Navigate to="courses" replace />} />
+            <Route path="dashboard" element={<Navigate to="courses" replace />} />
             <Route path="counselling" element={<Counselling />} />
             <Route path="skill-test" element={<SkillTest />} />
             <Route path="course" element={<CourseDiscovery />} />

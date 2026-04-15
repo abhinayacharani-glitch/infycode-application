@@ -169,6 +169,24 @@ const Sidebar = ({ isOpen, onClose }) => {
             <span className="nav-badge">3</span>
           </div>
         </NavLink>
+
+        <NavLink to="/trainer-dashboard/messages"
+          onClick={onClose}
+          className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
+          <div className="sd-box">
+            <span className="sd-icon"><MessageIcon /></span>
+            <span className="sd-text">Messages</span>
+          </div>
+        </NavLink>
+        
+        <NavLink to="/trainer-dashboard/live-session"
+          onClick={onClose}
+          className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
+          <div className="sd-box">
+            <span className="sd-icon"><LiveIcon /></span>
+            <span className="sd-text">Live Sessions</span>
+          </div>
+        </NavLink>
       </div>
 
       {/* LOGOUT */}

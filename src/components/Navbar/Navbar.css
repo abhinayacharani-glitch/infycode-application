@@ -67,7 +67,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 60px;
+  padding: 10px 4%;
   width: 100%;
   background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(16px);
@@ -89,12 +89,12 @@ body {
 }
 
 .logo img {
-  height: 56px;
+  height: 46px;
   display: block;
 }
 
 .logo-text img {
-  height: 48px;
+  height: 40px;
   display: block;
   position: relative;
   top: 4px;
@@ -107,16 +107,17 @@ body {
   align-items: center;
   list-style: none;
   font-size: var(--fs-text);
-  margin-left: 40px;
+  margin-left: 20px;
   margin-bottom: 0;
   flex: 1;
+  justify-content: space-between;
 }
 
 /* nav center */
 .nav-center {
   display: flex;
-  gap: 50px;
-  margin-left: 150px;
+  gap: clamp(15px, 2.5vw, 40px);
+  margin: 0 auto;
 }
 
 .nav-links li {
@@ -152,8 +153,8 @@ body {
 .nav-links span {
   display: block;
   text-align: center;
-  font-size: 18px;
-  line-height: 1;
+  font-size: 15px;
+  line-height: 1.2;
 }
 
 .nav-links .nav-link:hover,
@@ -187,7 +188,7 @@ body {
 
 .dropdown-menu .nav-link {
   color: black;
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 500;
   flex-direction: row;
   justify-content: center;
