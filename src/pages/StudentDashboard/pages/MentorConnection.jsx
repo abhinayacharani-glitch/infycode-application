@@ -79,39 +79,50 @@ const MentorConnection = () => {
       // Directory View
       return (
         <div className="mentor-viewport">
-          <div className="mentor-top-header">
-            <div>
+          <div className="mentor-top-header directory-header">
+            <div className="header-text-content">
               <h1 className="mentor-top-title">Mentor Directory</h1>
-              <p className="mentor-top-subtitle">Browse profiles to find the right expert for your technical questions.</p>
+              <p className="mentor-top-subtitle">Browse professional profiles and connect directly with industry experts.</p>
             </div>
           </div>
           
           <div className="mentor-directory-grid">
             {mentors.map((m, i) => (
-              <div className="dir-card" key={i}>
-                 <div className="dir-card-top" style={{ background: m.color }}>
-                    <div className="dir-avatar-large">
+              <div className="dir-card-premium" key={i}>
+                 <div className="dir-card-banner" style={{ background: `linear-gradient(135deg, ${m.color}e6, ${m.color})` }}>
+                 </div>
+                 
+                 <div className="dir-avatar-wrapper">
+                    <div className="dir-avatar-circle" style={{ color: m.color }}>
                       {m.n.split(' ').map(x => x[0]).join('').slice(0, 2)}
                     </div>
                  </div>
-                 <div className="dir-card-content">
-                    <h2 className="dir-name">{m.n}</h2>
-                    <p className="dir-role">{m.role}</p>
-                    <div className="dir-tags">
+                 
+                 <div className="dir-card-body">
+                    <div className="dir-title-section">
+                       <h2 className="dir-name">{m.n}</h2>
+                       <p className="dir-role">{m.role}</p>
+                    </div>
+
+                    <div className="dir-tags-group">
                       {m.spec.map((tag, j) => (
-                        <span key={j} className="dir-tag">{tag}</span>
+                        <span key={j} className="dir-tag-pill">{tag}</span>
                       ))}
                     </div>
                     
-                    <div className="dir-availability">
-                      <Calendar size={14} />
-                      <span>{m.availability}</span>
-                    </div>
+                    <div className="dir-separator"></div>
+                    
+                    <div className="dir-footer-section">
+                       <div className="dir-availability-pill">
+                         <Calendar size={14} className="avail-icon" />
+                         <span>{m.availability}</span>
+                       </div>
 
-                    <button className="dir-connect-btn" onClick={() => setSelected(i)}>
-                       <MessageCircle size={18} />
-                       Chat & Connect
-                    </button>
+                       <button className="dir-connect-action-btn" onClick={() => setSelected(i)}>
+                          <MessageCircle size={18} />
+                          <span>Connect</span>
+                       </button>
+                    </div>
                  </div>
                </div>
             ))}

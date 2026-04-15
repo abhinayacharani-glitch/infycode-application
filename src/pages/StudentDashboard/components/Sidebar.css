@@ -256,6 +256,47 @@
   to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 
+.sd-modal-user-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.sd-modal-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #f1f5f9;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.sd-modal-user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.sd-modal-name {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.sd-modal-role {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: #f1f5f9;
+  padding: 4px 12px;
+  border-radius: 12px;
+}
+
 .sd-modal-title {
   font-size: 1.4rem;
   font-weight: 700;
@@ -297,6 +338,94 @@
   background: #2563eb;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* ================= LOGO LOGOUT MODAL ================= */
+
+.sd-logo-modal-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 40px 48px;
+  width: auto;
+  min-width: 420px;
+  max-width: 92vw;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15), 0 6px 16px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: sd-card-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.sd-logo-modal-icon-wrapper {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #fef2f2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.sd-logo-modal-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 8px;
+  letter-spacing: -0.01em;
+}
+
+.sd-logo-modal-subtitle {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #64748b;
+  margin: 0 0 32px;
+}
+
+.sd-logo-modal-actions {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+.sd-logo-modal-cancel {
+  flex: 1;
+  padding: 12px 20px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #475569;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.sd-logo-modal-cancel:hover {
+  background: #f8fafc;
+  color: #1e293b;
+}
+
+.sd-logo-modal-confirm {
+  flex: 1;
+  padding: 12px 20px;
+  border-radius: 12px;
+  border: none;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.sd-logo-modal-confirm:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
 /* ================= RESPONSIVE ================= */

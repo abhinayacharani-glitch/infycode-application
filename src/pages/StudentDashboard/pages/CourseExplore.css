@@ -153,6 +153,16 @@
   margin: 0 auto;
 }
 
+.curr-section-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 24px;
+}
+
 /* ── Accordion ── */
 .curr-accordion {
   display: flex;
