@@ -9,19 +9,7 @@ import '../styles/trainerForgot.css';
 const ForgotPassword = () => {
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const handleBack = () => {
-      window.history.pushState(null, "", window.location.href);
-      window.location.replace("/trainer/login");
-    };
 
-    window.history.pushState(null, "", window.location.href);
-    window.addEventListener("popstate", handleBack);
-
-    return () => {
-      window.removeEventListener("popstate", handleBack);
-    };
-  }, []);
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -99,7 +87,13 @@ const ForgotPassword = () => {
 
           <div className="auth-footer">
             Remembered your password?
-            <Link to="/trainer/login">Back to Login</Link>
+            <Link 
+              to="/trainer/login"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate(-1);
+              }}
+            >Back to Login</Link>
           </div>
         </div>
 

@@ -85,7 +85,9 @@ const Profile = () => {
       </div>
 
       {/* 1. CLEAN & CENTERED PROFILE HEADER */}
-      <div className="profile-header-card shadow-sm minimal">
+      <div className="profile-layout">
+        <div className="profile-card-container">
+          <div className="profile-header-card shadow-sm minimal">
         <div className="profile-image-container-minimal" onClick={handleImageClick}>
           {profileImage ? (
             <img src={profileImage} alt="Profile" className="profile-img-centered" />
@@ -138,10 +140,11 @@ const Profile = () => {
             </div>
           )}
         </div>
+        </div>
       </div>
 
       {/* 2. QUICK STATS ROW */}
-      <div className="profile-stats-grid">
+      <div className="stats-container">
         {stats.map((stat, idx) => (
           <div key={idx} className={`stat-card-min ${stat.color}`}>
             <div className={`stat-icon-box ${stat.color}`}>{stat.icon}</div>
@@ -152,6 +155,7 @@ const Profile = () => {
           </div>
         ))}
       </div>
+    </div>
 
       {/* 3. DETAILS SECTION */}
       <div className="profile-details-grid-saas">

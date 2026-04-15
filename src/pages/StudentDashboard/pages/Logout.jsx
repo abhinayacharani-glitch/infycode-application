@@ -8,7 +8,8 @@ const Logout = () => {
   const navigate = useNavigate(); // ✅ added
 
   useEffect(() => {
-    localStorage.removeItem("loggedUser");
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
 
     // ✅ replace history instead of normal redirect
     navigate("/", { replace: true });

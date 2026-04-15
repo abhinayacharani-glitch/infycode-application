@@ -119,7 +119,11 @@ function Login() {
   };
 
   const toggleMode = () => {
-    navigate(isActive ? "/student/login" : "/student/signup");
+    if (location.state?.fromOpposite) {
+      navigate(-1);
+    } else {
+      navigate(isActive ? "/student/login" : "/student/signup", { state: { fromOpposite: true } });
+    }
     setSignInErrors({});
     setSignUpErrors({});
     setSignInApiError("");

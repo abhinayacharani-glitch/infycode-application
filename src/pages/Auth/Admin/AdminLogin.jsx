@@ -11,19 +11,7 @@ const AdminLogin = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  useEffect(() => {
-    const handleBack = () => {
-      window.history.pushState(null, "", window.location.href);
-      window.location.replace("/admin/login");
-    };
 
-    window.history.pushState(null, "", window.location.href);
-    window.addEventListener("popstate", handleBack);
-
-    return () => {
-      window.removeEventListener("popstate", handleBack);
-    };
-  }, []);
 
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({});
@@ -176,7 +164,17 @@ const AdminLogin = () => {
             <p className="admin-panel-sub">
               Manage Trainers, Courses, and System Growth from a centralized command center.
             </p>
-            <Link to="/admin/signup" className="admin-panel-btn">
+            <Link 
+              to="/admin/signup" 
+              className="admin-panel-btn"
+              state={{ fromLogin: true }}
+              onClick={(e) => {
+                if (location.state?.fromSignup) {
+                  e.preventDefault();
+                  navigate(-1);
+                }
+              }}
+            >
               Create Account
             </Link>
           </div>

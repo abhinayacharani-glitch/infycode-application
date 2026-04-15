@@ -102,7 +102,7 @@ const ForgotPassword = () => {
 
             <div className="admin-form-footer" style={{ display: 'block', marginTop: '16px' }}>
               Remember your password?{' '}
-              <Link to="/admin/login">Sign In</Link>
+              <Link to="/admin/login" onClick={(e) => { e.preventDefault(); navigate(-1); }}>Sign In</Link>
             </div>
           </div>
         </div>
@@ -114,7 +114,7 @@ const ForgotPassword = () => {
             <p className="admin-panel-sub">
               Reset your credentials and regain full control of your InfyCode admin dashboard.
             </p>
-            <Link to="/admin/login" className="admin-panel-btn">
+            <Link to="/admin/login" className="admin-panel-btn" onClick={(e) => { e.preventDefault(); navigate(-1); }}>
               Back to Login
             </Link>
           </div>

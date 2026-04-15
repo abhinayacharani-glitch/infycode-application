@@ -116,7 +116,7 @@ body {
 /* nav center */
 .nav-center {
   display: flex;
-  gap: clamp(15px, 2.5vw, 40px);
+  gap: clamp(15px, 2.5vw, 30px);
   margin: 0 auto;
 }
 
