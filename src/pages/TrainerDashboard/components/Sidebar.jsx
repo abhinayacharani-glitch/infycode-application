@@ -1,5 +1,5 @@
-import React from 'react';
-import { NavLink, Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
 import './Sidebar.css';
 import icLogo from '../../../assets/infycode-final-logo4-1.png';
 import bannerLogo from '../../../assets/color-logo-3.png';
@@ -80,105 +80,142 @@ const LiveIcon = () => (
 );
 
 const Sidebar = ({ isOpen, onClose }) => {
+  const navigate = useNavigate();
   const userName = "Charani";
   const userInitial = "C";
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("loggedUser");
+    setShowLogoutModal(false);
+    navigate('/trainer-login');
+  };
 
   return (
-    <aside className={`sd-sidebar ${isOpen ? 'open' : ''}`}>
-      <Link
-        to="/trainer-dashboard/profile"
-        className="sd-profile-link"
-        onClick={onClose}
-      >
-        <div className="sd-profile-card">
-          <div className="sd-avatar-circle">{userInitial}</div>
-          <div className="sd-user-info">
-            <div className="sd-user-name-wrapper">
-              <div className="sd-user-name">{userName}</div>
-              <span className="sd-status-dot"></span>
+    <>
+      <aside className={`sd-sidebar ${isOpen ? 'open' : ''}`}>
+        <Link
+          to="/trainer-dashboard/profile"
+          className="sd-profile-link"
+          onClick={onClose}
+        >
+          <div className="sd-profile-card">
+            <div className="sd-avatar-circle">{userInitial}</div>
+            <div className="sd-user-info">
+              <div className="sd-user-name-wrapper">
+                <div className="sd-user-name">{userName}</div>
+                <span className="sd-status-dot"></span>
+              </div>
+              <div className="sd-user-role">Trainer</div>
             </div>
-            <div className="sd-user-role">Trainer</div>
+          </div>
+        </Link>
+
+        {/* NAV */}
+        <div className="sd-nav">
+          <NavLink to="/trainer-dashboard/dashboard"
+            onClick={onClose}
+            className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
+            <div className="sd-box">
+              <span className="sd-icon"><DashboardIcon /></span>
+              <span className="sd-text">Dashboard</span>
+            </div>
+          </NavLink>
+
+          <NavLink to="/trainer-dashboard/profile"
+            onClick={onClose}
+            className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
+            <div className="sd-box">
+              <span className="sd-icon"><UserIcon /></span>
+              <span className="sd-text">My Profile</span>
+            </div>
+          </NavLink>
+
+          <NavLink to="/trainer-dashboard/batches"
+            onClick={onClose}
+            className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
+            <div className="sd-box">
+              <span className="sd-icon"><BookIcon /></span>
+              <span className="sd-text">Batches</span>
+
+            </div>
+          </NavLink>
+
+          <NavLink to="/trainer-dashboard/schedule"
+            onClick={onClose}
+            className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
+            <div className="sd-box">
+              <span className="sd-icon"><CalendarIcon /></span>
+              <span className="sd-text">Schedule</span>
+            </div>
+          </NavLink>
+
+          <NavLink to="/trainer-dashboard/materials"
+            onClick={onClose}
+            className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
+            <div className="sd-box">
+              <span className="sd-icon"><PaperclipIcon /></span>
+              <span className="sd-text">Courses & Materials</span>
+
+            </div>
+          </NavLink>
+
+          <NavLink to="/trainer-dashboard/attendance"
+            onClick={onClose}
+            className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
+            <div className="sd-box">
+              <span className="sd-icon"><ClipboardIcon /></span>
+              <span className="sd-text">Attendance</span>
+            </div>
+          </NavLink>
+
+          <NavLink to="/trainer-dashboard/feedback"
+            onClick={onClose}
+            className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
+            <div className="sd-box">
+              <span className="sd-icon"><MessageIcon /></span>
+              <span className="sd-text">Feedback & Queries</span>
+
+            </div>
+          </NavLink>
+        </div>
+
+        {/* LOGOUT */}
+        <div className="sd-footer">
+          <div className="sd-logout-btn" onClick={() => { onClose(); setShowLogoutModal(true); }}>
+            <span className="sd-icon"><LogoutIcon /></span>
+            <span className="sd-text">Logout</span>
           </div>
         </div>
-      </Link>
+      </aside>
 
-      {/* NAV */}
-      <div className="sd-nav">
-        <NavLink to="/trainer-dashboard/dashboard"
-          onClick={onClose}
-          className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
-          <div className="sd-box">
-            <span className="sd-icon"><DashboardIcon /></span>
-            <span className="sd-text">Dashboard</span>
+      {/* CONFIRMATION MODAL SC-UI */}
+      {showLogoutModal && (
+        <div className="logout-modal-overlay" onClick={() => setShowLogoutModal(false)}>
+          <div className="logout-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="logout-modal-profile-section">
+              <div className="logout-modal-avatar">{userInitial}</div>
+              <h3>{userName}</h3>
+            </div>
+
+            <div className="logout-modal-message-section">
+              <h2>Are you sure you want to logout?</h2>
+              <p>You will be redirected to the trainer login page.</p>
+            </div>
+
+            <div className="logout-modal-button-group">
+              <button className="logout-modal-cancel-btn" onClick={() => setShowLogoutModal(false)}>
+                Cancel
+              </button>
+              <button className="logout-modal-ok-btn" onClick={handleLogout}>
+                OK
+              </button>
+            </div>
           </div>
-        </NavLink>
-
-        <NavLink to="/trainer-dashboard/profile"
-          onClick={onClose}
-          className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
-          <div className="sd-box">
-            <span className="sd-icon"><UserIcon /></span>
-            <span className="sd-text">My Profile</span>
-          </div>
-        </NavLink>
-
-        <NavLink to="/trainer-dashboard/batches"
-          onClick={onClose}
-          className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
-          <div className="sd-box">
-            <span className="sd-icon"><BookIcon /></span>
-            <span className="sd-text">Batches</span>
-            <span className="nav-badge">4</span>
-          </div>
-        </NavLink>
-
-        <NavLink to="/trainer-dashboard/schedule"
-          onClick={onClose}
-          className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
-          <div className="sd-box">
-            <span className="sd-icon"><CalendarIcon /></span>
-            <span className="sd-text">Schedule</span>
-          </div>
-        </NavLink>
-
-        <NavLink to="/trainer-dashboard/materials"
-          onClick={onClose}
-          className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
-          <div className="sd-box">
-            <span className="sd-icon"><PaperclipIcon /></span>
-            <span className="sd-text">Courses & Materials</span>
-            <span className="nav-badge">12</span>
-          </div>
-        </NavLink>
-
-        <NavLink to="/trainer-dashboard/attendance"
-          onClick={onClose}
-          className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
-          <div className="sd-box">
-            <span className="sd-icon"><ClipboardIcon /></span>
-            <span className="sd-text">Attendance</span>
-          </div>
-        </NavLink>
-
-        <NavLink to="/trainer-dashboard/feedback"
-          onClick={onClose}
-          className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
-          <div className="sd-box">
-            <span className="sd-icon"><MessageIcon /></span>
-            <span className="sd-text">Feedback & Queries</span>
-            <span className="nav-badge">3</span>
-          </div>
-        </NavLink>
-      </div>
-
-      {/* LOGOUT */}
-      <div className="sd-footer">
-        <NavLink to="/trainer-dashboard/logout" className="sd-logout-btn" onClick={onClose}>
-          <span className="sd-icon"><LogoutIcon /></span>
-          <span className="sd-text">Logout</span>
-        </NavLink>
-      </div>
-    </aside>
+        </div>
+      )}
+    </>
   );
 };
 

@@ -1,21 +1,57 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Users, 
-  Layers, 
-  Calendar, 
-  CheckCircle, 
-  Clock, 
-  ArrowUpRight, 
-  MoreVertical,
+import {
+  Users,
+  Layers,
+  Calendar,
+  CheckCircle,
+  Clock,
+  ArrowUpRight,
   Play,
   Upload,
   UserCheck,
   MessageSquare,
-  FileText
+  FileText,
+  TrendingUp,
+  AlertCircle,
+  ExternalLink,
+  ChevronRight,
+  ArrowRight
 } from 'lucide-react';
 import LiveSessionCard from '../components/LiveSessionCard';
 import './Dashboard.css';
+
+// --- MOCK API LAYER ---
+const fetchDashboardData = () => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        attendance: {
+          batch: "Batch B12",
+          present: 24,
+          total: 32,
+          lastMarked: "10:30 AM",
+          percentage: 75
+        },
+        materials: {
+          moduleName: "Python: Module 4 - Advanced Data structures",
+          uploaded: ["Lecture Notes", "Assignment PDF", "Quiz Link"],
+          pending: ["Video Tutorial", "Reference Guide"]
+        },
+        queries: {
+          count: 3,
+          latestMessage: "Could you please explain the difference between for-in and for-of loops in detail?",
+          students: [
+            { initials: "RK", color: "#6366F1", bg: "#EEF2FF" },
+            { initials: "AM", color: "#10B981", bg: "#ECFDF5" },
+            { initials: "VK", color: "#F59E0B", bg: "#FFFBEB" },
+          ],
+          totalAvatars: 5
+        }
+      });
+    }, 1500);
+  });
+};
 
 const Counter = ({ target, isDecimal = false }) => {
   const [count, setCount] = useState(0);
@@ -25,7 +61,7 @@ const Counter = ({ target, isDecimal = false }) => {
     const dur = 1400;
     const step = 16;
     const inc = target / (dur / step);
-    
+
     const t = setInterval(() => {
       s += inc;
       if (s >= target) {
@@ -34,235 +70,232 @@ const Counter = ({ target, isDecimal = false }) => {
       }
       setCount(s);
     }, step);
-    
+
     return () => clearInterval(t);
   }, [target]);
 
   return <span>{isDecimal ? count.toFixed(1) : Math.floor(count)}</span>;
 };
 
-const Dashboard = () => {
-  const loggedUser = JSON.parse(localStorage.getItem("loggedUser") || "{}");
-  const userName = loggedUser.username || "Trainer";
-  const navigate = useNavigate();
+const SkeletonCard = () => (
+  <div className="modern-card skeleton-pulse">
+    <div className="card-main-content">
+      <div className="skeleton-icon"></div>
+      <div className="card-details">
+        <div className="skeleton-line title"></div>
+        <div className="skeleton-line sub"></div>
+        <div className="skeleton-line progress"></div>
+      </div>
+    </div>
+    <div className="skeleton-btn"></div>
+  </div>
+);
 
-  const [widths, setWidths] = useState({
-    b12: '0%',
-    c09: '0%',
-    a05: '0%',
-    d02: '0%',
-  });
+const Dashboard = () => {
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
+  const [dashData, setDashData] = useState(null);
+
+  const loggedUser = JSON.parse(localStorage.getItem("loggedUser") || "{}");
+  const userName = loggedUser.username || "Charani";
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setWidths({
-        b12: '75%',
-        c09: '60%',
-        a05: '90%',
-        d02: '30%',
-      });
-    }, 400);
-    return () => clearTimeout(timer);
+    const loadData = async () => {
+      const data = await fetchDashboardData();
+      setDashData(data);
+      setIsLoading(false);
+    };
+    loadData();
   }, []);
 
   const kpis = [
-    { label: 'Active Batches', value: 4, trend: '+5%', icon: <Layers size={20} />, color: 'blue' },
-    { label: 'Total Students', value: 128, trend: '+12%', icon: <Users size={20} />, color: 'green' },
-    { label: 'Sessions Today', value: 3, trend: 'On track', icon: <Calendar size={20} />, color: 'amber' },
-    { label: 'Avg Attendance', value: 92, trend: '+3%', icon: <CheckCircle size={20} />, color: 'purple', suffix: '%' }
+    { label: 'Active Batches', value: 4, trend: '+5%', icon: <Layers size={22} />, color: 'blue' },
+    { label: 'Total Students', value: 128, trend: '+12%', icon: <Users size={22} />, color: 'green' },
+    { label: 'Sessions Today', value: 3, trend: 'On track', icon: <Calendar size={22} />, color: 'amber' },
+    { label: 'Avg Attendance', value: 92, trend: '+3%', icon: <CheckCircle size={22} />, color: 'purple', suffix: '%' }
   ];
 
-  const [schedule, setSchedule] = useState(() => {
-    const fallback = [
-      { id: 1, time: '09:00 AM', course: 'Full Stack Development', batch: 'B12', students: 32, duration: '2h', mode: 'Online', status: 'Completed' },
-      { id: 2, time: '12:00 PM', course: 'Python & Data Science', batch: 'C09', students: 28, duration: '1.5h', mode: 'Offline', status: 'In Progress', active: true },
-      { id: 3, time: '03:30 PM', course: 'UI/UX Design Basics', batch: 'A05', students: 24, duration: '2h', mode: 'Online', status: 'Upcoming' },
-    ];
-    try {
-      const computeSessionStatus = (dateStr) => {
-          const today = new Date().toISOString().split('T')[0];
-          if (dateStr < today) return 'completed';
-          if (dateStr === today) return 'active';
-          return 'planned';
-      };
-      const data = localStorage.getItem('trainer_sessions');
-      if (data) {
-        const parsed = JSON.parse(data);
-        const todayStr = new Date().toISOString().split('T')[0];
-        const allForToday = parsed
-          .filter(s => s.date === todayStr)
-          .sort((a, b) => a.startTime.localeCompare(b.startTime));
-
-        const activeSess = allForToday.filter(s => computeSessionStatus(s.date) === 'active');
-        const nextPlanned = allForToday.filter(s => computeSessionStatus(s.date) === 'planned').slice(0, 1);
-        
-        const todaySess = [...activeSess, ...nextPlanned].map(s => ({
-            id: s.id,
-            time: s.startTime,
-            course: s.courseName || s.topic,
-            batch: s.batchId,
-            duration: `${s.duration}m`,
-            mode: s.mode,
-            status: computeSessionStatus(s.date),
-            active: computeSessionStatus(s.date) === 'active'
-        }));
-        if (todaySess.length > 0) return todaySess;
-      }
-      return fallback;
-    } catch {
-      return fallback;
-    }
-  });
-
-  const activities = [
-    { type: 'attendance', msg: 'Attendance marked for Batch B12', time: '2 hours ago' },
-    { type: 'upload', msg: 'New course material uploaded for React', time: '4 hours ago' },
-    { type: 'feedback', msg: 'Received 5-star feedback from Batch C09', time: '1 day ago' },
-    { type: 'system', msg: 'Batch D02 schedule updated', time: '2 days ago' },
-  ];
+  const [schedule, setSchedule] = useState([
+    { id: 1, time: '09:00 AM', course: 'Full Stack Development', batch: 'B1', students: 32, duration: '2h', mode: 'Online', status: 'Completed' },
+    { id: 2, time: '12:00 PM', course: 'Python & Data Science', batch: 'B2', students: 28, duration: '1.5h', mode: 'Offline', status: 'In Progress', active: true },
+    { id: 3, time: '03:30 PM', course: 'UI/UX Design Basics', batch: 'B3', students: 24, duration: '2h', mode: 'Online', status: 'Upcoming' },
+  ]);
 
   return (
-    <div className="dashboard-container">
-      {/* 0. HEADER */}
-      <div className="dashboard-header">
-        <h1 className="dashboard-title">Dashboard</h1>
-        <p className="dashboard-subtitle">Overview of your training performance and batches</p>
+    <div className="dashboard-container-v2 animate-fade-in">
+      {/* WELCOME BANNER V2 */}
+      <div className="welcome-banner-v2">
+        <div className="banner-left-v2">
+          <h1 className="banner-title-v2">Welcome back, {userName}!</h1>
+          <p className="banner-subtitle-v2">Here’s what’s happening with your batches today.</p>
+        </div>
+        <div className="banner-right-v2">
+          <div className="banner-stat-item-v2">
+            <span className="banner-stat-value-v2">128</span>
+            <span className="banner-stat-label-v2">Total Students</span>
+          </div>
+          <div className="banner-stat-item-v2">
+            <span className="banner-stat-value-v2">4</span>
+            <span className="banner-stat-label-v2">Active Batches</span>
+          </div>
+          <div className="banner-stat-item-v2">
+            <span className="banner-stat-value-v2">3</span>
+            <span className="banner-stat-label-v2">Live Sessions</span>
+          </div>
+        </div>
       </div>
 
-      {/* 1. TOP KPI CARDS */}
-      <div className="dashboard-kpi-row">
+      {/* KPI CARDS */}
+      <div className="dashboard-kpi-row-v2">
         {kpis.map((kpi, idx) => (
-          <div key={idx} className={`kpi-card-saas ${kpi.color}`}>
-            <div className="kpi-header">
-              <div className={`kpi-icon-box ${kpi.color}`}>{kpi.icon}</div>
-              <span className="kpi-trend-badge">{kpi.trend}</span>
-            </div>
-            <div className="kpi-content">
-              <h3 className="kpi-value">
+          <div key={idx} className={`kpi-card-v2`}>
+            <div className={`kpi-icon-v2 ${kpi.color}`}>{kpi.icon}</div>
+            <div className="kpi-info-v2">
+              <span className="kpi-label-v2">{kpi.label}</span>
+              <h3 className="kpi-value-v2">
                 <Counter target={kpi.value} />{kpi.suffix}
               </h3>
-              <p className="kpi-label">{kpi.label}</p>
+              <span className={`kpi-trend-v2 ${kpi.trend.startsWith('+') ? 'pos' : ''}`}>{kpi.trend}</span>
             </div>
-            <div className="kpi-progress-line"><div className="fill" style={{ width: '70%' }}></div></div>
           </div>
         ))}
       </div>
 
-      {/* 2. MAIN CONTENT GRID */}
-      <div className="dashboard-main-grid">
-        
-        {/* LEFT COLUMN */}
-        <div className="dashboard-column-left">
-          
-          {/* Today's Schedule */}
-          <section className="dashboard-section">
-            <div className="section-header">
-              <h2 className="section-title">Today's Schedule</h2>
-              <button className="text-btn" onClick={() => navigate('/trainer-dashboard/schedule')}>View full schedule</button>
-            </div>
-            <div className="schedule-list">
-              {schedule.map((session, idx) => (
-                <LiveSessionCard key={idx} session={session} />
-              ))}
-            </div>
-          </section>
+      {/* MAIN LAYOUT */}
+      <div className="dashboard-main-content-v2">
 
-          {/* Pending Actions */}
-          <section className="dashboard-section">
-            <h2 className="section-title">Pending Actions</h2>
-            <div className="pending-actions-grid">
-              <div className="pending-card blue">
-                <div className="pending-icon"><UserCheck size={20} /></div>
-                <div className="pending-info">
-                  <h4>Mark Attendance</h4>
-                  <p>Batch B12 session ended</p>
-                </div>
-                <button className="cta-link"><ArrowUpRight size={18} /></button>
-              </div>
-              <div className="pending-card green">
-                <div className="pending-icon"><Upload size={20} /></div>
-                <div className="pending-info">
-                  <h4>Upload Materials</h4>
-                  <p>Python Module 4 pending</p>
-                </div>
-                <button className="cta-link"><ArrowUpRight size={18} /></button>
-              </div>
-              <div className="pending-card purple">
-                <div className="pending-icon"><MessageSquare size={20} /></div>
-                <div className="pending-info">
-                  <h4>Respond to Queries</h4>
-                  <p>3 new student messages</p>
-                </div>
-                <button className="cta-link"><ArrowUpRight size={18} /></button>
-              </div>
-            </div>
-          </section>
-        </div>
+        {/* TOP SECTION: Today's Class */}
+        <section className="dashboard-section-v2">
+          <div className="section-header-v2">
+            <h2 className="section-title-v2">Today's Live Sessions</h2>
+            <button className="text-btn-v2" onClick={() => navigate('/trainer-dashboard/schedule')}>
+              View Full Schedule <ChevronRight size={14} style={{ marginLeft: '4px' }} />
+            </button>
+          </div>
+          <div className="schedule-list-v2">
+            {schedule.map((session, idx) => (
+              <LiveSessionCard key={idx} session={session} />
+            ))}
+          </div>
+        </section>
 
-        {/* RIGHT COLUMN */}
-        <div className="dashboard-column-right">
-          
-          {/* Quick Actions */}
-          <section className="dashboard-section">
-            <h2 className="section-title">Quick Actions</h2>
-            <div className="quick-actions-blocks">
-              <button className="qa-block" onClick={() => navigate('/trainer-dashboard/live-session')}>
-                <Play size={20} />
-                <span>Start Class</span>
-              </button>
-              <button className="qa-block" onClick={() => navigate('/trainer-dashboard/materials')}>
-                <FileText size={20} />
-                <span>Upload Material</span>
-              </button>
-              <button className="qa-block" onClick={() => navigate('/trainer-dashboard/attendance')}>
-                <UserCheck size={20} />
-                <span>Mark Attendance</span>
-              </button>
-            </div>
-          </section>
-
-          {/* Batch Progress */}
-          <section className="dashboard-section">
-            <div className="section-header">
-              <h2 className="section-title">Batch Progress</h2>
-              <button className="icon-btn-ghost"><MoreVertical size={18} /></button>
-            </div>
-            <div className="batch-progress-list">
-              {[
-                { name: 'Batch B12', pct: '75%', color: '#3B82F6' },
-                { name: 'Batch C09', pct: '60%', color: '#10B981' },
-                { name: 'Batch A05', pct: '90%', color: '#8B5CF6' }
-              ].map((batch, idx) => (
-                <div key={idx} className="batch-progress-item">
-                  <div className="batch-info-min">
-                    <span className="batch-name-min">{batch.name}</span>
-                    <span className="batch-pct-min">{batch.pct}</span>
-                  </div>
-                  <div className="progress-bar-min">
-                    <div className="progress-fill-min" style={{ width: batch.pct, backgroundColor: batch.color }}></div>
+        {/* PENDING ACTIONS GRID */}
+        <section className="dashboard-section-v2">
+          <div className="section-header-v2">
+            <h2 className="section-title-v2">Pending Actions</h2>
+          </div>
+          <div className="pending-actions-grid-v2">
+            {isLoading ? (
+              <>
+                <SkeletonCard />
+                <SkeletonCard />
+                <SkeletonCard />
+              </>
+            ) : dashData ? (
+              <>
+                {/* 1. Attendance Card */}
+                <div className="modern-card attendance-card-v2 clickable" onClick={() => navigate('/trainer-dashboard/attendance')}>
+                  <div className="card-main-content">
+                    <span className="batch-tag">{dashData.attendance.batch}</span>
+                    <div className="card-icon-wrapper">
+                      <UserCheck size={26} />
+                    </div>
+                    <div className="card-details">
+                      <h4>Mark Attendance</h4>
+                      <div className="attendance-stats">
+                        <span className="stats-main">{dashData.attendance.present}/{dashData.attendance.total}</span>
+                        <span className="stats-label">Present</span>
+                      </div>
+                      <div className="modern-progress-container">
+                        <div className="modern-progress-bar" style={{ width: `${dashData.attendance.percentage}%` }}></div>
+                      </div>
+                      <div className="card-footer-info">
+                        <Clock size={14} /> Last marked: {dashData.attendance.lastMarked}
+                      </div>
+                    </div>
+                    <button className="modern-card-cta primary">
+                      Complete Now <ArrowRight size={16} />
+                    </button>
                   </div>
                 </div>
-              ))}
-            </div>
-          </section>
 
-          {/* Recent Activity */}
-          <section className="dashboard-section">
-            <h2 className="section-title">Recent Activity</h2>
-            <div className="activity-timeline">
-              {activities.map((act, idx) => (
-                <div key={idx} className="timeline-item">
-                  <div className="timeline-dot"></div>
-                  <div className="timeline-content">
-                    <p className="act-msg">{act.msg}</p>
-                    <span className="act-time">{act.time}</span>
+                {/* 2. Materials Card */}
+                <div className="modern-card materials-card-v2 clickable" onClick={() => navigate('/trainer-dashboard/materials')}>
+                  <div className="card-main-content">
+                    <div className="card-icon-wrapper">
+                      <Upload size={26} />
+                    </div>
+                    <div className="card-details">
+                      <h4>Upload Materials</h4>
+                      <p className="module-name">{dashData.materials.moduleName}</p>
+                      <div className="upload-items">
+                        {dashData.materials.uploaded.map((item, i) => (
+                          <span key={i} className="upload-item"><div className="dot"></div> {item}</span>
+                        ))}
+                        {dashData.materials.pending.map((item, i) => (
+                          <span key={i} className="upload-item pending"><div className="dot grey"></div> {item} (Pending)</span>
+                        ))}
+                      </div>
+                    </div>
+                    <button className="modern-card-cta secondary">
+                      Upload Files <Upload size={16} />
+                    </button>
                   </div>
                 </div>
-              ))}
-            </div>
-          </section>
 
-        </div>
+                {/* 3. Queries Card */}
+                <div className="modern-card queries-card-v2 clickable" onClick={() => navigate('/trainer-dashboard/feedback')}>
+                  <div className="card-main-content">
+                    <span className="query-count">{dashData.queries.count} New Messages</span>
+                    <div className="card-icon-wrapper">
+                      <MessageSquare size={26} />
+                    </div>
+                    <div className="card-details">
+                      <h4>Respond to Queries</h4>
+                      <p className="message-preview">"{dashData.queries.latestMessage}"</p>
+                      <div className="student-avatars">
+                        <div className="avatar-stack">
+                          {dashData.queries.students.map((st, i) => (
+                            <div key={i} className="avatar" style={{ backgroundColor: st.bg, color: st.color }}>{st.initials}</div>
+                          ))}
+                          <div className="avatar-more">+{dashData.queries.totalAvatars - dashData.queries.students.length}</div>
+                        </div>
+                        <p className="avatar-text">Students are waiting</p>
+                      </div>
+                    </div>
+                    <button className="modern-card-cta accent">
+                      Open Chat <MessageSquare size={16} />
+                    </button>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="empty-state-v2">
+                <AlertCircle size={48} />
+                <p>No pending actions available right now.</p>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* QUICK INSIGHTS ROW */}
+        <section className="dashboard-section-v2">
+          <div className="section-header-v2">
+            <h2 className="section-title-v2">Quick Insights</h2>
+          </div>
+          <div className="quick-actions-row-v2">
+            <button className="qa-pill" onClick={() => navigate('/trainer-dashboard/live-session')}>
+              <Play size={18} /> Start New Class
+            </button>
+            <button className="qa-pill" onClick={() => navigate('/trainer-dashboard/batches')}>
+              <TrendingUp size={18} /> Batch Progress
+            </button>
+            <button className="qa-pill" onClick={() => navigate('/trainer-dashboard/attendance')}>
+              <FileText size={18} /> Attendance Report
+            </button>
+          </div>
+        </section>
+
       </div>
     </div>
   );

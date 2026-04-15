@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import './Topbar.css';
+import LogoutModal from './LogoutModal';
 import icLogo from '../../../assets/infycode-final-logo4-1.png';
 
 // ✅ Icons
@@ -38,6 +39,8 @@ const PAGE_LABELS = {
 
 const Topbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const [liveDate] = useState(() => {
     const d = new Date();
@@ -54,7 +57,12 @@ const Topbar = () => {
     <nav className="navbar">
       {/* NAVBAR LEFT: BRAND SECTION + TITLES */}
       <div className="navbar-content-left">
-        <div className="brand-wrapper">
+        <div 
+          className="brand-wrapper" 
+          onClick={() => setShowLogoutModal(true)} 
+          style={{ cursor: 'pointer' }}
+          title="Logout"
+        >
           <img src={icLogo} alt="Infycode Logo" className="logo" />
           <div className="brand-text">
             <span className="brand-name">INFYCODE</span>
@@ -93,6 +101,12 @@ const Topbar = () => {
           <SettingsIcon />
         </button>
       </div>
+
+      {/* Logout Confirmation Modal */}
+      <LogoutModal 
+        isOpen={showLogoutModal} 
+        onClose={() => setShowLogoutModal(false)} 
+      />
     </nav>
   );
 };
