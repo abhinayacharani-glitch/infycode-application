@@ -36,9 +36,9 @@ max-width:750px;
 /* ================= HEADING ================= */
 
 .hero-text h1{
-font-size: clamp(38px, 6vw, 65px);
+font-size: clamp(32px, 5vw, 52px);
 font-weight:700;
-line-height:1.1;
+line-height:1.2;
 color:#222;
 }
 
@@ -61,14 +61,14 @@ margin-top:40px;
 /* ================= MAIN BUTTON ================= */
 
 .btn{
-padding:0 45px;
-height:60px;
+padding:0 35px;
+height:52px;
 border-radius:50px;
 background:#2f6df6;
 color:white;
 border:none;
 font-family: 'Urbanist', sans-serif;
-font-size:17px;
+font-size:15px;
 font-weight:700;
 box-shadow:0 10px 20px rgba(47,109,246,0.2);
 cursor:pointer;
@@ -89,8 +89,8 @@ box-shadow:0 12px 25px rgba(47,109,246,0.3);
 
 .play-btn{
 position:relative;
-width:70px;
-height:70px;
+width:60px;
+height:60px;
 border-radius:50%;
 border:none;
 background:white;
