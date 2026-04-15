@@ -1,173 +1,166 @@
-/* 🔷 ROOT VARIABLES (OPTIONAL) */
-:root {
-  --sidebar-bg: #3b6ff5;
-  --primary-color: #2563eb;
-  --accent-blue: #3b82f6;
-}
+/* ================= STUDENT DASHBOARD TOPBAR ================= */
 
-/* 🔷 NAVBAR */
-.navbar-premium {
-  height: 100px;
-  background-color: var(--nav-bg-glass);
-  /* Glassmorphism base */
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  display: flex;
-  align-items: center;
-  padding: 0 5rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  font-family: 'Urbanist', sans-serif;
-  color: #ffffff;
-  /* Explicitly set white text */
-}
-
-/* 🔷 CONTAINER */
-.navbar-container {
+.student-topbar {
+  height: 85px;
+  background: #ffffff;
+  border-bottom: 2px solid #f1f5f9;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
+  padding: 0 2rem;
+  z-index: 50;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  color: #334155;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
-/* 🔷 CENTER TEXT */
-.navbar-center {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  flex: 1;
-}
-
-/* 🔷 WELCOME TEXT */
-.welcome-msg {
-  font-size: var(--fs-h2);
-  font-weight: 700;
-  color: #ffffff;
-  /* Force white text */
-  margin: 0;
-}
-
-/* 🔷 TAGLINE */
-.welcome-desc {
-  font-size: var(--fs-text);
-  color: rgba(255, 255, 255, 0.85);
-  margin-top: 4px;
-  font-family: 'Urbanist', sans-serif;
-}
-
-/* 🔷 RIGHT SIDE */
-.navbar-right {
+/* Left Section: Actions */
+.topbar-left {
   display: flex;
   align-items: center;
-  gap: 22px;
-  /* 🔥 perfect spacing */
+  gap: 2.5rem;
 }
 
-/* 🔷 COMMON ICON STYLE */
-.nav-icon-box {
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.action-with-badge {
   position: relative;
-  width: 40px;
-  height: 40px;
-  font-size: 1.4rem;
-  color: #ffffff;
-  /* Force white icon */
   cursor: pointer;
+  color: #64748b;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  transition: all 0.3s ease;
+  transition: all 0.2s;
 }
 
-/* 🔷 ICON HOVER */
-.nav-icon-box:hover {
-  transform: scale(1.15);
-  background: rgba(255, 255, 255, 0.1);
+.action-with-badge:hover {
+  color: #1e293b;
+  transform: translateY(-2px);
 }
 
-
-
-
-
-/* 🔔 NOTIFICATION ICON */
-.nav-icon-box.notification {
-  color: #ffffff;
-}
-
-/* 🔔 NOTIFICATION HOVER */
-.nav-icon-box.notification:hover {
-  background: rgba(255, 255, 255, 0.15);
-}
-
-/* 🔔 NOTIFICATION BADGE */
-.notification-badge {
+.nav-badge {
   position: absolute;
-  top: -6px;
-  right: -6px;
-  background: #ef4444;
-  color: #fff;
-  font-size: 10px;
-  padding: 3px 6px;
-  border-radius: 50%;
-  font-weight: 600;
-
-}
-
-/* 👤 PROFILE CIRCLE */
-.profile-circle {
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, #a78bfa, #8b5cf6);
-  border-radius: 50%;
+  top: -8px;
+  right: -8px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: white;
+  width: 18px;
+  height: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #ffffff;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+}
+
+.nav-badge.blue { background-color: #3b82f6; }
+.nav-badge.orange { background-color: #f59e0b; }
+
+.navbar-search {
+  display: flex;
+  align-items: center;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 0 18px;
+  height: 48px;
+  width: 400px;
+  transition: all 0.3s;
+}
+
+.navbar-search:focus-within {
+  background: #ffffff;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.search-icon {
+  color: #94a3b8;
+  margin-right: 14px;
+}
+
+.navbar-search input {
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 1rem;
+  color: #1e293b;
+  font-weight: 500;
+}
+
+.navbar-search input::placeholder {
+  color: #94a3b8;
+}
+
+/* Right Section: User Profile */
+.topbar-right {
+  display: flex;
+  align-items: center;
+}
+
+.nav-user-profile {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 16px;
+  border-radius: 14px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background 0.2s;
 }
 
-/* 👤 PROFILE HOVER */
-.profile-circle:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+.nav-user-profile:hover {
+  background: #f1f5f9;
 }
 
-/* 🔷 RESPONSIVE */
-@media (max-width: 768px) {
-  .navbar-premium {
-    padding: 0 1.5rem;
-    height: 80px;
-  }
+.navbar-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #f1f5f9;
+}
 
-  .welcome-msg {
-    font-size: 1.2rem;
-  }
+.navbar-username {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #334155;
+  white-space: nowrap;
+}
 
-  .welcome-desc {
-    font-size: 0.85rem;
-  }
+.chevron-icon {
+  color: #64748b;
+}
 
-  .navbar-right {
-    gap: 18px;
-  }
+/* ================= RESPONSIVE ================= */
 
-  .nav-icon-box {
-    width: 32px;
-    height: 32px;
-    font-size: 1.2rem;
+@media (max-width: 1100px) {
+  .navbar-search {
+    width: 220px;
   }
+}
 
-  .profile-circle {
-    width: 34px;
-    height: 34px;
-    font-size: 1rem;
-    margin-left: 20px;
+@media (max-width: 900px) {
+  .topbar-center {
+    justify-content: flex-end;
+  }
+  .navbar-search {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .navbar-banner-logo, .navbar-username, .chevron-icon {
+    display: none;
+  }
+  .student-topbar {
+    padding: 0 1rem;
   }
 }

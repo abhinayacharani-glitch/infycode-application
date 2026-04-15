@@ -2,44 +2,42 @@
    ENROLL COURSES PAGE
    =========================== */
 .enroll-page {
-  padding: 0;
+  padding: 24px;
 }
 
-.enroll-page-header {
-  background: linear-gradient(135deg, #f8faff 0%, #eff6ff 100%);
-  padding: 48px 48px 32px;
-  border-bottom: 1px solid var(--border);
+.grid-header {
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.grid-header h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+  letter-spacing: -0.02em;
 }
 
 .enroll-badge {
   display: inline-block;
-  padding: 4px 12px;
-  background: #dbeafe;
-  color: var(--primary);
+  align-self: flex-start;
+  padding: 4px 10px;
+  background: #eff6ff;
+  color: #2563eb;
   border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 700;
+  font-size: 0.7rem;
+  font-weight: 800;
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  margin-bottom: 12px;
-}
-
-.enroll-page-header h1 {
-  font-size: 2rem;
-  margin: 0 0 8px;
-}
-
-.enroll-page-header p {
-  color: var(--text-muted);
-  margin-bottom: 24px;
 }
 
 .enroll-course-grid {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 40px 48px;
-  max-width: 1200px;
+  max-width: 1300px;
   margin: 0 auto;
 }
 
@@ -47,38 +45,44 @@
 .ec-row-container {
   background: white;
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .ec-row-container:hover {
-  border-color: var(--primary);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border-color: #3b82f6;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
 }
 
 .ec-row-container.is-open {
-  border-color: var(--primary);
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
 /* Main Row */
 .ec-row-main {
   display: flex;
   align-items: center;
-  padding: 24px 32px;
+  padding: 20px 24px;
   cursor: pointer;
-  gap: 28px;
+  gap: 24px;
 }
 
 /* Icon Col */
 .ec-row-icon {
-  width: 64px;
-  height: 64px;
-  border-radius: 16px;
+  width: 60px;
+  height: 60px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.ec-row-icon:hover {
+  transform: scale(1.05);
 }
 
 /* Info Col */
@@ -87,17 +91,17 @@
 }
 
 .ec-row-title {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: 700;
-  color: #0f172a;
+  color: #1e293b;
   margin: 0 0 4px;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
 
 .ec-row-meta {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   color: #64748b;
   font-size: 0.85rem;
 }
@@ -122,25 +126,24 @@
 /* Status Col */
 .ec-row-status {
   text-align: right;
-  min-width: 120px;
+  min-width: 130px;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
 .ec-row-progress-text {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   font-weight: 800;
-  color: #1e293b;
+  color: #0f172a;
   margin-bottom: 0;
-  line-height: 1.2;
 }
 
 .ec-row-complete-badge {
-  font-size: 0.7rem;
-  font-weight: 700;
+  font-size: 0.65rem;
+  font-weight: 800;
   color: #64748b;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   margin-top: 2px;
 }
@@ -155,129 +158,141 @@
   align-items: center;
   justify-content: center;
   width: 32px;
+  color: #94a3b8;
 }
 
 /* Dropdown */
 .ec-row-dropdown {
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.4s ease;
-  background: #f8fafc;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #ffffff;
+  opacity: 0;
 }
 
 .ec-row-dropdown.is-visible {
-  max-height: 300px;
-  border-top: 1px solid #e2e8f0;
+  max-height: 500px;
+  opacity: 1;
+  border-top: 1px solid #f1f5f9;
 }
 
 .ec-dropdown-inner {
-  padding: 24px;
+  padding: 1.5rem 2rem;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 1.5rem;
 }
 
 /* Inner Sections */
 .ec-progress-section {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 0.75rem;
 }
 
 .ec-progress-header {
   display: flex;
   justify-content: space-between;
-  font-size: 0.85rem;
+  align-items: center;
+  font-size: 0.9rem;
   font-weight: 700;
-  color: #334155;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  color: #1e293b;
 }
 
 .ec-progress-bar {
-  height: 8px;
-  background: #e2e8f0;
-  border-radius: 4px;
+  height: 10px;
+  background: #f1f5f9;
+  border-radius: 20px;
+  overflow: hidden;
 }
 
 .ec-progress-fill {
   height: 100%;
-  background: var(--primary);
-  border-radius: 4px;
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  border-radius: 20px;
+  transition: width 1s ease-out;
 }
 
 .ec-current-topic-box-simple {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0.75rem;
 }
 
 .ec-ct-label {
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: #94a3b8;
-  letter-spacing: 1px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #64748b;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 .ec-ct-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: white;
-  padding: 12px 16px;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  gap: 1rem;
 }
 
 .ec-ct-name {
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 700;
   color: #1e293b;
+  flex: 1;
 }
 
 .ec-ct-resume-btn {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
-  background: var(--primary);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.85rem;
+  background: #3b82f6;
+  color: #ffffff;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 0.9rem;
   font-weight: 700;
+  border: none;
   cursor: pointer;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 
 .ec-ct-resume-btn:hover {
-  background: var(--primary-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+  background: #2563eb;
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .enroll-page {
+    padding: 16px;
+  }
 }
 
 @media (max-width: 768px) {
-  .enroll-course-grid {
-    padding: 24px;
-  }
-
   .ec-row-main {
     flex-wrap: wrap;
     gap: 16px;
-  }
-
-  .ec-row-status {
-    order: 2;
-    text-align: left;
-    flex: 1;
-  }
-
-  .ec-row-toggle {
-    order: 3;
   }
 
   .ec-row-info {
     min-width: 100%;
     order: 1;
   }
-}
+
+  .ec-row-status {
+    order: 2;
+    text-align: left;
+    min-width: auto;
+    flex: 1;
+  }
+
+  .ec-row-toggle {
+    order: 3;
+  }
+}

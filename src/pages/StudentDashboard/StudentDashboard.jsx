@@ -2,7 +2,6 @@ import React from "react";
 import { Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
-// Sub-pages from the 'pages' subdirectory
 import Counselling from "./pages/Counselling";
 import SkillTest from "./pages/SkillTest";
 import CourseDiscovery from "./pages/Course";
@@ -12,35 +11,35 @@ import MockInterview from "./pages/MockInterview";
 import Projects from "./pages/Projects";
 import Profile from "./pages/Profile";
 import CourseExplore from "./pages/CourseExplore";
-import CourseOverview from "./pages/CourseOverview";
+import CourseOverview from "./pages/Courseoverview";
+import MentorConnection from "./pages/MentorConnection";
 import Logout from "./pages/Logout";
+import "./StudentDashboard.css"; // We'll create this to store the layout styles
+
 function StudentDashboard() {
   const navigate = useNavigate();
   const location = useLocation();
 
   const isCourseExplore = location.pathname.includes('/course-explore');
-  const isFullPage = isCourseExplore;
 
   const handleNavigate = (path, state) => {
     navigate(path, { state });
   };
 
   return (
-    <div className="student-dashboard-layout" style={{ display: "flex", minHeight: "100vh", fontFamily: "'Urbanist', sans-serif" }}>
+    <div className={`student-dashboard-layout ${isCourseExplore ? 'full-screen' : ''}`}>
       
-      {/* Conditionally render Sidebar */}
-      {!isCourseExplore && (
-        <div className="sidebar-container" style={{ width: "250px", flexShrink: 0 }}>
-          <Sidebar />
-        </div>
-      )}
+      {/* Sidebar - Positioned naturally in the flex flow */}
+      {!isCourseExplore && <Sidebar />}
 
       {/* Main Content Area */}
-      <div className="main-content-wrapper" style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+      <div className="main-content-wrapper">
         {!isCourseExplore && <Navbar />}
-        <main className="dashboard-content" style={{ flex: 1, padding: isCourseExplore ? "0" : "20px", overflowY: "auto", background: "#f8fafc" }}>
+        
+        <main className={`dashboard-content ${isCourseExplore ? 'course-view' : ''}`}>
           <Routes>
             <Route index element={<Navigate to="courses" replace />} />
+            <Route path="dashboard" element={<Navigate to="courses" replace />} />
             <Route path="counselling" element={<Counselling />} />
             <Route path="skill-test" element={<SkillTest />} />
             <Route path="course" element={<CourseDiscovery />} />
@@ -51,6 +50,7 @@ function StudentDashboard() {
             <Route path="projects" element={<Projects />} />
             <Route path="profile" element={<Profile />} />
             <Route path="course-explore" element={<CourseExplore />} />
+            <Route path="mentor-connection" element={<MentorConnection />} />
             <Route path="logout" element={<Logout />} />
           </Routes>
         </main>
@@ -60,4 +60,4 @@ function StudentDashboard() {
   );
 }
 
-export default StudentDashboard;
+export default StudentDashboard;

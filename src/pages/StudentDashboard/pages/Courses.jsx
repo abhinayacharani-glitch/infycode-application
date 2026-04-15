@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { COURSE_MAP } from './data/extraCourses';
+import DashboardHero from '../components/DashboardHero';
 import './Courses.css';
 
 const categoryColors = {
@@ -19,10 +20,9 @@ const EnrolledCourseAccordion = ({ course, onNavigate }) => {
   const [isOpen, setIsOpen] = useState(false);
   const color = categoryColors[course.level] || categoryColors.Intermediate;
 
-  // Calculate dynamic progress from localStorage
   const dynamicProgress = (() => {
     const saved = localStorage.getItem(`course_progress_${course.id}`);
-    if (!saved) return course.progress || 0; // Fallback to COURSE_MAP value
+    if (!saved) return course.progress || 0;
 
     const completedSet = new Set(JSON.parse(saved));
     const navList = [];
@@ -53,9 +53,10 @@ const EnrolledCourseAccordion = ({ course, onNavigate }) => {
 
   return (
     <div className={`ec-row-container ${isOpen ? 'is-open' : ''}`}>
-      <div className="ec-row-main">
-        {/* Icon Col */}
-        <div className="ec-row-icon" style={{ background: color.bg, cursor: 'pointer' }} onClick={handleRowClick}>
+      {/* Clicking the row (except the arrow) navigates to course overview */}
+      <div className="ec-row-main" onClick={handleRowClick} style={{ cursor: 'pointer' }}>
+        {/* Icon Col — stop propagation so it doesn't navigate */}
+        <div className="ec-row-icon" style={{ background: color.bg }} onClick={e => e.stopPropagation()}>
           {course.id.includes('java') && (
             <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
@@ -79,7 +80,7 @@ const EnrolledCourseAccordion = ({ course, onNavigate }) => {
         </div>
 
         {/* Info Col */}
-        <div className="ec-row-info" onClick={handleRowClick}>
+        <div className="ec-row-info">
           <h3 className="ec-row-title">{course.title}</h3>
           <div className="ec-row-meta">
             <span className="ec-row-trainer">
@@ -95,7 +96,7 @@ const EnrolledCourseAccordion = ({ course, onNavigate }) => {
         </div>
 
         {/* Status Col */}
-        <div className="ec-row-status" onClick={toggleDropdown}>
+        <div className="ec-row-status">
           <div className="ec-row-progress-text">{dynamicProgress}%</div>
           <div className={`ec-row-complete-badge ${dynamicProgress === 100 ? 'done' : ''}`}>
             {dynamicProgress === 100 ? 'COMPLETE' : 'IN PROGRESS'}
@@ -103,7 +104,7 @@ const EnrolledCourseAccordion = ({ course, onNavigate }) => {
         </div>
 
         {/* Toggle Col */}
-        <div className="ec-row-toggle" onClick={toggleDropdown}>
+        <div className="ec-row-toggle" onClick={(e) => { e.stopPropagation(); toggleDropdown(e); }}>
           <svg style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }} xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><polyline points="6 9 12 15 18 9" /></svg>
         </div>
       </div>
@@ -147,15 +148,13 @@ const EnrollCourses = ({ onNavigate }) => {
 
   return (
     <div className="enroll-page">
-      <header className="enroll-page-header">
-        <div className="enroll-header-content">
-          <span className="enroll-badge">Enrolled Courses</span>
-          <h1>Continue your learning journey</h1>
-          <p>Track your progress and pick up right where you left off.</p>
-        </div>
-      </header>
-
+      <DashboardHero />
+      
       <div className="enroll-course-grid">
+        <header className="grid-header">
+          <span className="enroll-badge">Enrolled Courses</span>
+          <h2>Track Your Progress</h2>
+        </header>
         {courses.map((course) => (
           <EnrolledCourseAccordion key={course.id} course={course} onNavigate={onNavigate} />
         ))}

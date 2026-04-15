@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+
   server: {
     proxy: {
       '/api': {
@@ -11,5 +12,11 @@ export default defineConfig({
         changeOrigin: true
       }
     }
+  },
+
+  build: {
+    // Raise warning threshold to 2000 kB to suppress warnings 
+    // (our lazy imports in App.jsx will handle splitting routes naturally)
+    chunkSizeWarningLimit: 2000
   }
 })

@@ -15,36 +15,44 @@ import Analytics from "./pages/Analytics";
 import LearningActivation from "./pages/LearningActivation";
 import Reports from "./pages/Reports";
 import Logout from "./pages/Logout";
+import AccountSettings from "./pages/AccountSettings";
+import SecuritySettings from "./pages/SecuritySettings";
+import PreferenceSettings from "./pages/PreferenceSettings";
 
 const AdminDashboard = () => {
   return (
     <div className="admin-dashboard-layout">
+      {/* ── Topbar (Now Spanning Full Width) ── */}
+      <Topbar />
 
-      {/* ── Sticky Sidebar Container ── */}
-      <div className="admin-sidebar-container">
-        <Sidebar />
+      <div className="admin-bottom-container">
+        {/* ── Sticky Sidebar Container ── */}
+        <div className="admin-sidebar-container">
+          <Sidebar />
+        </div>
+
+        {/* ── Main Content ── */}
+        <div className="admin-main-wrapper">
+          <main className="adm-content adm-page">
+            <Routes>
+              <Route index element={<Navigate to="dashboard" replace />} />
+              <Route path="dashboard"            element={<Dashboard />} />
+              <Route path="student-verification" element={<StudentVerification />} />
+              <Route path="course-config"        element={<CourseConfig />} />
+              <Route path="trainer-approval"     element={<TrainerApproval />} />
+              <Route path="batch-setup"          element={<BatchSetup />} />
+              <Route path="enrollment"           element={<EnrollmentMapping />} />
+              <Route path="analytics"            element={<Analytics />} />
+              <Route path="activation"           element={<LearningActivation />} />
+              <Route path="reports"              element={<Reports />} />
+              <Route path="settings/account"     element={<AccountSettings />} />
+              <Route path="settings/security"    element={<SecuritySettings />} />
+              <Route path="settings/preferences" element={<PreferenceSettings />} />
+              <Route path="logout"               element={<Logout />} />
+            </Routes>
+          </main>
+        </div>
       </div>
-
-      {/* ── Main Content ── */}
-      <div className="admin-main-wrapper">
-        <Topbar />
-        <main className="adm-content adm-page">
-          <Routes>
-            <Route index element={<Navigate to="dashboard" replace />} />
-            <Route path="dashboard"            element={<Dashboard />} />
-            <Route path="student-verification" element={<StudentVerification />} />
-            <Route path="course-config"        element={<CourseConfig />} />
-            <Route path="trainer-approval"     element={<TrainerApproval />} />
-            <Route path="batch-setup"          element={<BatchSetup />} />
-            <Route path="enrollment"           element={<EnrollmentMapping />} />
-            <Route path="analytics"            element={<Analytics />} />
-            <Route path="activation"           element={<LearningActivation />} />
-            <Route path="reports"              element={<Reports />} />
-            <Route path="logout"               element={<Logout />} />
-          </Routes>
-        </main>
-      </div>
-
     </div>
   );
 };

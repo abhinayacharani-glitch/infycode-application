@@ -4,7 +4,8 @@ import './Logout.css';
 
 const Logout = () => {
     useEffect(() => {
-        localStorage.removeItem("loggedUser");
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
     }, []);
 
     return (

@@ -12,7 +12,7 @@ import imgJava from "../../assets/course/java.jpeg";
 import imgAI from "../../assets/course/AI.jpeg";
 import imgDataScience from "../../assets/course/DataScience.jpeg";
 import imgCloud from "../../assets/course/cloud.jpeg";
-import imgUIUX from "../../assets/course/UI & UX.jpeg";
+import imgUIUX from "../../assets/course/UI-UX.jpeg";
 
 const CATEGORIES = ["All", "Web Dev", "Python", "Java", "AI & Data", "Cybersecurity", "Cloud"];
 
@@ -49,7 +49,7 @@ const ALL_COURSES = [
     students: "18k",
     duration: "6 months",
     level: "Beginner",
-    price: "₹14,999"
+    price: "6 months"
   },
   {
     image: imgPython,
@@ -61,7 +61,7 @@ const ALL_COURSES = [
     students: "22k",
     duration: "4 months",
     level: "All Levels",
-    price: "₹9,999"
+    price: "4 months"
   },
   {
     image: imgJava,
@@ -73,7 +73,7 @@ const ALL_COURSES = [
     students: "15k",
     duration: "5 months",
     level: "Intermediate",
-    price: "₹12,499"
+    price: "3 months"
   },
   {
     image: imgWebDev,
@@ -85,7 +85,7 @@ const ALL_COURSES = [
     students: "14k",
     duration: "4 months",
     level: "Advanced",
-    price: "₹14,999"
+    price: "3 months"
   },
   {
     image: imgWebDev,
@@ -97,7 +97,7 @@ const ALL_COURSES = [
     students: "11k",
     duration: "5 months",
     level: "Beginner",
-    price: "₹15,499"
+    price: "4 months"
   },
   {
     image: imgAI,
@@ -109,7 +109,7 @@ const ALL_COURSES = [
     students: "7k",
     duration: "6 months",
     level: "Advanced",
-    price: "₹18,999"
+    price: "6 months"
   },
   {
     image: imgUIUX,
@@ -121,7 +121,7 @@ const ALL_COURSES = [
     students: "5k",
     duration: "4 months",
     level: "Intermediate",
-    price: "₹13,999"
+    price: "2 months"
   },
   {
     image: imgCloud,
@@ -133,7 +133,7 @@ const ALL_COURSES = [
     students: "12k",
     duration: "3 months",
     level: "Beginner",
-    price: "₹11,999"
+    price: "6 months"
   },
   {
     image: imgWebDev,
@@ -145,7 +145,7 @@ const ALL_COURSES = [
     students: "8k",
     duration: "6 months",
     level: "Intermediate",
-    price: "₹12,999"
+    price: "3 months"
   },
   {
     image: imgDataScience,
@@ -157,7 +157,7 @@ const ALL_COURSES = [
     students: "9k",
     duration: "6 months",
     level: "Intermediate",
-    price: "₹19,999"
+    price: "4 months"
   },
   {
     image: imgWebDev,
@@ -169,7 +169,7 @@ const ALL_COURSES = [
     students: "10k",
     duration: "5 months",
     level: "Beginner",
-    price: "₹11,999"
+    price: "6 months"
   },
   {
     image: imgPython,
@@ -181,7 +181,7 @@ const ALL_COURSES = [
     students: "16k",
     duration: "6 months",
     level: "Beginner",
-    price: "₹15,999"
+    price: "2 months"
   }
 ].map((course, index) => ({
   ...course,
@@ -350,42 +350,34 @@ const Courses = () => {
                   {/* Image Banner */}
                   <div className="card-img-banner">
                     <img src={course.image} alt={course.title} />
-                    <span className="card-category-tag">{course.category}</span>
                   </div>
 
                   <div className="card-content-modern">
-                    {/* Status Pill */}
-                    <div className="card-status-row">
-                      <span className="card-status-pill" style={{ background: sc.bg, color: sc.color }}>
-                        {course.badge}
-                      </span>
-                    </div>
-
                     <h3 className="card-title-modern">{course.title}</h3>
 
                     {/* Stats Row */}
                     <div className="card-stats-modern">
-                      <div className="stat">
-                        <Users size={14} />
-                        <span>{course.students}</span>
+                      <div className="stat students-text">
+                        {course.students} students
                       </div>
-                      <div className="stat">
-                        <Star size={14} fill="#f59e0b" color="#f59e0b" />
-                        <span>{course.rating}</span>
-                      </div>
-                      <div className="stat">
-                        <Clock size={14} />
-                        <span>{course.duration}</span>
+                      <div className="stat stars-container">
+                        {[...Array(5)].map((_, idx) => (
+                          <Star 
+                            key={idx} 
+                            size={14} 
+                            fill={idx < Math.floor(course.rating) ? "#f59e0b" : "#e2e8f0"} 
+                            color={idx < Math.floor(course.rating) ? "#f59e0b" : "#e2e8f0"} 
+                            strokeWidth={0}
+                          />
+                        ))}
                       </div>
                     </div>
 
                     {/* Footer */}
-                    <div className="card-footer-modern" style={{ justifyContent: 'space-between' }}>
-                      <div className="course-id-display">
-                        {course.courseId}
-                      </div>
-                      <button className="btn-primary mini" onClick={handleEnroll}>
-                        <span>Enroll</span>
+                    <div className="card-footer-modern">
+                      <span className="price-tag">{course.price}</span>
+                      <button className="btn-join-now" onClick={handleEnroll}>
+                        Enroll Now
                       </button>
                     </div>
                   </div>
