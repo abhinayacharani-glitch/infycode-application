@@ -1,0 +1,371 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+.ap-page {
+  min-height: 100vh;
+  background: #f1f5f9;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* ── Banner ── */
+.ap-banner {
+  position: relative;
+  height: 200px;
+  background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 60%, #2563eb 100%);
+  overflow: hidden;
+}
+
+.ap-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60')
+    center/cover no-repeat;
+  opacity: 0.12;
+}
+
+.ap-banner-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(30,58,138,0.85), rgba(124,58,237,0.7));
+}
+
+.ap-banner-content {
+  position: relative;
+  z-index: 1;
+  padding: 20px 32px;
+}
+
+.ap-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 20px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  font-family: inherit;
+  transition: background 0.2s;
+}
+
+.ap-back-btn:hover {
+  background: rgba(255,255,255,0.25);
+}
+
+/* ── Card ── */
+.ap-card-wrap {
+  max-width: 700px;
+  margin: -70px auto 40px;
+  padding: 0 16px;
+  position: relative;
+  z-index: 2;
+}
+
+.ap-card {
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.12);
+  padding: 32px 36px;
+  border: 1px solid #e2e8f0;
+}
+
+/* ── Avatar row ── */
+.ap-avatar-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.ap-avatar-wrap {
+  position: relative;
+}
+
+.ap-avatar-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #fff;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.15);
+}
+
+.ap-status-dot {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  width: 14px;
+  height: 14px;
+  background: #22c55e;
+  border: 2px solid #fff;
+  border-radius: 50%;
+}
+
+.ap-name-block {
+  padding-bottom: 8px;
+}
+
+.ap-name {
+  font-size: 26px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 6px 0;
+}
+
+.ap-role-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #2563eb18, #7c3aed18);
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ── Divider ── */
+.ap-divider {
+  height: 1px;
+  background: #f1f5f9;
+  margin: 24px 0;
+}
+
+/* ── Info Grid ── */
+.ap-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.ap-info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.ap-info-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #eff6ff, #f5f3ff);
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2563eb;
+  flex-shrink: 0;
+}
+
+.ap-info-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+
+.ap-info-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  word-break: break-all;
+}
+
+/* ── Stats Row ── */
+.ap-stats-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 16px;
+}
+
+.ap-stat {
+  text-align: center;
+  flex: 1;
+}
+
+.ap-stat-num {
+  font-size: 32px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.1;
+}
+
+.ap-stat-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+.ap-stat-divider {
+  width: 1px;
+  height: 50px;
+  background: #e2e8f0;
+}
+
+@media (max-width: 600px) {
+  .ap-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ap-card {
+    padding: 24px 20px;
+  }
+
+  .ap-avatar-img {
+    width: 80px;
+    height: 80px;
+  }
+
+  .ap-action-buttons {
+    position: static;
+    margin-top: 12px;
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .ap-avatar-row {
+    flex-wrap: wrap;
+  }
+}
+
+/* ================= EDIT MODE ================= */
+
+/* Action buttons row */
+.ap-action-buttons {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+  align-self: flex-start;
+}
+
+.ap-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.ap-btn-edit {
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+}
+
+.ap-btn-edit:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+}
+
+.ap-btn-save {
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.3);
+}
+
+.ap-btn-save:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+.ap-btn-cancel {
+  background: #f8fafc;
+  color: #475569;
+  border: 1.5px solid #e2e8f0;
+}
+
+.ap-btn-cancel:hover {
+  background: #e2e8f0;
+}
+
+/* Edit Inputs */
+.ap-edit-input {
+  padding: 8px 14px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  background: #f8fafc;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.ap-edit-input:focus {
+  border-color: #2563eb;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.ap-edit-name {
+  font-size: 22px;
+  font-weight: 800;
+  padding: 8px 16px;
+  margin-bottom: 6px;
+}
+
+/* Avatar camera edit button */
+.ap-avatar-edit-btn {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  color: #fff;
+  border: 2px solid #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+  transition: transform 0.2s, box-shadow 0.2s;
+  z-index: 2;
+}
+
+.ap-avatar-edit-btn:hover {
+  transform: scale(1.12);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.45);
+}
+
+/* Saved toast */
+.ap-saved-toast {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #dcfce7, #f0fdf4);
+  border: 1px solid #86efac;
+  border-radius: 12px;
+  color: #166534;
+  font-size: 13px;
+  font-weight: 700;
+  animation: apToastSlide 0.3s ease;
+}
+
+@keyframes apToastSlide {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

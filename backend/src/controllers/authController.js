@@ -135,6 +135,7 @@ export const studentLogin = async (req, res) => {
     const isMatch = await bcrypt.compare(password, userData.password);
 
     if (!isMatch) {
+      console.warn(`[Student Login] Password mismatch for email: ${email}`);
       return res.status(401).json({ success: false, message: "Incorrect password" });
     }
 

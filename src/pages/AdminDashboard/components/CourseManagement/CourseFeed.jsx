@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   Clock, Layers, PlusCircle, Bookmark,
   Search, Filter, TrendingUp, Edit2, Trash2, Check, X,
-  Heart, MessageCircle, Send, AlertCircle
+  MessageCircle, Send, AlertCircle
 } from 'lucide-react';
 import './CourseFeed.css';
 
@@ -252,10 +252,6 @@ const CourseFeed = ({ courses, onToggleLike, onUpdateCourse, onDeleteCourse, isE
                       </div>
                     )}
                     <div className="cf-social">
-                      <button className={`cf-action-btn ${course.isLiked ? 'cf-liked' : ''}`} onClick={() => handleLike(course.id)} disabled={likingId === course.id}>
-                        <Heart size={17} fill={course.isLiked ? 'currentColor' : 'none'} />
-                        <span>{course.likes || 0}</span>
-                      </button>
                       <button className="cf-action-btn cf-ml-auto" onClick={() => startEdit(course)}><Edit2 size={15} /></button>
                       <button className="cf-action-btn cf-delete-btn" onClick={() => handleDelete(course.id)}><Trash2 size={15} /></button>
                     </div>

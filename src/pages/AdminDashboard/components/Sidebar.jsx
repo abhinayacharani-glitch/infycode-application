@@ -1,145 +1,305 @@
-import React, { useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import React, { useState, useRef } from 'react';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import "./Sidebar.css";
-import icLogo from '../../../assets/infycode-final-logo4-1.png';
-import bannerLogo from '../../../assets/color-logo-3.png';
 
-import {
-  LayoutDashboard,
-  UserCheck,
-  Settings2,
-  UserPlus,
-  CalendarDays,
-  Link2,
-  BarChart3,
-  Zap,
-  FileText,
-  LogOut,
-  ChevronDown,
-  Library
-} from 'lucide-react';
+/* ── Custom SVG Icons ── */
+const DashboardIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
+  </svg>
+);
+const UserCheckIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="8.5" cy="7" r="4" /><polyline points="17 11 19 13 23 9" />
+  </svg>
+);
+const LibraryIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="m16 6 4 14" /><path d="M12 6v14" /><path d="M8 8v12" /><path d="M4 4v16" />
+  </svg>
+);
+const UserPlusIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="8.5" cy="7" r="4" /><line x1="20" y1="8" x2="20" y2="14" /><line x1="17" y1="11" x2="23" y2="11" />
+  </svg>
+);
+const CalendarIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
+  </svg>
+);
+const LinkIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+  </svg>
+);
+const ChartIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" />
+  </svg>
+);
+const ZapIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+  </svg>
+);
+const FileIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" />
+  </svg>
+);
+const LogOutIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
+  </svg>
+);
+const CameraIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+    <circle cx="12" cy="13" r="4" />
+  </svg>
+);
+const CloseIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+  </svg>
+);
 
-const Sidebar = () => {
+const Sidebar = ({ isCollapsed }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const loggedUser = JSON.parse(localStorage.getItem("user") || "{}");
   const userName = loggedUser.fullName || loggedUser.fullname || loggedUser.username || "Admin";
-  const userInitial = userName ? userName.charAt(0).toUpperCase() : 'A';
 
-  const isSettingsActive = location.pathname.includes('/settings/');
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showLogoutModal, setShowLogoutModal]   = useState(false);
+  const [profileImage, setProfileImage]         = useState(loggedUser.profileImage || "https://i.pravatar.cc/150?img=5");
+  const [previewImage, setPreviewImage]         = useState(null);
+  const [editName, setEditName]                 = useState(userName);
+  const [editRole, setEditRole]                 = useState(loggedUser.role || "TRAINER");
+  const fileInputRef = useRef(null);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => setPreviewImage(ev.target.result);
+    reader.readAsDataURL(file);
+  };
+
+  const handleSave = () => {
+    const updatedUser = {
+      ...loggedUser,
+      fullName: editName,
+      fullname: editName,
+      role: editRole,
+      profileImage: previewImage || profileImage,
+    };
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+    setProfileImage(previewImage || profileImage);
+    setPreviewImage(null);
+    setShowProfileModal(false);
+  };
+
+  const handleCancel = () => {
+    setPreviewImage(null);
+    setEditName(userName);
+    setEditRole(loggedUser.role || "TRAINER");
+    setShowProfileModal(false);
+  };
 
   return (
-    <aside className="admin-sidebar" id="admin-sidebar">
+    <>
+      <aside className={`admin-sidebar ${isCollapsed ? 'collapsed' : ''}`} id="admin-sidebar">
 
-      {/* ── Admin User Card ── */}
-      <div className="adm-user-card">
-        <div className="adm-user-avatar">
-          <img src={loggedUser.profileImage || "https://i.pravatar.cc/150?img=5"} alt="Profile" className="adm-user-avatar-img" />
+        {/* ── Admin User Card ── */}
+        <div
+          className="adm-user-card"
+          onClick={() => setShowProfileModal(true)}
+          style={{ cursor: 'pointer' }}
+          title="Edit Profile"
+        >
+          <div className="adm-user-avatar adm-avatar-hover-wrap">
+            <img src={profileImage} alt="Profile" className="adm-user-avatar-img" />
+            <div className="adm-avatar-edit-overlay">
+              <CameraIcon />
+            </div>
+          </div>
+          {!isCollapsed && (
+            <div className="adm-user-info">
+              <div className="adm-user-name">
+                {editName}
+                <span className="adm-user-status-dot"></span>
+              </div>
+              <div className="adm-user-role">
+                {editRole}
+              </div>
+            </div>
+          )}
         </div>
-        <div className="adm-user-info">
-          <div className="adm-user-name">{userName}</div>
-          <div className="adm-user-role">
-            Web Developer
+
+        {/* ── Navigation ── */}
+        <nav className="adm-nav-body">
+
+          <NavLink to="/admin-dashboard/dashboard" className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`} title="Dashboard" data-tooltip="Dashboard">
+            <span className="adm-nav-icon"><DashboardIcon /></span>
+            {!isCollapsed && <span className="adm-nav-label">Dashboard</span>}
+          </NavLink>
+
+          <NavLink to="/admin-dashboard/student-verification" className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`} title="Student Verification" data-tooltip="Student Verification">
+            <span className="adm-nav-icon"><UserCheckIcon /></span>
+            {!isCollapsed && <span className="adm-nav-label">Student Verification</span>}
+            {!isCollapsed && <span className="adm-nav-badge amber">12</span>}
+          </NavLink>
+
+          <NavLink to="/admin-dashboard/course-config" className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`} title="Course Management" data-tooltip="Course Management">
+            <span className="adm-nav-icon"><LibraryIcon /></span>
+            {!isCollapsed && <span className="adm-nav-label">Course Management</span>}
+          </NavLink>
+
+          <NavLink to="/admin-dashboard/trainer-approval" className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`} title="Trainer Approvals" data-tooltip="Trainer Approvals">
+            <span className="adm-nav-icon"><UserPlusIcon /></span>
+            {!isCollapsed && <span className="adm-nav-label">Trainer Approvals</span>}
+            {!isCollapsed && <span className="adm-nav-badge green">3</span>}
+          </NavLink>
+
+          <NavLink to="/admin-dashboard/batch-setup" className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`} title="Batch Management" data-tooltip="Batch Management">
+            <span className="adm-nav-icon"><CalendarIcon /></span>
+            {!isCollapsed && <span className="adm-nav-label">Batch Management</span>}
+          </NavLink>
+
+          <NavLink to="/admin-dashboard/enrollment" className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`} title="Enrolment Mapping" data-tooltip="Enrolment Mapping">
+            <span className="adm-nav-icon"><LinkIcon /></span>
+            {!isCollapsed && <span className="adm-nav-label">Enrolment Mapping</span>}
+          </NavLink>
+
+          <NavLink to="/admin-dashboard/analytics" className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`}>
+            <span className="adm-nav-icon"><ChartIcon /></span>
+            {!isCollapsed && <span className="adm-nav-label">Analytics &amp; Monitoring</span>}
+          </NavLink>
+
+          <NavLink to="/admin-dashboard/activation" className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`}>
+            <span className="adm-nav-icon"><ZapIcon /></span>
+            {!isCollapsed && <span className="adm-nav-label">Learning Activation</span>}
+          </NavLink>
+
+          <NavLink to="/admin-dashboard/reports" className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`}>
+            <span className="adm-nav-icon"><FileIcon /></span>
+            {!isCollapsed && <span className="adm-nav-label">Reports &amp; Logs</span>}
+          </NavLink>
+
+        </nav>
+
+        {/* ── Footer / Logout ── */}
+        <div className="adm-sidebar-footer">
+          <button className="adm-logout-btn" onClick={() => setShowLogoutModal(true)}>
+            <LogOutIcon />
+            {!isCollapsed && <span>Logout</span>}
+          </button>
+        </div>
+
+      </aside>
+
+      {/* ── Profile Edit Modal ── */}
+      {showProfileModal && (
+        <div className="adm-profile-overlay" onClick={handleCancel}>
+          <div className="adm-profile-modal" onClick={e => e.stopPropagation()}>
+
+            {/* Header */}
+            <div className="adm-profile-modal-header">
+              <h2 className="adm-profile-modal-title">Edit Profile</h2>
+              <button className="adm-profile-close" onClick={handleCancel}><CloseIcon /></button>
+            </div>
+
+            {/* Photo Upload */}
+            <div className="adm-profile-photo-section">
+              <div className="adm-profile-photo-wrap">
+                <img
+                  src={previewImage || profileImage}
+                  alt="Profile Preview"
+                  className="adm-profile-photo-img"
+                />
+                <button
+                  className="adm-profile-photo-btn"
+                  onClick={() => fileInputRef.current.click()}
+                  title="Upload Photo"
+                >
+                  <CameraIcon />
+                </button>
+              </div>
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                onChange={handleImageChange}
+              />
+              <p className="adm-profile-photo-hint">Click the camera icon to upload a photo</p>
+            </div>
+
+            {/* Fields */}
+            <div className="adm-profile-fields">
+              <div className="adm-profile-field">
+                <label>Full Name</label>
+                <input
+                  type="text"
+                  value={editName}
+                  onChange={e => setEditName(e.target.value)}
+                  placeholder="Enter your name"
+                />
+              </div>
+              <div className="adm-profile-field">
+                <label>Role</label>
+                <input
+                  type="text"
+                  value={editRole}
+                  onChange={e => setEditRole(e.target.value)}
+                  placeholder="e.g. TRAINER"
+                />
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="adm-profile-actions">
+              <button className="adm-profile-cancel" onClick={handleCancel}>Cancel</button>
+              <button className="adm-profile-save" onClick={handleSave}>Save Changes</button>
+            </div>
+
           </div>
         </div>
-      </div>
+      )}
 
-      {/* ── Navigation ── */}
-      <nav className="adm-nav-body">
+      {/* ── Logout Confirmation Modal ── */}
+      {showLogoutModal && (
+        <div className="adm-logout-overlay" onClick={() => setShowLogoutModal(false)}>
+          <div className="adm-logout-modal" onClick={e => e.stopPropagation()}>
+            {/* Profile Image */}
+            <div className="adm-logout-photo-section">
+              <img
+                src={profileImage}
+                alt="Profile"
+                className="adm-logout-photo-img"
+              />
+            </div>
 
-        {/* CORE OPERATIONS */}
-        {/* <div className="adm-nav-section">Core Operations</div> */}
+            {/* Message */}
+            <h2 className="adm-logout-title">Are you sure you want to logout?</h2>
+            <p className="adm-logout-subtitle">You will be redirected to the main page.</p>
 
-        <NavLink
-          to="/admin-dashboard/dashboard"
-          className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`}
-        >
-          <span className="adm-nav-icon"><LayoutDashboard size={22} /></span>
-          <span className="adm-nav-label">Dashboard</span>
-        </NavLink>
-
-        <NavLink
-          to="/admin-dashboard/student-verification"
-          className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`}
-        >
-          <span className="adm-nav-icon"><UserCheck size={22} /></span>
-          <span className="adm-nav-label">Student Verification</span>
-          <span className="adm-nav-badge amber">12</span>
-        </NavLink>
-
-        {/* ACADEMICS & CONFIG */}
-        {/* <div className="adm-nav-section">Academics &amp; Config</div> */}
-
-        <NavLink
-          to="/admin-dashboard/course-config"
-          className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`}
-        >
-          <span className="adm-nav-icon"><Library size={22} /></span>
-          <span className="adm-nav-label">Course Management</span>
-        </NavLink>
-
-        <NavLink
-          to="/admin-dashboard/trainer-approval"
-          className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`}
-        >
-          <span className="adm-nav-icon"><UserPlus size={22} /></span>
-          <span className="adm-nav-label">Trainer Approvals</span>
-          <span className="adm-nav-badge green">3</span>
-        </NavLink>
-
-        <NavLink
-          to="/admin-dashboard/batch-setup"
-          className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`}
-        >
-          <span className="adm-nav-icon"><CalendarDays size={22} /></span>
-          <span className="adm-nav-label">Batch Management</span>
-        </NavLink>
-
-        <NavLink
-          to="/admin-dashboard/enrollment"
-          className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`}
-        >
-          <span className="adm-nav-icon"><Link2 size={22} /></span>
-          <span className="adm-nav-label">Enrolment Mapping</span>
-        </NavLink>
-
-        {/* SYSTEM */}
-        {/* <div className="adm-nav-section">System</div> */}
-
-        <NavLink
-          to="/admin-dashboard/analytics"
-          className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`}
-        >
-          <span className="adm-nav-icon"><BarChart3 size={22} /></span>
-          <span className="adm-nav-label">Analytics &amp; Monitoring</span>
-        </NavLink>
-
-        <NavLink
-          to="/admin-dashboard/activation"
-          className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`}
-        >
-          <span className="adm-nav-icon"><Zap size={22} /></span>
-          <span className="adm-nav-label">Learning Activation</span>
-        </NavLink>
-
-        <NavLink
-          to="/admin-dashboard/reports"
-          className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`}
-        >
-          <span className="adm-nav-icon"><FileText size={22} /></span>
-          <span className="adm-nav-label">Reports &amp; Logs</span>
-        </NavLink>
-
-      </nav>
-
-      {/* ── Footer / Logout ── */}
-      <div className="adm-sidebar-footer">
-        <NavLink to="/admin-dashboard/logout" className="adm-logout-btn">
-          <LogOut size={22} />
-          <span>Logout</span>
-        </NavLink>
-      </div>
-
-    </aside>
+            {/* Actions */}
+            <div className="adm-logout-actions">
+              <button className="adm-logout-cancel" onClick={() => setShowLogoutModal(false)}>Cancel</button>
+              <button className="adm-logout-confirm" onClick={() => {
+                localStorage.removeItem("loggedUser");
+                localStorage.removeItem("user");
+                localStorage.removeItem("token");
+                navigate("/login");
+              }}>OK</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

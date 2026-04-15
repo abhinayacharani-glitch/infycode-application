@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import { useAdmin } from "../../../context/AdminContext";
 
+const FileIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
+);
+
 const StudentVerification = () => {
   const { students, approveStudent, rejectStudent } = useAdmin();
   const [searchTerm, setSearchTerm] = useState("");
@@ -154,7 +158,7 @@ const StudentVerification = () => {
               <div style={{ color: '#666' }}>Course:</div><div>{viewingStudent.course}</div>
               <div style={{ color: '#666' }}>Reg. Date:</div><div>{viewingStudent.date}</div>
               <div style={{ color: '#666' }}>Status:</div><div>{getStatusBadge(viewingStudent.status)}</div>
-              <div style={{ color: '#666' }}>ID Proof:</div><div style={{ color: 'var(--blue-600)', cursor: 'pointer' }}>📄 document-092.pdf</div>
+              <div style={{ color: '#666' }}>ID Proof:</div><div style={{ color: 'var(--blue-600)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}><FileIcon /> document-092.pdf</div>
             </div>
             <div style={{ marginTop: '32px', display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
               {viewingStudent.status === 'Pending' && (

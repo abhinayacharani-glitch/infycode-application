@@ -109,8 +109,9 @@ function HomePage() {
 }
 
 function ProtectedRoute({ children }) {
-  const token = localStorage.getItem("token");
-  if (!token) return <Navigate to="/login" replace />;
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const token = user.token || localStorage.getItem("token"); // Fallback for safety
+  if (!token) return <Navigate to="/student/login" replace />;
   return children;
 }
 

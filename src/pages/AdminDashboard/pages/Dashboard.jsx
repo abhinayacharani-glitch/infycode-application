@@ -97,6 +97,47 @@ const filterByDate = (students, dateFilter) => {
 };
 
 /* ─── Main component ─────────────────────────────────────────── */
+/* ── SVG Icons ── */
+const SettingsIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.72V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.72V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></svg>
+);
+
+const UsersIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="8.5" cy="7" r="4" /><polyline points="17 11 19 13 23 9" /></svg>
+);
+
+const TrainerIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /></svg>
+);
+
+const BatchIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>
+);
+
+const WaitIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+);
+
+const BoltIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>
+);
+
+const CheckIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+);
+
+const BookIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></svg>
+);
+
+const CalendarActionIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
+);
+
+const GraphIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6" /><polyline points="17 18 23 18 23 12" /></svg>
+);
+
 const Dashboard = () => {
   const { stats, students, notifications, courses, batches, trainers } = useAdmin();
   const loggedUser = JSON.parse(localStorage.getItem("user") || "{}");
@@ -165,7 +206,7 @@ const Dashboard = () => {
       {/* Welcome Banner */}
       <div className="welcome-banner">
         <div className="welcome-text">
-          <h2>Welcome back, {userName}! ⚙️</h2>
+          <h2>Welcome back, {userName}! <SettingsIcon /></h2>
           <p>
             Showing data for <strong>{filter.course === 'All' ? 'all courses' : filter.course}</strong> ·{' '}
             <strong>{kpiData.total}</strong> registrations in the {kpiData.dateLabel}
@@ -226,7 +267,7 @@ const Dashboard = () => {
       <div className="kpi-grid">
         <div className="kpi-card blue">
           <div className="kpi-top">
-            <div className="kpi-icon blue">👤</div>
+            <div className="kpi-icon blue"><UsersIcon /></div>
             <span className="kpi-trend up">↑ {filter.date === 'Last 30 Days' ? '14%' : '8%'}</span>
           </div>
           <div className="kpi-val"><Counter key={`kpi-total-${animKey}`} target={kpiData.total} /></div>
@@ -237,7 +278,7 @@ const Dashboard = () => {
         </div>
         <div className="kpi-card purple">
           <div className="kpi-top">
-            <div className="kpi-icon purple">👨‍🏫</div>
+            <div className="kpi-icon purple"><TrainerIcon /></div>
             <span className="kpi-trend up">↑ 5%</span>
           </div>
           <div className="kpi-val"><Counter key={`kpi-trainers-${animKey}`} target={stats.trainers.active} /></div>
@@ -248,7 +289,7 @@ const Dashboard = () => {
         </div>
         <div className="kpi-card green">
           <div className="kpi-top">
-            <div className="kpi-icon green">🏫</div>
+            <div className="kpi-icon green"><BatchIcon /></div>
             <span className="kpi-trend up">↑ 12%</span>
           </div>
           <div className="kpi-val"><Counter key={`kpi-batches-${animKey}`} target={kpiData.activeBatches} /></div>
@@ -259,7 +300,7 @@ const Dashboard = () => {
         </div>
         <div className="kpi-card amber">
           <div className="kpi-top">
-            <div className="kpi-icon amber">⏳</div>
+            <div className="kpi-icon amber"><WaitIcon /></div>
             <span className="kpi-trend down">↓ 2%</span>
           </div>
           <div className="kpi-val"><Counter key={`kpi-pending-${animKey}`} target={kpiData.pending} /></div>
@@ -275,7 +316,7 @@ const Dashboard = () => {
         <div className="card">
           <div className="card-header">
             <div>
-              <div className="card-title">🆕 Recent Registrations</div>
+              <div className="card-title"><BoltIcon /> Recent Registrations</div>
               <div className="card-sub">
                 {filteredStudents.length} student{filteredStudents.length !== 1 ? 's' : ''} · {filter.date}
               </div>
@@ -285,7 +326,7 @@ const Dashboard = () => {
           <div className="card-body">
             {filteredStudents.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '32px', color: 'var(--text-muted)', fontSize: '13px' }}>
-                <div style={{ fontSize: '32px', marginBottom: '8px' }}>📭</div>
+                <div style={{ fontSize: '32px', marginBottom: '8px' }}><WaitIcon /></div>
                 No registrations found for the selected filters.
               </div>
             ) : (
@@ -307,20 +348,20 @@ const Dashboard = () => {
         {/* Quick Actions + Notifications */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div className="card">
-            <div className="card-header"><div className="card-title">⚡ Quick Actions</div></div>
+            <div className="card-header"><div className="card-title"><BoltIcon /> Quick Actions</div></div>
             <div className="card-body">
               <div className="qa-grid">
                 <div className="qa-btn" onClick={() => navigate('/admin-dashboard/student-verification')}>
-                  <span>✅</span><span>Verify Students</span>
+                  <span><CheckIcon /></span><span>Verify Students</span>
                 </div>
                 <div className="qa-btn" onClick={() => navigate('/admin-dashboard/course-config')}>
-                  <span>📚</span><span>Add Course</span>
+                  <span><BookIcon /></span><span>Add Course</span>
                 </div>
                 <div className="qa-btn" onClick={() => navigate('/admin-dashboard/batch-setup')}>
-                  <span>📅</span><span>New Batch</span>
+                  <span><CalendarActionIcon /></span><span>New Batch</span>
                 </div>
                 <div className="qa-btn" onClick={() => navigate('/admin-dashboard/reports')}>
-                  <span>📉</span><span>Export Report</span>
+                  <span><GraphIcon /></span><span>Export Report</span>
                 </div>
               </div>
             </div>
