@@ -183,7 +183,18 @@ const Login = () => {
 
           <div className="auth-footer">
             Don't have an account?
-            <Link to="/trainer/signup">Create Account</Link>
+            <Link 
+              to="/trainer/signup" 
+              state={{ fromLogin: true }}
+              onClick={(e) => {
+                if (location.state?.fromSignup) {
+                  e.preventDefault();
+                  navigate(-1);
+                }
+              }}
+            >
+              Create Account
+            </Link>
           </div>
         </div>
 

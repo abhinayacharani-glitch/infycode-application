@@ -488,7 +488,18 @@ const Signup = () => {
 
           <div className="auth-footer">
             Already have an account?
-            <Link to="/trainer/login">Login here</Link>
+            <Link 
+              to="/trainer/login" 
+              state={{ fromSignup: true }}
+              onClick={(e) => {
+                if (location.state?.fromLogin) {
+                  e.preventDefault();
+                  navigate(-1);
+                }
+              }}
+            >
+              Login here
+            </Link>
           </div>
         </div>
 

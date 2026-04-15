@@ -152,7 +152,17 @@ const AdminLogin = () => {
             <p className="admin-panel-sub">
               Manage Trainers, Courses, and System Growth from a centralized command center.
             </p>
-            <Link to="/admin/signup" className="admin-panel-btn">
+            <Link 
+              to="/admin/signup" 
+              className="admin-panel-btn"
+              state={{ fromLogin: true }}
+              onClick={(e) => {
+                if (location.state?.fromSignup) {
+                  e.preventDefault();
+                  navigate(-1);
+                }
+              }}
+            >
               Create Account
             </Link>
           </div>

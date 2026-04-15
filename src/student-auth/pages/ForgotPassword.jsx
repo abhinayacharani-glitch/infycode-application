@@ -20,16 +20,7 @@ const ForgotPassword = () => {
 
   useEffect(() => { emailRef.current?.focus(); }, []);
 
-  /* Block browser back → redirect to login */
-  useEffect(() => {
-    const guard = () => {
-      window.history.pushState(null, '', window.location.href);
-      window.location.replace('/student/login');
-    };
-    window.history.pushState(null, '', window.location.href);
-    window.addEventListener('popstate', guard);
-    return () => window.removeEventListener('popstate', guard);
-  }, []);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -86,7 +77,7 @@ const ForgotPassword = () => {
               <div className="studentLogin-toggle-panel studentLogin-toggle-left">
                 <h1>Forgot Password?</h1>
                 <p>We will help you get back to your account.</p>
-                <button className="studentLogin-hidden" onClick={() => navigate('/student/login')} type="button">Back to Login</button>
+                <button className="studentLogin-hidden" onClick={() => navigate(-1)} type="button">Back to Login</button>
               </div>
             </div>
           </div>

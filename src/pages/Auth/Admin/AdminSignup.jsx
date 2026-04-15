@@ -87,19 +87,7 @@ const AdminSignup = () => {
     return () => clearInterval(interval);
   }, [showOTP, otpTimer, handleClose]);
 
-  useEffect(() => {
-    const handleBack = () => {
-      window.history.pushState(null, "", window.location.href);
-      window.location.replace("/admin/login");
-    };
 
-    window.history.pushState(null, "", window.location.href);
-    window.addEventListener("popstate", handleBack);
-
-    return () => {
-      window.removeEventListener("popstate", handleBack);
-    };
-  }, []);
 
   const handleResendOTP = async () => {
     setOtpTimer(60);
@@ -502,7 +490,17 @@ const AdminSignup = () => {
             <p className="admin-panel-sub">
               Access the command center to oversee your platform's entire ecosystem.
             </p>
-            <Link to="/admin/login" className="admin-panel-btn">
+            <Link 
+              to="/admin/login" 
+              className="admin-panel-btn"
+              state={{ fromSignup: true }}
+              onClick={(e) => {
+                if (location.state?.fromLogin) {
+                  e.preventDefault();
+                  navigate(-1);
+                }
+              }}
+            >
               Sign In
             </Link>
           </div>
