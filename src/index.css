@@ -598,3 +598,45 @@ small, .small {
   animation: fadeIn 0.4s ease-out forwards;
 }
 
+
+/* ============================================================
+   SHARED DASHBOARD BANNER
+   Ensures visual consistency between Admin and Trainer banners
+   ============================================================ */
+.shared-dashboard-banner {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 50%, #0ea5e9 100%) !important;
+  border-radius: 16px !important;
+  padding: 28px 32px !important;
+  position: relative !important;
+  overflow: hidden !important;
+  box-shadow: 0 8px 32px rgba(37, 99, 235, 0.25) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.shared-dashboard-banner::before {
+  content: '' !important;
+  position: absolute !important;
+  right: -40px !important;
+  top: -40px !important;
+  width: 200px !important;
+  height: 200px !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+.shared-dashboard-banner::after {
+  content: '' !important;
+  position: absolute !important;
+  right: 80px !important;
+  bottom: -60px !important;
+  width: 150px !important;
+  height: 150px !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
