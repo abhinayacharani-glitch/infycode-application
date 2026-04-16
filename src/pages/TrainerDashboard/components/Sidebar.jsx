@@ -93,7 +93,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     localStorage.removeItem("loggedUser");
     localStorage.removeItem("trainerProfileImage");
     setShowLogoutModal(false);
-    navigate('/trainer-login');
+    navigate('/trainer/login');
   };
 
   return (

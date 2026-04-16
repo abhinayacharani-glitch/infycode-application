@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&display=swap');
 
 /* ═══════════════════════════════════════
    TOPBAR — ROOT
@@ -22,32 +23,84 @@
   width: auto;
   display: flex;
   align-items: center;
-  padding-right: 64px;
+  padding-right: 80px;
 }
 
-.adm-logo-container {
+.brand-wrapper {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 8px;
+  cursor: pointer;
+  padding: 4px 0;
 }
 
-.adm-logo-img {
-  height: 48px;
+.logo {
+  height: 45px;
   width: auto;
   object-fit: contain;
+  transition: transform 0.3s ease-in-out;
 }
 
-.adm-brand-text {
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  font-family: 'Urbanist', sans-serif;
+}
+
+.logo-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: #000000;
+  letter-spacing: -0.3px;
   position: relative;
-  height: 40px;
-  display: flex;
-  align-items: center;
+  font-family: 'Urbanist', sans-serif;
+  display: inline-block;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  margin-bottom: 2px;
 }
 
-.adm-title-img {
-  height: 40px;
-  width: auto;
-  object-fit: contain;
+/* Animated Underline */
+.logo-title::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 0%;
+  height: 2px;
+  background: #2f5bd3;
+  transition: width 0.3s ease-in-out;
+}
+
+.logo-title:hover {
+  color: #2f5bd3;
+}
+
+.logo-title:hover::after {
+  width: 100%;
+}
+
+.logo-subtitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #000000;
+  margin-top: 2px;
+  font-family: 'Urbanist', sans-serif;
+  white-space: nowrap;
+}
+
+/* Brand Hover Micro-interactions */
+.brand-wrapper:hover .logo {
+  transform: scale(1.05);
+}
+
+.brand-wrapper:hover .logo-title {
+  opacity: 0.9;
+}
+
+.brand-wrapper:hover .logo-title::after {
+  height: 3px;
 }
 
 /* .tb-divider-vert {
@@ -168,8 +221,15 @@
 }
 
 @keyframes tbDropdownFade {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 
@@ -510,8 +570,13 @@
 }
 
 @keyframes tbFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .tb-logout-modal {
@@ -520,7 +585,7 @@
   padding: 44px 40px 36px;
   width: 380px;
   max-width: 90vw;
-  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255,255,255,0.15);
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.15);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -529,8 +594,15 @@
 }
 
 @keyframes tbModalSlide {
-  from { opacity: 0; transform: translateY(-20px) scale(0.96); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .tb-logout-icon {

@@ -72,11 +72,11 @@ const Sidebar = ({ isCollapsed }) => {
   const userName = loggedUser.fullName || loggedUser.fullname || loggedUser.username || "Admin";
 
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const [showLogoutModal, setShowLogoutModal]   = useState(false);
-  const [profileImage, setProfileImage]         = useState(loggedUser.profileImage || "https://i.pravatar.cc/150?img=5");
-  const [previewImage, setPreviewImage]         = useState(null);
-  const [editName, setEditName]                 = useState(userName);
-  const [editRole, setEditRole]                 = useState(loggedUser.role || "TRAINER");
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [profileImage, setProfileImage] = useState(loggedUser.profileImage || "https://i.pravatar.cc/150?img=5");
+  const [previewImage, setPreviewImage] = useState(null);
+  const [editName, setEditName] = useState(userName);
+  const [editRole, setEditRole] = useState(loggedUser.role || "TRAINER");
   const fileInputRef = useRef(null);
 
   const handleImageChange = (e) => {
@@ -284,7 +284,7 @@ const Sidebar = ({ isCollapsed }) => {
 
             {/* Message */}
             <h2 className="adm-logout-title">Are you sure you want to logout?</h2>
-            <p className="adm-logout-subtitle">You will be redirected to the main page.</p>
+            <p className="adm-logout-subtitle">You will be redirected to the admin login page.</p>
 
             {/* Actions */}
             <div className="adm-logout-actions">
@@ -293,7 +293,7 @@ const Sidebar = ({ isCollapsed }) => {
                 localStorage.removeItem("loggedUser");
                 localStorage.removeItem("user");
                 localStorage.removeItem("token");
-                navigate("/login");
+                navigate("/admin/login");
               }}>OK</button>
             </div>
           </div>

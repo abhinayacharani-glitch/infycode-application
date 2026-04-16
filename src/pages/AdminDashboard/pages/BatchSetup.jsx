@@ -42,13 +42,13 @@ const BatchSetup = () => {
 
         {showForm && (
           <div className="card-body" style={{ borderBottom: '1px solid var(--border)', background: '#f8fafc' }}>
-            <form onSubmit={handleCreateBatch} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
+            <form onSubmit={handleCreateBatch} className="admin-filter-container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
               <div className="form-group">
                 <label style={{ display: 'block', marginBottom: '4px', fontSize: '13px', fontWeight: '500' }}>Batch Name</label>
                 <input 
                   type="text" 
-                  className="filter-select-premium" 
-                  style={{ width: '100%', padding: '10px' }}
+                  className="admin-filter-input" 
+                  style={{ width: '100%' }}
                   value={newBatch.name}
                   onChange={(e) => setNewBatch({...newBatch, name: e.target.value})}
                   required
@@ -57,7 +57,7 @@ const BatchSetup = () => {
               <div className="form-group">
                 <label style={{ display: 'block', marginBottom: '4px', fontSize: '13px', fontWeight: '500' }}>Select Course</label>
                 <select 
-                  className="filter-select-premium" 
+                  className="admin-filter-select" 
                   style={{ width: '100%' }}
                   value={newBatch.course}
                   onChange={(e) => setNewBatch({...newBatch, course: e.target.value})}
@@ -70,7 +70,7 @@ const BatchSetup = () => {
               <div className="form-group">
                 <label style={{ display: 'block', marginBottom: '4px', fontSize: '13px', fontWeight: '500' }}>Assign Trainer</label>
                 <select 
-                  className="filter-select-premium" 
+                  className="admin-filter-select" 
                   style={{ width: '100%' }}
                   value={newBatch.trainer}
                   onChange={(e) => setNewBatch({...newBatch, trainer: e.target.value})}
@@ -86,15 +86,15 @@ const BatchSetup = () => {
                 <label style={{ display: 'block', marginBottom: '4px', fontSize: '13px', fontWeight: '500' }}>Max Capacity</label>
                 <input 
                   type="number" 
-                  className="filter-select-premium" 
-                  style={{ width: '100%', padding: '10px' }}
+                  className="admin-filter-input" 
+                  style={{ width: '100%' }}
                   value={newBatch.capacity}
                   onChange={(e) => setNewBatch({...newBatch, capacity: parseInt(e.target.value)})}
                   required
                 />
               </div>
               <div style={{ display: 'flex', alignItems: 'flex-end' }}>
-                <button type="submit" className="btn-primary" style={{ width: '100%', margin: 0 }}>Create Batch</button>
+                <button type="submit" className="btn-primary" style={{ width: '100%', margin: 0, height: '40px' }}>Create Batch</button>
               </div>
             </form>
           </div>

@@ -11,6 +11,50 @@ const StudentVerification = () => {
   const [filterStatus, setFilterStatus] = useState("All");
   const [selectedStudents, setSelectedStudents] = useState([]);
   const [viewingStudent, setViewingStudent] = useState(null);
+  const [exportState, setExportState] = useState('idle'); // idle | downloading | success
+
+  const handleExportCSV = () => {
+    if (exportState !== 'idle') return;
+    setExportState('downloading');
+    
+    // Simulate real-world delay for feedback
+    setTimeout(() => {
+      // 1. Prepare CSV Content from current filtered results
+      const headers = ["ID", "Name", "Email", "Course", "Status", "Date"];
+      const rows = filteredStudents.map(s => [
+        s.id, 
+        `"${s.name}"`, 
+        s.email, 
+        `"${s.course}"`, 
+        s.status, 
+        s.date || new Date().toLocaleDateString()
+      ]);
+      
+      const csvContent = [
+        headers.join(","),
+        ...rows.map(e => e.join(","))
+      ].join("\n");
+
+      // 2. Trigger browser Download
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `admin-data-students.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // 3. Update UI to success indication
+      setExportState('success');
+      
+      // 4. Revert to idle after delay
+      setTimeout(() => {
+        setExportState('idle');
+      }, 2500);
+    }, 1500);
+  };
 
   const filteredStudents = students.filter(s => {
     const matchesSearch = s.name.toLowerCase().includes(searchTerm.toLowerCase()) || s.email.toLowerCase().includes(searchTerm.toLowerCase());
@@ -51,33 +95,41 @@ const StudentVerification = () => {
                 <p className="card-sub">Review and verify student identities and registration sources.</p>
               </div>
               <div style={{ display: 'flex', gap: '8px' }}>
-                <button className="btn-primary">Export CSV</button>
+                <button 
+                  className={`btn-primary ${exportState === 'success' ? 'btn-export-success' : ''}`}
+                  onClick={handleExportCSV}
+                  disabled={exportState !== 'idle'}
+                  style={{ minWidth: '135px', transition: 'all 0.3s ease' }}
+                >
+                  {exportState === 'downloading' && <span className="adm-btn-loader"></span>}
+                  {exportState === 'idle' && "Export CSV"}
+                  {exportState === 'downloading' && "Downloading..."}
+                  {exportState === 'success' && "Downloaded ✓"}
+                </button>
               </div>
            </div>
 
-           <div className="table-controls" style={{ width: '100%', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-             <div className="filter-container-premium" style={{ flex: 1, minWidth: '300px' }}>
-               <input 
-                 type="text" 
-                 placeholder="Search students..." 
-                 className="filter-select-premium" 
-                 style={{ flex: 1, paddingRight: '12px', backgroundImage: 'none' }}
-                 value={searchTerm}
-                 onChange={(e) => setSearchTerm(e.target.value)}
-               />
-               <select 
-                 className="filter-select-premium" 
-                 value={filterStatus}
-                 onChange={(e) => setFilterStatus(e.target.value)}
-               >
-                 <option value="All">All Status</option>
-                 <option value="Pending">Pending</option>
-                 <option value="Verified">Verified</option>
-                 <option value="Assigned">Assigned</option>
-               </select>
-             </div>
+           <div className="admin-filter-container" style={{ width: '100%', flexWrap: 'wrap' }}>
+             <input 
+               type="text" 
+               placeholder="Search students..." 
+               className="admin-filter-input" 
+               style={{ flex: 1, minWidth: '200px' }}
+               value={searchTerm}
+               onChange={(e) => setSearchTerm(e.target.value)}
+             />
+             <select 
+               className="admin-filter-select" 
+               value={filterStatus}
+               onChange={(e) => setFilterStatus(e.target.value)}
+             >
+               <option value="All">All Status</option>
+               <option value="Pending">Pending</option>
+               <option value="Verified">Verified</option>
+               <option value="Assigned">Assigned</option>
+             </select>
              {selectedStudents.length > 0 && (
-               <div style={{ display: 'flex', gap: '8px' }}>
+               <div style={{ display: 'flex', gap: '8px', marginLeft: 'auto' }}>
                  <button className="btn-primary btn-small" onClick={() => selectedStudents.forEach(id => approveStudent(id))}>Approve Selected</button>
                  <button className="btn-secondary btn-small" onClick={() => selectedStudents.forEach(id => rejectStudent(id))}>Reject Selected</button>
                </div>

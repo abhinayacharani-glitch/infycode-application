@@ -123,24 +123,28 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-container-v2 animate-fade-in">
-      {/* WELCOME BANNER V2 */}
-      <div className="welcome-banner-v2 shared-dashboard-banner">
-        <div className="banner-left-v2">
-          <h1 className="banner-title-v2">Welcome back, {userName}!</h1>
-          <p className="banner-subtitle-v2">Here’s what’s happening with your batches today.</p>
-        </div>
-        <div className="banner-right-v2">
-          <div className="banner-stat-item-v2">
-            <span className="banner-stat-value-v2">128</span>
-            <span className="banner-stat-label-v2">Total Students</span>
+      {/* Welcome Banner — Restored with identical design */}
+      <div className="dashboard-banner">
+        <div className="banner-content">
+          <div className="banner-left">
+            <h1>Welcome back, {userName}!</h1>
+            <p>Here’s what’s happening with your batches today.</p>
           </div>
-          <div className="banner-stat-item-v2">
-            <span className="banner-stat-value-v2">4</span>
-            <span className="banner-stat-label-v2">Active Batches</span>
-          </div>
-          <div className="banner-stat-item-v2">
-            <span className="banner-stat-value-v2">3</span>
-            <span className="banner-stat-label-v2">Live Sessions</span>
+          <div className="banner-right">
+            <div className="banner-stat-item">
+              <span className="banner-stat-value"><Counter target={128} /></span>
+              <span className="banner-stat-label">Total Students</span>
+            </div>
+            <div className="banner-divider"></div>
+            <div className="banner-stat-item">
+              <span className="banner-stat-value"><Counter target={4} /></span>
+              <span className="banner-stat-label">Active Batches</span>
+            </div>
+            <div className="banner-divider"></div>
+            <div className="banner-stat-item">
+              <span className="banner-stat-value"><Counter target={3} /></span>
+              <span className="banner-stat-label">Live Sessions</span>
+            </div>
           </div>
         </div>
       </div>
