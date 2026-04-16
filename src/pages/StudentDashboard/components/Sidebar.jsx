@@ -1,18 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
+import { Camera, X } from 'lucide-react';
 import "./Sidebar.css";
 import icLogo from '../../../assets/infycode-final-logo4-1.png';
 import bannerLogo from '../../../assets/color-logo-3.png';
 
 const Sidebar = () => {
   const navigate = useNavigate();
+  const [showEditProfileModal, setShowEditProfileModal] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showLogoLogoutModal, setShowLogoLogoutModal] = useState(false);
 
-  const userString = localStorage.getItem('user');
-  const user = userString ? JSON.parse(userString) : { fullname: "Student", role: "STUDENT" };
-  const userName = user.fullname || user.fullName || "Student";
-  const userRole = user.role || "STUDENT";
+  const getInitialUser = () => {
+    const userString = localStorage.getItem('user');
+    return userString ? JSON.parse(userString) : { fullname: "Student", role: "STUDENT" };
+  };
+
+  const [user, setUser] = useState(getInitialUser());
+  const [formData, setFormData] = useState({
+    fullname: user.fullname || user.fullName || "Student",
+    role: user.role || "STUDENT"
+  });
+
+  useEffect(() => {
+    setFormData({
+      fullname: user.fullname || user.fullName || "Student",
+      role: user.role || "STUDENT"
+    });
+  }, [user]);
+
+  const handleSaveProfile = (e) => {
+    e.preventDefault();
+    const updatedUser = { ...user, ...formData };
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+    setUser(updatedUser);
+    setShowEditProfileModal(false);
+  };
 
   const handleLogout = () => {
     localStorage.clear();
@@ -42,8 +65,8 @@ const Sidebar = () => {
           </div>
         </button>
 
-        {/* USER PROFILE CARD */}
-        <Link to="/student-dashboard/profile" className="student-sd-user-link">
+        {/* USER PROFILE CARD - Click opens Edit Profile Modal */}
+        <div className="student-sd-user-link" onClick={() => setShowEditProfileModal(true)}>
           <div className="student-sd-user">
             <div className="student-sd-avatar-wrap">
               <img
@@ -54,11 +77,11 @@ const Sidebar = () => {
               <span className="student-sd-status-dot"></span>
             </div>
             <div className="student-sd-user-info">
-              <div className="student-sd-name">{userName}</div>
-              <div className="student-sd-role">{userRole}</div>
+              <div className="student-sd-name">{formData.fullname}</div>
+              <div className="student-sd-role">{formData.role}</div>
             </div>
           </div>
-        </Link>
+        </div>
 
         {/* NAV — text only, no icons */}
         <nav className="student-sd-nav">
@@ -83,8 +106,67 @@ const Sidebar = () => {
             <span>Logout</span>
           </button>
         </div>
-
       </aside>
+
+      {/* ── EDIT PROFILE MODAL ── */}
+      {showEditProfileModal && (
+        <div className="sd-modal-overlay" onClick={() => setShowEditProfileModal(false)}>
+          <div className="sd-edit-profile-modal" onClick={e => e.stopPropagation()}>
+            <div className="sd-modal-header">
+              <h3>Edit Profile</h3>
+              <button className="sd-modal-close" onClick={() => setShowEditProfileModal(false)}>
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="sd-modal-body">
+              <div className="sd-avatar-upload">
+                <div className="sd-avatar-container">
+                  <img
+                    src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200&h=200"
+                    alt="Profile"
+                    className="sd-modal-large-avatar"
+                  />
+                  <div className="sd-camera-overlay">
+                    <Camera size={20} color="#ffffff" />
+                  </div>
+                </div>
+                <p className="sd-upload-hint">Click the camera icon to upload a photo</p>
+              </div>
+
+              <form onSubmit={handleSaveProfile} className="sd-edit-profile-form">
+                <div className="sd-form-group">
+                  <label>FULL NAME</label>
+                  <input
+                    type="text"
+                    value={formData.fullname}
+                    onChange={(e) => setFormData({ ...formData, fullname: e.target.value })}
+                    placeholder="Enter full name"
+                  />
+                </div>
+                <div className="sd-form-group">
+                  <label>ROLE</label>
+                  <input
+                    type="text"
+                    value={formData.role}
+                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                    placeholder="Enter role"
+                  />
+                </div>
+
+                <div className="sd-modal-footer">
+                  <button type="button" className="sd-btn-cancel" onClick={() => setShowEditProfileModal(false)}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="sd-btn-save">
+                    Save Changes
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── LOGOUT CONFIRMATION MODAL (To Sign In) ── */}
       {showLogoutModal && (
@@ -94,8 +176,8 @@ const Sidebar = () => {
             <div className="sd-modal-user-header">
               <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200&h=200" alt="Profile" className="sd-modal-avatar" />
               <div className="sd-modal-user-info">
-                <span className="sd-modal-name">{userName}</span>
-                <span className="sd-modal-role">{userRole}</span>
+                <span className="sd-modal-name">{formData.fullname}</span>
+                <span className="sd-modal-role">{formData.role}</span>
               </div>
             </div>
 

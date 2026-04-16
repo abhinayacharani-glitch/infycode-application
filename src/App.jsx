@@ -4,6 +4,8 @@ import { FaWhatsapp } from "react-icons/fa";
 import Loader from "./components/Loader/Loader";
 import Popup from "./components/popup/popup";
 import Navbar from "./components/Navbar/Navbar";
+import AIChatbot from "./components/AIChatbot/AIChatbot";
+import { motion } from "framer-motion";
 import { AdminProvider } from "./context/AdminContext";
 
 import {
@@ -104,19 +106,72 @@ function WhatsAppFloat() {
   );
 }
 
+const FadeInView = ({ children, delay = 0 }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 50 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, margin: "-50px" }}
+    transition={{ duration: 0.6, delay, ease: "easeOut" }}
+  >
+    {children}
+  </motion.div>
+);
+
 function HomePage() {
+  const [showFloaters, setShowFloaters] = useState(true);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      
+      const footerZone = document.getElementById("footer-trigger-zone");
+      // Give a tiny 50px buffer so it hits cleanly when scrolling into it
+      const footerHeight = footerZone ? footerZone.offsetHeight : 350;
+      
+      // The floating buttons should appear ONLY on the very top (Hero) and very bottom (Footer)
+      if (scrollY < windowHeight * 0.25 || scrollY + windowHeight >= documentHeight - footerHeight + 50) {
+        setShowFloaters(true);
+      } else {
+        setShowFloaters(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll(); // Initialize on mount
+    
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <>
       <Hero />
-      <WhyChoose />
-      <Features />
-      <Courses />
-      <Achievements />
-      <Working />
-      <FAQ />
-      <Testimonals />
-      <Footer />
-      <WhatsAppFloat />
+      <FadeInView><WhyChoose /></FadeInView>
+      <FadeInView><Features /></FadeInView>
+      <FadeInView><Courses /></FadeInView>
+      <FadeInView><Achievements /></FadeInView>
+      <FadeInView><Working /></FadeInView>
+      <FadeInView><FAQ /></FadeInView>
+      <FadeInView><Testimonals /></FadeInView>
+      <div id="footer-trigger-zone">
+        <Footer />
+      </div>
+      <motion.div 
+        className="floating-buttons-container"
+        animate={{ 
+          y: [0, -6, 0],
+          opacity: showFloaters ? 1 : 0
+        }}
+        style={{ pointerEvents: showFloaters ? "auto" : "none" }}
+        transition={{ 
+          y: { duration: 3, repeat: Infinity, ease: "easeInOut" },
+          opacity: { duration: 0.3 }
+        }}
+      >
+        <AIChatbot />
+        <WhatsAppFloat />
+      </motion.div>
     </>
   );
 }
@@ -151,7 +206,7 @@ function Layout({ courses, setCourses, onToggleLike, onUpdateCourse, onDeleteCou
     <>
       {!hideNavbar && <Navbar />}
 
-      <div style={{ paddingTop: hideNavbar ? "0px" : "80px", width: "100%" }}>
+      <div style={{ paddingTop: hideNavbar ? "0px" : "84px", width: "100%" }}>
         <Suspense fallback={<PageLoader />}>
           <Routes>
             {/* ── Public ── */}
