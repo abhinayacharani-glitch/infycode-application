@@ -65,13 +65,15 @@
 
 /* Split Layout (used by Contact) */
 .training-split {
-  display: flex;
-  align-items: flex-start;
+  display: grid !important;
+  grid-template-columns: 1fr 1fr;
+  align-items: stretch !important;
   gap: 60px;
 }
 
 .training-text {
-  flex: 1;
+  height: 100% !important;
+  width: 100%;
 }
 
 /* Contact Hero Tweak */
@@ -85,6 +87,8 @@
   background: white;
   border-radius: 24px;
   box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
 }
 
 .contact-form-title {
@@ -96,6 +100,7 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+  flex: 1;
 }
 
 .contact-form-row {
@@ -116,12 +121,27 @@
 
 .contact-input.textarea {
   resize: none;
+  flex: 1;
+  min-height: 150px;
 }
 
 .contact-submit-btn {
-  background: var(--blue-600);
+  background: #2563eb;
   color: white;
   align-self: flex-start;
+  padding: 15px 35px;
+  border-radius: 12px;
+  border: none;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.3s;
+  margin-top: 10px;
+}
+
+.contact-submit-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-2px);
 }
 
 .contact-info-card {
@@ -148,4 +168,10 @@
   border-radius: 16px;
   margin-top: 30px;
   box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 992px) {
+  .training-split {
+    grid-template-columns: 1fr;
+  }
 }
