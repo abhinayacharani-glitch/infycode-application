@@ -66,7 +66,7 @@ const GalleryPage               = lazy(() => import("./pages/InternalPages/Galle
 const InstagramPage             = lazy(() => import("./pages/InternalPages/InstagramPage"));
 
 // ─── Lazy-loaded — Other ─────────────────────────────────────────────────────
-const BatchCreation             = lazy(() => import("./pages/BatchCreation"));
+const BatchCreation             = lazy(() => import("./pages/AdminDashboard/pages/BatchCreation"));
 
 // ─── Page-level Suspense fallback ────────────────────────────────────────────
 function PageLoader() {
