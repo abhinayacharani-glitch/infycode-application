@@ -1,12 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Edit2, Mail, Phone, User, Calendar } from 'lucide-react';
+import { useLocation } from "react-router-dom";
 import "./Profile.css";
 
 const Profile = () => {
+  const location = useLocation();
+
   const [loggedUser, setLoggedUser] = useState(
     JSON.parse(localStorage.getItem("loggedUser") || "{}")
   );
   const [open, setOpen] = useState("personal");
   const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('edit') === 'true') {
+      setIsEditing(true);
+      setOpen("personal");
+    }
+  }, [location]);
 
   const [personalDetails, setPersonalDetails] = useState({
     fullName: loggedUser.username || "charanistudent",

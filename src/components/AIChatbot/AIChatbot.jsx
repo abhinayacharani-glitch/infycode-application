@@ -1,5 +1,3 @@
-AIChatbot.jsx
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Bot, X, Send, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';

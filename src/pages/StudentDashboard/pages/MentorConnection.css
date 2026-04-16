@@ -317,118 +317,194 @@
 /* Directory Grid */
 .mentor-directory-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 32px;
+  padding: 8px;
 }
 
-.dir-card {
-  background: white;
-  border-radius: 16px;
+.dir-card-premium {
+  background: #ffffff;
+  border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+  border: 1px solid #f1f5f9;
   display: flex;
   flex-direction: column;
-}
-
-.dir-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.08);
-}
-
-.dir-card-top {
-  height: 80px;
   position: relative;
-  display: flex;
-  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.dir-avatar-large {
-  width: 70px;
-  height: 70px;
-  background: white;
-  border: 4px solid white;
-  border-radius: 50%;
+.dir-card-premium:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15);
+}
+
+.dir-card-banner {
+  height: 100px;
+  width: 100%;
+  position: relative;
+}
+
+.dir-card-banner::after {
+  content: '';
   position: absolute;
-  bottom: -35px;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.3) 1px, transparent 1px);
+  background-size: 14px 14px;
+}
+
+.dir-avatar-wrapper {
+  position: absolute;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  z-index: 2;
+}
+
+.dir-avatar-circle {
+  width: 80px;
+  height: 80px;
+  background: #f8fafc;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #1e293b;
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   font-weight: 800;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  border: 1px solid #f1f5f9;
 }
 
-.dir-card-content {
-  padding: 45px 24px 24px;
-  text-align: center;
+.dir-card-body {
+  padding: 56px 24px 24px;
   display: flex;
   flex-direction: column;
   flex: 1;
+  text-align: center;
+  background: white;
 }
 
-.dir-name {
-  font-size: 1.25rem;
+.dir-title-section {
+  margin-bottom: 20px;
+}
+
+.dir-title-section .dir-name {
+  font-size: 1.35rem;
   font-weight: 800;
-  color: #1e293b;
-  margin-bottom: 4px;
+  color: #0f172a;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.01em;
 }
 
-.dir-role {
+.dir-title-section .dir-role {
   color: #64748b;
-  font-size: 0.9rem;
-  margin-bottom: 16px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin: 0;
 }
 
-.dir-tags {
+.dir-tags-group {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   justify-content: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
-.dir-tag {
+.dir-tag-pill {
   background: #f1f5f9;
   color: #475569;
-  padding: 4px 10px;
-  border-radius: 20px;
+  padding: 6px 14px;
+  border-radius: 100px;
   font-size: 0.75rem;
   font-weight: 600;
-}
-
-.dir-availability {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  color: #64748b;
-  font-size: 0.85rem;
-  margin-top: auto;
-  margin-bottom: 20px;
-}
-
-.dir-connect-btn {
-  background: linear-gradient(135deg, #2563eb, #4f46e5);
-  color: white;
-  border: none;
-  border-radius: 10px;
-  padding: 12px;
-  font-weight: 600;
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  cursor: pointer;
+  letter-spacing: 0.02em;
+  border: 1px solid #e2e8f0;
   transition: all 0.2s ease;
+}
+
+.dir-tag-pill:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+.dir-separator {
+  height: 1px;
+  background: #f1f5f9;
+  width: 100%;
+  margin-bottom: 20px;
+  margin-top: auto;
+}
+
+.dir-footer-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
   width: 100%;
 }
 
-.dir-connect-btn:hover {
-  background: linear-gradient(135deg, #1d4ed8, #4338ca);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+.dir-availability-pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #475569;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 10px 16px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px dashed #cbd5e1;
+}
+
+.avail-icon {
+  color: #94a3b8;
+}
+
+.dir-connect-action-btn {
+  background: #0f172a;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.15);
+}
+
+.dir-connect-action-btn:hover {
+  background: #1e293b;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px rgba(15, 23, 42, 0.25);
+}
+
+.dir-connect-action-btn:active {
+  transform: translateY(0);
+}
+
+/* Directory Header Styling */
+.directory-header {
+  padding: 24px 0 32px;
+}
+
+.directory-header .mentor-top-title {
+  font-size: 2rem;
+  letter-spacing: -0.02em;
+}
+
+.directory-header .mentor-top-subtitle {
+  font-size: 1.05rem;
+  color: #475569;
 }
 
 .back-to-dir-btn {

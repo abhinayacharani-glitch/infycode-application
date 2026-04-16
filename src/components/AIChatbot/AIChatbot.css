@@ -1,5 +1,3 @@
-AIChatbot.css
-
 .ai-chatbot-container {
   font-family: 'Inter', 'Urbanist', sans-serif;
   /* Removed absolute positioning, relying on floating-buttons-container flex layout */

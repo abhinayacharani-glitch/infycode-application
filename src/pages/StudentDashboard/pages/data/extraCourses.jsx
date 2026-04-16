@@ -9,7 +9,7 @@ export const COURSE_MAP = {
     level: "Intermediate",
     progress: 95,
     trainer: {
-      name: "Mohan Krishna",
+      name: "Charani",
       role: "Senior Java Architect",
       experience: "12+ Years",
       specialization: "Spring Boot, Microservices, React"
@@ -288,7 +288,7 @@ export const COURSE_MAP = {
     level: "Beginner",
     progress: 10,
     trainer: {
-      name: "Sarah Williams",
+      name: "Charani",
       role: "Lead Python Developer",
       experience: "9+ Years",
       specialization: "Python, Django, Data Science"
@@ -612,7 +612,7 @@ export const COURSE_MAP = {
     level: "Intermediate",
     progress: 75,
     trainer: {
-      name: "Michael Chang",
+      name: "Charani",
       role: "Cloud Solutions Architect",
       experience: "14+ Years",
       specialization: "AWS, Terraform, Kubernetes"
