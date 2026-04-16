@@ -257,7 +257,7 @@ function Login() {
         {showOTP && (
           <div className="otp-popup-overlay" style={{
             position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-            zIndex: 1000,
+            zIndex: 9999,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             background: 'rgba(255, 255, 255, 0.4)', backdropFilter: 'blur(4px)',
             animation: 'fadeInScale 0.3s ease-out'
