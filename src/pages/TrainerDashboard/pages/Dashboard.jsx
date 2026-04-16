@@ -124,7 +124,7 @@ const Dashboard = () => {
   return (
     <div className="dashboard-container-v2 animate-fade-in">
       {/* WELCOME BANNER V2 */}
-      <div className="welcome-banner-v2">
+      <div className="welcome-banner-v2 shared-dashboard-banner">
         <div className="banner-left-v2">
           <h1 className="banner-title-v2">Welcome back, {userName}!</h1>
           <p className="banner-subtitle-v2">Here’s what’s happening with your batches today.</p>

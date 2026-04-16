@@ -17,41 +17,8 @@
 
 /* WELCOME BANNER V2 */
 .welcome-banner-v2 {
-  background: linear-gradient(90deg, #1e3a8a 0%, #2563eb 40%, #38bdf8 100%);
-  border-radius: 20px;
-  padding: 24px 32px;
   color: white;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: relative;
-  overflow: hidden;
   margin-bottom: 32px;
-  box-shadow: 0 12px 30px -10px rgba(30, 58, 138, 0.3);
-}
-
-.welcome-banner-v2::before {
-  content: "";
-  position: absolute;
-  top: -20%;
-  right: -5%;
-  width: 300px;
-  height: 300px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  pointer-events: none;
-}
-
-.welcome-banner-v2::after {
-  content: "";
-  position: absolute;
-  bottom: -30%;
-  right: 15%;
-  width: 200px;
-  height: 200px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 50%;
-  pointer-events: none;
 }
 
 .banner-left-v2 {

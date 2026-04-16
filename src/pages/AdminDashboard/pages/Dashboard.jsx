@@ -163,7 +163,7 @@ const Dashboard = () => {
   return (
     <div className="page active" id="page-dashboard">
       {/* Welcome Banner */}
-      <div className="welcome-banner">
+      <div className="welcome-banner shared-dashboard-banner">
         <div className="welcome-text">
           <h2>Welcome back, {userName}! ⚙️</h2>
           <p>

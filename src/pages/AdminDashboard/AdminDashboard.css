@@ -109,38 +109,7 @@
    WELCOME BANNER
    ═══════════════════════════════════════════════ */
 .admin-dashboard-layout .welcome-banner {
-  background: linear-gradient(135deg, var(--adm-blue-500) 0%, var(--adm-blue-700) 50%, #0ea5e9 100%);
-  border-radius: var(--adm-radius);
-  padding: 28px 32px;
   margin-bottom: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 8px 32px rgba(37, 99, 235, 0.25);
-}
-
-.admin-dashboard-layout .welcome-banner::before {
-  content: '';
-  position: absolute;
-  right: -40px;
-  top: -40px;
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.admin-dashboard-layout .welcome-banner::after {
-  content: '';
-  position: absolute;
-  right: 80px;
-  bottom: -60px;
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.05);
 }
 
 .admin-dashboard-layout .welcome-text h2 {
