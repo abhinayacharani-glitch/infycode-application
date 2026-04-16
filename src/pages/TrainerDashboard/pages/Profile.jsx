@@ -1,4 +1,5 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { useTrainer } from '../../../context/TrainerContext';
 import {
   Camera,
   Mail,
@@ -19,34 +20,50 @@ import {
 import './Profile.css';
 
 const Profile = () => {
+  const { trainerData, profileImage, updateTrainerProfile } = useTrainer();
   const [isEditing, setIsEditing] = useState(false);
   const fileInputRef = useRef(null);
 
-  const [profileData, setProfileData] = useState({
-    name: "Charani",
-    role: "Senior Trainer",
-    email: "charani@infycode.com",
-    phone: "+91 98765 43210",
-    location: "Vijayawada, AP",
-    experience: "5+ Years",
-    expertise: "Full Stack Development, React, Node.js",
-    courses: "3 Active Batches",
-    mode: "Online & Offline",
-    about: "Experienced trainer focused on building industry-ready developers with practical skills and real-world projects."
+  const [tempData, setTempData] = useState({
+    name: trainerData.fullname || trainerData.name || "Trainer",
+    role: trainerData.role || "Senior Trainer",
+    email: trainerData.email || "trainer@infycode.com",
+    phone: trainerData.phone || "+91 98765 43210",
+    location: trainerData.location || "Vijayawada, AP",
+    experience: trainerData.experience || "5+ Years",
+    expertise: trainerData.expertise || "Full Stack Development, React, Node.js",
+    courses: trainerData.courses || "3 Active Batches",
+    mode: trainerData.mode || "Online & Offline",
+    about: trainerData.about || "Experienced trainer focused on building industry-ready developers with practical skills and real-world projects."
   });
 
-  const [tempData, setTempData] = useState({ ...profileData });
-  const [profileImage, setProfileImage] = useState(null);
+  const [localImage, setLocalImage] = useState(profileImage);
+
+  // Sync with context if it changes elsewhere
+  useEffect(() => {
+    setLocalImage(profileImage);
+  }, [profileImage]);
 
   const handleEditToggle = () => {
     if (isEditing) {
-      setTempData({ ...profileData });
+      setTempData({
+        name: trainerData.fullname || trainerData.name || "Trainer",
+        role: trainerData.role || "Senior Trainer",
+        email: trainerData.email || "trainer@infycode.com",
+        phone: trainerData.phone || "+91 98765 43210",
+        location: trainerData.location || "Vijayawada, AP",
+        experience: trainerData.experience || "5+ Years",
+        expertise: trainerData.expertise || "Full Stack Development, React, Node.js",
+        courses: trainerData.courses || "3 Active Batches",
+        mode: trainerData.mode || "Online & Offline",
+        about: trainerData.about || "Experienced trainer focused on building industry-ready developers with practical skills and real-world projects."
+      });
     }
     setIsEditing(!isEditing);
   };
 
   const handleSave = () => {
-    setProfileData({ ...tempData });
+    updateTrainerProfile({ ...tempData, fullname: tempData.name }, localImage);
     setIsEditing(false);
   };
 
@@ -62,9 +79,17 @@ const Profile = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Basic size check (2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        alert("Image size should be less than 2MB");
+        return;
+      }
+
       const reader = new FileReader();
       reader.onloadend = () => {
-        setProfileImage(reader.result);
+        setLocalImage(reader.result);
+        // Instant update as requested
+        updateTrainerProfile(null, reader.result);
       };
       reader.readAsDataURL(file);
     }
@@ -76,86 +101,88 @@ const Profile = () => {
     { label: 'Avg Attendance', value: '92%', icon: <Star size={18} />, color: 'purple' }
   ];
 
+  const displayName = trainerData.fullname || trainerData.name || "Trainer";
+
   return (
     <div className="profile-saas-container">
       {/* 0. HEADER */}
-      <div class="profile-header">
-        <h1 class="profile-title">My Profile</h1>
-        <p class="profile-subtitle">View and update your trainer profile</p>
+      <div className="profile-header">
+        <h1 className="profile-title">My Profile</h1>
+        <p className="profile-subtitle">View and update your trainer profile</p>
       </div>
 
       {/* 1. CLEAN & CENTERED PROFILE HEADER */}
       <div className="profile-layout">
         <div className="profile-card-container">
           <div className="profile-header-card shadow-sm minimal">
-        <div className="profile-image-container-minimal" onClick={handleImageClick}>
-          {profileImage ? (
-            <img src={profileImage} alt="Profile" className="profile-img-centered" />
-          ) : (
-            <div className="profile-img-centered placeholder">
-              <User size={40} className="text-muted" />
+            <div className="profile-image-container-minimal" onClick={handleImageClick}>
+              {localImage ? (
+                <img src={localImage} alt="Profile" className="profile-img-centered" />
+              ) : (
+                <div className="profile-img-centered placeholder">
+                  <User size={40} className="text-muted" />
+                </div>
+              )}
+              <div className="camera-overlay-minimal">
+                <Camera size={14} color="white" />
+              </div>
+              <input
+                type="file"
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                accept="image/*"
+                onChange={handleImageChange}
+              />
             </div>
-          )}
-          <div className="camera-overlay-minimal">
-            <Camera size={14} color="white" />
+
+            <div className="profile-identity-centered">
+              <h1 className="trainer-name-centered">{displayName}</h1>
+              <p className="trainer-role-minimal">{trainerData.role || "Senior Trainer"}</p>
+              <p className="trainer-email-centered">{trainerData.email || "trainer@infycode.com"}</p>
+              <div className="trainer-id-status-row">
+                <span className="trainer-id-centered">TRN-1024</span>
+                <span className="trainer-status-pill">
+                  <span className="status-dot-green"></span>
+                  Active
+                </span>
+              </div>
+            </div>
+
+            <div className="profile-header-actions-minimal">
+              {!isEditing ? (
+                <button className="btn-edit-primary" onClick={handleEditToggle}>
+                  <Edit3 size={14} />
+                  <span>Edit Profile</span>
+                </button>
+              ) : (
+                <div className="edit-mode-btns-centered">
+                  <button className="btn-cancel-saas" onClick={handleEditToggle}>
+                    <X size={14} />
+                    <span>Cancel</span>
+                  </button>
+                  <button className="btn-save-saas" onClick={handleSave}>
+                    <Check size={14} />
+                    <span>Save Changes</span>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
-          <input
-            type="file"
-            ref={fileInputRef}
-            style={{ display: 'none' }}
-            accept="image/*"
-            onChange={handleImageChange}
-          />
         </div>
 
-        <div className="profile-identity-centered">
-          <h1 className="trainer-name-centered">{profileData.name}</h1>
-          <p className="trainer-role-minimal">Senior Trainer</p>
-          <p className="trainer-email-centered">{profileData.email}</p>
-          <div className="trainer-id-status-row">
-            <span className="trainer-id-centered">TRN-1024</span>
-            <span className="trainer-status-pill">
-              <span className="status-dot-green"></span>
-              Active
-            </span>
-          </div>
-        </div>
-
-        <div className="profile-header-actions-minimal">
-          {!isEditing ? (
-            <button className="btn-edit-primary" onClick={handleEditToggle}>
-              <Edit3 size={14} />
-              <span>Edit Profile</span>
-            </button>
-          ) : (
-            <div className="edit-mode-btns-centered">
-              <button className="btn-cancel-saas" onClick={handleEditToggle}>
-                <X size={14} />
-                <span>Cancel</span>
-              </button>
-              <button className="btn-save-saas" onClick={handleSave}>
-                <Check size={14} />
-                <span>Save Changes</span>
-              </button>
+        {/* 2. QUICK STATS ROW */}
+        <div className="stats-container">
+          {stats.map((stat, idx) => (
+            <div key={idx} className={`stat-card-min ${stat.color}`}>
+              <div className={`stat-icon-box ${stat.color}`}>{stat.icon}</div>
+              <div className="stat-info-min">
+                <h3 className="stat-value-min">{stat.value}</h3>
+                <p className="stat-label-min">{stat.label}</p>
+              </div>
             </div>
-          )}
-        </div>
+          ))}
         </div>
       </div>
-
-      {/* 2. QUICK STATS ROW */}
-      <div className="stats-container">
-        {stats.map((stat, idx) => (
-          <div key={idx} className={`stat-card-min ${stat.color}`}>
-            <div className={`stat-icon-box ${stat.color}`}>{stat.icon}</div>
-            <div className="stat-info-min">
-              <h3 className="stat-value-min">{stat.value}</h3>
-              <p className="stat-label-min">{stat.label}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
 
       {/* 3. DETAILS SECTION */}
       <div className="profile-details-grid-saas">
@@ -169,7 +196,7 @@ const Profile = () => {
               {isEditing ? (
                 <input name="name" value={tempData.name} onChange={handleChange} className="edit-input-saas" />
               ) : (
-                <div className="item-value-saas">{profileData.name}</div>
+                <div className="item-value-saas">{displayName}</div>
               )}
             </div>
             <div className="info-item-saas">
@@ -177,7 +204,7 @@ const Profile = () => {
               {isEditing ? (
                 <input name="email" value={tempData.email} onChange={handleChange} className="edit-input-saas" />
               ) : (
-                <div className="item-value-saas text-blue">{profileData.email}</div>
+                <div className="item-value-saas text-blue">{trainerData.email || "trainer@infycode.com"}</div>
               )}
             </div>
             <div className="info-item-saas">
@@ -185,12 +212,12 @@ const Profile = () => {
               {isEditing ? (
                 <input name="phone" value={tempData.phone} onChange={handleChange} className="edit-input-saas" />
               ) : (
-                <div className="item-value-saas">{profileData.phone}</div>
+                <div className="item-value-saas">{trainerData.phone || "+91 98765 43210"}</div>
               )}
             </div>
             <div className="info-item-saas">
               <div className="item-label-saas"><MapPin size={14} /> Location</div>
-              <div className="item-value-saas">{profileData.location}</div>
+              <div className="item-value-saas">{trainerData.location || "Vijayawada, AP"}</div>
             </div>
           </div>
         </div>
@@ -204,7 +231,7 @@ const Profile = () => {
               {isEditing ? (
                 <input name="experience" value={tempData.experience} onChange={handleChange} className="edit-input-saas" />
               ) : (
-                <div className="item-value-saas">{profileData.experience}</div>
+                <div className="item-value-saas">{trainerData.experience || "5+ Years"}</div>
               )}
             </div>
             <div className="info-item-saas">
@@ -212,16 +239,16 @@ const Profile = () => {
               {isEditing ? (
                 <input name="expertise" value={tempData.expertise} onChange={handleChange} className="edit-input-saas" />
               ) : (
-                <div className="item-value-saas">{profileData.expertise}</div>
+                <div className="item-value-saas">{trainerData.expertise || "Full Stack Development, React, Node.js"}</div>
               )}
             </div>
             <div className="info-item-saas">
               <div className="item-label-saas"><Layers size={14} /> Courses Handling</div>
-              <div className="item-value-saas">{profileData.courses}</div>
+              <div className="item-value-saas">{trainerData.courses || "3 Active Batches"}</div>
             </div>
             <div className="info-item-saas">
               <div className="item-label-saas"><Monitor size={14} /> Training Mode</div>
-              <div className="item-value-saas">{profileData.mode}</div>
+              <div className="item-value-saas">{trainerData.mode || "Online & Offline"}</div>
             </div>
           </div>
         </div>
@@ -238,7 +265,7 @@ const Profile = () => {
               rows="4"
             />
           ) : (
-            <p className="about-text-saas">{profileData.about}</p>
+            <p className="about-text-saas">{trainerData.about || "Experienced trainer focused on building industry-ready developers with practical skills and real-world projects."}</p>
           )}
         </div>
 

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
+import { useTrainer } from '../../../context/TrainerContext';
 import './Sidebar.css';
 import icLogo from '../../../assets/infycode-final-logo4-1.png';
 import bannerLogo from '../../../assets/color-logo-3.png';
@@ -81,13 +82,16 @@ const LiveIcon = () => (
 
 const Sidebar = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
-  const userName = "Charani";
-  const userInitial = "C";
+  const { trainerData, profileImage } = useTrainer();
+  const userName = trainerData.fullname || trainerData.name || "Trainer";
+  const userInitial = userName.charAt(0).toUpperCase();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
     localStorage.removeItem("loggedUser");
+    localStorage.removeItem("trainerProfileImage");
     setShowLogoutModal(false);
     navigate('/trainer-login');
   };
@@ -101,7 +105,13 @@ const Sidebar = ({ isOpen, onClose }) => {
           onClick={onClose}
         >
           <div className="sd-profile-card">
-            <div className="sd-avatar-circle">{userInitial}</div>
+            <div className="sd-avatar-circle">
+              {profileImage ? (
+                <img src={profileImage} alt="Profile" className="sd-avatar-img" />
+              ) : (
+                userInitial
+              )}
+            </div>
             <div className="sd-user-info">
               <div className="sd-user-name-wrapper">
                 <div className="sd-user-name">{userName}</div>
@@ -195,7 +205,13 @@ const Sidebar = ({ isOpen, onClose }) => {
         <div className="logout-modal-overlay" onClick={() => setShowLogoutModal(false)}>
           <div className="logout-modal-card" onClick={(e) => e.stopPropagation()}>
             <div className="logout-modal-profile-section">
-              <div className="logout-modal-avatar">{userInitial}</div>
+              <div className="logout-modal-avatar">
+                {profileImage ? (
+                  <img src={profileImage} alt="Profile" className="sd-avatar-img" />
+                ) : (
+                  userInitial
+                )}
+              </div>
               <h3>{userName}</h3>
             </div>
 
