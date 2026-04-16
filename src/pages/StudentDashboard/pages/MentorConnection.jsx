@@ -9,23 +9,23 @@ const MentorConnection = () => {
   const messagesEndRef = useRef(null);
 
   const mentors = [
-    { n: 'Mohan Krishna', preview: 'Sure, I will share the resources with the batch.', time: '10:20 AM', unread: false, color: '#2563eb', role: 'Senior Java Architect', spec: ['Java', 'Spring Boot', 'Microservices'], availability: 'Mon-Fri, 6PM-8PM' },
-    { n: 'Sarah Williams', preview: 'When are you available for a 1:1?', time: 'Yesterday', unread: true, color: '#10b981', role: 'Lead Python Developer', spec: ['Python', 'Django', 'AI'], availability: 'Tue, Thu, 4PM-7PM' },
-    { n: 'Michael Chang', preview: 'Let me look at your AWS architecture diagram.', time: 'Mar 12', unread: false, color: '#f59e0b', role: 'Cloud Solutions Architect', spec: ['AWS', 'Terraform', 'Kubernetes'], availability: 'Weekends, 10AM-12PM' }
+    { n: 'Charani', preview: 'Sure, I will share the resources with the batch.', time: '10:20 AM', unread: false, color: '#2563eb', role: 'Senior Java Architect', spec: ['Java', 'Spring Boot', 'Microservices'], availability: 'Mon-Fri, 6PM-8PM' },
+    { n: 'Charani', preview: 'When are you available for a 1:1?', time: 'Yesterday', unread: true, color: '#10b981', role: 'Lead Python Developer', spec: ['Python', 'Django', 'AI'], availability: 'Tue, Thu, 4PM-7PM' },
+    { n: 'Charani', preview: 'Let me look at your AWS architecture diagram.', time: 'Mar 12', unread: false, color: '#f59e0b', role: 'Cloud Solutions Architect', spec: ['AWS', 'Terraform', 'Kubernetes'], availability: 'Weekends, 10AM-12PM' }
   ];
 
   const [activeThreads, setActiveThreads] = useState([
     [
       { from: 'You', text: 'Hello sir, I have a doubt regarding the React useEffect hook. Can you help me?', time: '10:15 AM', self: true },
-      { from: 'Mohan Krishna', text: 'Sure Priya! useEffect runs after every render by default. Adding an empty dependency array [] makes it run only once on mount. I\'ll share resources with the batch.', time: '10:20 AM', self: false },
+      { from: 'Charani', text: 'Sure! useEffect runs after every render by default. Adding an empty dependency array [] makes it run only once on mount. I\'ll share resources with the batch.', time: '10:20 AM', self: false },
     ],
     [
-      { from: 'You', text: 'Hi Sarah, I am struggling with the Django ORM queries for the assignment.', time: 'Yesterday', self: true },
-      { from: 'Sarah Williams', text: 'Hi! That is a common hurdle. When are you available for a 1:1?', time: 'Yesterday', self: false },
+      { from: 'You', text: 'Hi Charani, I am struggling with the Django ORM queries for the assignment.', time: 'Yesterday', self: true },
+      { from: 'Charani', text: 'Hi! That is a common hurdle. When are you available for a 1:1?', time: 'Yesterday', self: false },
     ],
     [
-      { from: 'You', text: 'Hi Michael, can you review my AWS architecture diagram?', time: 'Mar 12', self: true },
-      { from: 'Michael Chang', text: 'Let me look at your AWS architecture diagram. Send over the link.', time: 'Mar 12', self: false },
+      { from: 'You', text: 'Hi Charani, can you review my AWS architecture diagram?', time: 'Mar 12', self: true },
+      { from: 'Charani', text: 'Let me look at your AWS architecture diagram. Send over the link.', time: 'Mar 12', self: false },
     ]
   ]);
 
