@@ -1,5 +1,6 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+import { TrainerProvider } from "../../context/TrainerContext";
 import Sidebar from "./components/Sidebar";
 import Topbar from "./components/Topbar";
 import "./TrainerDashboard.css";
@@ -21,43 +22,45 @@ const TrainerDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
 
   return (
-    <div className="trainer-dashboard-layout">
-      
-      {/* Sidebar - Fixed width */}
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-
-      {/* Main Content Area */}
-      <div className="main-content-wrapper">
-        <Topbar />
+    <TrainerProvider>
+      <div className="trainer-dashboard-layout">
         
-        {/* Mobile Menu Toggle */}
-        <button 
-          className="menu-toggle" 
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          aria-label="Toggle Menu"
-        >
-          {isSidebarOpen ? "✕" : "☰"}
-        </button>
+        {/* Sidebar - Fixed width */}
+        <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
-        <main className="dashboard-content">
-          <Routes>
-            <Route index element={<Navigate to="dashboard" replace />} />
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="profile" element={<Profile />} />
-            <Route path="batches" element={<Batches />} />
-            <Route path="batches/:batchId" element={<BatchDetails />} />
-            <Route path="schedule" element={<Schedule />} />
-            <Route path="materials" element={<Materials />} />
-            <Route path="attendance" element={<Attendance />} />
-            <Route path="feedback" element={<Feedback />} />
-            <Route path="messages" element={<Messages />} />
-            <Route path="live-session" element={<LiveSession />} />
-            <Route path="logout" element={<Logout />} />
-          </Routes>
-        </main>
+        {/* Main Content Area */}
+        <div className="main-content-wrapper">
+          <Topbar />
+          
+          {/* Mobile Menu Toggle */}
+          <button 
+            className="menu-toggle" 
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            aria-label="Toggle Menu"
+          >
+            {isSidebarOpen ? "✕" : "☰"}
+          </button>
+
+          <main className="dashboard-content">
+            <Routes>
+              <Route index element={<Navigate to="dashboard" replace />} />
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="profile" element={<Profile />} />
+              <Route path="batches" element={<Batches />} />
+              <Route path="batches/:batchId" element={<BatchDetails />} />
+              <Route path="schedule" element={<Schedule />} />
+              <Route path="materials" element={<Materials />} />
+              <Route path="attendance" element={<Attendance />} />
+              <Route path="feedback" element={<Feedback />} />
+              <Route path="messages" element={<Messages />} />
+              <Route path="live-session" element={<LiveSession />} />
+              <Route path="logout" element={<Logout />} />
+            </Routes>
+          </main>
+        </div>
+
       </div>
-
-    </div>
+    </TrainerProvider>
   );
 };
 

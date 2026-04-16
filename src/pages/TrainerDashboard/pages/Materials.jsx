@@ -199,53 +199,63 @@ const Materials = () => {
   return (
     <div className="materials-page-wrapper">
       
-      {/* Header Row */}
-      <div className="mat-header-row">
-        <div>
+      {/* Header Container — 2-Line Layout */}
+      <div className="mat-header-container">
+        
+        {/* Row 1: Titles */}
+        <div className="mat-title-row">
           <h1 className="mat-page-title">Course Materials</h1>
           <p className="mat-page-subtitle">Upload and manage course content</p>
         </div>
         
-        <div className="mat-controls">
-          <div className="mat-search-box">
-            <Search size={16} />
-            <input 
-              type="text" 
-              className="mat-input-field" 
-              placeholder="Search by file or topic..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+        {/* Row 2: Controls */}
+        <div className="mat-controls-row">
+          <div className="mat-search-wrapper">
+            <div className="mat-search-box">
+              <Search size={16} />
+              <input 
+                type="text" 
+                className="mat-input-field" 
+                placeholder="Search by file or topic..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
           </div>
-          <div className="mat-filter-wrapper">
-            <span className="mat-filter-label">All Status</span>
-            <select 
-              className="mat-select-field"
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-            >
-              <option value="all">All</option>
-              <option value="uploaded">Uploaded</option>
-              <option value="pending">Pending</option>
-            </select>
+
+          <div className="mat-actions-right">
+            <div className="mat-filters-group">
+              <div className="mat-filter-wrapper">
+                <span className="mat-filter-label">All Status</span>
+                <select 
+                  className="mat-select-field"
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                >
+                  <option value="all">All</option>
+                  <option value="uploaded">Uploaded</option>
+                  <option value="pending">Pending</option>
+                </select>
+              </div>
+              <div className="mat-filter-wrapper">
+                <span className="mat-filter-label">File Type</span>
+                <select 
+                  className="mat-select-field"
+                  value={filterType}
+                  onChange={(e) => setFilterType(e.target.value)}
+                >
+                  <option value="all">All Types</option>
+                  <option value="PDF">PDF Documents</option>
+                  <option value="VID">Video Lessons</option>
+                  <option value="DOC">Word Docs</option>
+                  <option value="ZIP">Zip Archives</option>
+                </select>
+              </div>
+            </div>
+            <button className="mat-btn-primary header-btn" onClick={openGeneralUpload}>
+              <Plus size={16} /> Upload General
+            </button>
           </div>
-          <div className="mat-filter-wrapper">
-            <span className="mat-filter-label">File Type</span>
-            <select 
-              className="mat-select-field"
-              value={filterType}
-              onChange={(e) => setFilterType(e.target.value)}
-            >
-              <option value="all">All Types</option>
-              <option value="PDF">PDF Documents</option>
-              <option value="VID">Video Lessons</option>
-              <option value="DOC">Word Docs</option>
-              <option value="ZIP">Zip Archives</option>
-            </select>
-          </div>
-          <button className="mat-btn-primary header-btn" onClick={openGeneralUpload}>
-            <Plus size={16} /> Upload General
-          </button>
         </div>
       </div>
 

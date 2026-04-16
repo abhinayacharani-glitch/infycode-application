@@ -67,6 +67,14 @@
   justify-content: center;
   font-weight: 800;
   font-size: 14px;
+  overflow: hidden; /* Ensure image doesn't overflow rounded corners */
+}
+
+.sd-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
 }
 
 .sd-user-info {
