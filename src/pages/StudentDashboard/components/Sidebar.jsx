@@ -13,13 +13,13 @@ const Sidebar = () => {
 
   const getInitialUser = () => {
     const userString = localStorage.getItem('user');
-    return userString ? JSON.parse(userString) : { fullname: "Student", role: "STUDENT" };
+    return userString ? JSON.parse(userString) : { fullname: "Student", role: "Developer" };
   };
 
   const [user, setUser] = useState(getInitialUser());
   const [formData, setFormData] = useState({
     fullname: user.fullname || user.fullName || "Student",
-    role: user.role || "STUDENT"
+    role: user.role || "Developer"
   });
 
   useEffect(() => {
