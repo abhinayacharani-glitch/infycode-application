@@ -9,7 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import StudentVerification from "./pages/StudentVerification";
 import CourseConfig from "./pages/CourseConfig";
 import TrainerApproval from "./pages/TrainerApproval";
-import BatchSetup from "./pages/BatchSetup";
+import BatchCreation from "./pages/BatchCreation";
 import EnrollmentMapping from "./pages/EnrollmentMapping";
 import Analytics from "./pages/Analytics";
 import LearningActivation from "./pages/LearningActivation";
@@ -41,7 +41,7 @@ const AdminDashboard = () => {
               <Route path="student-verification" element={<StudentVerification />} />
               <Route path="course-config"        element={<CourseConfig />} />
               <Route path="trainer-approval"     element={<TrainerApproval />} />
-              <Route path="batch-setup"          element={<BatchSetup />} />
+              <Route path="batch-setup"          element={<BatchCreation />} />
               <Route path="enrollment"           element={<EnrollmentMapping />} />
               <Route path="analytics"            element={<Analytics />} />
               <Route path="activation"           element={<LearningActivation />} />

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import "./Sidebar.css";
 
@@ -53,17 +53,6 @@ const LogOutIcon = () => (
     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
   </svg>
 );
-const CameraIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-    <circle cx="12" cy="13" r="4" />
-  </svg>
-);
-const CloseIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
-  </svg>
-);
 
 const Sidebar = ({ isCollapsed }) => {
   const location = useLocation();
@@ -71,42 +60,25 @@ const Sidebar = ({ isCollapsed }) => {
   const loggedUser = JSON.parse(localStorage.getItem("user") || "{}");
   const userName = loggedUser.fullName || loggedUser.fullname || loggedUser.username || "Admin";
 
-  const [showProfileModal, setShowProfileModal] = useState(false);
   const [showLogoutModal, setShowLogoutModal]   = useState(false);
   const [profileImage, setProfileImage]         = useState(loggedUser.profileImage || "https://i.pravatar.cc/150?img=5");
-  const [previewImage, setPreviewImage]         = useState(null);
-  const [editName, setEditName]                 = useState(userName);
-  const [editRole, setEditRole]                 = useState(loggedUser.role || "TRAINER");
-  const fileInputRef = useRef(null);
+  const [currentUserName, setCurrentUserName]   = useState(userName);
+  const [currentUserRole, setCurrentUserRole]   = useState(loggedUser.role || "TRAINER");
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => setPreviewImage(ev.target.result);
-    reader.readAsDataURL(file);
-  };
-
-  const handleSave = () => {
-    const updatedUser = {
-      ...loggedUser,
-      fullName: editName,
-      fullname: editName,
-      role: editRole,
-      profileImage: previewImage || profileImage,
+  useEffect(() => {
+    const syncProfile = () => {
+      const updated = JSON.parse(localStorage.getItem("user") || "{}");
+      setProfileImage(updated.profileImage || "https://i.pravatar.cc/150?img=5");
+      setCurrentUserName(updated.fullName || updated.fullname || updated.username || "Admin");
+      setCurrentUserRole(updated.role || "TRAINER");
     };
-    localStorage.setItem("user", JSON.stringify(updatedUser));
-    setProfileImage(previewImage || profileImage);
-    setPreviewImage(null);
-    setShowProfileModal(false);
-  };
-
-  const handleCancel = () => {
-    setPreviewImage(null);
-    setEditName(userName);
-    setEditRole(loggedUser.role || "TRAINER");
-    setShowProfileModal(false);
-  };
+    window.addEventListener('storage', syncProfile);
+    window.addEventListener('adminProfileUpdate', syncProfile);
+    return () => {
+      window.removeEventListener('storage', syncProfile);
+      window.removeEventListener('adminProfileUpdate', syncProfile);
+    };
+  }, []);
 
   return (
     <>
@@ -115,24 +87,21 @@ const Sidebar = ({ isCollapsed }) => {
         {/* ── Admin User Card ── */}
         <div
           className="adm-user-card"
-          onClick={() => setShowProfileModal(true)}
+          onClick={() => navigate('/admin-dashboard/profile')}
           style={{ cursor: 'pointer' }}
-          title="Edit Profile"
+          title="View Profile"
         >
-          <div className="adm-user-avatar adm-avatar-hover-wrap">
+          <div className="adm-user-avatar">
             <img src={profileImage} alt="Profile" className="adm-user-avatar-img" />
-            <div className="adm-avatar-edit-overlay">
-              <CameraIcon />
-            </div>
           </div>
           {!isCollapsed && (
             <div className="adm-user-info">
               <div className="adm-user-name">
-                {editName}
+                {currentUserName}
                 <span className="adm-user-status-dot"></span>
               </div>
               <div className="adm-user-role">
-                {editRole}
+                {currentUserRole}
               </div>
             </div>
           )}
@@ -199,75 +168,6 @@ const Sidebar = ({ isCollapsed }) => {
         </div>
 
       </aside>
-
-      {/* ── Profile Edit Modal ── */}
-      {showProfileModal && (
-        <div className="adm-profile-overlay" onClick={handleCancel}>
-          <div className="adm-profile-modal" onClick={e => e.stopPropagation()}>
-
-            {/* Header */}
-            <div className="adm-profile-modal-header">
-              <h2 className="adm-profile-modal-title">Edit Profile</h2>
-              <button className="adm-profile-close" onClick={handleCancel}><CloseIcon /></button>
-            </div>
-
-            {/* Photo Upload */}
-            <div className="adm-profile-photo-section">
-              <div className="adm-profile-photo-wrap">
-                <img
-                  src={previewImage || profileImage}
-                  alt="Profile Preview"
-                  className="adm-profile-photo-img"
-                />
-                <button
-                  className="adm-profile-photo-btn"
-                  onClick={() => fileInputRef.current.click()}
-                  title="Upload Photo"
-                >
-                  <CameraIcon />
-                </button>
-              </div>
-              <input
-                type="file"
-                accept="image/*"
-                ref={fileInputRef}
-                style={{ display: 'none' }}
-                onChange={handleImageChange}
-              />
-              <p className="adm-profile-photo-hint">Click the camera icon to upload a photo</p>
-            </div>
-
-            {/* Fields */}
-            <div className="adm-profile-fields">
-              <div className="adm-profile-field">
-                <label>Full Name</label>
-                <input
-                  type="text"
-                  value={editName}
-                  onChange={e => setEditName(e.target.value)}
-                  placeholder="Enter your name"
-                />
-              </div>
-              <div className="adm-profile-field">
-                <label>Role</label>
-                <input
-                  type="text"
-                  value={editRole}
-                  onChange={e => setEditRole(e.target.value)}
-                  placeholder="e.g. TRAINER"
-                />
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="adm-profile-actions">
-              <button className="adm-profile-cancel" onClick={handleCancel}>Cancel</button>
-              <button className="adm-profile-save" onClick={handleSave}>Save Changes</button>
-            </div>
-
-          </div>
-        </div>
-      )}
 
       {/* ── Logout Confirmation Modal ── */}
       {showLogoutModal && (
