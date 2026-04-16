@@ -184,7 +184,7 @@ const Sidebar = ({ isCollapsed }) => {
 
             {/* Message */}
             <h2 className="adm-logout-title">Are you sure you want to logout?</h2>
-            <p className="adm-logout-subtitle">You will be redirected to the main page.</p>
+            <p className="adm-logout-subtitle">You will be redirected to the admin login page.</p>
 
             {/* Actions */}
             <div className="adm-logout-actions">
@@ -193,7 +193,7 @@ const Sidebar = ({ isCollapsed }) => {
                 localStorage.removeItem("loggedUser");
                 localStorage.removeItem("user");
                 localStorage.removeItem("token");
-                navigate("/login");
+                navigate("/admin/login");
               }}>OK</button>
             </div>
           </div>

@@ -5,7 +5,6 @@ import { useAdmin } from '../../../context/AdminContext';
 import './Topbar.css';
 
 import icLogo from '../../../assets/infycode-final-logo4-1.png';
-import logoDark from '../../../assets/color-logo-3.png';
 
 /* ── SVG Icons ── */
 const MenuToggleIcon = () => (
@@ -170,14 +169,16 @@ const Topbar = () => {
 
       {/* ── Brand / Logo ── */}
       <div className="adm-brand-section-tb">
-        <div className="adm-logo-container" onClick={() => setShowLogoutModal(true)} style={{ cursor: 'pointer' }}>
-          <img
-            src={icLogo}
-            alt="InfyCode Logo"
-            className="adm-logo-img"
-          />
-          <div className="adm-brand-text">
-            <img src={logoDark} alt="InfyCode Banner" className="adm-title-img" />
+        <div
+          className="brand-wrapper"
+          onClick={() => setShowLogoutModal(true)}
+          style={{ cursor: 'pointer' }}
+          title="Logout"
+        >
+          <img src={icLogo} alt="Infycode Logo" className="logo" />
+          <div className="brand-text">
+            <span className="logo-title">INFYCODE</span>
+            <span className="logo-subtitle">Infinite Learning Solutions</span>
           </div>
         </div>
       </div>

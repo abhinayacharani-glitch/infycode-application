@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, Mail, Bell, ChevronDown, LogOut, User, Edit, MessageSquare, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import icLogo from '../../../assets/infycode-final-logo4-1.png';
 import "./Navbar.css";
 
 const Navbar = ({ onToggleSidebar }) => {
@@ -12,9 +13,9 @@ const Navbar = ({ onToggleSidebar }) => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const userString = localStorage.getItem('user');
-  const user = userString ? JSON.parse(userString) : { fullname: "Pandeti Abhinaya", role: "STUDENT" };
-  const userName = user.fullname || user.fullName || "Pandeti Abhinaya";
-  const userRole = user.role || "STUDENT";
+  const user = userString ? JSON.parse(userString) : { fullname: "Anjali Syamala", role: "student" };
+  const userName = user.fullname || user.fullName || "Anjali Syamala";
+  const userRole = user.role || "student";
 
   const notifications = [
     {

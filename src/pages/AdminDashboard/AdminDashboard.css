@@ -9,7 +9,7 @@
 /* ── CSS TOKENS (scoped) ── */
 .admin-dashboard-layout {
   --adm-white: #ffffff;
-  --adm-bg: #cfcfcf;
+  --adm-bg: #ffffff;
   --adm-blue-50: #e8f2ff;
   --adm-blue-100: #cce0ff;
   --adm-blue-200: #99c2ff;
@@ -109,8 +109,24 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes adm-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
 .admin-dashboard-layout .adm-page {
   animation: adm-fadeIn 0.3s ease;
+}
+
+.admin-dashboard-layout .adm-btn-loader {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: adm-spin 0.8s linear infinite;
+  margin-right: 8px;
 }
 
 /* ═══════════════════════════════════════════════
@@ -377,6 +393,11 @@
 .admin-dashboard-layout .btn-primary:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.admin-dashboard-layout .btn-primary.btn-export-success {
+  background: linear-gradient(135deg, #10b981, #059669);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
 }
 
 .admin-dashboard-layout .btn-secondary {
@@ -849,26 +870,50 @@
 }
 
 /* ═══════════════════════════════════════════════
-   TOPBAR FILTER ROW (dashboard)
+   MODERN FILTER SYSTEM (scoped to Admin)
    ═══════════════════════════════════════════════ */
-.admin-dashboard-layout .adm-filter-row {
+.admin-dashboard-layout .admin-filter-container {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-bottom: 20px;
+  gap: 12px;
 }
 
-.admin-dashboard-layout .adm-filter-row select {
-  padding: 8px 14px;
-  border: 1.5px solid var(--adm-border);
-  border-radius: 10px;
-  font-size: 13px;
+.admin-dashboard-layout .admin-filter-input,
+.admin-dashboard-layout .admin-filter-select,
+.admin-dashboard-layout select {
+  height: 40px;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 14px;
+  background-color: #FFFFFF;
+  color: #111827;
   font-family: 'Urbanist', sans-serif;
-  color: var(--adm-text-dark);
-  background: var(--adm-white);
   outline: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.admin-dashboard-layout .admin-filter-input::placeholder {
+  color: #9CA3AF;
+}
+
+.admin-dashboard-layout .admin-filter-input:focus,
+.admin-dashboard-layout .admin-filter-select:focus,
+.admin-dashboard-layout select:focus {
+  border-color: #2563EB;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.admin-dashboard-layout .admin-filter-select,
+.admin-dashboard-layout select {
   cursor: pointer;
+  appearance: auto;
+}
+
+.admin-dashboard-layout .admin-filter-select:hover,
+.admin-dashboard-layout select:hover {
+  background-color: #F9FAFB;
 }
 
 /* ═══════════════════════════════════════════════

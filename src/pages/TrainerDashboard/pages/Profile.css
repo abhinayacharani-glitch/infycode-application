@@ -5,7 +5,7 @@
   max-width: 1400px;
   margin: 0 auto;
   padding: 20px 0 40px;
-  background: #F8FAFC;
+  background: transparent;
   animation: slideUpProfile 0.3s ease-out;
 }
 

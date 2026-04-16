@@ -106,7 +106,7 @@ const Topbar = () => {
     localStorage.removeItem("loggedUser");
     localStorage.removeItem("trainerProfileImage");
     setShowLogoutModal(false);
-    navigate('/trainer-login');
+    navigate('/'); // Redirect to landing page
   };
 
   const markAllRead = () => {
@@ -125,8 +125,8 @@ const Topbar = () => {
         >
           <img src={icLogo} alt="Infycode Logo" className="logo" />
           <div className="brand-text">
-            <span className="brand-name">INFYCODE</span>
-            <span className="brand-tagline">Infinite Learning Solutions</span>
+            <span className="logo-title">INFYCODE</span>
+            <span className="logo-subtitle">Infinite Learning Solutions</span>
           </div>
         </div>
       </div>

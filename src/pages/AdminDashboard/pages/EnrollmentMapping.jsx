@@ -30,12 +30,12 @@ const EnrollmentMapping = () => {
             </div>
           </div>
           <div className="card-body">
-            <form onSubmit={handleMap} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <form onSubmit={handleMap} className="admin-filter-container" style={{ flexDirection: 'column', gap: '20px', alignItems: 'stretch' }}>
               <div className="form-group">
                 <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Select Student</label>
                 <select 
-                  className="filter-select-premium" 
-                  style={{ width: '100%', padding: '12px' }}
+                  className="admin-filter-select" 
+                  style={{ width: '100%' }}
                   value={mapping.studentId}
                   onChange={(e) => setMapping({...mapping, studentId: e.target.value})}
                   required
@@ -50,8 +50,8 @@ const EnrollmentMapping = () => {
               <div className="form-group">
                 <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Target Course</label>
                 <select 
-                  className="filter-select-premium" 
-                  style={{ width: '100%', padding: '12px' }}
+                  className="admin-filter-select" 
+                  style={{ width: '100%' }}
                   value={mapping.courseName}
                   onChange={(e) => setMapping({...mapping, courseName: e.target.value, batchId: ''})}
                   required
@@ -64,8 +64,8 @@ const EnrollmentMapping = () => {
               <div className="form-group">
                 <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Available Batch</label>
                 <select 
-                  className="filter-select-premium" 
-                  style={{ width: '100%', padding: '12px' }}
+                  className="admin-filter-select" 
+                  style={{ width: '100%' }}
                   value={mapping.batchId}
                   onChange={(e) => setMapping({...mapping, batchId: e.target.value})}
                   required

@@ -12,7 +12,8 @@
   display: flex;
   align-items: center;
   gap: 20px;
-  position: fixed; /* Changed from sticky to fixed for Trainer consistency */
+  position: fixed;
+  /* Changed from sticky to fixed for Trainer consistency */
   top: 0;
   left: 0;
   right: 0;
@@ -28,20 +29,22 @@
   width: auto;
   display: flex;
   align-items: center;
-  padding-right: 80px; /* Increased to match Admin Dashboard's generous spacing */
+  padding-right: 80px;
+  /* Increased to match Admin Dashboard's generous spacing */
 }
 
 .brand-wrapper {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   cursor: pointer;
   padding: 4px 0;
 }
 
 .logo {
-  width: 48px;
-  height: 48px;
+  height: 45px;
+  /* Slightly increased for better visibility */
+  width: auto;
   object-fit: contain;
   transition: transform 0.3s ease-in-out;
 }
@@ -53,36 +56,55 @@
   font-family: 'Urbanist', sans-serif;
 }
 
-.brand-name {
+.logo-title {
   font-size: 24px;
-  font-weight: 900;
-  color: #1E293B;
+  font-weight: 800;
+  color: #000000;
+  /* Default Black */
   letter-spacing: -0.3px;
-  transition: color 0.3s ease-in-out;
   position: relative;
   font-family: 'Urbanist', sans-serif;
+  display: inline-block;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  margin-bottom: 2px;
+  /* Space below title */
 }
 
-/* Underline Animation */
-.brand-name::after {
-  content: '';
+/* Animated Underline */
+.logo-title::after {
+  content: "";
   position: absolute;
-  bottom: -2px;
   left: 0;
-  width: 0;
+  bottom: -4px;
+  /* Slightly moves underline down */
+  width: 0%;
+  /* Start empty */
   height: 2px;
-  background-color: #3B82F6;
+  background: #2f5bd3;
   transition: width 0.3s ease-in-out;
 }
 
-.brand-tagline {
-  font-size: 15px;
+.logo-title:hover {
+  color: #2f5bd3;
+  /* Blue on hover */
+}
+
+.logo-title:hover::after {
+  width: 100%;
+  /* Animate underline from left to right */
+}
+
+.logo-subtitle {
+  font-size: 14px;
+  /* Refined size */
   font-weight: 600;
-  color: #64748B;
-  opacity: 0.7;
-  transition: opacity 0.3s ease-in-out;
-  margin-top: 1px;
+  color: #000000;
+  /* Professional Black */
+  margin-top: 2px;
+  /* Added spacing from underline */
   font-family: 'Urbanist', sans-serif;
+  white-space: nowrap;
 }
 
 /* Brand Hover Micro-interactions */
@@ -90,17 +112,12 @@
   transform: scale(1.05);
 }
 
-.brand-wrapper:hover .brand-name {
-  color: #3B82F6;
-  text-shadow: 0 0 10px rgba(59, 130, 246, 0.1);
+.brand-wrapper:hover .logo-title {
+  opacity: 0.9;
 }
 
-.brand-wrapper:hover .brand-name::after {
-  width: 100%;
-}
-
-.brand-wrapper:hover .brand-tagline {
-  opacity: 1;
+.brand-wrapper:hover .logo-title::after {
+  height: 3px;
 }
 
 /* ── Search Bar (Matching Admin) ── */
@@ -177,7 +194,8 @@
 }
 
 .tb-icon-box svg {
-  width: 24px;/* Adjusted for trainer icons view */
+  width: 24px;
+  /* Adjusted for trainer icons view */
   height: 24px;
 }
 
@@ -221,8 +239,15 @@
 }
 
 @keyframes tbDropdownFade {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .tb-dropdown-header {
@@ -535,7 +560,7 @@
   margin-top: 24px;
 }
 
-.logout-modal-cancel-btn, 
+.logout-modal-cancel-btn,
 .logout-modal-ok-btn {
   flex: 1;
   padding: 12px;
@@ -567,13 +592,25 @@
 }
 
 @keyframes modalFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes modalScaleIn {
-  from { transform: scale(0.9); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 /* ================= BRAND-SPECIFIC LOGOUT MODAL (LogoutModal.jsx style) ================= */
@@ -648,5 +685,3 @@
 .logout-modal-confirm-btn:active {
   transform: translateY(0);
 }
-
-
