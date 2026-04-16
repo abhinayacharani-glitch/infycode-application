@@ -1,0 +1,256 @@
+.result-page {
+    min-height: 100vh;
+    padding: 80px 20px;
+    background: #fcfcfc;
+    font-family: 'Urbanist', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.result-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.result-badge {
+    width: 80px;
+    height: 80px;
+    background: #6C63FF;
+    color: white;
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 30px;
+    box-shadow: 0 15px 30px rgba(108, 99, 255, 0.3);
+}
+
+.result-header h1 {
+    font-size: 42px;
+    font-weight: 800;
+    color: #0F172A;
+    margin-bottom: 10px;
+}
+
+.result-header p {
+    font-size: 19px;
+    color: #64748B;
+}
+
+/* MAIN CARD */
+.result-main {
+    width: 100%;
+    max-width: 900px;
+}
+
+.level-card-premium {
+    background: #0F172A;
+    border-radius: 40px;
+    padding: 60px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 60px;
+    margin-bottom: 40px;
+    box-shadow: 0 40px 80px rgba(15, 23, 42, 0.15);
+}
+
+.level-highlight {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.level-label {
+    font-size: 48px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background: linear-gradient(to bottom, #ffffff, #94a3b8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    z-index: 2;
+    position: relative;
+}
+
+.level-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120%;
+    height: 120%;
+    background: radial-gradient(circle, rgba(108, 99, 255, 0.4) 0%, transparent 70%);
+    filter: blur(20px);
+}
+
+.level-details h3 {
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 15px;
+    color: #818CF8;
+}
+
+.level-details p {
+    font-size: 18px;
+    color: #94A3B8;
+    line-height: 1.6;
+}
+
+.metrics-grid {
+    margin-left: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 200px;
+}
+
+.metric {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.metric span {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #64748B;
+}
+
+.m-bar {
+    height: 6px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.m-fill {
+    height: 100%;
+    background: #6C63FF;
+}
+
+/* SECTIONS */
+.result-sections {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    margin-bottom: 60px;
+}
+
+.strengths-box, .next-steps-box {
+    background: white;
+    padding: 40px;
+    border-radius: 32px;
+    border: 1px solid #E2E8F0;
+}
+
+.strengths-box h4, .next-steps-box h4 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 25px;
+}
+
+.strengths-box ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.strengths-box li {
+    padding: 12px 20px;
+    background: #F8FAFC;
+    border-radius: 12px;
+    font-weight: 700;
+    color: #1E293B;
+}
+
+.track-card {
+    background: #F1F5F9;
+    padding: 25px;
+    border-radius: 20px;
+}
+
+.track-card span {
+    display: block;
+    font-weight: 800;
+    color: #0F172A;
+    margin-bottom: 8px;
+}
+
+.track-card p {
+    font-size: 14px;
+    color: #64748B;
+    margin-bottom: 20px;
+}
+
+.track-btn {
+    width: 100%;
+    padding: 12px;
+    background: #0F172A;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+/* FOOTER */
+.result-footer {
+    display: flex;
+    gap: 20px;
+}
+
+.share-btn {
+    padding: 16px 30px;
+    background: #ffffff;
+    border: 1px solid #E2E8F0;
+    border-radius: 16px;
+    font-family: inherit;
+    font-weight: 700;
+    color: #0F172A;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dashboard-btn {
+    padding: 16px 40px;
+    background: #6C63FF;
+    color: white;
+    border: none;
+    border-radius: 16px;
+    font-family: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(108, 99, 255, 0.2);
+}
+
+@media (max-width: 800px) {
+    .level-card-premium {
+        flex-direction: column;
+        padding: 40px;
+        text-align: center;
+    }
+    
+    .metrics-grid {
+        margin: 0;
+        width: 100%;
+    }
+    
+    .result-sections {
+        grid-template-columns: 1fr;
+    }
+}
