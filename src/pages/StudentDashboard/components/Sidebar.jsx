@@ -25,7 +25,7 @@ const Sidebar = () => {
   useEffect(() => {
     setFormData({
       fullname: user.fullname || user.fullName || "Student",
-      role: user.role || "STUDENT"
+      role: user.role || "Developer"
     });
   }, [user]);
 

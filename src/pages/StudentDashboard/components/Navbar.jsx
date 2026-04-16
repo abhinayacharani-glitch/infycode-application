@@ -1,28 +1,86 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, Mail, Bell, ChevronDown, LogOut, User, Edit } from 'lucide-react';
+import { Search, Mail, Bell, ChevronDown, LogOut, User, Edit, MessageSquare, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import "./Navbar.css";
 
 const Navbar = ({ onToggleSidebar }) => {
   const navigate = useNavigate();
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState(null); // 'profile', 'notifications', 'messages', or null
   const dropdownRef = useRef(null);
+  const notificationsRef = useRef(null);
+  const messagesRef = useRef(null);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const userString = localStorage.getItem('user');
   const user = userString ? JSON.parse(userString) : { fullname: "Pandeti Abhinaya", role: "STUDENT" };
   const userName = user.fullname || user.fullName || "Pandeti Abhinaya";
   const userRole = user.role || "STUDENT";
-  
+
+  const notifications = [
+    {
+      id: 1,
+      title: "Assessment Due",
+      message: "Your React Fundamentals assessment is due in 2 hours.",
+      time: "2h ago",
+      type: "warning"
+    },
+    {
+      id: 2,
+      title: "Grade Updated",
+      message: "Your project 'E-commerce API' has been graded.",
+      time: "5h ago",
+      type: "info"
+    },
+    {
+      id: 3,
+      title: "New Course Available",
+      message: "Advanced Node.js is now open for enrollment.",
+      time: "1d ago",
+      type: "success"
+    }
+  ];
+
+  const messages = [
+    {
+      id: 1,
+      sender: "Charani (Mentor)",
+      text: "Don't forget to push your code for the latest assignment.",
+      time: "10m ago",
+      unread: true
+    },
+    {
+      id: 2,
+      sender: "Admin",
+      text: "System maintenance scheduled for tonight at 2 AM.",
+      time: "3h ago",
+      unread: false
+    },
+    {
+      id: 3,
+      sender: "Placement Cell",
+      text: "New internship opportunity at TechCorp for React Developers.",
+      time: "1d ago",
+      unread: false
+    }
+  ];
+
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false);
+      const isOutsideDropdown = dropdownRef.current && !dropdownRef.current.contains(event.target);
+      const isOutsideNotifications = notificationsRef.current && !notificationsRef.current.contains(event.target);
+      const isOutsideMessages = messagesRef.current && !messagesRef.current.contains(event.target);
+
+      if (isOutsideDropdown && isOutsideNotifications && isOutsideMessages) {
+        setActiveDropdown(null);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const toggleDropdown = (dropdownType) => {
+    setActiveDropdown(activeDropdown === dropdownType ? null : dropdownType);
+  };
 
   const handleLogout = () => {
     localStorage.clear();
@@ -40,17 +98,73 @@ const Navbar = ({ onToggleSidebar }) => {
 
       <div className="topbar-right">
         <div className="navbar-actions" style={{ marginRight: '1.5rem' }}>
-          <div className="action-with-badge">
-            <Mail size={22} className="nav-icon" />
-            <span className="nav-badge blue">2</span>
+          {/* MESSAGES DROPDOWN */}
+          <div className="dropdown-wrapper" ref={messagesRef}>
+            <div className="action-with-badge" onClick={() => toggleDropdown('messages')}>
+              <Mail size={22} className="nav-icon" />
+              <span className="nav-badge blue">3</span>
+            </div>
+            {activeDropdown === 'messages' && (
+              <div className="content-dropdown messages-dropdown">
+                <div className="dropdown-header">
+                  <h3>Messages</h3>
+                  <button className="view-all">View All</button>
+                </div>
+                <div className="dropdown-body">
+                  {messages.map((msg) => (
+                    <div key={msg.id} className={`dropdown-item ${msg.unread ? 'unread' : ''}`}>
+                      <div className="item-icon bg-blue">
+                        <MessageSquare size={16} />
+                      </div>
+                      <div className="item-content">
+                        <div className="item-title">{msg.sender}</div>
+                        <div className="item-snippet">{msg.text}</div>
+                        <div className="item-time">
+                          <Clock size={12} /> {msg.time}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
-          <div className="action-with-badge">
-            <Bell size={22} className="nav-icon" />
-            <span className="nav-badge orange">2</span>
+
+          {/* NOTIFICATIONS DROPDOWN */}
+          <div className="dropdown-wrapper" ref={notificationsRef}>
+            <div className="action-with-badge" onClick={() => toggleDropdown('notifications')}>
+              <Bell size={22} className="nav-icon" />
+              <span className="nav-badge orange">3</span>
+            </div>
+            {activeDropdown === 'notifications' && (
+              <div className="content-dropdown notifications-dropdown">
+                <div className="dropdown-header">
+                  <h3>Notifications</h3>
+                  <button className="view-all">View All</button>
+                </div>
+                <div className="dropdown-body">
+                  {notifications.map((notif) => (
+                    <div key={notif.id} className={`dropdown-item ${notif.type}`}>
+                      <div className={`item-icon ${notif.type}`}>
+                        <Bell size={16} />
+                      </div>
+                      <div className="item-content">
+                        <div className="item-title">{notif.title}</div>
+                        <div className="item-snippet">{notif.message}</div>
+                        <div className="item-time">
+                          <Clock size={12} /> {notif.time}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
-        <div className="nav-user-profile" ref={dropdownRef} onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
+        {/* PROFILE DROPDOWN */}
+        <div className="nav-user-profile" ref={dropdownRef} onClick={() => toggleDropdown('profile')}>
           <img 
             src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200&h=200" 
             alt="Profile" 
@@ -59,7 +173,7 @@ const Navbar = ({ onToggleSidebar }) => {
           <span className="navbar-username">{userName}</span>
           <ChevronDown size={14} className="chevron-icon" />
           
-          {isDropdownOpen && (
+          {activeDropdown === 'profile' && (
             <div className="profile-dropdown-menu">
               <div className="profile-dropdown-header">
                 <img 
@@ -74,10 +188,9 @@ const Navbar = ({ onToggleSidebar }) => {
               </div>
               <div className="dropdown-divider"></div>
               
-              {/* Removed My Profile as requested */}
               <button 
                 className="dropdown-item" 
-                onClick={(e) => { e.stopPropagation(); setIsDropdownOpen(false); navigate('/student-dashboard/profile?edit=true'); }}
+                onClick={(e) => { e.stopPropagation(); setActiveDropdown(null); navigate('/student-dashboard/profile?edit=true'); }}
               >
                 <Edit size={16} />
                 <span>Edit Profile</span>
@@ -87,7 +200,7 @@ const Navbar = ({ onToggleSidebar }) => {
               
               <button 
                 className="dropdown-item logout-item" 
-                onClick={(e) => { e.stopPropagation(); setIsDropdownOpen(false); setShowLogoutModal(true); }}
+                onClick={(e) => { e.stopPropagation(); setActiveDropdown(null); setShowLogoutModal(true); }}
               >
                 <LogOut size={16} />
                 <span>Logout</span>
