@@ -9,7 +9,7 @@ const Popup = ({ onClose }) => {
 
   const handleReserveNow = () => {
     onClose();
-    navigate('/student/login');
+    navigate('/course-details/CID-103');
   };
 
   return (
