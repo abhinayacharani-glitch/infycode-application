@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Search, Filter, Star, Clock, Users, ArrowRight } from "lucide-react";
+import { Search, Filter, Star, Clock, Users, ArrowRight, Eye } from "lucide-react";
 import "./Courses.css";
 import bgImage from "../../assets/course/bg.jpg";
 // Course images from assets/course
@@ -38,7 +38,55 @@ const statusColors = {
   "SUCCESS": { bg: "rgba(244, 63, 94, 0.12)", color: "#f43f5e" },
 };
 
-const ALL_COURSES = [
+export const ALL_COURSES = [
+  {
+    image: imgAI,
+    title: "Machine Learning Deep Dive",
+    category: "AI & Data",
+    badge: "ADVANCED",
+    color: "#8b5cf6",
+    rating: 4.8,
+    students: "7k",
+    duration: "6 months",
+    level: "Advanced",
+    price: "6 months"
+  },
+  {
+    image: imgDataScience,
+    title: "Data Science & AI",
+    category: "AI & Data",
+    badge: "BEGINNER",
+    color: "#f59e0b",
+    rating: 5.0,
+    students: "9k",
+    duration: "6 months",
+    level: "Intermediate",
+    price: "4 months"
+  },
+  {
+    image: imgJava,
+    title: "Java Full Stack Development",
+    category: "Java",
+    badge: "ADVANCED",
+    color: "#818cf8",
+    rating: 4.9,
+    students: "15k",
+    duration: "5 months",
+    level: "Intermediate",
+    price: "3 months"
+  },
+  {
+    image: imgCloud,
+    title: "AWS Cloud Practitioner",
+    category: "Cloud",
+    badge: "INTERMEDIATE",
+    color: "#fbbf24",
+    rating: 4.8,
+    students: "12k",
+    duration: "3 months",
+    level: "Beginner",
+    price: "6 months"
+  },
   {
     image: imgReact,
     title: "React JS Full Stack Development",
@@ -62,18 +110,6 @@ const ALL_COURSES = [
     duration: "4 months",
     level: "All Levels",
     price: "4 months"
-  },
-  {
-    image: imgJava,
-    title: "Java Full Stack Development",
-    category: "Java",
-    badge: "ADVANCED",
-    color: "#818cf8",
-    rating: 4.9,
-    students: "15k",
-    duration: "5 months",
-    level: "Intermediate",
-    price: "3 months"
   },
   {
     image: imgWebDev,
@@ -100,18 +136,6 @@ const ALL_COURSES = [
     price: "4 months"
   },
   {
-    image: imgAI,
-    title: "Machine Learning Deep Dive",
-    category: "AI & Data",
-    badge: "ADVANCED",
-    color: "#8b5cf6",
-    rating: 4.8,
-    students: "7k",
-    duration: "6 months",
-    level: "Advanced",
-    price: "6 months"
-  },
-  {
     image: imgUIUX,
     title: "Ethical Hacking & Cyber Security",
     category: "Cybersecurity",
@@ -124,18 +148,6 @@ const ALL_COURSES = [
     price: "2 months"
   },
   {
-    image: imgCloud,
-    title: "AWS Cloud Practitioner",
-    category: "Cloud",
-    badge: "INTERMEDIATE",
-    color: "#fbbf24",
-    rating: 4.8,
-    students: "12k",
-    duration: "3 months",
-    level: "Beginner",
-    price: "6 months"
-  },
-  {
     image: imgWebDev,
     title: "Angular Enterprise Development",
     category: "Web Dev",
@@ -146,18 +158,6 @@ const ALL_COURSES = [
     duration: "6 months",
     level: "Intermediate",
     price: "3 months"
-  },
-  {
-    image: imgDataScience,
-    title: "Data Science & AI",
-    category: "AI & Data",
-    badge: "BEGINNER",
-    color: "#f59e0b",
-    rating: 5.0,
-    students: "9k",
-    duration: "6 months",
-    level: "Intermediate",
-    price: "4 months"
   },
   {
     image: imgWebDev,
@@ -375,7 +375,18 @@ const Courses = () => {
 
                     {/* Footer */}
                     <div className="card-footer-modern">
-                      <span className="price-tag">{course.price}</span>
+                      <div className="footer-actions-left">
+                        <div className="details-action-wrapper">
+                          <button 
+                            className="btn-view-details" 
+                            onClick={() => navigate(`/course-details/${course.courseId}`)}
+                            title="View Course Details"
+                          >
+                            <Eye size={20} />
+                          </button>
+                          <span className="action-label">Overview</span>
+                        </div>
+                      </div>
                       <button className="btn-join-now" onClick={handleEnroll}>
                         Enroll Now
                       </button>
