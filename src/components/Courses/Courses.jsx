@@ -386,12 +386,6 @@ const Courses = () => {
                           </button>
                           <span className="action-label">Overview</span>
                         </div>
-                        <div className="details-action-wrapper">
-                          <button className="btn-pricing-primary" title="Pricing">
-                            ₹
-                          </button>
-                          <span className="action-label">Pricing</span>
-                        </div>
                       </div>
                       <button className="btn-join-now" onClick={handleEnroll}>
                         Enroll Now
