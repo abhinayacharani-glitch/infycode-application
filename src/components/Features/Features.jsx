@@ -87,12 +87,12 @@ export default function Features() {
               }}
               onClick={() => navigate(feature.path)}
             >
-              <div className="card-top-v4">
-                <span className="step-num-v4" style={{ color: feature.color }}>{feature.id}</span>
-                <div className="icon-box-v4" style={{ backgroundColor: `${feature.color}15`, color: feature.color }}>
-                  {feature.icon}
+                <div className="card-top-v4">
+                  <span className="step-num-v4" style={{ color: feature.color, background: "none" }}>{feature.id}</span>
+                  <div className="icon-box-v4" style={{ background: "rgba(0,0,0,0.03)", color: feature.color }}>
+                    {feature.icon}
+                  </div>
                 </div>
-              </div>
 
               <div className="card-content-v4">
                 <h3 className="card-title-v4">{feature.title}</h3>

@@ -42,8 +42,9 @@
 }
 
 .title-bar {
-  height: 5px;
-  background: #3b82f6;
+  height: 4px;
+  width: 60px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
   border-radius: 10px;
 }
 
@@ -83,10 +84,13 @@
 }
 
 .step-num-v4 {
-  font-size: 42px;
+  font-size: 48px;
   font-weight: 900;
   line-height: 1;
   user-select: none;
+  opacity: 0.3; /* Subtle professional look */
+  font-family: 'Urbanist', sans-serif;
+  letter-spacing: -2px;
 }
 
 .icon-box-v4 {

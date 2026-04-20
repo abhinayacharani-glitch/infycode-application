@@ -1,0 +1,151 @@
+.roadmap-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc, #eff6ff);
+  font-family: 'Urbanist', sans-serif;
+  padding: 80px 20px;
+}
+
+.roadmap-v4-wrap {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.roadmap-header-v4 {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.map-icon-v4 {
+  font-size: 56px;
+  color: #3b82f6;
+  margin-bottom: 20px;
+}
+
+.roadmap-tag-v4 {
+  display: block;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #64748b;
+  margin-bottom: 10px;
+}
+
+.roadmap-header-v4 h1 {
+  font-size: 42px;
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.roadmap-header-v4 p {
+  color: #64748b;
+  font-size: 18px;
+}
+
+.roadmap-track-v4 {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 50px;
+}
+
+.roadmap-step-v4 {
+  background: white;
+  padding: 30px;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+  transition: 0.3s;
+}
+
+.roadmap-step-v4:hover {
+  transform: translateX(10px);
+  border-color: #3b82f6;
+}
+
+.step-num-v4 {
+  width: 44px;
+  height: 44px;
+  background: #0f172a;
+  color: white;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.step-content-v4 {
+  flex: 1;
+}
+
+.c-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.c-header h3 { font-size: 19px; font-weight: 800; }
+.c-status { font-size: 12px; font-weight: 800; background: #eff6ff; color: #3b82f6; padding: 4px 10px; border-radius: 6px; text-transform: uppercase; }
+
+.step-content-v4 p { color: #64748b; font-size: 15px; }
+
+.chevron-v4 { color: #e2e8f0; font-size: 20px; }
+
+.roadmap-cta-v4 {
+  margin-bottom: 50px;
+}
+
+.enroll-card-v4 {
+  background: #3b82f6;
+  color: white;
+  padding: 50px;
+  border-radius: 32px;
+  text-align: center;
+}
+
+.check-v4 { font-size: 48px; margin-bottom: 20px; }
+.enroll-card-v4 h3 { font-size: 28px; font-weight: 900; margin-bottom: 12px; }
+.enroll-card-v4 p { opacity: 0.8; margin-bottom: 30px; font-size: 17px; }
+
+.btn-enroll-v4 {
+  background: white;
+  color: #3b82f6;
+  border: none;
+  padding: 18px 40px;
+  border-radius: 16px;
+  font-size: 17px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-enroll-v4:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
+}
+
+.btn-home-v4 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 auto;
+  align-self: center;
+  background: none;
+  border: none;
+  color: #64748b;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .c-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .roadmap-step-v4 { padding: 20px; }
+}

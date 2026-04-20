@@ -1,4 +1,3 @@
-import React, { useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Briefcase, FileText, GraduationCap, Quote, Users, UserCheck, Search } from "lucide-react";
@@ -20,15 +19,15 @@ const CareerPreparationPage = () => {
 
   return (
     <div className="feature-page-v4">
+      {/* Fixed Back Button */}
+      <button className="global-back-btn-v4" onClick={() => navigate(-1)}>
+        <ArrowLeft size={18} /> Back
+      </button>
+
       <div className="container-custom">
         <nav className="breadcrumb-v4">
           <Link to="/">Home</Link> <span className="separator">/</span> <span>Career Preparation</span>
         </nav>
-
-        <button onClick={() => navigate(-1)} className="back-btn-v4">
-          <ArrowLeft size={18} />
-          <span>Back</span>
-        </button>
 
         {/* Hero Section */}
         <motion.section 

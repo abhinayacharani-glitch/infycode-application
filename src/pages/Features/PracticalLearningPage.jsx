@@ -20,15 +20,15 @@ const PracticalLearningPage = () => {
 
   return (
     <div className="feature-page-v4">
+      {/* Fixed Back Button */}
+      <button className="global-back-btn-v4" onClick={() => navigate(-1)}>
+        <ArrowLeft size={18} /> Back
+      </button>
+
       <div className="container-custom">
         <nav className="breadcrumb-v4">
           <Link to="/">Home</Link> <span className="separator">/</span> <span>Practical Learning</span>
         </nav>
-
-        <button onClick={() => navigate(-1)} className="back-btn-v4">
-          <ArrowLeft size={18} />
-          <span>Back</span>
-        </button>
 
         {/* Hero Section */}
         <motion.section 

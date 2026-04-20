@@ -1,23 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500;600;700;800&display=swap');
 
 .why {
-  padding: 70px 20px;
-  background: #F0F0F0;
+  padding: 80px 20px;
+  background: #f8fafc;
   text-align: center;
   font-family: 'Urbanist', sans-serif;
 }
 
 .why-title {
-  font-size: 36px;
-  font-weight: 800;
-  color: rgb(12, 12, 12);
+  font-size: 42px;
+  font-weight: 900;
+  color: #0f172a;
+  margin-bottom: 12px;
 }
 
 .why-sub {
-  font-size: 18px;
-  font-weight: 800px;
-  margin: 10px 0 60px;
-  color: rgb(7, 7, 7);
+  font-size: 19px;
+  color: #64748b;
+  margin-bottom: 60px;
 }
 
 /* OPTIONS */
@@ -34,18 +34,19 @@
 .why-option {
   position: relative;
   width: 320px;
-  height: 400px;
-  border-radius: 20px;
+  height: 420px;
+  border-radius: 30px;
   overflow: hidden;
   cursor: pointer;
-  transition: 0.5s ease;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
 }
 
 .why-option img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: 0.6s ease;
+  transition: 0.8s ease;
 }
 
 /* OVERLAY */
@@ -54,21 +55,23 @@
   position: absolute;
   bottom: 0;
   width: 100%;
-  padding: 25px;
-  background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+  padding: 30px;
+  background: linear-gradient(to top, rgba(15, 23, 42, 0.9), transparent);
   color: white;
   text-align: left;
 }
 
 .overlay h3 {
-  font-size: 18px;
-  margin-bottom: 5px;
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 8px;
   color: white;
 }
 
 .overlay p {
-  font-size: 17px;
-  opacity: 0.9;
+  font-size: 16px;
+  opacity: 0.8;
+  margin-bottom: 20px;
 }
 
 /* HOVER */
@@ -78,117 +81,85 @@
 }
 
 .why-option:hover {
-  transform: translateY(-10px) scale(1.02);
-  box-shadow: 0 25px 60px rgba(0,0,0,0.2);
+  transform: translateY(-12px);
+  box-shadow: 0 30px 60px rgba(108, 99, 255, 0.2);
 }
 
 .why-option.active {
-  outline: 3px solid #6c63ff;
-  transform: scale(1.05);
+  box-shadow: 0 0 0 4px rgba(108, 99, 255, 0.4), 0 30px 60px rgba(108, 99, 255, 0.2);
+}
+
+/* KNOW MORE BUTTON */
+
+.know-more-btn-v4 {
+  background: white;
+  color: #7c3aed;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 50px;
+  font-weight: 800;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.know-more-btn-v4:hover {
+  background: #7c3aed;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4);
 }
 
 /* FLOW */
 
 .why-flow {
-  margin-top: 70px;
+  margin-top: 80px;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 18px;
+  gap: 20px;
   flex-wrap: wrap;
 }
-
-/* FLOW STEP */
 
 .flow-step {
   padding: 14px 28px;
   border-radius: 50px;
-  font-size: 18px;
-  font-weight: 500;
+  font-size: 17px;
+  font-weight: 700;
   background: #ffffff;
-  border: 1.5px solid #e5e7eb;
+  border: 1px solid #e2e8f0;
   cursor: pointer;
-  position: relative;
-  overflow: hidden;
   transition: all 0.3s ease;
+  color: #1e293b;
 }
-
-/* HOVER (NO MOVEMENT) */
 
 .flow-step:hover {
-  background: #f8f9ff;
-  border-color: #6c63ff;
-  box-shadow: 0 10px 30px rgba(108, 99, 255, 0.25);
+  border-color: #7c3aed;
+  color: #7c3aed;
+  background: #f5f3ff;
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(124, 58, 237, 0.15);
 }
 
-/* SHINE EFFECT */
-
-.flow-step::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -120%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    120deg,
-    transparent,
-    rgba(255, 255, 255, 0.7),
-    transparent
-  );
-  transition: 0.6s;
-}
-
-.flow-step:hover::before {
-  left: 120%;
-}
-
-/* BORDER GLOW */
-
-.flow-step::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 50px;
-  border: 1px solid transparent;
-  transition: 0.3s;
-}
-
-.flow-step:hover::after {
-  border: 1px solid #6c63ff;
-}
-
-/* ✅ IMPORTANT FIX */
-
-.highlight,
-.highlight:hover {
-  background: linear-gradient(135deg, #6c63ff, #8b85ff) !important;
+.highlight {
+  background: linear-gradient(135deg, #7c3aed, #4f46e5) !important;
   color: white !important;
   border: none !important;
 }
 
-/* KEEP HOVER EFFECT ONLY SHADOW */
-
-.highlight:hover {
-  box-shadow: 0 15px 40px rgba(108, 99, 255, 0.4);
-}
-
-/* ARROWS */
-
 .flow-arrow {
-  font-size: var(--fs-h3);
-  color: #b0b7c3;
-  transition: 0.3s;
-}
-
-.flow-step:hover + .flow-arrow {
-  color: #6c63ff;
+  font-size: 20px;
+  color: #94a3b8;
 }
 
 /* DETAILS */
 
 .details {
-  margin-top: 60px;
+  margin-top: 70px;
   display: flex;
   justify-content: center;
   gap: 30px;
@@ -196,61 +167,44 @@
 }
 
 .detail-card {
-  width: 270px;
-  padding: 28px;
-  border-radius: 18px;
+  width: 280px;
+  padding: 30px;
+  border-radius: 24px;
   background: #ffffff;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #e2e8f0;
   text-align: left;
-  position: relative;
-  overflow: hidden;
-  cursor: default;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.03);
   transition: all 0.4s ease;
 }
 
-.detail-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  height: 4px;
-  width: 100%;
-  background: linear-gradient(90deg, #6c63ff, #8b85ff);
-}
-
-/* .detail-card:hover {
-  transform: translateY(-12px) scale(1.04);
-  box-shadow: 0 25px 60px rgba(108, 99, 255, 0.25);
-  border-color: #6c63ff;
-} */
-
-.detail-card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at top left, #6c63ff20, transparent);
-  opacity: 0;
-  transition: 0.4s;
-}
-
-/* .detail-card:hover::after {
-  opacity: 1;
-} */
-
 .detail-card h4 {
-  font-size: var(--fs-h3);
-  font-weight: 700;
+  font-size: 18px;
+  font-weight: 800;
   margin-bottom: 12px;
-  color: #0e1133;
+  color: #0f172a;
 }
 
 .detail-card p {
-  font-size: 17px;
-  hyphens: auto;
-  color: var(--text-main);
+  font-size: 15px;
+  color: #64748b;
   line-height: 1.6;
 }
 
-.detail-card:active {
-  transform: scale(0.98);
+.clickable {
+  cursor: pointer !important;
+}
+
+.clickable:hover {
+  transform: translateY(-8px);
+  border-color: #7c3aed;
+  box-shadow: 0 20px 40px rgba(124, 58, 237, 0.1);
+}
+
+.click-demo {
+  display: block;
+  margin-top: 15px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #7c3aed;
+  text-transform: uppercase;
 }

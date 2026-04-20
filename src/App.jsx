@@ -72,6 +72,18 @@ const PracticalLearningPage     = lazy(() => import("./pages/Features/PracticalL
 const SkillEvaluationPage       = lazy(() => import("./pages/Features/SkillEvaluationPage"));
 const CareerPreparationPage     = lazy(() => import("./pages/Features/CareerPreparationPage"));
 
+// ─── WhyChoose Demo Pages ────────────────────────────────────────────────────
+const MentorshipSteps           = lazy(() => import("./pages/InternalPages/WhyChooseDemo/MentorshipSteps"));
+const SkillTestSteps            = lazy(() => import("./pages/InternalPages/WhyChooseDemo/SkillTestSteps"));
+const BookingPage               = lazy(() => import("./pages/InternalPages/WhyChooseDemo/BookingPage"));
+const CounsellingDemo           = lazy(() => import("./pages/InternalPages/WhyChooseDemo/CounsellingDemo"));
+const CareerRoadmap             = lazy(() => import("./pages/InternalPages/WhyChooseDemo/CareerRoadmap"));
+
+// ─── Skill Test Demo Pages ───────────────────────────────────────────────────
+const FoundationalTestDemo       = lazy(() => import("./pages/InternalPages/WhyChooseDemo/FoundationalTestDemo"));
+const EvaluationStatus           = lazy(() => import("./pages/InternalPages/WhyChooseDemo/EvaluationStatus"));
+const SkillLevelResult           = lazy(() => import("./pages/InternalPages/WhyChooseDemo/SkillLevelResult"));
+
 // ─── Lazy-loaded — Other ─────────────────────────────────────────────────────
 const BatchCreation = lazy(() => import("./pages/AdminDashboard/pages/BatchCreation"));
 
@@ -264,6 +276,17 @@ function Layout({ courses, setCourses, onToggleLike, onUpdateCourse, onDeleteCou
             <Route path="/features/practical-learning"  element={<PracticalLearningPage />} />
             <Route path="/features/skill-evaluation"    element={<SkillEvaluationPage />} />
             <Route path="/features/career-preparation"   element={<CareerPreparationPage />} />
+
+            {/* WhyChoose Demo Routes */}
+            <Route path="/expert-consultation"         element={<MentorshipSteps />} />
+            <Route path="/expert-consultation/book"    element={<BookingPage />} />
+            <Route path="/expert-consultation/session" element={<CounsellingDemo />} />
+            <Route path="/expert-consultation/roadmap" element={<CareerRoadmap />} />
+
+            <Route path="/skill-test"                  element={<SkillTestSteps />} />
+            <Route path="/skill-test/foundational"      element={<FoundationalTestDemo />} />
+            <Route path="/skill-test/evaluation"        element={<EvaluationStatus />} />
+            <Route path="/skill-test/result"            element={<SkillLevelResult />} />
 
             {/* ── Protected ── */}
             <Route path="/student/test/*" element={<ProtectedRoute><TestApp /></ProtectedRoute>} />

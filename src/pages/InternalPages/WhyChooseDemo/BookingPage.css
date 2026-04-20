@@ -1,0 +1,194 @@
+.booking-container {
+  min-height: 100vh;
+  background: white;
+  font-family: 'Urbanist', sans-serif;
+  padding: 80px 20px;
+}
+
+.booking-v4-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.booking-header-v4 {
+  text-align: center;
+  margin-bottom: 70px;
+}
+
+.booking-tag-v4 {
+  color: #3b82f6;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 13px;
+}
+
+.booking-header-v4 h1 {
+  font-size: 46px;
+  font-weight: 900;
+  margin: 15px 0;
+  color: #0f172a;
+}
+
+.booking-header-v4 p {
+  font-size: 19px;
+  color: #64748b;
+}
+
+.experts-grid-v4 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+
+.expert-card-v4 {
+  background: #ffffff;
+  border: 1px solid #f1f5f9;
+  border-radius: 32px;
+  padding: 40px 30px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+  transition: all 0.3s;
+}
+
+.expert-card-v4:hover {
+  box-shadow: 0 30px 60px rgba(15, 23, 42, 0.1);
+  border-color: #3b82f640;
+}
+
+.expert-img-v4 {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin: 0 auto 24px;
+  border: 4px solid #f8fafc;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  background: #f1f5f9;
+}
+
+.expert-info-v4 h3 {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+
+.expert-role-v4 {
+  color: #3b82f6;
+  font-weight: 800;
+  font-size: 14px;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.expert-specialty-v4 {
+  color: #64748b;
+  font-size: 15px;
+  margin-bottom: 24px;
+}
+
+.expert-slots-v4 {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.slot-v4 {
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+  border: 1px solid #e2e8f0;
+}
+
+.slot-v4.active {
+  background: #eff6ff;
+  color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.btn-book-v4 {
+  width: 100%;
+  background: #0f172a;
+  color: white;
+  border: none;
+  padding: 16px;
+  border-radius: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-book-v4:hover {
+  background: #3b82f6;
+  transform: scale(1.02);
+}
+
+.booking-success-v4 {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+  background: #f8fafc;
+  padding: 60px;
+  border-radius: 40px;
+  border: 2px dashed #e2e8f0;
+}
+
+.success-icon-v4 {
+  font-size: 64px;
+  color: #10b981;
+  margin-bottom: 30px;
+}
+
+.booking-success-v4 h2 {
+  font-size: 32px;
+  font-weight: 900;
+  margin-bottom: 16px;
+}
+
+.booking-details-v4 {
+  margin: 40px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.b-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 17px;
+  font-weight: 700;
+  color: #475569;
+}
+
+.b-item svg { color: #3b82f6; }
+
+.cta-proceed-v4 {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 20px 40px;
+  border-radius: 20px;
+  font-size: 18px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.cta-proceed-v4:hover {
+  background: #2563eb;
+  box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+}
+
+@media (max-width: 900px) {
+  .experts-grid-v4 { grid-template-columns: 1fr; }
+}

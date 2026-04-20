@@ -1,0 +1,147 @@
+.eval-container {
+  min-height: 100vh;
+  background: #020617;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  font-family: 'Urbanist', sans-serif;
+  overflow: hidden;
+}
+
+.eval-card {
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+  color: white;
+}
+
+.ai-scanner {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin: 0 auto 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scanner-circle {
+  width: 100%;
+  height: 100%;
+  border: 4px dashed rgba(59, 130, 246, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cpu-icon {
+  font-size: 60px;
+  color: #3b82f6;
+  filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.5));
+}
+
+.scanner-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+  box-shadow: 0 0 20px #3b82f6;
+  z-index: 2;
+}
+
+.eval-title {
+  font-size: 36px;
+  font-weight: 900;
+  margin-bottom: 12px;
+  color: white !important;
+}
+
+.eval-subtitle {
+  color: #94a3b8;
+  font-size: 18px;
+  margin-bottom: 30px;
+}
+
+.ai-logs-container-v4 {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 20px;
+  margin-bottom: 40px;
+  height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 10px;
+  text-align: left;
+}
+
+.log-line-v4 {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 14px;
+  color: #3b82f6;
+  opacity: 0.8;
+}
+
+.log-arrow {
+  font-weight: 900;
+  margin-right: 8px;
+}
+
+.eval-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-bottom: 60px;
+}
+
+.stat-item-v4 {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 20px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 700;
+  color: #e2e8f0;
+}
+
+.stat-item-v4 svg {
+  color: #3b82f6;
+  font-size: 20px;
+}
+
+.eval-progress-box {
+  background: rgba(255, 255, 255, 0.02);
+  padding: 40px;
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.eval-progress-bar {
+  height: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.eval-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6, #3b82f6);
+  background-size: 200% 100%;
+}
+
+.status-text-v4 {
+  font-size: 14px;
+  color: #3b82f6;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
