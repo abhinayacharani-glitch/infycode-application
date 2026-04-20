@@ -5,6 +5,7 @@ import { FiCpu, FiSearch, FiDatabase, FiLayers, FiActivity, FiArrowRight } from 
 import "./EvaluationStatus.css";
 
 export default function EvaluationStatus() {
+  const navigate = useNavigate();
   const [progress, setProgress] = useState(0);
   const [logs, setLogs] = useState([]);
   const [statusText, setStatusText] = useState("");

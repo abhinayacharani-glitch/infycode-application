@@ -10,24 +10,27 @@ const steps = [
     title: "Step 1: Book a Session", 
     desc: "You connect with an expert based on your interests and goals.", 
     icon: <FiVideo />,
-    active: false,
-    path: "/expert-consultation/book"
+    active: true,
+    path: "/expert-consultation/book",
+    color: "#2563eb"
   },
   { 
     id: "02", 
-    title: "Step 2: 1-on-1 Interaction", 
-    desc: "Deep dive into your strengths, doubts, and aspirations with a mentor.", 
+    title: "Step 2: Group Interaction", 
+    desc: "Deep dive into your strengths, doubts, and aspirations with mentors and peers.", 
     icon: <FiInfo />,
     active: true,
-    path: "/expert-consultation/session"
+    path: "/expert-consultation/session",
+    color: "#059669"
   },
   { 
     id: "03", 
     title: "Step 3: Career Direction", 
     desc: "Receive a tailored roadmap designed specifically for your growth.", 
     icon: <FiCheckCircle />,
-    active: false,
-    path: "/expert-consultation/roadmap"
+    active: true,
+    path: "/expert-consultation/roadmap",
+    color: "#7c3aed"
   }
 ];
 
@@ -47,19 +50,22 @@ export default function MentorshipSteps() {
             <motion.div 
               key={step.id}
               className={`step-card-v4 ${step.active ? "active" : ""}`}
+              style={step.active ? { borderColor: step.color, boxShadow: `0 20px 50px ${step.color}20` } : {}}
               whileHover={{ x: 10 }}
               onClick={() => navigate(step.path)}
             >
+              <div className="step-num-large-v4" style={{ color: step.color }}>
+                {step.id}
+              </div>
               <div className="step-icon-wrap-v4">
-                <div className="step-icon-v4">{step.icon}</div>
-                <span className="step-num-badge-v4">{step.id}</span>
+                <div className="step-icon-v4" style={{ backgroundColor: step.color, color: 'white', borderColor: step.color }}>{step.icon}</div>
               </div>
               <div className="step-text-v4">
                 <h3>{step.title}</h3>
                 <p>{step.desc}</p>
               </div>
               {step.active && (
-                <div className="step-action-v4">
+                <div className="step-action-v4" style={{ backgroundColor: step.color }}>
                   <FiArrowRight />
                 </div>
               )}

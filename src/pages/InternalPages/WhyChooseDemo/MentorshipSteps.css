@@ -80,26 +80,10 @@
   color: white;
 }
 
-.step-num-badge-v4 {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  width: 24px;
-  height: 24px;
-  background: #6366f1;
-  color: white;
-  border-radius: 50%;
-  font-size: 11px;
+.step-num-large-v4 {
+  font-size: 48px;
   font-weight: 900;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid white;
-}
-
-.step-card-v4.active .step-num-badge-v4 {
-  background: white;
-  color: #6366f1;
+  margin-right: 10px;
 }
 
 .step-text-v4 {
