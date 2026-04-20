@@ -17,8 +17,8 @@
 /* Greeting Popup - minimal, clean, small */
 .ai-greeting-popup {
   position: absolute;
-  bottom: 15px; /* sit beside the icon */
-  right: 65px;
+  bottom: 70px; /* sit ABOVE the icon when horizontal */
+  right: 0;
   width: 220px;
   background: white;
   border-radius: 14px;
@@ -34,12 +34,12 @@
 
 /* Floating Button - Blue Gradient */
 .ai-floating-btn {
-  width: 52px;
-  height: 52px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3), inset 0 0 10px rgba(56, 189, 248, 0.1);
+  background: transparent;
+  border: none;
+  box-shadow: none;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -58,19 +58,25 @@
   pointer-events: none;
 }
 
-/* SVG Robot Icon - smaller */
+/* SVG Robot Icon */
 .robot-svg {
-  width: 38px;
-  height: 38px;
+  width: 46px;
+  height: 46px;
   animation: gentleFloat 4s ease-in-out infinite;
+}
+
+.hi-bubble-rect, .hi-bubble-tail {
+  animation: bounceHi 3s ease-in-out infinite;
+  transform-origin: center;
 }
 
 .robot-eye {
   animation: blink 4s infinite;
 }
 
-.antenna-glow {
-  animation: flashAlpha 2s infinite;
+@keyframes bounceHi {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
 }
 
 @keyframes gentleFloat {
@@ -369,12 +375,12 @@
 /* Responsive */
 @media (max-width: 480px) {
   .ai-floating-btn {
-    width: 46px;
-    height: 46px;
+    width: 42px;
+    height: 42px;
   }
   .robot-svg {
-    width: 30px;
-    height: 30px;
+    width: 42px;
+    height: 42px;
   }
   .ai-greeting-popup {
     bottom: 0px;

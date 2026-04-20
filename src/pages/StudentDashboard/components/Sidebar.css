@@ -49,22 +49,82 @@
   background: #f8fafc;
 }
 
-.sidebar-logo-group {
+.brand-wrapper {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
+  cursor: pointer;
+  padding: 4px 0;
 }
 
-.sidebar-ic-logo {
-  height: 58px;
+.logo {
+  height: 45px;
   width: auto;
   object-fit: contain;
+  transition: transform 0.3s ease-in-out;
 }
 
-.sidebar-banner-logo {
-  height: 34px;
-  width: auto;
-  object-fit: contain;
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  font-family: 'Urbanist', sans-serif;
+  text-align: left;
+}
+
+.logo-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: #000000;
+  letter-spacing: -0.3px;
+  position: relative;
+  font-family: 'Urbanist', sans-serif;
+  display: inline-block;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  margin-bottom: 2px;
+}
+
+/* Animated Underline */
+.logo-title::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 0%;
+  height: 2px;
+  background: #2f5bd3;
+  transition: width 0.3s ease-in-out;
+}
+
+.logo-title:hover {
+  color: #2f5bd3;
+}
+
+.logo-title:hover::after {
+  width: 100%;
+}
+
+.logo-subtitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #000000;
+  margin-top: 2px;
+  font-family: 'Urbanist', sans-serif;
+  white-space: nowrap;
+}
+
+/* Brand Hover Micro-interactions */
+.brand-wrapper:hover .logo {
+  transform: scale(1.05);
+}
+
+.brand-wrapper:hover .logo-title {
+  opacity: 0.9;
+}
+
+.brand-wrapper:hover .logo-title::after {
+  height: 3px;
 }
 
 /* ================= PROFILE ================= */
@@ -146,7 +206,7 @@
   border-radius: 24px;
   width: 100%;
   max-width: 520px;
-  box-shadow: 
+  box-shadow:
     0 25px 50px -12px rgba(0, 0, 0, 0.25),
     0 0 0 1px rgba(0, 0, 0, 0.05);
   overflow: hidden;
@@ -346,7 +406,9 @@
   scrollbar-width: none;
 }
 
-.student-sd-nav::-webkit-scrollbar { display: none; }
+.student-sd-nav::-webkit-scrollbar {
+  display: none;
+}
 
 .student-sd-item {
   text-decoration: none;
@@ -419,7 +481,7 @@
   width: auto;
   min-width: 420px;
   max-width: 92vw;
-  box-shadow: 
+  box-shadow:
     0 25px 50px -12px rgba(0, 0, 0, 0.25),
     0 0 0 1px rgba(0, 0, 0, 0.05);
   text-align: center;
@@ -517,6 +579,7 @@
     left: -300px;
     transition: left 0.3s ease;
   }
+
   .student-sd-sidebar.open {
     left: 0;
   }

@@ -92,22 +92,6 @@ function BatchCreation() {
   return (
     <div className="batch-page">
       {/* Top Navbar */}
-      <nav className="batch-navbar">
-        <div className="batch-navbar__container">
-          <button 
-            className="navbar-back-btn" 
-            onClick={() => navigate(-1)}
-          >
-            ← Back
-          </button>
-          <button 
-            className="navbar-logout-btn"
-            onClick={() => navigate("/login/AdminLogin")}
-          >
-            Logout
-          </button>
-        </div>
-      </nav>
 
       <div className="batch-content-wrapper">
         {/* Toast */}

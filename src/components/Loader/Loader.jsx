@@ -1,9 +1,41 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./Loader.css";
 import logo from "../../assets/infycode-final-logo3.png";
 import bgImage from "../../assets/circuit-bg-final1.png";
 
 function Loader() {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const duration = 2800; // Reach 100% in 2.8s to fit App.jsx's 3s timer
+    const interval = 30;
+    const step = 100 / (duration / interval);
+
+    const timer = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(timer);
+          return 100;
+        }
+        return Math.min(prev + step, 100);
+      });
+    }, interval);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    // Navigate only after reaching 100% and if we are on the landing page
+    if (progress === 100) {
+      const navTimer = setTimeout(() => {
+        if (window.location.pathname === "/") {
+          window.location.assign("/admin-dashboard/dashboard");
+        }
+      }, 200); // Small delay for visual completion
+      return () => clearTimeout(navTimer);
+    }
+  }, [progress]);
+
   return (
     <div
       className="loader-container"
@@ -48,14 +80,17 @@ function Loader() {
 
         {/* Bright glowing logo */}
         <img
-  src={logo}
-  alt="Infycode Logo"
-  className="loader-logo"
-  style={{
-    filter:
-      "brightness(1.5) contrast(1.3) drop-shadow(0 0 25px #ffffff) drop-shadow(0 0 50px #00eaff)",
-  }}
-/>
+          src={logo}
+          alt="Infycode Logo"
+          className="loader-logo"
+          style={{
+            filter:
+              "brightness(1.5) contrast(1.3) drop-shadow(0 0 25px #ffffff) drop-shadow(0 0 50px #00eaff)",
+          }}
+        />
+
+        <h1 className="brand-name">INFYCODE</h1>
+        <p className="loader-tagline">Infinite Learning Solutions</p>
 
         <div
           className="loading-bar"
@@ -63,7 +98,14 @@ function Loader() {
             filter: "brightness(2.5) drop-shadow(0 0 10px #ffffff)"
           }}
         >
-          <div className="loading-progress"></div>
+          <div 
+            className="loading-progress" 
+            style={{ width: `${progress}%` }}
+          ></div>
+        </div>
+
+        <div className="percentage-text">
+          {Math.round(progress)}%
         </div>
 
       </div>

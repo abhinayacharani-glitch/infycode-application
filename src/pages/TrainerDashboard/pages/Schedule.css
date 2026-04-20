@@ -2,7 +2,7 @@
 
 .schedule-v2-container {
   padding: 32px;
-  background: #F8FAFC;
+  background: transparent;
   min-height: calc(100vh - 80px);
   font-family: 'Urbanist', sans-serif;
   animation: fadeIn 0.4s ease-out;

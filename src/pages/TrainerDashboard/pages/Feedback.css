@@ -15,7 +15,7 @@
 
 .fb-dashboard-v7 {
   padding: 30px;
-  background-color: var(--bg-light);
+  background-color: transparent;
   min-height: 100vh;
   font-family: 'Urbanist', sans-serif;
   color: var(--text-main);

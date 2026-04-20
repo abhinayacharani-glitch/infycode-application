@@ -203,35 +203,37 @@ const Dashboard = () => {
 
   return (
     <div className="page active" id="page-dashboard">
-      {/* Welcome Banner */}
-      <div className="welcome-banner shared-dashboard-banner">
-        <div className="welcome-text">
-          <h2>Welcome back, {userName}! <SettingsIcon /></h2>
-          <p>
-            Showing data for <strong>{filter.course === 'All' ? 'all courses' : filter.course}</strong> ·{' '}
-            <strong>{kpiData.total}</strong> registrations in the {kpiData.dateLabel}
-          </p>
-        </div>
-        <div className="welcome-stats">
-          <div className="w-stat">
-            <div className="w-stat-num"><Counter key={`total-${animKey}`} target={kpiData.total} /></div>
-            <div className="w-stat-label">Total Students</div>
+      {/* Welcome Banner — Restored with identical design */}
+      <div className="dashboard-banner">
+        <div className="banner-content">
+          <div className="banner-left">
+            <h2>Welcome back, {userName}! <SettingsIcon /></h2>
+            <p>
+              Showing data for <strong>{filter.course === 'All' ? 'all courses' : filter.course}</strong> ·{' '}
+              <strong>{kpiData.total}</strong> registrations in the {kpiData.dateLabel}
+            </p>
           </div>
-          <div className="w-divider"></div>
-          <div className="w-stat">
-            <div className="w-stat-num"><Counter key={`trainers-${animKey}`} target={stats.trainers.active} /></div>
-            <div className="w-stat-label">Active Trainers</div>
-          </div>
-          <div className="w-divider"></div>
-          <div className="w-stat">
-            <div className="w-stat-num"><Counter key={`batches-${animKey}`} target={kpiData.activeBatches} /></div>
-            <div className="w-stat-label">Live Batches</div>
+          <div className="banner-right">
+            <div className="banner-stat-item">
+              <span className="banner-stat-value"><Counter key={`total-${animKey}`} target={kpiData.total} /></span>
+              <span className="banner-stat-label">Total Students</span>
+            </div>
+            <div className="banner-divider"></div>
+            <div className="banner-stat-item">
+              <span className="banner-stat-value"><Counter key={`trainers-${animKey}`} target={stats.trainers.active} /></span>
+              <span className="banner-stat-label">Active Trainers</span>
+            </div>
+            <div className="banner-divider"></div>
+            <div className="banner-stat-item">
+              <span className="banner-stat-value"><Counter key={`batches-${animKey}`} target={kpiData.activeBatches} /></span>
+              <span className="banner-stat-label">Live Batches</span>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="dashboard-filters" style={{ display: 'flex', gap: '12px', marginBottom: '24px', justifyContent: 'flex-end', alignItems: 'center' }}>
+      <div className="admin-filter-container" style={{ marginBottom: '24px', justifyContent: 'flex-end' }}>
         {/* Active filter badge */}
         {(filter.course !== 'All' || filter.date !== 'Last 7 Days') && (
           <span
@@ -242,25 +244,23 @@ const Dashboard = () => {
             ✕ Reset Filters
           </span>
         )}
-        <div className="filter-container-premium">
-          <select
-            value={filter.course}
-            onChange={(e) => handleFilterChange('course', e.target.value)}
-            className="filter-select-premium"
-          >
-            <option value="All">All Courses</option>
-            {courses.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
-          </select>
-          <select
-            value={filter.date}
-            onChange={(e) => handleFilterChange('date', e.target.value)}
-            className="filter-select-premium"
-          >
-            <option value="Today">Today</option>
-            <option value="Last 7 Days">Last 7 Days</option>
-            <option value="Last 30 Days">Last 30 Days</option>
-          </select>
-        </div>
+        <select
+          value={filter.course}
+          onChange={(e) => handleFilterChange('course', e.target.value)}
+          className="admin-filter-select"
+        >
+          <option value="All">All Courses</option>
+          {courses.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+        </select>
+        <select
+          value={filter.date}
+          onChange={(e) => handleFilterChange('date', e.target.value)}
+          className="admin-filter-select"
+        >
+          <option value="Today">Today</option>
+          <option value="Last 7 Days">Last 7 Days</option>
+          <option value="Last 30 Days">Last 30 Days</option>
+        </select>
       </div>
 
       {/* KPI Cards */}

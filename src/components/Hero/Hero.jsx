@@ -55,10 +55,11 @@ function Hero() {
   }, [index]);
 
   useEffect(() => {
-    if (!transition) {
-      setTimeout(() => setTransition(true), 50);
-    }
-  }, [transition]);
+    const timer = setInterval(() => {
+      nextSlide();
+    }, 3000);
+    return () => clearInterval(timer);
+  }, [index]);
 
   return (
     <section className="hero">
@@ -87,7 +88,7 @@ function Hero() {
 
                 <div className="hero-buttons">
 
-                  <button 
+                  <button
                     className="btn"
                     onClick={() => {
                       const section = document.getElementById("why-choose");
@@ -120,34 +121,34 @@ function Hero() {
 
       {/* ✅ INLINE VIDEO (NEW) */}
       {showVideo && (
-  <div 
-    className="hero-video-overlay"
-    onClick={() => setShowVideo(false)}  // click outside to close
-  >
+        <div
+          className="hero-video-overlay"
+          onClick={() => setShowVideo(false)}  // click outside to close
+        >
 
-    <div 
-      className="hero-video"
-      onClick={(e) => e.stopPropagation()}  // prevent closing when clicking video
-    >
+          <div
+            className="hero-video"
+            onClick={(e) => e.stopPropagation()}  // prevent closing when clicking video
+          >
 
-      <span 
-        className="close-video"
-        onClick={() => setShowVideo(false)}
-      >
-        ✕
-      </span>
+            <span
+              className="close-video"
+              onClick={() => setShowVideo(false)}
+            >
+              ✕
+            </span>
 
-      <iframe
-        src="https://www.youtube.com/embed/kqtD5dpn9C8?autoplay=1"
-        title="Educational Video"
-        allow="autoplay; encrypted-media"
-        allowFullScreen
-      ></iframe>
+            <iframe
+              src="https://www.youtube.com/embed/kqtD5dpn9C8?autoplay=1"
+              title="Educational Video"
+              allow="autoplay; encrypted-media"
+              allowFullScreen
+            ></iframe>
 
-    </div>
+          </div>
 
-  </div>
-)}
+        </div>
+      )}
 
       <div className="slider-controls">
         <span className="slide-number">

@@ -140,6 +140,15 @@
   width: 100%;
 }
 
+/* ── WRAPPER OVERRIDES ── */
+/* Specifically targeting classes used in individual pages to ensure they inherit the layout background */
+.trainer-dashboard-layout .main-content,
+.trainer-dashboard-layout .page-container,
+.trainer-dashboard-layout .content-wrapper,
+.trainer-dashboard-layout .trainer-layout {
+  background: transparent !important;
+}
+
 .page-wrapper {
   animation: fadeIn .35s ease;
 }

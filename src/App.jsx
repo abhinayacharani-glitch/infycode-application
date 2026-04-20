@@ -5,7 +5,7 @@ import Loader from "./components/Loader/Loader";
 import Popup from "./components/popup/popup";
 import Navbar from "./components/Navbar/Navbar";
 import AIChatbot from "./components/AIChatbot/AIChatbot";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { AdminProvider } from "./context/AdminContext";
 
 import {
@@ -29,41 +29,42 @@ import Testimonals from "./components/Testimonals/Testimonals";
 import Footer from "./components/Footer/Footer";
 
 // ─── Lazy-loaded — Auth ──────────────────────────────────────────────────────
-const StudentAuthRoutes     = lazy(() => import("./student-auth/routes/StudentAuthRoutes"));
-const TrainerAuthRoutes     = lazy(() => import("./trainer-auth/routes/AuthRoutes"));
-const AdminLogin            = lazy(() => import("./pages/Auth/Admin/AdminLogin"));
-const AdminSignup           = lazy(() => import("./pages/Auth/Admin/AdminSignup"));
-const AdminForgotPassword   = lazy(() => import("./pages/Auth/Admin/ForgotPassword"));
-const AdminVerifyEmail      = lazy(() => import("./pages/Auth/Admin/VerifyEmail"));
-const AdminVerifyOTP        = lazy(() => import("./pages/Auth/Admin/VerifyOTP"));
-const AdminResetPassword    = lazy(() => import("./pages/Auth/Admin/ResetPassword"));
+const StudentAuthRoutes = lazy(() => import("./student-auth/routes/StudentAuthRoutes"));
+const TrainerAuthRoutes = lazy(() => import("./trainer-auth/routes/AuthRoutes"));
+const AdminLogin = lazy(() => import("./pages/Auth/Admin/AdminLogin"));
+const AdminSignup = lazy(() => import("./pages/Auth/Admin/AdminSignup"));
+const AdminForgotPassword = lazy(() => import("./pages/Auth/Admin/ForgotPassword"));
+const AdminVerifyEmail = lazy(() => import("./pages/Auth/Admin/VerifyEmail"));
+const AdminVerifyOTP = lazy(() => import("./pages/Auth/Admin/VerifyOTP"));
+const AdminResetPassword = lazy(() => import("./pages/Auth/Admin/ResetPassword"));
 
 // ─── Lazy-loaded — Dashboards ────────────────────────────────────────────────
-const StudentDashboard      = lazy(() => import("./pages/StudentDashboard/StudentDashboard"));
-const TrainerDashboard      = lazy(() => import("./pages/TrainerDashboard/TrainerDashboard"));
-const AdminDashboard        = lazy(() => import("./pages/AdminDashboard/AdminDashboard"));
-const TestApp               = lazy(() => import("./pages/StudentDashboard/pages/Test/src/App"));
-const CoreTestApp           = lazy(() => import("./pages/StudentDashboard/pages/core-test/CoreTest"));
+const StudentDashboard = lazy(() => import("./pages/StudentDashboard/StudentDashboard"));
+const TrainerDashboard = lazy(() => import("./pages/TrainerDashboard/TrainerDashboard"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard/AdminDashboard"));
+const TestApp = lazy(() => import("./pages/StudentDashboard/pages/Test/src/App"));
+const CoreTestApp = lazy(() => import("./pages/StudentDashboard/pages/core-test/CoreTest"));
 
 // ─── Lazy-loaded — Internal Pages ────────────────────────────────────────────
-const CoursesPage               = lazy(() => import("./pages/InternalPages/CoursesPage"));
-const TrainingsPage             = lazy(() => import("./pages/InternalPages/TrainingsPage"));
-const ResourcesPage             = lazy(() => import("./pages/InternalPages/ResourcesPage"));
-const ContactPage               = lazy(() => import("./pages/InternalPages/ContactPage"));
-const BecomeTrainerPage         = lazy(() => import("./pages/InternalPages/BecomeTrainerPage"));
-const VideoCoursesPage          = lazy(() => import("./pages/InternalPages/VideoCourses/VideoCoursesPage"));
-const VideoModulesPage          = lazy(() => import("./pages/InternalPages/VideoCourses/VideoModulesPage"));
-const VideoPaymentPage          = lazy(() => import("./pages/InternalPages/VideoCourses/VideoPaymentPage"));
-const VideoPlayerPage           = lazy(() => import("./pages/InternalPages/VideoCourses/VideoPlayerPage"));
-const PopularCoursesPage        = lazy(() => import("./pages/InternalPages/SubPages/PopularCoursesPage"));
-const TrendingCoursesPage       = lazy(() => import("./pages/InternalPages/SubPages/TrendingCoursesPage"));
-const CorporateTrainingPage     = lazy(() => import("./pages/InternalPages/SubPages/CorporateTrainingPage"));
+const CoursesPage = lazy(() => import("./pages/InternalPages/CoursesPage"));
+const TrainingsPage = lazy(() => import("./pages/InternalPages/TrainingsPage"));
+const ResourcesPage = lazy(() => import("./pages/InternalPages/ResourcesPage"));
+const ContactPage = lazy(() => import("./pages/InternalPages/ContactPage"));
+const BecomeTrainerPage = lazy(() => import("./pages/InternalPages/BecomeTrainerPage"));
+const VideoCoursesPage = lazy(() => import("./pages/InternalPages/VideoCourses/VideoCoursesPage"));
+const VideoModulesPage = lazy(() => import("./pages/InternalPages/VideoCourses/VideoModulesPage"));
+const VideoPaymentPage = lazy(() => import("./pages/InternalPages/VideoCourses/VideoPaymentPage"));
+const VideoPlayerPage = lazy(() => import("./pages/InternalPages/VideoCourses/VideoPlayerPage"));
+const PopularCoursesPage = lazy(() => import("./pages/InternalPages/SubPages/PopularCoursesPage"));
+const TrendingCoursesPage = lazy(() => import("./pages/InternalPages/SubPages/TrendingCoursesPage"));
+const CorporateTrainingPage = lazy(() => import("./pages/InternalPages/SubPages/CorporateTrainingPage"));
 const InstitutionalTrainingPage = lazy(() => import("./pages/InternalPages/SubPages/InstitutionalTrainingPage"));
-const ArticlesPage              = lazy(() => import("./pages/InternalPages/SubPages/ArticlesPage"));
-const EbooksPage                = lazy(() => import("./pages/InternalPages/SubPages/EbooksPage"));
-const AboutPage                 = lazy(() => import("./pages/InternalPages/AboutPage"));
-const GalleryPage               = lazy(() => import("./pages/InternalPages/GalleryPage"));
-const InstagramPage             = lazy(() => import("./pages/InternalPages/InstagramPage"));
+const ArticlesPage = lazy(() => import("./pages/InternalPages/SubPages/ArticlesPage"));
+const EbooksPage = lazy(() => import("./pages/InternalPages/SubPages/EbooksPage"));
+const AboutPage = lazy(() => import("./pages/InternalPages/AboutPage"));
+const GalleryPage = lazy(() => import("./pages/InternalPages/GalleryPage"));
+const InstagramPage = lazy(() => import("./pages/InternalPages/InstagramPage"));
+const CourseDetailsPage = lazy(() => import("./pages/CourseDetails/CourseDetails"));
 
 // ─── WhyChoose Demo Pages ────────────────────────────────────────────────────
 const BookingPage               = lazy(() => import("./pages/InternalPages/WhyChooseDemo/BookingPage"));
@@ -82,7 +83,7 @@ const SkillEvaluationPage       = lazy(() => import("./pages/Features/SkillEvalu
 const CareerPreparationPage     = lazy(() => import("./pages/Features/CareerPreparationPage"));
 
 // ─── Lazy-loaded — Other ─────────────────────────────────────────────────────
-const BatchCreation             = lazy(() => import("./pages/BatchCreation"));
+const BatchCreation = lazy(() => import("./pages/AdminDashboard/pages/BatchCreation"));
 
 // ─── Page-level Suspense fallback ────────────────────────────────────────────
 function PageLoader() {
@@ -139,15 +140,12 @@ function HomePage() {
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY;
-      const windowHeight = window.innerHeight;
-      const documentHeight = document.documentElement.scrollHeight;
-      
-      const footerZone = document.getElementById("footer-trigger-zone");
-      // Give a tiny 50px buffer so it hits cleanly when scrolling into it
-      const footerHeight = footerZone ? footerZone.offsetHeight : 350;
-      
-      // The floating buttons should appear ONLY on the very top (Hero) and very bottom (Footer)
-      if (scrollY < windowHeight * 0.25 || scrollY + windowHeight >= documentHeight - footerHeight + 50) {
+
+      // Get the height of the first section (Hero) to set the threshold
+      const threshold = window.innerHeight * 0.8; // Hide when 80% through the first section
+
+      // Show ONLY on the first section and hide immediately after
+      if (scrollY < threshold) {
         setShowFloaters(true);
       } else {
         setShowFloaters(false);
@@ -156,7 +154,7 @@ function HomePage() {
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll(); // Initialize on mount
-    
+
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -173,21 +171,27 @@ function HomePage() {
       <div id="footer-trigger-zone">
         <Footer />
       </div>
-      <motion.div 
-        className="floating-buttons-container"
-        animate={{ 
-          y: [0, -6, 0],
-          opacity: showFloaters ? 1 : 0
-        }}
-        style={{ pointerEvents: showFloaters ? "auto" : "none" }}
-        transition={{ 
-          y: { duration: 3, repeat: Infinity, ease: "easeInOut" },
-          opacity: { duration: 0.3 }
-        }}
-      >
-        <AIChatbot />
-        <WhatsAppFloat />
-      </motion.div>
+      <AnimatePresence>
+        {showFloaters && (
+          <motion.div
+            className="floating-buttons-container"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{
+              y: [0, -6, 0],
+              opacity: 1
+            }}
+            exit={{ opacity: 0, y: 20 }}
+            style={{ pointerEvents: "auto" }}
+            transition={{
+              y: { duration: 3, repeat: Infinity, ease: "easeInOut" },
+              opacity: { duration: 0.3 }
+            }}
+          >
+            <AIChatbot />
+            <WhatsAppFloat />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
@@ -230,39 +234,40 @@ function Layout({ courses, setCourses, onToggleLike, onUpdateCourse, onDeleteCou
 
             {/* Student Auth */}
             <Route path="/student/*" element={<StudentAuthRoutes />} />
-            <Route path="/login"    element={<Navigate to="/student/login"  replace />} />
+            <Route path="/login" element={<Navigate to="/student/login" replace />} />
             <Route path="/register" element={<Navigate to="/student/signup" replace />} />
 
             {/* Trainer Auth */}
             <Route path="/trainer/*" element={<TrainerAuthRoutes />} />
 
             {/* Admin Auth */}
-            <Route path="/admin/login"          element={<AdminLogin />} />
-            <Route path="/admin/signup"         element={<AdminSignup />} />
+            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/admin/signup" element={<AdminSignup />} />
             <Route path="/admin/forgot-password" element={<AdminForgotPassword />} />
-            <Route path="/admin/verify-email"   element={<AdminVerifyEmail />} />
-            <Route path="/admin/verify-otp"     element={<AdminVerifyOTP />} />
+            <Route path="/admin/verify-email" element={<AdminVerifyEmail />} />
+            <Route path="/admin/verify-otp" element={<AdminVerifyOTP />} />
             <Route path="/admin/reset-password" element={<AdminResetPassword />} />
 
             {/* ── Internal Pages ── */}
-            <Route path="/courses"                     element={<CoursesPage />} />
-            <Route path="/courses/popular"             element={<PopularCoursesPage />} />
-            <Route path="/courses/trending"            element={<TrendingCoursesPage />} />
-            <Route path="/trainings"                   element={<TrainingsPage />} />
-            <Route path="/trainings/corporate"         element={<CorporateTrainingPage />} />
-            <Route path="/trainings/institutional"     element={<InstitutionalTrainingPage />} />
-            <Route path="/resources"                   element={<ResourcesPage />} />
-            <Route path="/resources/articles"          element={<ArticlesPage />} />
-            <Route path="/resources/ebooks"            element={<EbooksPage />} />
-            <Route path="/contact"                     element={<ContactPage />} />
-            <Route path="/become-trainer"              element={<BecomeTrainerPage />} />
-            <Route path="/video-courses"               element={<VideoCoursesPage />} />
-            <Route path="/video-courses/:courseId"     element={<VideoModulesPage />} />
+            <Route path="/courses" element={<CoursesPage />} />
+            <Route path="/courses/popular" element={<PopularCoursesPage />} />
+            <Route path="/courses/trending" element={<TrendingCoursesPage />} />
+            <Route path="/trainings" element={<TrainingsPage />} />
+            <Route path="/trainings/corporate" element={<CorporateTrainingPage />} />
+            <Route path="/trainings/institutional" element={<InstitutionalTrainingPage />} />
+            <Route path="/resources" element={<ResourcesPage />} />
+            <Route path="/resources/articles" element={<ArticlesPage />} />
+            <Route path="/resources/ebooks" element={<EbooksPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/become-trainer" element={<BecomeTrainerPage />} />
+            <Route path="/video-courses" element={<VideoCoursesPage />} />
+            <Route path="/video-courses/:courseId" element={<VideoModulesPage />} />
             <Route path="/video-courses/:courseId/:lessonId" element={<VideoPlayerPage />} />
-            <Route path="/video-courses/payment/:courseId"   element={<VideoPaymentPage />} />
-            <Route path="/about"     element={<AboutPage />} />
-            <Route path="/gallery"   element={<GalleryPage />} />
+            <Route path="/video-courses/payment/:courseId" element={<VideoPaymentPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/gallery" element={<GalleryPage />} />
             <Route path="/instagram" element={<InstagramPage />} />
+            <Route path="/course-details/:id" element={<CourseDetailsPage />} />
 
             {/* WhyChoose Demo Routes */}
             <Route path="/expert-consultation/book"    element={<BookingPage />} />
@@ -280,15 +285,15 @@ function Layout({ courses, setCourses, onToggleLike, onUpdateCourse, onDeleteCou
             <Route path="/features/career-preparation"   element={<CareerPreparationPage />} />
 
             {/* ── Protected ── */}
-            <Route path="/student/test/*"      element={<ProtectedRoute><TestApp /></ProtectedRoute>} />
+            <Route path="/student/test/*" element={<ProtectedRoute><TestApp /></ProtectedRoute>} />
             <Route path="/student/core-test/*" element={<ProtectedRoute><CoreTestApp /></ProtectedRoute>} />
             <Route path="/student-dashboard/*" element={<ProtectedRoute><StudentDashboard /></ProtectedRoute>} />
             <Route path="/trainer-dashboard/*" element={<TrainerDashboard />} />
-            <Route path="/admin-dashboard/*"   element={<AdminProvider><AdminDashboard /></AdminProvider>} />
+            <Route path="/admin-dashboard/*" element={<AdminProvider><AdminDashboard /></AdminProvider>} />
 
             {/* ── Misc ── */}
             <Route path="/batchcreation" element={<BatchCreation />} />
-            <Route path="/loading"       element={<LoadingPage />} />
+            <Route path="/loading" element={<LoadingPage />} />
           </Routes>
         </Suspense>
       </div>
@@ -299,9 +304,9 @@ function Layout({ courses, setCourses, onToggleLike, onUpdateCourse, onDeleteCou
 // ─── Root App ────────────────────────────────────────────────────────────────
 
 function App() {
-  const [isLoading, setIsLoading]   = useState(true);
-  const [showPopup, setShowPopup]   = useState(false);
-  const [courses, setCourses]       = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showPopup, setShowPopup] = useState(false);
+  const [courses, setCourses] = useState([]);
 
   useEffect(() => {
     getAllCourses()

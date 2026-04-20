@@ -1,114 +1,288 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useTrainer } from '../../../context/TrainerContext';
+import { LogOut } from 'lucide-react';
 import './Topbar.css';
-import LogoutModal from './LogoutModal';
+
 import icLogo from '../../../assets/infycode-final-logo4-1.png';
 
-// ✅ Icons
+const EnvelopeIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="#606d80">
+    <path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0l-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z"/>
+  </svg>
+);
+
+const BellSolidIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="#606d80">
+    <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+  </svg>
+);
+
+const ChevronDownIcon = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#606d80" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="6 9 12 15 18 9" />
+  </svg>
+);
+
 const SearchIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="11" cy="11" r="8"></circle>
-    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#606d80" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="11" cy="11" r="8" />
+    <line x1="21" y1="21" x2="16.65" y2="16.65" />
   </svg>
 );
 
-const BellIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+const CheckCircleIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10" /><polyline points="9 12 11 14 15 10" />
   </svg>
 );
 
-const SettingsIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="3"></circle>
-    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+const AlertIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+    <line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" />
   </svg>
 );
 
-// Route → page label map
-const PAGE_LABELS = {
-  '/trainer-dashboard/dashboard':  { name: 'Dashboard',       sub: 'Overview of your training activities' },
-  '/trainer-dashboard/profile':    { name: 'My Profile',      sub: 'View and update your trainer profile' },
-  '/trainer-dashboard/batches':    { name: 'Batches',         sub: 'Manage your assigned training batches' },
-  '/trainer-dashboard/schedule':   { name: 'Schedule',        sub: 'View and plan your teaching schedule' },
-  '/trainer-dashboard/materials':  { name: 'Course Materials',sub: 'Upload and manage course content' },
-  '/trainer-dashboard/attendance': { name: 'Attendance',      sub: 'Track student attendance records' },
-  '/trainer-dashboard/feedback':   { name: 'Feedback & Ratings', sub: 'Review student feedback and ratings' },
+const InfoIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+  </svg>
+);
+
+/* ── Notification icon resolver ── */
+const NotifIcon = ({ type }) => {
+  if (type === 'success') return <CheckCircleIcon />;
+  if (type === 'warning') return <AlertIcon />;
+  return <InfoIcon />;
 };
 
 const Topbar = () => {
-  const location = useLocation();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { trainerData, profileImage } = useTrainer();
+
+  const userName = trainerData.fullname || trainerData.name || 'Trainer';
+  const role = trainerData.role || 'Trainer';
+  const userInitial = userName.charAt(0).toUpperCase();
+
+  // State
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [modalType, setModalType] = useState('user-menu'); // 'user-menu' or 'brand-logo'
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showMessages, setShowMessages] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [searchFocused, setSearchFocused] = useState(false);
+  const [searchValue, setSearchValue] = useState('');
 
-  const [liveDate] = useState(() => {
-    const d = new Date();
-    const weekday = d.toLocaleDateString('en-US', { weekday: 'short' });
-    const day = d.getDate();
-    const month = d.toLocaleDateString('en-US', { month: 'short' });
-    const year = d.getFullYear();
-    return `${weekday}, ${day} ${month}, ${year}`;
-  });
+  // Dummy Data for Trainer
+  const [notifications, setNotifications] = useState([
+    { id: 1, type: 'info', title: 'Session Reminder', text: 'React Basics starts in 15 mins', time: '10m ago', read: false },
+    { id: 2, type: 'success', title: 'Attendance Marked', text: 'Batch B2 attendance updated.', time: '2h ago', read: false }
+  ]);
+  const [messages] = useState([
+    { id: 1, sender: "Admin", text: "Please submit last week's reports.", time: "1h ago", unread: true },
+    { id: 2, sender: "Student Council", text: "Doubt clearing session requested.", time: "4h ago", unread: false }
+  ]);
 
-  const currentPage = PAGE_LABELS[location.pathname] || { name: 'Dashboard', sub: 'Overview of your training activities' };
+  const msgRef = useRef(null);
+  const notifRef = useRef(null);
+  const userMenuRef = useRef(null);
+
+  /* Click-outside handler */
+  useEffect(() => {
+    const handler = (e) => {
+      if (notifRef.current && !notifRef.current.contains(e.target)) setShowNotifications(false);
+      if (msgRef.current && !msgRef.current.contains(e.target)) setShowMessages(false);
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setShowUserMenu(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("loggedUser");
+    localStorage.removeItem("trainerProfileImage");
+    setShowLogoutModal(false);
+    navigate('/'); // Redirect to landing page
+  };
+
+  const markAllRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+  };
 
   return (
-    <nav className="navbar">
-      {/* NAVBAR LEFT: BRAND SECTION + TITLES */}
-      <div className="navbar-content-left">
+    <header className="tb-root">
+      {/* ── Brand / Logo ── */}
+      <div className="adm-brand-section-tb">
         <div 
           className="brand-wrapper" 
-          onClick={() => setShowLogoutModal(true)} 
+          onClick={() => { setModalType('brand-logo'); setShowLogoutModal(true); }} 
           style={{ cursor: 'pointer' }}
           title="Logout"
         >
           <img src={icLogo} alt="Infycode Logo" className="logo" />
           <div className="brand-text">
-            <span className="brand-name">INFYCODE</span>
-            <span className="brand-tagline">Infinite Learning Solutions</span>
+            <span className="logo-title">INFYCODE</span>
+            <span className="logo-subtitle">Infinite Learning Solutions</span>
           </div>
-        </div>
-
-        <div className="nav-separator"></div>
-
-        <div className="nav-info-section">
-          <div className="nav-breadcrumb-trail">
-            <span className="breadcrumb-root">Trainer</span>
-            <span className="breadcrumb-sep">/</span>
-            <span className="breadcrumb-current">{currentPage.name}</span>
-          </div>
-          <h1 className="navbar-main-title">Trainer Dashboard</h1>
-          <p className="navbar-page-sub">{currentPage.sub}</p>
         </div>
       </div>
 
-      {/* NAVBAR RIGHT: SEARCH + ACTIONS */}
-      <div className="navbar-actions-right">
-        <div className="search-container">
-          <span className="search-icon"><SearchIcon /></span>
-          <input type="text" placeholder="Search anything..." className="search-input" />
+      {/* ── Search Bar (Center) ── */}
+      <div className="tb-left-aligned">
+        <div className={`tb-search-box-new ${searchFocused ? 'focused' : ''}`}>
+          <span className="tb-search-icon-new"><SearchIcon /></span>
+          <input
+            type="text"
+            placeholder="Search & Enter"
+            className="tb-search-input-new"
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            onFocus={() => setSearchFocused(true)}
+            onBlur={() => setSearchFocused(false)}
+          />
         </div>
-
-        <div className="date-pill">{liveDate}</div>
-
-        <button className="icon-utility" aria-label="Notifications">
-          <BellIcon />
-          <span className="notif-badge">2</span>
-        </button>
-
-        <button className="icon-utility" aria-label="Settings">
-          <SettingsIcon />
-        </button>
       </div>
 
-      {/* Logout Confirmation Modal */}
-      <LogoutModal 
-        isOpen={showLogoutModal} 
-        onClose={() => setShowLogoutModal(false)} 
-      />
-    </nav>
+      <div className="tb-spacer" style={{ flex: 1 }}></div>
+
+      {/* ── Right Items (User Profile + Icons) ── */}
+      <div className="tb-right-aligned">
+        <div className="tb-icon-badge-wrap" style={{ marginRight: '24px' }}>
+          <div className="tb-icon-box" ref={notifRef} onClick={() => setShowNotifications(!showNotifications)}>
+            <BellSolidIcon />
+            <span className="tb-badge orange">{notifications.filter(n => !n.read).length}</span>
+            {showNotifications && (
+              <div className="tb-dropdown modern">
+                <div className="tb-dropdown-header">Notifications</div>
+                <div className="tb-dropdown-list">
+                  {notifications.map(n => (
+                    <div className={`tb-dropdown-item ${!n.read ? 'unread' : ''}`} key={n.id}>
+                      <div className="tb-item-icon"><NotifIcon type={n.type} /></div>
+                      <div className="tb-item-content">
+                        <div className="tb-item-title">{n.title}</div>
+                        <div className="tb-item-text">{n.text}</div>
+                        <div className="tb-item-time">{n.time}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="tb-dropdown-footer" onClick={markAllRead}>Mark all as read</div>
+              </div>
+            )}
+          </div>
+          <div className="tb-icon-box" ref={msgRef} onClick={() => setShowMessages(!showMessages)}>
+            <EnvelopeIcon />
+            <span className="tb-badge teal">{messages.filter(m => m.unread).length}</span>
+            {showMessages && (
+              <div className="tb-dropdown modern">
+                <div className="tb-dropdown-header">Messages</div>
+                <div className="tb-dropdown-list">
+                  {messages.map(m => (
+                    <div className={`tb-dropdown-item ${m.unread ? 'unread' : ''}`} key={m.id}>
+                      <div className="tb-item-avatar">{m.sender.charAt(0)}</div>
+                      <div className="tb-item-content">
+                        <div className="tb-item-sender">{m.sender}</div>
+                        <div className="tb-item-text">{m.text}</div>
+                        <div className="tb-item-time">{m.time}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="tb-dropdown-footer">View All Messages</div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="tb-user-profile-new" ref={userMenuRef} onClick={() => setShowUserMenu(!showUserMenu)}>
+          <img src={profileImage || "https://i.pravatar.cc/150?img=5"} alt={userName} className="tb-user-avatar-new" />
+          <span className="tb-user-name-new">
+            {userName}
+            <span className="tb-chevron-new"><ChevronDownIcon /></span>
+          </span>
+          {showUserMenu && (
+            <div className="tb-user-dropdown">
+              <div className="tb-user-dropdown-header">
+                <img src={profileImage || "https://i.pravatar.cc/150?img=5"} alt={userName} className="tb-udrop-avatar" />
+                <div>
+                  <div className="tb-udrop-name">{userName}</div>
+                  <div className="tb-udrop-role">{role}</div>
+                </div>
+              </div>
+              <div className="tb-user-dropdown-divider" />
+              <button className="tb-udrop-item" onClick={(e) => { e.stopPropagation(); setShowUserMenu(false); navigate('/trainer-dashboard/profile'); }}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                My Profile
+              </button>
+              <div className="tb-user-dropdown-divider" />
+              <button className="tb-udrop-item tb-udrop-logout" onClick={(e) => { e.stopPropagation(); setShowUserMenu(false); setModalType('user-menu'); setShowLogoutModal(true); }}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* CONFIRMATION MODAL SC-UI (Conditional based on Trigger Source) */}
+      {showLogoutModal && (
+        <div className="logout-modal-overlay" onClick={() => setShowLogoutModal(false)}>
+          {modalType === 'brand-logo' ? (
+            /* BRAND-SPECIFIC LOGOUT MODAL (Matching LogoutModal.jsx code) */
+            <div className="logout-modal-container" onClick={(e) => e.stopPropagation()}>
+              <div className="logout-icon-circle">
+                <LogOut size={28} strokeWidth={2.5} />
+              </div>
+              <h2 className="logout-modal-title">Logout</h2>
+              <p className="logout-modal-subtitle">Are you sure you want to log out?</p>
+              <div className="logout-modal-button-group">
+                <button className="logout-modal-cancel-btn" onClick={() => setShowLogoutModal(false)}>
+                  Cancel
+                </button>
+                <button className="logout-modal-confirm-btn" onClick={handleLogout}>
+                  OK, Logout
+                </button>
+              </div>
+            </div>
+          ) : (
+            /* USER-SPECIFIC LOGOUT MODAL (Matching Sidebar style) */
+            <div className="logout-modal-card" onClick={(e) => e.stopPropagation()}>
+              <div className="logout-modal-profile-section">
+                <div className="logout-modal-avatar">
+                  {profileImage ? (
+                    <img src={profileImage} alt="Profile" className="tb-user-avatar-new" style={{ width: '100%', height: '100%', borderRadius: '50%' }} />
+                  ) : (
+                    userInitial
+                  )}
+                </div>
+                <h3>{userName}</h3>
+              </div>
+
+              <div className="logout-modal-message-section">
+                <h2>Are you sure you want to logout?</h2>
+                <p>You will be redirected to the trainer login page.</p>
+              </div>
+
+              <div className="logout-modal-button-group">
+                <button className="logout-modal-cancel-btn" onClick={() => setShowLogoutModal(false)}>
+                  Cancel
+                </button>
+                <button className="logout-modal-ok-btn" onClick={handleLogout}>
+                  OK
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </header>
   );
 };
 
 export default Topbar;
+
+

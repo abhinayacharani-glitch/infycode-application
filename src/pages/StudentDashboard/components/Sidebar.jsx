@@ -3,7 +3,6 @@ import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { Camera, X } from 'lucide-react';
 import "./Sidebar.css";
 import icLogo from '../../../assets/infycode-final-logo4-1.png';
-import bannerLogo from '../../../assets/color-logo-3.png';
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -13,19 +12,23 @@ const Sidebar = () => {
 
   const getInitialUser = () => {
     const userString = localStorage.getItem('user');
-    return userString ? JSON.parse(userString) : { fullname: "Student", role: "Developer" };
+    const user = userString ? JSON.parse(userString) : { fullname: "Anjali Syamala", role: "student" };
+    return {
+      fullname: user.fullname || user.fullName || "Anjali Syamala",
+      role: user.role || "student"
+    };
   };
 
   const [user, setUser] = useState(getInitialUser());
   const [formData, setFormData] = useState({
-    fullname: user.fullname || user.fullName || "Student",
-    role: user.role || "Developer"
+    fullname: user.fullname,
+    role: user.role
   });
 
   useEffect(() => {
     setFormData({
-      fullname: user.fullname || user.fullName || "Student",
-      role: user.role || "Developer"
+      fullname: user.fullname || user.fullName || "Anjali Syamala",
+      role: user.role || "student"
     });
   }, [user]);
 
@@ -59,9 +62,12 @@ const Sidebar = () => {
 
         {/* BRAND — click opens logo logout modal */}
         <button className="student-sd-brand" onClick={() => setShowLogoLogoutModal(true)}>
-          <div className="sidebar-logo-group">
-            <img src={icLogo} alt="Logo" className="sidebar-ic-logo" />
-            <img src={bannerLogo} alt="InfyCode" className="sidebar-banner-logo" />
+          <div className="brand-wrapper">
+            <img src={icLogo} alt="Infycode Logo" className="logo" />
+            <div className="brand-text">
+              <span className="logo-title">INFYCODE</span>
+              <span className="logo-subtitle">Infinite Learning Solutions</span>
+            </div>
           </div>
         </button>
 

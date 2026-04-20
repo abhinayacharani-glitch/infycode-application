@@ -34,14 +34,14 @@ const AIChatbot = () => {
   }, [messages, isTyping]);
 
   useEffect(() => {
-    // Show greeting tooltip 1 second after mount, hide after 4.5s
+    // Show greeting tooltip 1 second after mount, hide after 3 seconds of being visible
     const showTimer = setTimeout(() => {
       setShowGreetingTooltip(true);
     }, 1000);
 
     const hideTimer = setTimeout(() => {
       setShowGreetingTooltip(false);
-    }, 5500);
+    }, 4000); // 1s wait + 3s display = 4s total
 
     return () => {
       clearTimeout(showTimer);
@@ -99,42 +99,25 @@ const AIChatbot = () => {
 
   const RobotIcon = () => (
     <svg viewBox="0 0 100 100" className="robot-svg" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        {/* Very light colors instead of dark themes */}
-        <linearGradient id="robotGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#f8fafc" />
-          <stop offset="100%" stopColor="#e2e8f0" />
-        </linearGradient>
-        <linearGradient id="faceGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#ffffff" />
-          <stop offset="100%" stopColor="#f1f5f9" />
-        </linearGradient>
-        <filter id="neonGlowLight" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="3" result="blur" />
-          <feComposite in="SourceGraphic" in2="blur" operator="over" />
-        </filter>
-      </defs>
+      {/* Background Dark Blue Circle */}
+      <circle cx="50" cy="50" r="48" fill="#0c112b" />
       
-      {/* Outer Head - Light & Transparent like */}
-      <rect x="20" y="25" width="60" height="50" rx="25" fill="url(#robotGrad)" stroke="#cbd5e1" strokeWidth="2" className="robot-head" />
+      {/* Robot Face/Body */}
+      <path d="M50 90 L50 78 C25 78 20 65 20 48 Q20 30 50 30 Q80 30 80 48 Q80 65 75 78 L75 90 Z" fill="#f8fafc" />
+      <rect x="25" y="44" width="50" height="26" rx="13" fill="#040921" />
+      
+      {/* Eyes (Cyan) */}
+      <circle cx="38" cy="57" r="5" fill="#22d3ee" className="robot-eye" />
+      <circle cx="62" cy="57" r="5" fill="#22d3ee" className="robot-eye" />
       
       {/* Antenna */}
-      <line x1="50" y1="25" x2="50" y2="12" stroke="#94a3b8" strokeWidth="3" strokeLinecap="round" />
-      <circle cx="50" cy="10" r="4" fill="#0ea5e9" filter="url(#neonGlowLight)" className="antenna-glow" />
-      
-      {/* Ears */}
-      <rect x="15" y="40" width="8" height="20" rx="4" fill="#e2e8f0" stroke="#cbd5e1" strokeWidth="1" />
-      <rect x="77" y="40" width="8" height="20" rx="4" fill="#e2e8f0" stroke="#cbd5e1" strokeWidth="1" />
-      
-      {/* Face Screen */}
-      <rect x="28" y="35" width="44" height="30" rx="12" fill="url(#faceGrad)" stroke="#e2e8f0" strokeWidth="1" />
-      
-      {/* Glowing Eyes */}
-      <rect x="36" y="42" width="6" height="12" rx="3" fill="#0ea5e9" filter="url(#neonGlowLight)" className="robot-eye" />
-      <rect x="58" y="42" width="6" height="12" rx="3" fill="#0ea5e9" filter="url(#neonGlowLight)" className="robot-eye" />
-      
-      {/* Small Smile */}
-      <path d="M 44 56 Q 50 60 56 56" fill="none" stroke="#0ea5e9" strokeWidth="3" strokeLinecap="round" />
+      <line x1="50" y1="30" x2="50" y2="20" stroke="#f8fafc" strokeWidth="4" strokeLinecap="round" />
+      <circle cx="50" cy="18" r="4" fill="#f8fafc" />
+
+      {/* HI! Bubble (Cyan) */}
+      <rect x="58" y="5" width="38" height="28" rx="14" fill="#22d3ee" className="hi-bubble-rect" />
+      <path d="M 68 32 L 64 42 L 78 32 Z" fill="#22d3ee" className="hi-bubble-tail" />
+      <text x="77" y="24" fontSize="13" fontWeight="900" textAnchor="middle" fill="#0c112b" fontFamily="'Inter', 'Arial', sans-serif">HI!</text>
     </svg>
   );
 

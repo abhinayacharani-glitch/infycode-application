@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Search, Filter, Star, Clock, Users, ArrowRight, Eye } from "lucide-react";
+import { Search, Filter, Star, Clock, Users, ArrowRight, Eye } from "lucide-react";
 import "./Courses.css";
 import bgImage from "../../assets/course/bg.jpg";
 // Course images from assets/course
@@ -375,18 +376,7 @@ const Courses = () => {
 
                     {/* Footer */}
                     <div className="card-footer-modern">
-                      <div className="footer-actions-left">
-                        <div className="details-action-wrapper">
-                          <button
-                            className="btn-view-details"
-                            onClick={() => navigate(`/course-details/${course.courseId}`)}
-                            title="View Course Details"
-                          >
-                            <Eye size={20} />
-                          </button>
-                          <span className="action-label">Overview</span>
-                        </div>
-                      </div>
+                      <span className="price-tag">{course.price}</span>
                       <button className="btn-join-now" onClick={handleEnroll}>
                         Enroll Now
                       </button>

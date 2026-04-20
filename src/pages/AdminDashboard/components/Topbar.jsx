@@ -5,7 +5,6 @@ import { useAdmin } from '../../../context/AdminContext';
 import './Topbar.css';
 
 import icLogo from '../../../assets/infycode-final-logo4-1.png';
-import logoDark from '../../../assets/color-logo-3.png';
 
 /* ── SVG Icons ── */
 const MenuToggleIcon = () => (
@@ -101,6 +100,22 @@ const Topbar = () => {
   const [searchFocused, setSearchFocused] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [currentUserName, setCurrentUserName] = useState(userName);
+  const [userProfileImage, setUserProfileImage] = useState(user?.profileImage || "https://i.pravatar.cc/150?img=5");
+
+  useEffect(() => {
+    const syncProfile = () => {
+      const updated = JSON.parse(localStorage.getItem("user") || "{}");
+      setCurrentUserName(updated.fullName || updated.fullname || updated.username || "Admin");
+      setUserProfileImage(updated.profileImage || "https://i.pravatar.cc/150?img=5");
+    };
+    window.addEventListener('storage', syncProfile);
+    window.addEventListener('adminProfileUpdate', syncProfile);
+    return () => {
+      window.removeEventListener('storage', syncProfile);
+      window.removeEventListener('adminProfileUpdate', syncProfile);
+    };
+  }, []);
 
   const handleLogoutConfirm = () => {
     localStorage.clear();
@@ -154,14 +169,16 @@ const Topbar = () => {
 
       {/* ── Brand / Logo ── */}
       <div className="adm-brand-section-tb">
-        <div className="adm-logo-container" onClick={() => setShowLogoutModal(true)} style={{ cursor: 'pointer' }}>
-          <img
-            src={icLogo}
-            alt="InfyCode Logo"
-            className="adm-logo-img"
-          />
-          <div className="adm-brand-text">
-            <img src={logoDark} alt="InfyCode Banner" className="adm-title-img" />
+        <div
+          className="brand-wrapper"
+          onClick={() => setShowLogoutModal(true)}
+          style={{ cursor: 'pointer' }}
+          title="Logout"
+        >
+          <img src={icLogo} alt="Infycode Logo" className="logo" />
+          <div className="brand-text">
+            <span className="logo-title">INFYCODE</span>
+            <span className="logo-subtitle">Infinite Learning Solutions</span>
           </div>
         </div>
       </div>
@@ -236,17 +253,17 @@ const Topbar = () => {
           </div>
         </div>
         <div className="tb-user-profile-new" ref={userMenuRef} onClick={() => setShowUserMenu(!showUserMenu)}>
-          <img src={user?.profileImage || "https://i.pravatar.cc/150?img=5"} alt={userName} className="tb-user-avatar-new" />
+          <img src={userProfileImage} alt={currentUserName} className="tb-user-avatar-new" />
           <span className="tb-user-name-new">
-            {userName}
+            {currentUserName}
             <span className="tb-chevron-new"><ChevronDownIcon /></span>
           </span>
           {showUserMenu && (
             <div className="tb-user-dropdown">
               <div className="tb-user-dropdown-header">
-                <img src={user?.profileImage || "https://i.pravatar.cc/150?img=5"} alt={userName} className="tb-udrop-avatar" />
+                <img src={userProfileImage} alt={currentUserName} className="tb-udrop-avatar" />
                 <div>
-                  <div className="tb-udrop-name">{userName}</div>
+                  <div className="tb-udrop-name">{currentUserName}</div>
                   <div className="tb-udrop-role">{user?.role || 'Administrator'}</div>
                 </div>
               </div>

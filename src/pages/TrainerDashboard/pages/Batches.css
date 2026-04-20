@@ -1,7 +1,7 @@
 /* Batches.css - Production SaaS Overhaul */
 
 .batches-page-production {
-    background: #F9FAFB;
+    background: transparent;
     min-height: calc(100vh - 80px);
     padding: 32px 0;
     font-family: 'Urbanist', sans-serif;

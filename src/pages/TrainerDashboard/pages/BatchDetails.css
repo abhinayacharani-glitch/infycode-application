@@ -15,7 +15,7 @@
 }
 
 .batch-details-production {
-    background: var(--prod-bg);
+    background: transparent;
     min-height: 100vh;
     padding: 32px 0;
     font-family: 'Urbanist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
