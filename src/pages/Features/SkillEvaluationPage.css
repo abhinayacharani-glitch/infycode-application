@@ -1,0 +1,14 @@
+@import "./MentorshipPage.css";
+
+.evaluation-hero-v4 {
+  border-left: 8px solid #8b5cf6;
+}
+
+.purple-icon { color: #8b5cf6; }
+.purple-bg { background: #8b5cf6 !important; }
+.purple-dark-bg { background: #4c1d95 !important; }
+
+.cta-v4-btn.purple-bg:hover {
+  background: #7c3aed !important;
+  box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
+}
