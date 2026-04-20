@@ -68,30 +68,6 @@ function WhyChoose() {
 
       </div>
 
-      {/* FLOW */}
-
-      {activePath === "confused" && (
-        <div className="why-flow fade-up" data-aos="fade-up">
-          <div className="flow-step clickable" onClick={() => navigate("/expert-consultation/book")}>1-on-1 Expert Session</div>
-          <div className="flow-arrow">→</div>
-          <div className="flow-step clickable" onClick={() => navigate("/expert-consultation/session")}>Understanding You</div>
-          <div className="flow-arrow">→</div>
-          <div className="flow-step highlight clickable" onClick={() => navigate("/expert-consultation/roadmap")}>Clear Career Direction</div>
-        </div>
-      )}
-
-      {activePath === "clear" && (
-        <div className="why-flow fade-up" data-aos="fade-up">
-          <div className="flow-step clickable" onClick={() => navigate("/skill-test/foundational")}>Skill Assessment</div>
-          <div className="flow-arrow">→</div>
-          <div className="flow-step clickable" onClick={() => navigate("/skill-test/evaluation")}>Performance Analysis</div>
-          <div className="flow-arrow">→</div>
-          <div className="flow-step highlight clickable" onClick={() => navigate("/skill-test/result")}>
-            Beginner / Intermediate / Advanced
-          </div>
-        </div>
-      )}
-
       {/* DETAILS CARDS */}
 
       {activePath === "confused" && (

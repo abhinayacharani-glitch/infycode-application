@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { FiMap, FiChevronRight, FiCheckCircle, FiHome, FiLayout } from "react-icons/fi";
+import { FiMap, FiChevronRight, FiCheckCircle, FiHome, FiLayout, FiArrowRight } from "react-icons/fi";
 import "./CareerRoadmap.css";
 
 export default function CareerRoadmap() {

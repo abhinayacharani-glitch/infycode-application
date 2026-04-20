@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { FiCpu, FiSearch, FiDatabase, FiLayers, FiActivity } from "react-icons/fi";
+import { FiCpu, FiSearch, FiDatabase, FiLayers, FiActivity, FiArrowRight } from "react-icons/fi";
 import "./EvaluationStatus.css";
 
 export default function EvaluationStatus() {
   const [progress, setProgress] = useState(0);
   const [logs, setLogs] = useState([]);
+  const [statusText, setStatusText] = useState("");
 
   const logMessages = [
     "Analyzing complexity of nested loops...",
