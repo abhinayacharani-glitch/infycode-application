@@ -1,0 +1,14 @@
+@import "./MentorshipPage.css";
+
+.practical-hero-v4 {
+  border-left: 8px solid #10b981;
+}
+
+.green-icon { color: #10b981; }
+.green-bg { background: #10b981 !important; }
+.green-dark-bg { background: #064e3b !important; }
+
+.cta-v4-btn.green-bg:hover {
+  background: #059669 !important;
+  box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+}

@@ -1,0 +1,14 @@
+@import "./MentorshipPage.css";
+
+.career-hero-v4 {
+  border-left: 8px solid #f59e0b;
+}
+
+.orange-icon { color: #f59e0b; }
+.orange-bg { background: #f59e0b !important; }
+.orange-dark-bg { background: #78350f !important; }
+
+.cta-v4-btn.orange-bg:hover {
+  background: #d97706 !important;
+  box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3);
+}

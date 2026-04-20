@@ -75,6 +75,12 @@ const FoundationalTestDemo       = lazy(() => import("./pages/InternalPages/WhyC
 const EvaluationStatus           = lazy(() => import("./pages/InternalPages/WhyChooseDemo/EvaluationStatus"));
 const SkillLevelResult           = lazy(() => import("./pages/InternalPages/WhyChooseDemo/SkillLevelResult"));
 
+// ─── Journey to Excellence Feature Pages ──────────────────────────────────────
+const MentorshipPage            = lazy(() => import("./pages/Features/MentorshipPage"));
+const PracticalLearningPage     = lazy(() => import("./pages/Features/PracticalLearningPage"));
+const SkillEvaluationPage       = lazy(() => import("./pages/Features/SkillEvaluationPage"));
+const CareerPreparationPage     = lazy(() => import("./pages/Features/CareerPreparationPage"));
+
 // ─── Lazy-loaded — Other ─────────────────────────────────────────────────────
 const BatchCreation             = lazy(() => import("./pages/BatchCreation"));
 
@@ -263,10 +269,15 @@ function Layout({ courses, setCourses, onToggleLike, onUpdateCourse, onDeleteCou
             <Route path="/expert-consultation/session" element={<CounsellingDemo />} />
             <Route path="/expert-consultation/roadmap" element={<CareerRoadmap />} />
 
-            {/* Skill Test Demo Routes */}
             <Route path="/skill-test/foundational"      element={<FoundationalTestDemo />} />
             <Route path="/skill-test/evaluation"        element={<EvaluationStatus />} />
             <Route path="/skill-test/result"            element={<SkillLevelResult />} />
+
+            {/* Feature Detail Routes */}
+            <Route path="/features/mentorship"          element={<MentorshipPage />} />
+            <Route path="/features/practical-learning"  element={<PracticalLearningPage />} />
+            <Route path="/features/skill-evaluation"    element={<SkillEvaluationPage />} />
+            <Route path="/features/career-preparation"   element={<CareerPreparationPage />} />
 
             {/* ── Protected ── */}
             <Route path="/student/test/*"      element={<ProtectedRoute><TestApp /></ProtectedRoute>} />
