@@ -162,9 +162,14 @@ const CourseDetailsPage = () => {
               <span className="cd-stat"><BookOpen size={16} /> Comprehensive</span>
             </div>
 
-            <button className="cd-hero-enroll" onClick={handleEnroll}>
-              Enroll Now
-            </button>
+            <div className="cd-hero-actions">
+              <button className="cd-hero-enroll" onClick={handleEnroll}>
+                Enroll Now
+              </button>
+              <button className="cd-hero-pricing" title="Pricing">
+                ₹
+              </button>
+            </div>
           </div>
           <div className="cd-header-image">
             <img src={course.image} alt={course.title} />
