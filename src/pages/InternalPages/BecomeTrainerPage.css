@@ -316,7 +316,7 @@
 
 .trainer-submit-btn {
   background: var(--blue-600);
-  color: white;
+  color: rgb(15, 15, 15);
   margin: 20px auto 0;
   display: block;
 }
