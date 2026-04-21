@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ALL_COURSES } from "../../components/Courses/Courses";
-import { ArrowLeft, Clock, Users, Star, BookOpen, ChevronDown, ChevronUp, CheckCircle } from "lucide-react";
+import { ArrowLeft, Clock, Users, Star, BookOpen, ChevronDown, ChevronUp, CheckCircle, Eye } from "lucide-react";
 import "./CourseDetailsPage.css";
 
 const SYLLABUS_DB = {
@@ -108,50 +108,7 @@ const DEFAULT_SYLLABUS = [
 
 ];
 
-const SUGGESTIONS_DB = {
-  "Java": [
-    "Advanced Microservices Architecture with Spring Boot",
-    "Java Performance Tuning & Memory Management",
-    "Enterprise Messaging Systems (Kafka/RabbitMQ)",
-    "Building Scalable REST APIs with JAX-RS",
-    "Cloud-Native Java Development with Quarkus"
-  ],
-  "Web Dev": [
-    "Mastering Modern Frontend Frameworks (React/Next.js)",
-    "Backend System Design & Scalable Architectures",
-    "Advanced CSS & Responsive Design Masterclass",
-    "Full-Stack Security & Authentication Patterns",
-    "PWA (Progressive Web Apps) & Offline Capabilities"
-  ],
-  "Python": [
-    "Data Science & Statistical Modeling with Python",
-    "Automation & Scripting for DevOps & Cloud",
-    "Natural Language Processing (NLP) Fundamentals",
-    "Building Robust Web APIs with FastAPI",
-    "Quantitative Analysis & Financial Modeling"
-  ],
-  "AI & Data": [
-    "Deep Learning Architectures & Neural Networks",
-    "Big Data Processing with Spark & Hadoop",
-    "MLOps: Deploying & Monitoring ML Models",
-    "Computer Vision & Image Processing Techniques",
-    "Ethics & Fairness in AI Systems"
-  ],
-  "Cloud": [
-    "Multi-Cloud Strategy (AWS, Azure, GCP)",
-    "Serverless Architecture & Lambda Functions",
-    "Kubernetes & Docker Container Orchestration",
-    "Cloud Infrastructure as Code (Terraform/CDK)",
-    "Disaster Recovery & High Availability Design"
-  ],
-  "Cybersecurity": [
-    "Penetration Testing & Vulnerability Assessment",
-    "Network Security & Intrusion Detection Systems",
-    "Incident Response & Digital Forensics",
-    "Cloud Security Posture Management (CSPM)",
-    "Identity & Access Management (IAM) Strategy"
-  ]
-};
+
 
 const CourseDetailsPage = () => {
   const { id } = useParams();
@@ -354,38 +311,145 @@ const CourseDetailsPage = () => {
 
         </div>
 
-        {/* Related Learning Suggestions */}
-        <RelatedCourses currentCourse={course} />
+        {/* Related Courses Section */}
+        <RelatedCourses currentCourse={course} navigate={navigate} />
 
       </div>
     </div>
   );
 };
 
-/* ---------- Related Courses Component (Bullet Points) ---------- */
-const RelatedCourses = ({ currentCourse }) => {
-  // Get suggestions based on category from SUGGESTIONS_DB
-  const points = SUGGESTIONS_DB[currentCourse.category] || [
-    "Advanced Project Implementation & Case Studies",
-    "Industry Standard Best Practices & Design Patterns",
-    "Emerging Trends & Future Tech in this Domain",
-    "Career Guidance & Portfolio Building Strategies",
-    "Community Collaboration & Open Source Contribution"
-  ];
+/* ----------  Related Courses Component (Animated Slider) ---------- */
+const statusColors = {
+  "BEST SELLER": { bg: "rgba(249,115,22,0.12)", color: "#f97316" },
+  "TRENDING":    { bg: "rgba(16,185,129,0.12)",  color: "#10b981" },
+  "POPULAR":     { bg: "rgba(99,102,241,0.12)",  color: "#6366f1" },
+  "HOT":         { bg: "rgba(220,38,38,0.12)",   color: "#dc2626" },
+  "NEW":         { bg: "rgba(14,165,233,0.12)",  color: "#0ea5e9" },
+  "ADVANCED":    { bg: "rgba(139,92,246,0.12)",  color: "#8b5cf6" },
+  "INTERMEDIATE":{ bg: "rgba(16,185,129,0.12)",  color: "#10b981" },
+  "BEGINNER":    { bg: "rgba(99,102,241,0.12)",  color: "#6366f1" },
+};
+
+const RelatedCourses = ({ currentCourse, navigate }) => {
+  // Get suggestions
+  const sameCat = ALL_COURSES.filter(
+    (c) => c.courseId !== currentCourse.courseId && c.category === currentCourse.category
+  );
+  const others = ALL_COURSES.filter(
+    (c) => c.courseId !== currentCourse.courseId && c.category !== currentCourse.category
+  );
+  const originalSuggestions = [...sameCat, ...others].slice(0, 8);
+  
+  // Triple the items for a seamless loop
+  const suggestions = [...originalSuggestions, ...originalSuggestions, ...originalSuggestions];
+
+  const [index, setIndex] = useState(originalSuggestions.length);
+  const [isTransitioning, setIsTransitioning] = useState(true);
+
+  if (originalSuggestions.length === 0) return null;
+
+  const next = () => {
+    setIndex((prev) => prev + 1);
+  };
+
+  const prev = () => {
+    setIndex((prev) => prev - 1);
+  };
+
+  // Seamless reset logic
+  useEffect(() => {
+    if (index >= originalSuggestions.length * 2) {
+      setTimeout(() => {
+        setIsTransitioning(false);
+        setIndex(originalSuggestions.length);
+      }, 600);
+    } else if (index < originalSuggestions.length) {
+      setTimeout(() => {
+        setIsTransitioning(false);
+        setIndex(originalSuggestions.length * 2 - 1);
+      }, 600);
+    } else {
+      setIsTransitioning(true);
+    }
+  }, [index, originalSuggestions.length]);
+
+  // Auto-scroll logic
+  useEffect(() => {
+    const interval = setInterval(() => {
+      next();
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [index, originalSuggestions.length]);
 
   return (
-    <div className="cd-related-bullet-section">
-      <h2 className="cd-section-title">Related Learning Suggestions</h2>
-      <ul className="cd-related-list">
-        {points.map((point, index) => (
-          <li key={index} className="cd-related-item">
-            <div className="cd-related-point">
-              <CheckCircle size={16} className="cd-bullet-icon" />
-              <span>{point}</span>
-            </div>
-          </li>
-        ))}
-      </ul>
+    <div className="cd-related-section slider-mode">
+      <div className="cd-related-header">
+        <h2 className="cd-related-title">You Might Also Like</h2>
+        <p className="cd-related-sub">Explore more courses to accelerate your learning journey</p>
+      </div>
+
+      <div className="cd-slider-container">
+        <button className="cd-slider-nav prev" onClick={prev}>❮</button>
+        
+        <div className="cd-slider-viewport">
+          <div 
+            className="cd-slider-track"
+            style={{ 
+              transform: `translateX(-${index * (100 / 4)}%)`,
+              transition: isTransitioning ? "transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)" : "none"
+            }}
+          >
+            {suggestions.map((c, i) => {
+              const sc = statusColors[c.badge] || { bg: "rgba(14,165,233,0.12)", color: "#0ea5e9" };
+              const isActive = i === index;
+              return (
+                <div 
+                  key={c.courseId} 
+                  className={`cd-slider-item ${isActive ? "active" : "inactive"}`}
+                >
+                  <div
+                    className="cd-related-card"
+                    onClick={() => {
+                      navigate(`/course-details/${c.courseId}`);
+                      window.scrollTo(0, 0);
+                    }}
+                  >
+                    <div className="cd-related-img">
+                      <img src={c.image} alt={c.title} />
+                      <span
+                        className="cd-related-badge"
+                        style={{ background: sc.bg, color: sc.color }}
+                      >
+                        {c.badge}
+                      </span>
+                    </div>
+                    <div className="cd-related-body">
+                      <span className="cd-related-cat">{c.category}</span>
+                      <h4 className="cd-related-name">{c.title}</h4>
+                      <div className="cd-related-meta">
+                        <span className="cd-related-rating">
+                          <Star size={13} fill="#f59e0b" color="#f59e0b" strokeWidth={0} />
+                          {c.rating}
+                        </span>
+                        <span className="cd-related-dur">
+                          <Clock size={13} />
+                          {c.duration}
+                        </span>
+                      </div>
+                      <button className="cd-related-cta">
+                        <Eye size={14} /> Overview
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <button className="cd-slider-nav next" onClick={next}>❯</button>
+      </div>
     </div>
   );
 };
