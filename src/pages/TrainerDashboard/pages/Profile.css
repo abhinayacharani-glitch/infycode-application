@@ -38,7 +38,7 @@
 }
 
 .profile-title {
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   font-size: 22px;
   font-weight: 600;
   color: #1E293B;
@@ -282,7 +282,7 @@
   gap: 8px;
   padding: 10px 24px;
   border-radius: 50px;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
@@ -508,7 +508,7 @@
   border-radius: 10px;
   border: 1.5px solid #CBD5E1;
   background: #F8FAFC;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   font-size: 15px;
   font-weight: 600;
   color: #0F172A;
@@ -529,7 +529,7 @@
   border-radius: 10px;
   border: 1.5px solid #CBD5E1;
   background: #F8FAFC;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   font-size: 15px;
   font-weight: 500;
   color: #0F172A;
@@ -585,7 +585,7 @@
 }
 
 .profile-title {
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   font-size: 24px;
   font-weight: 700;
   color: #1E293B;

@@ -19,7 +19,7 @@
   --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --radius: 12px;
   
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   line-height: 1.6;
 }
 
@@ -36,7 +36,7 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   font-size: var(--fs-text);
   color: var(--text-main);
   background-color: var(--bg-main);
@@ -52,14 +52,14 @@ h2 { font-size: var(--fs-h2); }
 h3 { font-size: var(--fs-h3); }
 
 button {
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   font-size: var(--fs-button);
 }
 
 input, 
 select, 
 textarea {
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   font-size: var(--fs-text);
 }
 
@@ -531,7 +531,7 @@ small, .small {
 
 .editor-content code {
   color: #38bdf8;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
 }
 
 .upload-area {

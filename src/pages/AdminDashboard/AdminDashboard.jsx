@@ -19,6 +19,7 @@ import AccountSettings from "./pages/AccountSettings";
 import SecuritySettings from "./pages/SecuritySettings";
 import PreferenceSettings from "./pages/PreferenceSettings";
 import AdminProfile from "./pages/AdminProfile";
+import FAQManagement from "./pages/FAQManagement";
 
 const AdminDashboard = () => {
   return (
@@ -46,6 +47,8 @@ const AdminDashboard = () => {
               <Route path="analytics"            element={<Analytics />} />
               <Route path="activation"           element={<LearningActivation />} />
               <Route path="reports"              element={<Reports />} />
+              <Route path="faq-management"       element={<FAQManagement />} />
+              <Route path="settings/account"     element={<AccountSettings />} />
               <Route path="settings/account"     element={<AccountSettings />} />
               <Route path="settings/security"    element={<SecuritySettings />} />
               <Route path="settings/preferences" element={<PreferenceSettings />} />

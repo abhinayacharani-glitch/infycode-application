@@ -65,6 +65,7 @@ const AboutPage = lazy(() => import("./pages/InternalPages/AboutPage"));
 const GalleryPage = lazy(() => import("./pages/InternalPages/GalleryPage"));
 const InstagramPage = lazy(() => import("./pages/InternalPages/InstagramPage"));
 const CourseDetailsPage = lazy(() => import("./pages/CourseDetails/CourseDetails"));
+const FAQPage = lazy(() => import("./pages/InternalPages/FAQPage"));
 
 // ─── Lazy-loaded — Other ─────────────────────────────────────────────────────
 const BatchCreation = lazy(() => import("./pages/AdminDashboard/pages/BatchCreation"));
@@ -252,6 +253,7 @@ function Layout({ courses, setCourses, onToggleLike, onUpdateCourse, onDeleteCou
             <Route path="/gallery" element={<GalleryPage />} />
             <Route path="/instagram" element={<InstagramPage />} />
             <Route path="/course-details/:id" element={<CourseDetailsPage />} />
+            <Route path="/faq" element={<FAQPage />} />
 
             {/* ── Protected ── */}
             <Route path="/student/test/*" element={<ProtectedRoute><TestApp /></ProtectedRoute>} />

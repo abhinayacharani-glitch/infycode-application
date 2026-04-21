@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { useAdmin } from '../../../context/AdminContext';
 import "./Sidebar.css";
 
 /* ── Custom SVG Icons ── */
@@ -53,10 +54,16 @@ const LogOutIcon = () => (
     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
   </svg>
 );
+const MessageIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 1 1-7.6-10.6 8.38 8.38 0 0 1 3.8.9L21 3.5z" />
+  </svg>
+);
 
 const Sidebar = ({ isCollapsed }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { pendingFAQs } = useAdmin();
   const loggedUser = JSON.parse(localStorage.getItem("user") || "{}");
   const userName = loggedUser.fullName || loggedUser.fullname || loggedUser.username || "Admin";
 
@@ -155,6 +162,12 @@ const Sidebar = ({ isCollapsed }) => {
           <NavLink to="/admin-dashboard/reports" className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`}>
             <span className="adm-nav-icon"><FileIcon /></span>
             {!isCollapsed && <span className="adm-nav-label">Reports &amp; Logs</span>}
+          </NavLink>
+
+          <NavLink to="/admin-dashboard/faq-management" className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`} title="FAQ Management" data-tooltip="FAQ Management">
+            <span className="adm-nav-icon"><MessageIcon /></span>
+            {!isCollapsed && <span className="adm-nav-label">FAQ Management</span>}
+            {!isCollapsed && pendingFAQs.length > 0 && <span className="adm-nav-badge blue">{pendingFAQs.length}</span>}
           </NavLink>
 
         </nav>

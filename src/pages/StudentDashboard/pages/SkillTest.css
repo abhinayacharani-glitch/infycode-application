@@ -25,7 +25,7 @@
 .special-note-box p {
   color: black;
   font-size: var(--fs-text);
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
 }
 
 .special-note-box span {
@@ -79,7 +79,7 @@
   font-size: var(--fs-small);
   font-weight: 700;
   z-index: 2;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
 }
 
 .card-badge.secondary {
@@ -117,7 +117,7 @@
   margin-bottom: 0.8rem;
   color: #3b6ff5;
   font-weight: 700;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   /* 🔥 PROFESSIONAL FONT */
   letter-spacing: 0.3px;
 }
@@ -130,7 +130,7 @@
   margin-bottom: 1.5rem;
   font-weight: 500;
   /* Weighted professional description */
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   /* 🔥 CLEAN BODY FONT */
 
   min-height: 70px;
@@ -147,7 +147,7 @@
   font-weight: 700;
   font-size: var(--fs-text);
 
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
 
   margin-top: auto;
   /* 🔥 ALIGN BUTTONS */

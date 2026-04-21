@@ -9,7 +9,7 @@
   min-height: 100vh;
   padding: 40px 20px;
   background-color: transparent;
-  font-family: "Urbanist", sans-serif;
+  font-family: "Open Sans", sans-serif;
 }
 
 /* Header */
@@ -18,7 +18,7 @@
 }
 
 .page-header h1 {
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   font-size: 24px;
   font-weight: 700;
   color: #1E293B;

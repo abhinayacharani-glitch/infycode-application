@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open Sans:ital,wght@0,100..900;1,100..900&display=swap');
 
 /* ================= ROOT ================= */
 :root {
@@ -19,7 +19,7 @@
   flex-direction: column;
   padding: 12px 0;
   gap: 12px;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   z-index: 1000;
   border-right: 1.5px solid #dbeafe;
   animation: admSidebarFade 0.4s ease;
@@ -414,7 +414,7 @@
   flex-direction: column;
   gap: 20px;
   animation: admProfileSlide 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
 }
 
 @keyframes admProfileSlide {
@@ -531,7 +531,7 @@
   font-size: 14px;
   color: #0f172a;
   background: #f8fafc;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   transition: border-color 0.2s, box-shadow 0.2s;
   outline: none;
 }
@@ -558,7 +558,7 @@
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   transition: background 0.2s;
 }
 
@@ -576,7 +576,7 @@
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
   transition: opacity 0.2s, transform 0.2s;
 }
@@ -616,7 +616,7 @@
   align-items: center;
   gap: 12px;
   animation: admLogoutSlide 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   text-align: center;
 }
 
@@ -668,7 +668,7 @@
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   transition: background 0.2s;
 }
 
@@ -686,7 +686,7 @@
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
   transition: opacity 0.2s, transform 0.2s;
 }
@@ -701,5 +701,5 @@
   border: none;
   background: none;
   width: 100%;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
 }

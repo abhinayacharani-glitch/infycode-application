@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
-import { User, Mail, Phone, Lock, Eye, EyeOff, RefreshCw, CheckCircle } from "lucide-react";
+import { User, Mail, Phone, Lock, Eye, EyeOff, RefreshCw, CheckCircle, ArrowLeft } from "lucide-react";
 import { validateEmail, validatePassword, validateFullName, validatePhone } from "../utils/validation";
 import { studentLogin, studentRegister, studentVerifyRegistrationOTP, resendRegistrationOTP } from "../../services/api";
 
@@ -289,10 +289,10 @@ function Login() {
                 <Mail size={28} />
               </div>
 
-              <h2 style={{ fontSize: '22px', fontWeight: '700', marginBottom: '8px', color: '#1e293b', fontFamily: 'Urbanist, sans-serif' }}>
+              <h2 style={{ fontSize: '22px', fontWeight: '700', marginBottom: '8px', color: '#1e293b', fontFamily: 'Open Sans, sans-serif' }}>
                 Verify Your <span style={{ color: '#1E90FF' }}>Email</span>
               </h2>
-              <p style={{ fontSize: '14.5px', color: '#64748b', marginBottom: '24px', lineHeight: '1.5', fontFamily: 'Urbanist, sans-serif' }}>
+              <p style={{ fontSize: '14.5px', color: '#64748b', marginBottom: '24px', lineHeight: '1.5', fontFamily: 'Open Sans, sans-serif' }}>
                 Enter the OTP sent to <br /><strong style={{ color: '#0f172a' }}>{maskEmail(signUpForm.email)}</strong>
               </p>
 
@@ -306,7 +306,7 @@ function Login() {
                   backgroundColor: otpMsg.type === 'error' ? '#fef2f2' : '#f0fdf4',
                   color: otpMsg.type === 'error' ? '#ef4444' : '#10b981',
                   border: `1px solid ${otpMsg.type === 'error' ? '#fecaca' : '#bbf7d0'}`,
-                  fontFamily: 'Urbanist, sans-serif'
+                  fontFamily: 'Open Sans, sans-serif'
                 }}>
                   {otpMsg.text}
                 </div>
@@ -324,7 +324,7 @@ function Login() {
                     border: '2px solid #e2e8f0', fontSize: '22px', textAlign: 'center',
                     letterSpacing: '8px', marginBottom: '20px', outline: 'none',
                     color: '#1e293b', fontWeight: '600', transition: 'border-color 0.2s',
-                    fontFamily: 'Urbanist, sans-serif'
+                    fontFamily: 'Open Sans, sans-serif'
                   }}
                   className="sa-otp-input-popup"
                   required
@@ -336,7 +336,7 @@ function Login() {
                       display: 'inline-flex', alignItems: 'center', gap: '6px',
                       padding: '6px 12px', background: '#fff1f2', color: '#e11d48',
                       borderRadius: '20px', fontSize: '13px', fontWeight: '600',
-                      fontFamily: 'Urbanist, sans-serif'
+                      fontFamily: 'Open Sans, sans-serif'
                     }}>
                       <span>OTP expired</span>
                     </div>
@@ -345,7 +345,7 @@ function Login() {
                       display: 'inline-flex', alignItems: 'center', gap: '6px',
                       padding: '6px 12px', background: '#f8fafc', color: '#64748b',
                       borderRadius: '20px', fontSize: '13px', fontWeight: '500',
-                      fontFamily: 'Urbanist, sans-serif'
+                      fontFamily: 'Open Sans, sans-serif'
                     }}>
                       <span style={{ color: getTimerColor(otpTimer) }}>
                         {formatTime(otpTimer)}
@@ -358,7 +358,7 @@ function Login() {
                   <div style={{
                     padding: '12px', background: '#f0fdf4', color: '#16a34a',
                     borderRadius: '10px', fontWeight: '600', marginBottom: '16px',
-                    fontFamily: 'Urbanist, sans-serif'
+                    fontFamily: 'Open Sans, sans-serif'
                   }}>
                     Registration successfully
                   </div>
@@ -387,7 +387,7 @@ function Login() {
                   fontSize: '14px', fontWeight: '600', cursor: 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
                   margin: '0 auto', transition: 'color 0.2s',
-                  fontFamily: 'Urbanist, sans-serif'
+                  fontFamily: 'Open Sans, sans-serif'
                 }}
               >
                 {(otpExpired || otpMsg.type === 'error') && <RefreshCw size={14} />}
@@ -409,7 +409,7 @@ function Login() {
       `}</style>
 
         <div className={`studentLogin-container ${isActive ? "studentLogin-active" : ""}`} id="container">
-          
+
           {/* SIGN UP FORM */}
           <div className="studentLogin-form-container studentLogin-sign-up">
             <form className="sa-form" onSubmit={handleSignUpSubmit} noValidate>
@@ -485,6 +485,13 @@ function Login() {
               <button type="submit" className="sa-submit-btn" disabled={isSignUpLoading}>
                 {isSignUpLoading ? "Creating..." : "Sign Up"}
               </button>
+
+              <div className="sa-back-home">
+                <Link to="/" className="sa-back-link">
+                  <ArrowLeft size={16} />
+                  <span>Back to Home</span>
+                </Link>
+              </div>
             </form>
           </div>
 
@@ -540,6 +547,13 @@ function Login() {
               <button type="submit" className="sa-submit-btn" disabled={isSignInLoading}>
                 {isSignInLoading ? "Signing in..." : "Sign In"}
               </button>
+
+              <div className="sa-back-home">
+                <Link to="/" className="sa-back-link">
+                  <ArrowLeft size={16} />
+                  <span>Back to Home</span>
+                </Link>
+              </div>
             </form>
           </div>
 

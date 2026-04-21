@@ -4,7 +4,10 @@ import {
   createCourse as apiCreateCourse,
   updateCourse as apiUpdateCourse,
   deleteCourse as apiDeleteCourse,
-  toggleCourseLike as apiToggleCourseLike
+  toggleCourseLike as apiToggleCourseLike,
+  getPendingFAQs as apiGetPendingFAQs,
+  updateFAQStatus as apiUpdateFAQStatus,
+  deleteFAQ as apiDeleteFAQ
 } from '../services/api';
 
 const AdminContext = createContext();
@@ -23,6 +26,7 @@ export const AdminProvider = ({ children }) => {
   const [trainers, setTrainers] = useState([]);
   const [courses, setCourses] = useState([]);
   const [batches, setBatches] = useState([]);
+  const [pendingFAQs, setPendingFAQs] = useState([]);
 
   const [notifications, setNotifications] = useState([
     { id: 1, message: 'New student registration: Harvey Specter', type: 'info', read: false, time: '2 mins ago' },
@@ -136,6 +140,57 @@ export const AdminProvider = ({ children }) => {
     }
   };
 
+  /* --- FAQ Actions --- */
+  const loadPendingFAQs = async () => {
+    try {
+      const data = await apiGetPendingFAQs();
+      const currentPending = data.faqs || [];
+      
+      // Check for new questions to add to notifications
+      if (currentPending.length > pendingFAQs.length) {
+        const newOnes = currentPending.filter(q => !pendingFAQs.find(p => p.id === q.id));
+        newOnes.forEach(q => {
+          setNotifications(prev => [
+            {
+              id: Date.now() + Math.random(),
+              message: `New FAQ Query from ${q.userName}: ${q.question.substring(0, 30)}...`,
+              type: 'info',
+              read: false,
+              time: 'Just now'
+            },
+            ...prev
+          ]);
+        });
+      }
+      
+      setPendingFAQs(currentPending);
+    } catch (error) {
+      console.error("Error loading pending FAQs:", error.message);
+    }
+  };
+
+  const approveFAQ = async (id, answer) => {
+    try {
+      await apiUpdateFAQStatus(id, { answer, status: 'published' });
+      setPendingFAQs(prev => prev.filter(f => f.id !== id));
+      return true;
+    } catch (error) {
+      console.error("Error approving FAQ:", error);
+      throw error;
+    }
+  };
+
+  const deleteFAQ = async (id) => {
+    try {
+      await apiDeleteFAQ(id);
+      setPendingFAQs(prev => prev.filter(f => f.id !== id));
+      return true;
+    } catch (error) {
+      console.error("Error deleting FAQ:", error);
+      throw error;
+    }
+  };
+
   const fetchDashboardStats = async () => {
     try {
       const data = await getAdminStats();
@@ -178,10 +233,12 @@ export const AdminProvider = ({ children }) => {
   useEffect(() => {
     fetchDashboardStats();
     loadCourses(); // Load courses separately
+    loadPendingFAQs();
 
     const interval = setInterval(() => {
       fetchDashboardStats();
       loadCourses();
+      loadPendingFAQs();
     }, 30000);
     return () => clearInterval(interval);
   }, []);
@@ -204,6 +261,10 @@ export const AdminProvider = ({ children }) => {
     deleteCourse,
     toggleCourseLike,
     fetchDashboardStats,
+    pendingFAQs,
+    approveFAQ,
+    deleteFAQ,
+    loadPendingFAQs,
   };
 
   return <AdminContext.Provider value={value}>{children}</AdminContext.Provider>;

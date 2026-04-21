@@ -101,7 +101,7 @@ const CoreTest = () => {
 
   if (isSubmitted) {
     return (
-      <div style={{ padding: '20px', fontFamily: '"Urbanist", sans-serif' }}>
+      <div style={{ padding: '20px', fontFamily: '"Open Sans", sans-serif' }}>
         <Header />
         <div style={{ textAlign: 'center', marginTop: '120px' }}>
           <h2 style={{ fontSize: '2rem', color: '#0A3D91', marginBottom: '15px' }}>Core Test Submitted Successfully!</h2>
@@ -134,7 +134,7 @@ const CoreTest = () => {
   });
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#f4f7fb', fontFamily: '"Urbanist", sans-serif', boxSizing: 'border-box' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#f4f7fb', fontFamily: '"Open Sans", sans-serif', boxSizing: 'border-box' }}>
       <Header />
       <div style={{ display: 'flex', flex: 1, padding: '20px', gap: '20px', marginTop: '80px', maxHeight: 'calc(100vh - 80px)' }}>
         
