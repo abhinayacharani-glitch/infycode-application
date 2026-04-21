@@ -1,0 +1,228 @@
+.faq-page {
+  padding: 120px 0 80px;
+  background: #f8fafc;
+  min-height: 100vh;
+}
+
+.faq-page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.faq-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.faq-header h1 {
+  font-size: 3rem;
+  color: #1e293b;
+  margin-bottom: 16px;
+  background: linear-gradient(90deg, #2563eb, #7c3aed);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.faq-header p {
+  font-size: 1.1rem;
+  color: #64748b;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.faq-search-wrapper {
+  max-width: 600px;
+  margin: 40px auto;
+  position: relative;
+}
+
+.faq-search-input {
+  width: 100%;
+  padding: 16px 20px 16px 50px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  font-size: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.faq-search-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.1);
+}
+
+.faq-search-icon {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+}
+
+/* Accordion Styling */
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 80px;
+}
+
+.faq-accordion-item {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.faq-accordion-item.active {
+  border-color: #2563eb;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.05);
+}
+
+.faq-accordion-header {
+  padding: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  background: transparent;
+}
+
+.faq-accordion-header h3 {
+  font-size: 1.2rem;
+  color: #334155;
+  margin: 0;
+  padding-right: 20px;
+}
+
+.faq-accordion-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f5f9;
+  border-radius: 50%;
+  color: #2563eb;
+  transition: transform 0.3s ease;
+}
+
+.faq-accordion-item.active .faq-accordion-icon {
+  transform: rotate(180deg);
+  background: #2563eb;
+  color: #fff;
+}
+
+.faq-accordion-content {
+  padding: 0 24px 24px;
+  color: #64748b;
+  line-height: 1.6;
+}
+
+/* Submission Form */
+.faq-submission-section {
+  background: #fff;
+  border-radius: 24px;
+  padding: 60px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.faq-submission-info h2 {
+  font-size: 2.2rem;
+  color: #1e293b;
+  margin-bottom: 20px;
+}
+
+.faq-submission-info p {
+  color: #64748b;
+  margin-bottom: 30px;
+  font-size: 1.1rem;
+}
+
+.faq-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group textarea {
+  padding: 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+  transition: all 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+.submit-btn {
+  background: #2563eb;
+  color: #fff;
+  padding: 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.submit-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2);
+}
+
+.submit-btn:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.success-message {
+  background: #ecfdf5;
+  color: #059669;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  border: 1px solid #10b981;
+  margin-top: 20px;
+}
+
+@media (max-width: 991px) {
+  .faq-submission-section {
+    grid-template-columns: 1fr;
+    padding: 40px;
+  }
+  
+  .faq-header h1 {
+    font-size: 2.2rem;
+  }
+}

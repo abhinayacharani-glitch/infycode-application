@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
-import { User, Mail, Phone, Lock, Eye, EyeOff, RefreshCw, CheckCircle } from "lucide-react";
+import { User, Mail, Phone, Lock, Eye, EyeOff, RefreshCw, CheckCircle, ArrowLeft } from "lucide-react";
 import { validateEmail, validatePassword, validateFullName, validatePhone } from "../utils/validation";
 import { studentLogin, studentRegister, studentVerifyRegistrationOTP, resendRegistrationOTP } from "../../services/api";
 
@@ -409,7 +409,7 @@ function Login() {
       `}</style>
 
         <div className={`studentLogin-container ${isActive ? "studentLogin-active" : ""}`} id="container">
-          
+
           {/* SIGN UP FORM */}
           <div className="studentLogin-form-container studentLogin-sign-up">
             <form className="sa-form" onSubmit={handleSignUpSubmit} noValidate>
@@ -485,6 +485,13 @@ function Login() {
               <button type="submit" className="sa-submit-btn" disabled={isSignUpLoading}>
                 {isSignUpLoading ? "Creating..." : "Sign Up"}
               </button>
+
+              <div className="sa-back-home">
+                <Link to="/" className="sa-back-link">
+                  <ArrowLeft size={16} />
+                  <span>Back to Home</span>
+                </Link>
+              </div>
             </form>
           </div>
 
@@ -540,6 +547,13 @@ function Login() {
               <button type="submit" className="sa-submit-btn" disabled={isSignInLoading}>
                 {isSignInLoading ? "Signing in..." : "Sign In"}
               </button>
+
+              <div className="sa-back-home">
+                <Link to="/" className="sa-back-link">
+                  <ArrowLeft size={16} />
+                  <span>Back to Home</span>
+                </Link>
+              </div>
             </form>
           </div>
 
