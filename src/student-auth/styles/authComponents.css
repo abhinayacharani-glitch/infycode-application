@@ -1,7 +1,7 @@
 /* authComponents.css — Reusable student-auth component styles
    Mirrors Login.css: blue curved panel LEFT, white form RIGHT        */
 
-@import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open Sans:wght@300;400;500;600;700;800&display=swap');
 
 /* ── reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -17,7 +17,7 @@ input::-ms-reveal, input::-ms-clear { display: none; }
   align-items: center;
   justify-content: center;
   background: linear-gradient(to right, #e2e2e2, #c9d6ff);
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
 }
 
 /* ════════════════════════════════════
@@ -106,7 +106,7 @@ input::-ms-reveal, input::-ms-clear { display: none; }
   color: #fff;
   border: 1px solid #fff;
   border-radius: 8px;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.5px;
@@ -179,7 +179,7 @@ input::-ms-reveal, input::-ms-clear { display: none; }
   margin: 8px 0;
   padding: 10px 15px;
   font-size: 13px;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   border-radius: 8px;
   width: 100%;
   outline: none;
@@ -235,7 +235,7 @@ input::-ms-reveal, input::-ms-clear { display: none; }
 .sa-submit-btn {
   background-color: #1E90FF;
   color: #fff;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.5px;
@@ -359,7 +359,7 @@ input::-ms-reveal, input::-ms-clear { display: none; }
   text-align: center;
   font-size: 20px;
   font-weight: 700;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   background: #eee;
   border: 2px solid transparent;
   border-radius: 8px;

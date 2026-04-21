@@ -14,7 +14,7 @@ const NotFound = () => {
       alignItems: 'center',
       justifyContent: 'center',
       background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-      fontFamily: '"Urbanist", sans-serif',
+      fontFamily: '"Open Sans", sans-serif',
       textAlign: 'center',
       padding: '20px'
     }}>

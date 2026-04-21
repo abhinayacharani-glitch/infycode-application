@@ -9,7 +9,7 @@
 .ap-page {
   min-height: 100vh;
   background: #f0f4ff;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
 }
 
 /* ── Hero ─────────────────────────────── */
@@ -191,7 +191,7 @@
   border-radius: 10px;
   font-size: 0.9375rem;
   color: #0f172a;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
   width: 100%;
 }

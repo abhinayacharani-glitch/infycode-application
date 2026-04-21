@@ -20,7 +20,7 @@
   --mat-radius-card: 18px;
   --mat-radius-sm: 8px;
 
-  --font-main: 'Urbanist', sans-serif;
+  --font-main: 'Open Sans', sans-serif;
 }
 
 .materials-page-wrapper {
@@ -58,7 +58,7 @@
 }
 
 .mat-page-title {
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   font-size: 26px;
   font-weight: 800;
   color: #1E293B;

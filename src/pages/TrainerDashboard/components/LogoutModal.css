@@ -62,7 +62,7 @@
 }
 
 .logout-modal-title {
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   font-size: 24px;
   font-weight: 800;
   color: #1e293b;
@@ -87,7 +87,7 @@
   flex: 1;
   padding: 12px 20px;
   border-radius: 12px;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
