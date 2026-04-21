@@ -33,23 +33,28 @@ function Working() {
         </div>
         <div className="steps-container">
           {steps.map((step, index) => (
-            <div className="step-item" key={step.id}>
-              <div className="step-diamond-wrap">
-                <div className="step-diamond">
-                  {step.icon}
+            <React.Fragment key={step.id}>
+              <div className="step-item-card">
+                <div className="step-card-left">
+                  <div className="step-diamond">
+                    {step.icon}
+                  </div>
+                </div>
+                <div className="step-card-right">
+                  <h3 className="step-title">{step.title}</h3>
+                  <p className="step-desc">{step.desc}</p>
                 </div>
               </div>
-              <h3 className="step-title">{step.title}</h3>
-              <p className="step-desc">{step.desc}</p>
+              
               {index < steps.length - 1 && (
-                <div className="step-arrow-wrap">
-                  <svg width="120" height="40" viewBox="0 0 120 40" className="step-arrow-svg">
-                    <path d="M10 20 Q60 0 110 20" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="2" strokeDasharray="6,6" />
-                    <path d="M105 15 L115 20 L105 25" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="2" />
+                <div className="step-arrow-divider">
+                  <svg width="80" height="40" viewBox="0 0 80 40">
+                    <path d="M0 20 Q40 0 80 20" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2" strokeDasharray="5,5" />
+                    <path d="M72 15 L80 20 L72 25" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2" />
                   </svg>
                 </div>
               )}
-            </div>
+            </React.Fragment>
           ))}
         </div>
       </div>

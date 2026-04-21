@@ -8,6 +8,43 @@
   width: 100%;
   font-family: 'Open Sans', sans-serif;
   background: var(--bg, #f4f6f9);
+  position: relative;
+}
+
+/* Back Button */
+.internal-back-btn {
+  position: absolute;
+  top: 100px;
+  left: 5%;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50px;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.internal-back-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateX(-5px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.internal-back-btn svg {
+  transition: transform 0.3s ease;
+}
+
+.internal-back-btn:hover svg {
+  transform: translateX(-3px);
 }
 
 /* Hero Section */

@@ -1,13 +1,23 @@
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import './BecomeTrainerPage.css';
 
 const BecomeTrainerPage = () => {
+  const navigate = useNavigate();
+  
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   return (
     <div className="internal-page">
+      {/* Back Button */}
+      <button onClick={() => navigate(-1)} className="internal-back-btn">
+        <ArrowLeft size={18} />
+        <span>Back</span>
+      </button>
+
       <div className="internal-hero trainer-hero">
         <div className="internal-hero-content">
           <h1>Join Our Elite Faculty</h1>
