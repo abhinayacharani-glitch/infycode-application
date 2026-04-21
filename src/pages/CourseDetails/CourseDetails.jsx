@@ -262,6 +262,9 @@ const CourseDetailsPage = () => {
                   </p>
                 </div>
               </section>
+
+              {/* Related Courses Section */}
+              <RelatedCourses currentCourse={course} navigate={navigate} />
             </div>
           )}
 
@@ -311,9 +314,6 @@ const CourseDetailsPage = () => {
 
         </div>
 
-        {/* Related Courses Section */}
-        <RelatedCourses currentCourse={course} navigate={navigate} />
-
       </div>
     </div>
   );
@@ -322,13 +322,13 @@ const CourseDetailsPage = () => {
 /* ----------  Related Courses Component (Animated Slider) ---------- */
 const statusColors = {
   "BEST SELLER": { bg: "rgba(249,115,22,0.12)", color: "#f97316" },
-  "TRENDING":    { bg: "rgba(16,185,129,0.12)",  color: "#10b981" },
-  "POPULAR":     { bg: "rgba(99,102,241,0.12)",  color: "#6366f1" },
-  "HOT":         { bg: "rgba(220,38,38,0.12)",   color: "#dc2626" },
-  "NEW":         { bg: "rgba(14,165,233,0.12)",  color: "#0ea5e9" },
-  "ADVANCED":    { bg: "rgba(139,92,246,0.12)",  color: "#8b5cf6" },
-  "INTERMEDIATE":{ bg: "rgba(16,185,129,0.12)",  color: "#10b981" },
-  "BEGINNER":    { bg: "rgba(99,102,241,0.12)",  color: "#6366f1" },
+  "TRENDING": { bg: "rgba(16,185,129,0.12)", color: "#10b981" },
+  "POPULAR": { bg: "rgba(99,102,241,0.12)", color: "#6366f1" },
+  "HOT": { bg: "rgba(220,38,38,0.12)", color: "#dc2626" },
+  "NEW": { bg: "rgba(14,165,233,0.12)", color: "#0ea5e9" },
+  "ADVANCED": { bg: "rgba(139,92,246,0.12)", color: "#8b5cf6" },
+  "INTERMEDIATE": { bg: "rgba(16,185,129,0.12)", color: "#10b981" },
+  "BEGINNER": { bg: "rgba(99,102,241,0.12)", color: "#6366f1" },
 };
 
 const RelatedCourses = ({ currentCourse, navigate }) => {
@@ -340,7 +340,7 @@ const RelatedCourses = ({ currentCourse, navigate }) => {
     (c) => c.courseId !== currentCourse.courseId && c.category !== currentCourse.category
   );
   const originalSuggestions = [...sameCat, ...others].slice(0, 8);
-  
+
   // Triple the items for a seamless loop
   const suggestions = [...originalSuggestions, ...originalSuggestions, ...originalSuggestions];
 
@@ -385,7 +385,7 @@ const RelatedCourses = ({ currentCourse, navigate }) => {
   return (
     <div className="cd-related-section slider-mode">
       <div className="cd-related-header">
-        <h2 className="cd-related-title">You Might Also Like</h2>
+        <h2 className="cd-related-title">Course Related Suggestions</h2>
         <p className="cd-related-sub">Explore more courses to accelerate your learning journey</p>
       </div>
 
@@ -396,50 +396,36 @@ const RelatedCourses = ({ currentCourse, navigate }) => {
           <div 
             className="cd-slider-track"
             style={{ 
-              transform: `translateX(-${index * (100 / 4)}%)`,
-              transition: isTransitioning ? "transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)" : "none"
+              transform: `translateX(-${index * (100 / (window.innerWidth > 1024 ? 3 : window.innerWidth > 768 ? 2 : 1))}%)`,
+              transition: isTransitioning ? "transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)" : "none"
             }}
           >
             {suggestions.map((c, i) => {
-              const sc = statusColors[c.badge] || { bg: "rgba(14,165,233,0.12)", color: "#0ea5e9" };
-              const isActive = i === index;
               return (
                 <div 
-                  key={c.courseId} 
-                  className={`cd-slider-item ${isActive ? "active" : "inactive"}`}
+                  key={`${c.courseId}-${i}`} 
+                  className="cd-slider-item"
+                  style={{ flex: `0 0 ${100 / (window.innerWidth > 1024 ? 3 : window.innerWidth > 768 ? 2 : 1)}%` }}
                 >
-                  <div
-                    className="cd-related-card"
+                  <div 
+                    className="working-style-card"
                     onClick={() => {
                       navigate(`/course-details/${c.courseId}`);
                       window.scrollTo(0, 0);
                     }}
                   >
-                    <div className="cd-related-img">
-                      <img src={c.image} alt={c.title} />
-                      <span
-                        className="cd-related-badge"
-                        style={{ background: sc.bg, color: sc.color }}
-                      >
-                        {c.badge}
-                      </span>
-                    </div>
-                    <div className="cd-related-body">
-                      <span className="cd-related-cat">{c.category}</span>
-                      <h4 className="cd-related-name">{c.title}</h4>
-                      <div className="cd-related-meta">
-                        <span className="cd-related-rating">
-                          <Star size={13} fill="#f59e0b" color="#f59e0b" strokeWidth={0} />
-                          {c.rating}
-                        </span>
-                        <span className="cd-related-dur">
-                          <Clock size={13} />
-                          {c.duration}
-                        </span>
+                    <div className="ws-card-left">
+                      <div className="ws-diamond">
+                        <BookOpen size={24} />
                       </div>
-                      <button className="cd-related-cta">
-                        <Eye size={14} /> Overview
-                      </button>
+                    </div>
+                    <div className="ws-card-right">
+                      <span className="ws-cat">{c.category}</span>
+                      <h4 className="ws-title">{c.title}</h4>
+                      <div className="ws-meta">
+                        <span><Star size={14} fill="#f59e0b" color="#f59e0b" strokeWidth={0} /> {c.rating}</span>
+                        <span><Clock size={14} /> {c.duration}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
