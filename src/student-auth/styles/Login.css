@@ -4,7 +4,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
 }
 
 .studentLogin-body {
@@ -300,4 +300,36 @@
 .studentLogin-toggle-panel button {
   color: #ffffff;
   border-color: #ffffff;
+}
+
+/* Back to Home Link */
+.sa-back-home {
+  margin-top: 18px;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.sa-back-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+.sa-back-link:hover {
+  color: #1E90FF;
+  background-color: rgba(30, 144, 255, 0.08);
+  transform: translateX(-4px);
+}
+
+.sa-back-link span {
+  font-size: 14px !important;
+  font-weight: 600;
 }

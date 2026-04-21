@@ -31,7 +31,7 @@
 }
 
 .sub-label-blue {
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   font-size: 18px;
   color: #ffffff;
   font-weight: 600;
@@ -39,7 +39,7 @@
 }
 
 .section-title-white {
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   font-size: 42px;
   font-weight: 700;
   margin-top: 10px;
@@ -92,7 +92,7 @@
 
 /* TITLE TEXT */
 .step-title {
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   font-size: 20px;
   font-weight: 600;
   color: #ffffff;
@@ -101,7 +101,7 @@
 
 /* DESCRIPTION */
 .step-desc {
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   font-size: 16px;
   color: rgba(255, 255, 255, 0.7);
   line-height: 1.5rem;

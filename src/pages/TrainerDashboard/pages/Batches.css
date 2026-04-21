@@ -4,7 +4,7 @@
     background: transparent;
     min-height: calc(100vh - 80px);
     padding: 32px 0;
-    font-family: 'Urbanist', sans-serif;
+    font-family: 'Open Sans', sans-serif;
 }
 
 .main-content {
@@ -19,7 +19,7 @@
 }
 
 .batches-title {
-    font-family: 'Urbanist', sans-serif;
+    font-family: 'Open Sans', sans-serif;
     font-size: 24px;
     font-weight: 700;
     color: #1E293B;

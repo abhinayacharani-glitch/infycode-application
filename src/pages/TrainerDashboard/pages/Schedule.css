@@ -4,7 +4,7 @@
   padding: 32px;
   background: transparent;
   min-height: calc(100vh - 80px);
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   animation: fadeIn 0.4s ease-out;
 }
 

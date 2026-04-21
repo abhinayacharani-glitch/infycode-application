@@ -22,7 +22,7 @@ const AccountSettings = () => {
   };
 
   return (
-    <div className="settings-page" style={{ padding: '24px', fontFamily: 'Urbanist, sans-serif' }}>
+    <div className="settings-page" style={{ padding: '24px', fontFamily: 'Open Sans, sans-serif' }}>
       <div className="adm-page-header" style={{ marginBottom: '32px' }}>
         <h2 className="adm-page-title" style={{ fontSize: '28px', fontWeight: '800', color: '#0f172a' }}>Trainer Profile Settings</h2>
         <p className="adm-page-subtitle" style={{ color: '#64748b' }}>Configure your professional profile and training credentials.</p>

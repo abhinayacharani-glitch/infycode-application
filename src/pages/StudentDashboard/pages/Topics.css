@@ -7,7 +7,7 @@
 .ctp-landing {
   padding: 5px 8px;
   min-height: 80vh;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
 }
 
 .ctp-landing-header {
@@ -286,7 +286,7 @@
 .ctp-content-only {
   padding: 5px 15px 10px 15px;
   min-height: 80vh;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   background: #f8fafc;
 }
 

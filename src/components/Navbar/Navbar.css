@@ -1,7 +1,7 @@
 /* remove browser gap */
 body {
   margin: 0;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   overflow-x: hidden;
   width: 100%;
   max-width: 100%;
@@ -75,7 +75,7 @@ body {
   border-bottom: 1px solid rgba(255, 255, 255, 0.4);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
   flex-wrap: nowrap;
-  font-family: 'Playfair Display', serif;
+  font-family: 'Open Sans', sans-serif;
   gap: 16px;
   box-sizing: border-box;
 }
@@ -229,7 +229,7 @@ body {
   outline: none;
   font-size: 16px;
   background: white;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   transition: all 0.3s ease;
 }
 

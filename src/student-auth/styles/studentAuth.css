@@ -1,6 +1,6 @@
 /* studentAuth.css — Shared styles for student ForgotPassword, VerifyOTP, ResetPassword */
 
-@import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open Sans:wght@300;400;500;600;700;800&display=swap');
 
 /* ─────────────────────────────────────────────
    CSS Variables  (mirror Login.css tokens)
@@ -31,7 +31,7 @@ input::-ms-reveal, input::-ms-clear { display: none; }
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   padding: 24px;
   background: linear-gradient(to right, var(--sa-bg-from), var(--sa-bg-to));
   position: relative;
@@ -165,7 +165,7 @@ input::-ms-reveal, input::-ms-clear { display: none; }
   /* same padding style as Login inputs */
   padding: 10px 42px 10px 40px;
   font-size: 13px;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   color: var(--sa-text);
   background: #eee;             /* matches .studentLogin-container input bg */
   border: none;
@@ -217,7 +217,7 @@ input::-ms-reveal, input::-ms-clear { display: none; }
   margin-top: 4px;
   background: var(--sa-primary);
   color: #fff;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   font-size: 13px;
   font-weight: 700;
   border: none;
@@ -340,7 +340,7 @@ input::-ms-reveal, input::-ms-clear { display: none; }
   padding: 10px 36px;
   background: transparent;
   color: #ffffff;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   font-size: 13px;
   font-weight: 700;
   border: 2px solid rgba(255, 255, 255, 0.75);
@@ -419,7 +419,7 @@ input::-ms-reveal, input::-ms-clear { display: none; }
   text-align: center;
   font-size: 20px;
   font-weight: 700;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   border: 2px solid var(--sa-border);
   border-radius: 10px;
   background: #eee;
