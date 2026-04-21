@@ -287,74 +287,94 @@ transform:translateY(0);
 
 /* ===== OVERLAY BACKGROUND ===== */
 
-.hero-video-overlay{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.6);   /* dark background */
-backdrop-filter: blur(6px);   /* blur effect 🔥 */
-display:flex;
-justify-content:center;
-align-items:center;
-z-index:9999;
-animation:fadeIn 0.4s ease;
+/* ===== OVERLAY BACKGROUND ===== */
+
+.hero-video-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: fadeIn 0.4s ease;
 }
 
-/* ===== VIDEO BOX ===== */
+/* ===== VIDEO CONTENT WRAPPER (allows overflow for floating button) ===== */
 
-.hero-video{
-position:relative;
-width:70%;
-max-width:900px;
-aspect-ratio:16/9;
-background:black;
-border-radius:16px;
-overflow:hidden;
-box-shadow:0 20px 60px rgba(0,0,0,0.5);
-animation:scaleIn 0.4s ease;
+.hero-video-content {
+  position: relative;
+  width: 80%;
+  max-width: 960px;
+  aspect-ratio: 16/9;
+  z-index: 10000;
+  animation: scaleIn 0.4s ease;
 }
 
-/* iframe */
+/* ===== CLOSE BUTTON (FLOATING RED) ===== */
 
-.hero-video iframe{
-width:100%;
-height:100%;
-border:none;
+.close-video {
+  position: absolute;
+  top: -22px;     /* Floating slightly outside */
+  right: -22px;    /* Floating slightly outside */
+  width: 45px;
+  height: 45px;
+  background: #FF0000;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(255, 0, 0, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10001;
 }
 
-/* ===== CLOSE BUTTON ===== */
+.close-video:hover {
+  background: #cc0000;
+  transform: scale(1.1);
+  box-shadow: 0 15px 30px rgba(255, 0, 0, 0.5);
+}
 
-.close-video{
-position:absolute;
-top:-40px;
-right:0;
-color:white;
-font-size:28px;
-cursor:pointer;
+/* ===== VIDEO INNER (rounded and clipped) ===== */
+
+.hero-video-inner {
+  width: 100%;
+  height: 100%;
+  background: black;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+.hero-video-inner iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
 }
 
 /* ===== ANIMATIONS ===== */
 
-@keyframes fadeIn{
-from{
-opacity:0;
-}
-to{
-opacity:1;
-}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-@keyframes scaleIn{
-from{
-transform:scale(0.85);
-opacity:0;
-}
-to{
-transform:scale(1);
-opacity:1;
-}
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 .hero .btn{
   border-radius: 999px;
