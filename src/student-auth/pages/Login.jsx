@@ -79,7 +79,10 @@ function Login() {
     try {
       const data = await studentLogin(signInForm.email.trim(), signInForm.password);
       localStorage.setItem("user", JSON.stringify({ token: data.token, fullname: data.fullname || data.fullName, email: data.email, role: data.role || "student" }));
-      navigate("/student-dashboard");
+      // Role-based navigation
+      if (data.role === 'admin')        navigate("/admin-dashboard");
+      else if (data.role === 'trainer') navigate("/trainer-dashboard");
+      else                              navigate("/student-dashboard");
     } catch (err) { setSignInApiError(err.message); }
     finally { setIsSignInLoading(false); }
   };

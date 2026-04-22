@@ -59,7 +59,10 @@ const AdminLogin = () => {
         email: data.email,
         fullName: data.fullName
       }));
-      navigate('/admin-dashboard');
+      // Role-based navigation
+      if (data.role === 'admin')        navigate("/admin-dashboard");
+      else if (data.role === 'trainer') navigate("/trainer-dashboard");
+      else                              navigate("/student-dashboard");
     } catch (err) {
       setApiError(err.message);
     } finally {
