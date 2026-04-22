@@ -42,14 +42,13 @@
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease, margin 0.6s ease;
   flex-shrink: 0;
   overflow: hidden;
   z-index: 1;
 }
 
-.why-interactive-container.is-active-confused .why-middle-content,
-.why-interactive-container.is-active-clear .why-middle-content {
+.why-middle-content.visible {
   width: 480px;
   opacity: 1;
   visibility: visible;
@@ -61,32 +60,8 @@
 
 .why-card-wrapper {
   flex-shrink: 0;
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 2;
-}
-
-.why-interactive-container.is-active-confused .why-card-wrapper.left-card {
-  order: 1;
-}
-
-.why-interactive-container.is-active-confused .why-middle-content {
-  order: 2;
-}
-
-.why-interactive-container.is-active-confused .why-card-wrapper.right-card {
-  order: 3;
-}
-
-.why-interactive-container.is-active-clear .why-card-wrapper.left-card {
-  order: 1;
-}
-
-.why-interactive-container.is-active-clear .why-card-wrapper.right-card {
-  order: 2;
-}
-
-.why-interactive-container.is-active-clear .why-middle-content {
-  order: 3;
 }
 
 .why-interactive-container.is-active-confused .why-card-wrapper.dimmed,
@@ -274,11 +249,7 @@
     gap: 30px;
   }
   
-  .why-middle-content {
-    position: relative;
-    left: auto;
-    right: auto;
-    transform: none;
+  .why-middle-content.visible {
     width: 100%;
     max-width: 400px;
     margin: 20px 0;
