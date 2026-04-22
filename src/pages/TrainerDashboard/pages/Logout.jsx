@@ -16,8 +16,8 @@ const Logout = () => {
                 </div>
                 <h2>Securely Logged Out</h2>
                 <p>Your session has ended. Thank you for using the Trainer Portal.</p>
-                <NavLink to="/" className="relogin-btn">
-                    Return to Home
+                <NavLink to="/student/login" className="relogin-btn">
+                    Return to Login
                 </NavLink>
             </div>
         </div>

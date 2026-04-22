@@ -1,6 +1,7 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { TrainerProvider } from "../../context/TrainerContext";
+import { useNavigationLock } from "../../hooks/useNavigationLock";
 import Sidebar from "./components/Sidebar";
 import Topbar from "./components/Topbar";
 import "./TrainerDashboard.css";
@@ -20,13 +21,24 @@ import Logout from "./pages/Logout";
 
 const TrainerDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
+  const [showLogoutModal, setShowLogoutModal] = React.useState(false);
+
+  // Hook to catch browser "Back" button
+  useNavigationLock(true, () => {
+    setShowLogoutModal(true);
+  });
 
   return (
     <TrainerProvider>
       <div className="trainer-dashboard-layout">
         
         {/* Sidebar - Fixed width */}
-        <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+        <Sidebar 
+          isOpen={isSidebarOpen} 
+          onClose={() => setIsSidebarOpen(false)} 
+          externalShowLogoutModal={showLogoutModal}
+          setExternalShowLogoutModal={setShowLogoutModal}
+        />
 
         {/* Main Content Area */}
         <div className="main-content-wrapper">

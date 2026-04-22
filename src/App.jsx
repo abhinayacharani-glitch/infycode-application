@@ -66,6 +66,10 @@ const GalleryPage = lazy(() => import("./pages/InternalPages/GalleryPage"));
 const InstagramPage = lazy(() => import("./pages/InternalPages/InstagramPage"));
 const CourseDetailsPage = lazy(() => import("./pages/CourseDetails/CourseDetails"));
 const FAQPage = lazy(() => import("./pages/InternalPages/FAQPage"));
+const MentorshipPage = lazy(() => import("./pages/Features/MentorshipPage"));
+const PracticalLearningPage = lazy(() => import("./pages/Features/PracticalLearningPage"));
+const SkillEvaluationPage = lazy(() => import("./pages/Features/SkillEvaluationPage"));
+const CareerPreparationPage = lazy(() => import("./pages/Features/CareerPreparationPage"));
 
 // ─── Lazy-loaded — Other ─────────────────────────────────────────────────────
 const BatchCreation = lazy(() => import("./pages/AdminDashboard/pages/BatchCreation"));
@@ -181,10 +185,20 @@ function HomePage() {
   );
 }
 
-function ProtectedRoute({ children }) {
+function ProtectedRoute({ children, allowedRoles }) {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const token = user.token || localStorage.getItem("token"); // Fallback for safety
+
   if (!token) return <Navigate to="/student/login" replace />;
+
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
+    // If user has a token but wrong role, redirect to their default dashboard
+    console.warn(`Access denied for role: ${user.role}. Allowed: ${allowedRoles}`);
+    if (user.role === 'admin') return <Navigate to="/admin-dashboard" replace />;
+    if (user.role === 'trainer') return <Navigate to="/trainer-dashboard" replace />;
+    return <Navigate to="/student-dashboard" replace />;
+  }
+
   return children;
 }
 
@@ -255,12 +269,18 @@ function Layout({ courses, setCourses, onToggleLike, onUpdateCourse, onDeleteCou
             <Route path="/course-details/:id" element={<CourseDetailsPage />} />
             <Route path="/faq" element={<FAQPage />} />
 
+            {/* ── Feature Pages ── */}
+            <Route path="/features/mentorship" element={<MentorshipPage />} />
+            <Route path="/features/practical-learning" element={<PracticalLearningPage />} />
+            <Route path="/features/skill-evaluation" element={<SkillEvaluationPage />} />
+            <Route path="/features/career-preparation" element={<CareerPreparationPage />} />
+
             {/* ── Protected ── */}
-            <Route path="/student/test/*" element={<ProtectedRoute><TestApp /></ProtectedRoute>} />
-            <Route path="/student/core-test/*" element={<ProtectedRoute><CoreTestApp /></ProtectedRoute>} />
-            <Route path="/student-dashboard/*" element={<ProtectedRoute><StudentDashboard /></ProtectedRoute>} />
-            <Route path="/trainer-dashboard/*" element={<TrainerDashboard />} />
-            <Route path="/admin-dashboard/*" element={<AdminProvider><AdminDashboard /></AdminProvider>} />
+            <Route path="/student/test/*" element={<ProtectedRoute allowedRoles={['student']}><TestApp /></ProtectedRoute>} />
+            <Route path="/student/core-test/*" element={<ProtectedRoute allowedRoles={['student']}><CoreTestApp /></ProtectedRoute>} />
+            <Route path="/student-dashboard/*" element={<ProtectedRoute allowedRoles={['student']}><StudentDashboard /></ProtectedRoute>} />
+            <Route path="/trainer-dashboard/*" element={<ProtectedRoute allowedRoles={['trainer']}><TrainerDashboard /></ProtectedRoute>} />
+            <Route path="/admin-dashboard/*" element={<ProtectedRoute allowedRoles={['admin']}><AdminProvider><AdminDashboard /></AdminProvider></ProtectedRoute>} />
 
             {/* ── Misc ── */}
             <Route path="/batchcreation" element={<BatchCreation />} />

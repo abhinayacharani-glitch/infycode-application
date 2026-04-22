@@ -46,8 +46,8 @@ function WhyChoose() {
           </div>
         </div>
 
-        {/* MIDDLE STEPS */}
-        <div className={`why-middle-content ${activePath ? "visible" : ""}`}>
+        {/* STEPS FOR CONFUSED PATH (BETWEEN CARDS) */}
+        <div className={`why-middle-content ${activePath === "confused" ? "visible" : ""}`}>
           {activePath === "confused" && (
             <div className="vertical-stepper fade-in">
               <div className="step-item" style={{ animationDelay: "0.1s" }}>
@@ -75,7 +75,24 @@ function WhyChoose() {
               </div>
             </div>
           )}
+        </div>
 
+        {/* CLEAR PATH (RIGHT CARD) */}
+        <div className={`why-card-wrapper right-card ${activePath === "clear" ? "selected" : ""} ${activePath === "confused" ? "dimmed" : ""}`}>
+          <div
+            className={`why-option ${activePath === "clear" ? "active" : ""}`}
+            onClick={() => setActivePath(activePath === "clear" ? null : "clear")}
+          >
+            <img src={focusedImg} alt="Focused Student" />
+            <div className="overlay">
+              <h3>I Know My Path</h3>
+              <p>Test your skills & discover your level</p>
+            </div>
+          </div>
+        </div>
+
+        {/* STEPS FOR CLEAR PATH (ON THE RIGHT) */}
+        <div className={`why-middle-content ${activePath === "clear" ? "visible" : ""}`}>
           {activePath === "clear" && (
             <div className="vertical-stepper fade-in">
               <div className="step-item" style={{ animationDelay: "0.1s" }}>
@@ -103,20 +120,6 @@ function WhyChoose() {
               </div>
             </div>
           )}
-        </div>
-
-        {/* CLEAR PATH (RIGHT CARD) */}
-        <div className={`why-card-wrapper right-card ${activePath === "clear" ? "selected" : ""} ${activePath === "confused" ? "dimmed" : ""}`}>
-          <div
-            className={`why-option ${activePath === "clear" ? "active" : ""}`}
-            onClick={() => setActivePath(activePath === "clear" ? null : "clear")}
-          >
-            <img src={focusedImg} alt="Focused Student" />
-            <div className="overlay">
-              <h3>I Know My Path</h3>
-              <p>Test your skills & discover your level</p>
-            </div>
-          </div>
         </div>
 
       </div>

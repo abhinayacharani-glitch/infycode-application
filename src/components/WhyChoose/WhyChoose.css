@@ -42,14 +42,13 @@
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease, margin 0.6s ease;
   flex-shrink: 0;
   overflow: hidden;
   z-index: 1;
 }
 
-.why-interactive-container.is-active-confused .why-middle-content,
-.why-interactive-container.is-active-clear .why-middle-content {
+.why-middle-content.visible {
   width: 480px;
   opacity: 1;
   visibility: visible;
@@ -61,22 +60,8 @@
 
 .why-card-wrapper {
   flex-shrink: 0;
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 2;
-}
-
-.why-interactive-container.is-active-confused .why-card-wrapper.left-card,
-.why-interactive-container.is-active-clear .why-card-wrapper.right-card {
-  order: 1;
-}
-
-.why-middle-content {
-  order: 2;
-}
-
-.why-interactive-container.is-active-confused .why-card-wrapper.right-card,
-.why-interactive-container.is-active-clear .why-card-wrapper.left-card {
-  order: 3;
 }
 
 .why-interactive-container.is-active-confused .why-card-wrapper.dimmed,
@@ -89,7 +74,7 @@
 .why-interactive-container.is-active-confused .why-card-wrapper.selected,
 .why-interactive-container.is-active-clear .why-card-wrapper.selected {
   transform: scale(1.02);
-  filter: drop-shadow(0 20px 50px rgba(108, 99, 255, 0.3));
+  filter: drop-shadow(0 20px 50px rgba(37, 99, 235, 0.3));
 }
 
 .why-option {
@@ -116,7 +101,7 @@
 }
 
 .why-option.active {
-  outline: 4px solid #6c63ff;
+  outline: 4px solid #2563eb;
 }
 
 /* OVERLAY */
@@ -177,10 +162,10 @@
 
 .step-item:hover {
   transform: translateY(-4px) scale(1.02);
-  background: linear-gradient(135deg, #6c63ff, #8b85ff);
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
   color: white;
   border-color: transparent;
-  box-shadow: 0 15px 35px rgba(108, 99, 255, 0.25);
+  box-shadow: 0 15px 35px rgba(37, 99, 235, 0.25);
 }
 
 .step-item:hover .step-number {
@@ -202,8 +187,8 @@
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: #f4f3ff;
-  color: #6c63ff;
+  background: #eff6ff;
+  color: #2563eb;
   font-size: 22px;
   font-weight: 800;
   display: flex;
@@ -211,7 +196,7 @@
   align-items: center;
   flex-shrink: 0;
   margin-right: 20px;
-  border: 2px solid #e8e7ff;
+  border: 2px solid #dbeafe;
 }
 
 .step-content {
@@ -237,7 +222,7 @@
 .step-connector {
   width: 3px;
   height: 25px;
-  background: linear-gradient(to bottom, #d1cfff, #6c63ff);
+  background: linear-gradient(to bottom, #bfdbfe, #2563eb);
   opacity: 0;
   border-radius: 3px;
   animation: fadeIn 0.6s forwards;
@@ -264,11 +249,7 @@
     gap: 30px;
   }
   
-  .why-middle-content {
-    position: relative;
-    left: auto;
-    right: auto;
-    transform: none;
+  .why-middle-content.visible {
     width: 100%;
     max-width: 400px;
     margin: 20px 0;

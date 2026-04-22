@@ -54,10 +54,10 @@ const AdminLogin = () => {
       const data = await adminLogin(formData.email, formData.password);
       // Store auth data in standardized 'user' object
       localStorage.setItem('user', JSON.stringify({
-        token: data.token,
-        role: data.role,
-        email: data.email,
-        fullName: data.fullName
+        token:    data.token,
+        role:     data.role,
+        email:    data.email,
+        fullName: data.fullName || 'Admin',
       }));
       // Role-based navigation
       if (data.role === 'admin')        navigate("/admin-dashboard");

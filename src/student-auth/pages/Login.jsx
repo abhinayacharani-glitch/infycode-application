@@ -78,8 +78,12 @@ function Login() {
     setIsSignInLoading(true);
     try {
       const data = await studentLogin(signInForm.email.trim(), signInForm.password);
-      localStorage.setItem("user", JSON.stringify({ token: data.token, fullname: data.fullname || data.fullName, email: data.email, role: data.role || "student" }));
-      // Role-based navigation
+      localStorage.setItem("user", JSON.stringify({
+        token:    data.token,
+        fullName: data.fullName || data.fullname,
+        email:    data.email,
+        role:     data.role
+      }));
       if (data.role === 'admin')        navigate("/admin-dashboard");
       else if (data.role === 'trainer') navigate("/trainer-dashboard");
       else                              navigate("/student-dashboard");

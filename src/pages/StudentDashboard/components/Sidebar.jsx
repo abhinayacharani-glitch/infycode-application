@@ -4,17 +4,22 @@ import { Camera, X } from 'lucide-react';
 import "./Sidebar.css";
 import icLogo from '../../../assets/infycode-final-logo4-1.png';
 
-const Sidebar = () => {
+const Sidebar = ({ externalShowLogoutModal, setExternalShowLogoutModal }) => {
   const navigate = useNavigate();
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
-  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [internalShowLogoutModal, setInternalShowLogoutModal] = useState(false);
   const [showLogoLogoutModal, setShowLogoLogoutModal] = useState(false);
+
+  // Sync internal modal state with external (for browser back button)
+  useEffect(() => {
+    if (externalShowLogoutModal) setInternalShowLogoutModal(true);
+  }, [externalShowLogoutModal]);
 
   const getInitialUser = () => {
     const userString = localStorage.getItem('user');
-    const user = userString ? JSON.parse(userString) : { fullname: "Anjali Syamala", role: "student" };
+    const user = userString ? JSON.parse(userString) : { fullName: "Student", role: "student" };
     return {
-      fullname: user.fullname || user.fullName || "Anjali Syamala",
+      fullname: user.fullName || user.fullname || "Student",
       role: user.role || "student"
     };
   };
@@ -27,7 +32,7 @@ const Sidebar = () => {
 
   useEffect(() => {
     setFormData({
-      fullname: user.fullname || user.fullName || "Anjali Syamala",
+      fullname: user.fullname || "Student",
       role: user.role || "student"
     });
   }, [user]);
@@ -103,7 +108,7 @@ const Sidebar = () => {
 
         {/* FOOTER LOGOUT */}
         <div className="student-sd-footer">
-          <button className="student-sd-logout-btn" onClick={() => setShowLogoutModal(true)}>
+          <button className="student-sd-logout-btn" onClick={() => setInternalShowLogoutModal(true)}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
               <polyline points="16 17 21 12 16 7" />
@@ -175,8 +180,8 @@ const Sidebar = () => {
       )}
 
       {/* ── LOGOUT CONFIRMATION MODAL (To Sign In) ── */}
-      {showLogoutModal && (
-        <div className="sd-modal-overlay" onClick={() => setShowLogoutModal(false)}>
+      {internalShowLogoutModal && (
+        <div className="sd-modal-overlay" onClick={() => { setInternalShowLogoutModal(false); setExternalShowLogoutModal?.(false); }}>
           <div className="sd-modal-card" onClick={e => e.stopPropagation()}>
 
             <div className="sd-modal-user-header">
@@ -188,10 +193,10 @@ const Sidebar = () => {
             </div>
 
             <h2 className="sd-modal-title">Log out to Sign in Page?</h2>
-            <p className="sd-modal-subtitle">Are you sure you want to end your current dashboard session?</p>
+            <p className="sd-modal-subtitle">You will be redirected to the sign in page.</p>
 
             <div className="sd-modal-actions">
-              <button className="sd-modal-cancel" onClick={() => setShowLogoutModal(false)}>
+              <button className="sd-modal-cancel" onClick={() => { setInternalShowLogoutModal(false); setExternalShowLogoutModal?.(false); }}>
                 Cancel
               </button>
               <button className="sd-modal-logout" onClick={handleLogout}>
@@ -223,7 +228,7 @@ const Sidebar = () => {
               <button className="sd-logo-modal-cancel" onClick={() => setShowLogoLogoutModal(false)}>
                 Cancel
               </button>
-              <button className="sd-logo-modal-confirm" onClick={() => { localStorage.clear(); navigate('/'); }}>
+              <button className="sd-logo-modal-confirm" onClick={() => { localStorage.clear(); navigate('/student/login'); }}>
                 OK, Logout
               </button>
             </div>
