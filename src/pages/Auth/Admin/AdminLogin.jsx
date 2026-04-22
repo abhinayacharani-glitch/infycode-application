@@ -59,11 +59,10 @@ const AdminLogin = () => {
         email:    data.email,
         fullName: data.fullName || 'Admin',
       }));
-      // Route by role returned from the unified login endpoint
-      const role = data.role;
-      if (role === 'admin')   navigate('/admin-dashboard');
-      else if (role === 'trainer') navigate('/trainer-dashboard');
-      else                         navigate('/student-dashboard');
+      // Role-based navigation
+      if (data.role === 'admin')        navigate("/admin-dashboard");
+      else if (data.role === 'trainer') navigate("/trainer-dashboard");
+      else                              navigate("/student-dashboard");
     } catch (err) {
       setApiError(err.message);
     } finally {

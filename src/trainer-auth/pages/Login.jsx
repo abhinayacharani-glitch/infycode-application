@@ -52,11 +52,10 @@ const Login = () => {
         fullName: data.fullName || data.fullname,
         email:    data.email
       }));
-
       // Role-based navigation
-      if (data.role === 'admin')        navigate('/admin-dashboard');
-      else if (data.role === 'trainer') navigate('/trainer-dashboard');
-      else                              navigate('/student-dashboard');
+      if (data.role === 'admin')        navigate("/admin-dashboard");
+      else if (data.role === 'trainer') navigate("/trainer-dashboard");
+      else                              navigate("/student-dashboard");
     } catch (err) {
       setApiError(err.message);
     } finally {
