@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { getPublishedFAQs, submitFAQ } from "../../services/api";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiSearch, FiChevronDown, FiMail, FiUser, FiMessageSquare } from "react-icons/fi";
+import { FiSearch, FiChevronDown, FiMail, FiUser, FiMessageSquare, FiArrowLeft } from "react-icons/fi";
 import "./FAQPage.css";
 
 const FAQPage = () => {
+  const navigate = useNavigate();
   const [faqs, setFaqs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -62,6 +64,12 @@ const FAQPage = () => {
   return (
     <div className="faq-page">
       <div className="faq-page-container">
+        {/* Back Navigation */}
+        <button onClick={() => navigate(-1)} className="faq-nav-back">
+          <FiArrowLeft size={18} />
+          <span>Go Back</span>
+        </button>
+
         {/* Header Section */}
         <motion.div 
           className="faq-header"

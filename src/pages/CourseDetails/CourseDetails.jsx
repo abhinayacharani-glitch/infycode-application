@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ALL_COURSES } from "../../components/Courses/Courses";
 import { ArrowLeft, Clock, Users, Star, BookOpen, ChevronDown, ChevronUp, CheckCircle, Eye } from "lucide-react";
+import "../../components/Courses/Courses.css";
 import "./CourseDetailsPage.css";
 
 const SYLLABUS_DB = {
@@ -407,24 +408,74 @@ const RelatedCourses = ({ currentCourse, navigate }) => {
                   className="cd-slider-item"
                   style={{ flex: `0 0 ${100 / (window.innerWidth > 1024 ? 3 : window.innerWidth > 768 ? 2 : 1)}%` }}
                 >
-                  <div 
-                    className="working-style-card"
-                    onClick={() => {
-                      navigate(`/course-details/${c.courseId}`);
-                      window.scrollTo(0, 0);
-                    }}
-                  >
-                    <div className="ws-card-left">
-                      <div className="ws-diamond">
-                        <BookOpen size={24} />
-                      </div>
+                  <div className="course-card-modern">
+                    <div 
+                      className="card-img-banner" 
+                      onClick={() => { navigate(`/course-details/${c.courseId}`); window.scrollTo(0, 0); }} 
+                      style={{ cursor: "pointer" }}
+                    >
+                      <img src={c.image} alt={c.title} />
                     </div>
-                    <div className="ws-card-right">
-                      <span className="ws-cat">{c.category}</span>
-                      <h4 className="ws-title">{c.title}</h4>
-                      <div className="ws-meta">
-                        <span><Star size={14} fill="#f59e0b" color="#f59e0b" strokeWidth={0} /> {c.rating}</span>
-                        <span><Clock size={14} /> {c.duration}</span>
+
+                    <div className="card-content-modern">
+                      <h3 
+                        className="card-title-modern" 
+                        onClick={() => { navigate(`/course-details/${c.courseId}`); window.scrollTo(0, 0); }} 
+                        style={{ cursor: "pointer" }}
+                      >
+                        {c.title}
+                      </h3>
+
+                      <div className="card-stats-modern">
+                        <div className="stat students-text">
+                          {c.students} students
+                        </div>
+                        <div className="stat stars-container">
+                          {[...Array(5)].map((_, idx) => (
+                            <Star 
+                              key={idx} 
+                              size={14} 
+                              fill={idx < Math.floor(c.rating) ? "#f59e0b" : "#e2e8f0"} 
+                              color={idx < Math.floor(c.rating) ? "#f59e0b" : "#e2e8f0"} 
+                              strokeWidth={0}
+                            />
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="card-footer-modern">
+                        <div className="footer-actions-left">
+                          <div className="details-action-wrapper">
+                            <button 
+                              className="btn-view-details" 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/course-details/${c.courseId}`);
+                                window.scrollTo(0, 0);
+                              }}
+                              title="View Course Details"
+                            >
+                              <Eye size={20} />
+                            </button>
+                            <span className="action-label">Overview</span>
+                          </div>
+                        </div>
+                        <button 
+                          className="btn-join-now" 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const userStr = localStorage.getItem("loggedUser");
+                            let userObj = null;
+                            try { userObj = userStr ? JSON.parse(userStr) : null; } catch {}
+                            if (userObj && userObj.role === "Student") {
+                              navigate("/student-dashboard/courses");
+                            } else {
+                              navigate("/login", { state: { redirect: "/student-dashboard/courses" } });
+                            }
+                          }}
+                        >
+                          Enroll Now
+                        </button>
                       </div>
                     </div>
                   </div>

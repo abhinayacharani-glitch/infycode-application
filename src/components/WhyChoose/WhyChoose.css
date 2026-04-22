@@ -65,17 +65,27 @@
   z-index: 2;
 }
 
-.why-interactive-container.is-active-confused .why-card-wrapper.left-card,
-.why-interactive-container.is-active-clear .why-card-wrapper.right-card {
+.why-interactive-container.is-active-confused .why-card-wrapper.left-card {
   order: 1;
 }
 
-.why-middle-content {
+.why-interactive-container.is-active-confused .why-middle-content {
   order: 2;
 }
 
-.why-interactive-container.is-active-confused .why-card-wrapper.right-card,
+.why-interactive-container.is-active-confused .why-card-wrapper.right-card {
+  order: 3;
+}
+
 .why-interactive-container.is-active-clear .why-card-wrapper.left-card {
+  order: 1;
+}
+
+.why-interactive-container.is-active-clear .why-card-wrapper.right-card {
+  order: 2;
+}
+
+.why-interactive-container.is-active-clear .why-middle-content {
   order: 3;
 }
 
