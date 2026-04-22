@@ -54,13 +54,19 @@ const LogOutIcon = () => (
   </svg>
 );
 
-const Sidebar = ({ isCollapsed }) => {
+const Sidebar = ({ isCollapsed, externalShowLogoutModal, setExternalShowLogoutModal }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const loggedUser = JSON.parse(localStorage.getItem("user") || "{}");
   const userName = loggedUser.fullName || loggedUser.fullname || loggedUser.username || "Admin";
 
-  const [showLogoutModal, setShowLogoutModal]   = useState(false);
+  const [internalShowLogoutModal, setInternalShowLogoutModal] = useState(false);
+  
+  // Sync internal modal state with external (for browser back button)
+  useEffect(() => {
+    if (externalShowLogoutModal) setInternalShowLogoutModal(true);
+  }, [externalShowLogoutModal]);
+
   const [profileImage, setProfileImage]         = useState(loggedUser.profileImage || "https://i.pravatar.cc/150?img=5");
   const [currentUserName, setCurrentUserName]   = useState(userName);
   const [currentUserRole, setCurrentUserRole]   = useState(loggedUser.role || "TRAINER");
@@ -161,7 +167,7 @@ const Sidebar = ({ isCollapsed }) => {
 
         {/* ── Footer / Logout ── */}
         <div className="adm-sidebar-footer">
-          <button className="adm-logout-btn" onClick={() => setShowLogoutModal(true)}>
+          <button className="adm-logout-btn" onClick={() => setInternalShowLogoutModal(true)}>
             <LogOutIcon />
             {!isCollapsed && <span>Logout</span>}
           </button>
@@ -170,8 +176,8 @@ const Sidebar = ({ isCollapsed }) => {
       </aside>
 
       {/* ── Logout Confirmation Modal ── */}
-      {showLogoutModal && (
-        <div className="adm-logout-overlay" onClick={() => setShowLogoutModal(false)}>
+      {internalShowLogoutModal && (
+        <div className="adm-logout-overlay" onClick={() => { setInternalShowLogoutModal(false); setExternalShowLogoutModal?.(false); }}>
           <div className="adm-logout-modal" onClick={e => e.stopPropagation()}>
             {/* Profile Image */}
             <div className="adm-logout-photo-section">
@@ -184,16 +190,16 @@ const Sidebar = ({ isCollapsed }) => {
 
             {/* Message */}
             <h2 className="adm-logout-title">Are you sure you want to logout?</h2>
-            <p className="adm-logout-subtitle">You will be redirected to the admin login page.</p>
+            <p className="adm-logout-subtitle">You will be redirected to the sign in page.</p>
 
             {/* Actions */}
             <div className="adm-logout-actions">
-              <button className="adm-logout-cancel" onClick={() => setShowLogoutModal(false)}>Cancel</button>
+              <button className="adm-logout-cancel" onClick={() => { setInternalShowLogoutModal(false); setExternalShowLogoutModal?.(false); }}>Cancel</button>
               <button className="adm-logout-confirm" onClick={() => {
-                localStorage.removeItem("loggedUser");
-                localStorage.removeItem("user");
-                localStorage.removeItem("token");
-                navigate("/admin/login");
+                localStorage.clear();
+                setInternalShowLogoutModal(false);
+                setExternalShowLogoutModal?.(false);
+                navigate("/student/login");
               }}>OK</button>
             </div>
           </div>

@@ -15,7 +15,7 @@ const LogoutModal = ({ isOpen, onClose }) => {
     
     // Close modal and navigate to landing page
     onClose();
-    navigate('/');
+    navigate('/student/login');
   };
 
   return (

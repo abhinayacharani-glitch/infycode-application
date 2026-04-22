@@ -35,22 +35,40 @@ const request = async (endpoint, options = {}) => {
 };
 
 // ─────────────────────────────────────────────
+// UNIFIED LOGIN  (admin / trainer / student)
+// ─────────────────────────────────────────────
+
+/**
+ * POST /api/login
+ * Single endpoint that resolves role by email:
+ *   admin@charani.in           → role: "admin"
+ *   *@trainer.in               → role: "trainer"
+ *   anything else              → role: "student"
+ * @returns {{ success, role, token, email, fullName, message }}
+ */
+export const unifiedLogin = (email, password) =>
+  request('/api/login', {
+    method: 'POST',
+    body: JSON.stringify({ email, password }),
+  });
+
+// ─────────────────────────────────────────────
 // ADMIN AUTH
 // ─────────────────────────────────────────────
 
 /**
- * POST /api/admin/login
- * @returns {{ message, token, role, email }}
+ * POST /api/login  (admin credentials)
+ * Alias kept so AdminLogin.jsx import continues to work without changes.
+ * @returns {{ success, role, token, email, fullName }}
  */
 export const adminLogin = (email, password) =>
-  request('/api/admin/login', {
+  request('/api/login', {
     method: 'POST',
     body: JSON.stringify({ email, password }),
   });
 
 /**
- * POST /api/admin/register
- * @returns {{ message }}
+ * Admin register — not used (admin is seeded; kept for API completeness)
  */
 export const adminRegister = (fullName, email, phone, password, confirmPassword) =>
   request('/api/admin/register', {
@@ -88,12 +106,11 @@ export const createBatch = (batchData) => {
 // ─────────────────────────────────────────────
 
 /**
- * POST /api/student/login
- * @param {string} email
- * @param {string} password
+ * POST /api/login  (student credentials)
+ * Alias kept so student Login.jsx import continues to work without changes.
  */
 export const studentLogin = (email, password) =>
-  request('/api/student/login', {
+  request('/api/login', {
     method: 'POST',
     body: JSON.stringify({ email, password }),
   });
@@ -160,23 +177,36 @@ export const studentResetPassword = (token, newPassword, confirmPassword) =>
 // ─────────────────────────────────────────────
 
 /**
- * POST /api/trainer/login
- * @returns {{ message, token, role, fullName, email }}
+ * POST /api/login  (trainer credentials — email must end with @trainer.in)
+ * Alias kept so trainer Login.jsx import continues to work without changes.
+ * @returns {{ success, role, token, fullName, email }}
  */
 export const trainerLogin = (email, password) =>
-  request('/api/trainer/login', {
+  request('/api/login', {
     method: 'POST',
     body: JSON.stringify({ email, password }),
   });
 
 /**
  * POST /api/trainer/register
- * @returns {{ message }}
+ * Email MUST end with @trainer.in.
+ * DEV MODE: registration completes immediately — no real OTP validation.
+ * @returns {{ success, message, email, trainerId }}
  */
 export const trainerRegister = (fullName, email, phone, password, confirmPassword) =>
   request('/api/trainer/register', {
     method: 'POST',
     body: JSON.stringify({ fullName, email, phone, password, confirmPassword }),
+  });
+
+/**
+ * POST /api/trainer/verify-otp
+ * DEV MODE: always returns success regardless of otp value.
+ */
+export const trainerVerifyOtp = (email, otp) =>
+  request('/api/trainer/verify-otp', {
+    method: 'POST',
+    body: JSON.stringify({ email, otp }),
   });
 
 // ─────────────────────────────────────────────

@@ -1,5 +1,6 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+import { useNavigationLock } from "../../hooks/useNavigationLock";
 import Sidebar from "./components/Sidebar";
 import Topbar from "./components/Topbar";
 import "./AdminDashboard.css"; // ✅ Dedicated scoped CSS — no shared conflicts
@@ -21,6 +22,13 @@ import PreferenceSettings from "./pages/PreferenceSettings";
 import AdminProfile from "./pages/AdminProfile";
 
 const AdminDashboard = () => {
+  const [showLogoutModal, setShowLogoutModal] = React.useState(false);
+
+  // Hook to catch browser "Back" button
+  useNavigationLock(true, () => {
+    setShowLogoutModal(true);
+  });
+
   return (
     <div className="admin-dashboard-layout">
       {/* ── Topbar (Now Spanning Full Width) ── */}
@@ -29,7 +37,11 @@ const AdminDashboard = () => {
       <div className="admin-bottom-container">
         {/* ── Sticky Sidebar Container ── */}
         <div className="admin-sidebar-container">
-          <Sidebar isCollapsed={false} />
+          <Sidebar 
+            isCollapsed={false} 
+            externalShowLogoutModal={showLogoutModal}
+            setExternalShowLogoutModal={setShowLogoutModal}
+          />
         </div>
 
         {/* ── Main Content ── */}

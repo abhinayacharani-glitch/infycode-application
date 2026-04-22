@@ -151,14 +151,17 @@ function Login() {
       const data = await studentLogin(signInForm.email.trim(), signInForm.password);
 
       localStorage.setItem("user", JSON.stringify({
-        token: data.token,
-        fullname: data.fullname || data.fullName,
-        email: data.email,
-        role: data.role || "student"
+        token:    data.token,
+        fullName: data.fullName || data.fullname,
+        email:    data.email,
+        role:     data.role
       }));
-      navigate("/student-dashboard");
-    } catch (err) {
 
+      // Role-based navigation
+      if (data.role === 'admin')        navigate("/admin-dashboard");
+      else if (data.role === 'trainer') navigate("/trainer-dashboard");
+      else                              navigate("/student-dashboard");
+    } catch (err) {
       setSignInApiError(err.message);
     } finally {
       setIsSignInLoading(false);
@@ -327,7 +330,6 @@ function Login() {
                     fontFamily: 'Urbanist, sans-serif'
                   }}
                   className="sa-otp-input-popup"
-                  required
                 />
 
                 <div style={{ marginBottom: '24px' }}>

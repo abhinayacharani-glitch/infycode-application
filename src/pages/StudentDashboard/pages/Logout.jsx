@@ -12,7 +12,7 @@ const Logout = () => {
     localStorage.removeItem("token");
 
     // ✅ replace history instead of normal redirect
-    navigate("/", { replace: true });
+    navigate("/student/login", { replace: true });
 
   }, [navigate]);
 
@@ -27,7 +27,7 @@ const Logout = () => {
 
         <button 
           className="relogin-btn" 
-          onClick={() => navigate("/", { replace: true })} // ✅ updated
+          onClick={() => navigate("/student/login", { replace: true })} // ✅ updated
         >
           Return to Login
         </button>
