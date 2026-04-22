@@ -127,7 +127,7 @@ const Dashboard = () => {
       <div className="dashboard-banner">
         <div className="banner-content">
           <div className="banner-left">
-            <h1>Welcome back, {userName}!</h1>
+            <h1>Welcome B, {userName}!</h1>
             <p>Here’s what’s happening with your batches today.</p>
           </div>
           <div className="banner-right">
