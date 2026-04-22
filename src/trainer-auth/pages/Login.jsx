@@ -47,12 +47,16 @@ const Login = () => {
     try {
       const data = await trainerLogin(formData.email, formData.password);
       localStorage.setItem('user', JSON.stringify({
-        token: data.token,
-        role: data.role,
-        fullName: data.fullName,
-        email: data.email
+        token:    data.token,
+        role:     data.role,
+        fullName: data.fullName || data.fullname,
+        email:    data.email
       }));
-      navigate('/trainer-dashboard');
+
+      // Role-based navigation
+      if (data.role === 'admin')        navigate('/admin-dashboard');
+      else if (data.role === 'trainer') navigate('/trainer-dashboard');
+      else                              navigate('/student-dashboard');
     } catch (err) {
       setApiError(err.message);
     } finally {

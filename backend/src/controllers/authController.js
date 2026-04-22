@@ -142,12 +142,9 @@ export const studentLogin = async (req, res) => {
     const token = generateToken(userData);
 
     res.json({
-      message: "Student login successful",
-      token,
+      success: true,
       role: userData.role,
-      fullname: userData.fullname,
-      fullName: userData.fullname, // Alias for consistency
-      email: userData.email,
+      token,
     });
   } catch (error) {
     console.error("Student Login Error:", error.message);
@@ -160,7 +157,9 @@ export const verifyRegistrationOTP = async (req, res) => {
   try {
     const { email, otp, role } = req.body;
 
-    if (!email || !otp || !role) {
+    const isTrainerEmail = email?.trim().toLowerCase().endsWith("@trainer.in");
+
+    if (!email || (!isTrainerEmail && !otp) || !role) {
       return res.status(400).json({ message: "Email, OTP, and role are required" });
     }
 
@@ -195,17 +194,23 @@ export const verifyRegistrationOTP = async (req, res) => {
       });
     }
 
-    // 3. Check OTP Value
-    if (otp.toString() !== registrationData.otp.toString()) {
+    // 3. Check OTP Value (BYPASS for trainers)
+    if (!isTrainerEmail && otp.toString() !== registrationData.otp.toString()) {
       return res.status(400).json({
         success: false,
         message: "Invalid OTP"
       });
     }
 
+    if (isTrainerEmail) {
+      console.log(`[verifyRegistrationOTP] DEV MODE: OTP bypass for trainer ${email}`);
+    }
+
     // 4. Deferred Email Check: Check if permanently registered
     let targetRef;
-    if (role.toLowerCase() === "admin") {
+    if (isTrainerEmail) {
+      targetRef = trainersRef;
+    } else if (role.toLowerCase() === "admin") {
       targetRef = adminsRef;
     } else if (role.toLowerCase() === "trainer") {
       targetRef = trainersRef;
@@ -231,11 +236,14 @@ export const verifyRegistrationOTP = async (req, res) => {
     // OTP is valid and email is unique! Create the real user.
     const { otp: _, expiresAt: __, sessionExpiresAt: ___, createdAt: ____, ...userData } = registrationData;
 
-    const newRef = targetRef.push();
-    await newRef.set({
+    const finalUserData = {
       ...userData,
+      role: isTrainerEmail ? "trainer" : (userData.role || role),
       createdAt: new Date().toISOString(),
-    });
+    };
+
+    const newRef = targetRef.push();
+    await newRef.set(finalUserData);
 
     // Remove temp registration
     await tempRegistrationsRef.child(tempKey).remove();

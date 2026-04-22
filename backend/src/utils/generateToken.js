@@ -1,10 +1,18 @@
+/**
+ * generateToken.js
+ *
+ * Creates a signed JWT containing the user's role, username, and email.
+ * Token expires in 1 day.
+ */
+
 import jwt from "jsonwebtoken";
 
 const generateToken = (user) => {
   return jwt.sign(
     {
+      email:    user.email,
       username: user.username || user.fullname || user.fullName,
-      role: user.role
+      role:     user.role,
     },
     process.env.JWT_SECRET,
     { expiresIn: "1d" }

@@ -14,9 +14,11 @@ import {
   isStudent,
 } from "../middleware/authMiddleware.js";
 
+import { unifiedLogin } from "../controllers/loginController.js";
+
 // STUDENT
 router.post("/student/register", studentRegister);
-router.post("/student/login", studentLogin);
+router.post("/student/login", unifiedLogin);
 
 // REGISTRATION OTP (Admin/Trainer/Student)
 router.post("/auth/verify-registration-otp", verifyRegistrationOTP);

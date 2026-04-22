@@ -150,10 +150,10 @@ const Signup = () => {
 
       if (response && response.error === 'EMAIL_ALREADY_EXISTS') {
         setEmailError("Email already exists. Try with another mail.");
-        return; // stop further execution
+        return;
       }
 
-      // Only if success
+      // ── NEW BACKEND: Show OTP popup (Bypassable) ──
       setShowOTP(true);
       setOtpTimer(60);
       setOtpExpired(false);
@@ -243,7 +243,6 @@ const Signup = () => {
                   color: '#1e293b', fontWeight: '600', transition: 'border-color 0.2s'
                 }}
                 className="otp-input-focus"
-                required
               />
 
               <div style={{ marginBottom: '24px' }}>

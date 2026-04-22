@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import loginRoutes from "./routes/loginRoutes.js";       // Unified login (admin/trainer/student)
 import authRoutes from "./routes/authRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import trainerRoutes from "./routes/trainerRoutes.js";
@@ -45,9 +46,10 @@ app.get("/", (req, res) => {
 });
 
 // API Routes
-app.use("/api", authRoutes);              // /api/student/login, /api/student/register
-app.use("/api/admin", adminRoutes);       // /api/admin/login, /api/admin/register
-app.use("/api/trainer", trainerRoutes);   // /api/trainer/login, /api/trainer/register
+app.use("/api", loginRoutes);             // POST /api/login  ← unified for admin / trainer / student
+app.use("/api", authRoutes);              // /api/student/register, /api/student/login, OTP routes
+app.use("/api/admin", adminRoutes);       // /api/admin/dashboard, /api/admin/stats, /api/admin/batches
+app.use("/api/trainer", trainerRoutes);   // /api/trainer/register, /api/trainer/verify-otp, /api/trainer/dashboard
 app.use("/api/password", passwordRoutes); // /api/password/forgot-password, /api/password/reset-password
 app.use("/api/courses", courseRoutes);    // /api/courses CRUD
 app.use("/api/faqs", faqRoutes);          // /api/faqs FAQ operations
