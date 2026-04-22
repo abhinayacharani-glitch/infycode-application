@@ -175,7 +175,7 @@
 
 .course-card-modern:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.08); /* slight shadow popup */
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.08);
 }
 
 .card-img-banner {
@@ -193,7 +193,7 @@
 }
 
 .course-card-modern:hover .card-img-banner img {
-    transform: scale(1.05); /* very slight zoom */
+    transform: scale(1.05);
 }
 
 .card-content-modern {
@@ -216,7 +216,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: auto; /* Push the footer down */
+    margin-bottom: auto;
 }
 
 .stat.students-text {
@@ -298,8 +298,6 @@
 .action-label {
     font-size: 0.65rem;
     font-weight: 700;
-    color: #64748b;
-    text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 

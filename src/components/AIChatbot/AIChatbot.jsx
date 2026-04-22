@@ -98,26 +98,47 @@ const AIChatbot = () => {
   };
 
   const RobotIcon = () => (
-    <svg viewBox="0 0 100 100" className="robot-svg" xmlns="http://www.w3.org/2000/svg">
-      {/* Background Dark Blue Circle */}
-      <circle cx="50" cy="50" r="48" fill="#0c112b" />
+    <svg viewBox="0 0 120 140" className="robot-svg" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="botBackground" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style={{stopColor: '#001a4d', stopOpacity: 1}} />
+          <stop offset="100%" style={{stopColor: '#000f2e', stopOpacity: 1}} />
+        </linearGradient>
+      </defs>
       
-      {/* Robot Face/Body */}
-      <path d="M50 90 L50 78 C25 78 20 65 20 48 Q20 30 50 30 Q80 30 80 48 Q80 65 75 78 L75 90 Z" fill="#f8fafc" />
-      <rect x="25" y="44" width="50" height="26" rx="13" fill="#040921" />
+      {/* Background circle */}
+      <circle cx="60" cy="70" r="58" fill="url(#botBackground)" />
       
-      {/* Eyes (Cyan) */}
-      <circle cx="38" cy="57" r="5" fill="#22d3ee" className="robot-eye" />
-      <circle cx="62" cy="57" r="5" fill="#22d3ee" className="robot-eye" />
+      {/* Antenna - pole */}
+      <rect x="57" y="8" width="6" height="28" fill="#ffffff" rx="3" />
       
-      {/* Antenna */}
-      <line x1="50" y1="30" x2="50" y2="20" stroke="#f8fafc" strokeWidth="4" strokeLinecap="round" />
-      <circle cx="50" cy="18" r="4" fill="#f8fafc" />
-
-      {/* HI! Bubble (Cyan) */}
-      <rect x="58" y="5" width="38" height="28" rx="14" fill="#22d3ee" className="hi-bubble-rect" />
-      <path d="M 68 32 L 64 42 L 78 32 Z" fill="#22d3ee" className="hi-bubble-tail" />
-      <text x="77" y="24" fontSize="13" fontWeight="900" textAnchor="middle" fill="#0c112b" fontFamily="'Inter', 'Arial', sans-serif">HI!</text>
+      {/* Antenna - top circle */}
+      <circle cx="60" cy="6" r="6" fill="#ffffff" />
+      
+      {/* Robot head - outer rounded rectangle (white) */}
+      <rect x="28" y="35" width="64" height="52" rx="18" fill="#ffffff" />
+      
+      {/* Robot face area - dark navy for face section */}
+      <rect x="32" y="48" width="56" height="32" rx="14" fill="#001a4d" />
+      
+      {/* Left eye - cyan */}
+      <circle cx="44" cy="62" r="6" fill="#00d4ff" />
+      
+      {/* Right eye - cyan */}
+      <circle cx="76" cy="62" r="6" fill="#00d4ff" />
+      
+      {/* Body/neck area - light blue-gray */}
+      <rect x="38" y="85" width="44" height="20" rx="10" fill="#d0e8f2" />
+      
+      {/* Chat bubble - cyan with HI! text */}
+      <g transform="translate(88, 25)">
+        {/* Bubble body */}
+        <ellipse cx="0" cy="0" rx="22" ry="18" fill="#00d4ff" />
+        {/* Bubble tail */}
+        <polygon points="0,18 -8,28 -2,20" fill="#00d4ff" />
+        {/* HI! text */}
+        <text x="0" y="6" fontSize="16" fontWeight="900" textAnchor="middle" fill="#001a4d" fontFamily="'Arial', sans-serif">HI!</text>
+      </g>
     </svg>
   );
 

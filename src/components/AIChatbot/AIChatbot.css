@@ -62,32 +62,24 @@
 .robot-svg {
   width: 46px;
   height: 46px;
-  animation: gentleFloat 4s ease-in-out infinite;
+  animation: aiPulse 3s ease-in-out infinite;
 }
 
-.hi-bubble-rect, .hi-bubble-tail {
-  animation: bounceHi 3s ease-in-out infinite;
-  transform-origin: center;
-}
-
-.robot-eye {
-  animation: blink 4s infinite;
-}
-
-@keyframes bounceHi {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-2px); }
+@keyframes aiPulse {
+  0%, 100% { 
+    opacity: 0.9;
+    filter: drop-shadow(0 0 0px rgba(14, 165, 233, 0));
+  }
+  50% { 
+    opacity: 1;
+    filter: drop-shadow(0 0 8px rgba(14, 165, 233, 0.4));
+  }
 }
 
 @keyframes gentleFloat {
   0% { transform: translateY(0); }
-  50% { transform: translateY(-1.5px); }
+  50% { transform: translateY(-2px); }
   100% { transform: translateY(0); }
-}
-
-@keyframes blink {
-  0%, 96%, 98% { transform: scaleY(1); opacity: 1; }
-  97% { transform: scaleY(0.1); opacity: 0.5; }
 }
 
 @keyframes flashAlpha {
