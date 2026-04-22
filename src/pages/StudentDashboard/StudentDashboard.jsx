@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
+import { useNavigationLock } from "../../hooks/useNavigationLock";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 import Counselling from "./pages/Counselling";
@@ -19,6 +20,12 @@ import "./StudentDashboard.css"; // We'll create this to store the layout styles
 function StudentDashboard() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  // Hook to catch browser "Back" button
+  useNavigationLock(true, () => {
+    setShowLogoutModal(true);
+  });
 
   const isCourseExplore = location.pathname.includes('/course-explore');
 
@@ -30,7 +37,12 @@ function StudentDashboard() {
     <div className={`student-dashboard-layout ${isCourseExplore ? 'full-screen' : ''}`}>
       
       {/* Sidebar - Positioned naturally in the flex flow */}
-      {!isCourseExplore && <Sidebar />}
+      {!isCourseExplore && (
+        <Sidebar 
+          externalShowLogoutModal={showLogoutModal} 
+          setExternalShowLogoutModal={setShowLogoutModal} 
+        />
+      )}
 
       {/* Main Content Area */}
       <div className="main-content-wrapper">

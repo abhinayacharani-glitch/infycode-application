@@ -106,7 +106,7 @@ const Topbar = () => {
     localStorage.removeItem("loggedUser");
     localStorage.removeItem("trainerProfileImage");
     setShowLogoutModal(false);
-    navigate('/'); // Redirect to landing page
+    navigate('/student/login'); // Redirect to login page
   };
 
   const markAllRead = () => {

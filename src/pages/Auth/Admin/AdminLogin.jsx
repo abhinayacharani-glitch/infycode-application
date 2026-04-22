@@ -54,12 +54,16 @@ const AdminLogin = () => {
       const data = await adminLogin(formData.email, formData.password);
       // Store auth data in standardized 'user' object
       localStorage.setItem('user', JSON.stringify({
-        token: data.token,
-        role: data.role,
-        email: data.email,
-        fullName: data.fullName
+        token:    data.token,
+        role:     data.role,
+        email:    data.email,
+        fullName: data.fullName || 'Admin',
       }));
-      navigate('/admin-dashboard');
+      // Route by role returned from the unified login endpoint
+      const role = data.role;
+      if (role === 'admin')   navigate('/admin-dashboard');
+      else if (role === 'trainer') navigate('/trainer-dashboard');
+      else                         navigate('/student-dashboard');
     } catch (err) {
       setApiError(err.message);
     } finally {

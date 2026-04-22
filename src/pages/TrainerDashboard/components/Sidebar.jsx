@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { useTrainer } from '../../../context/TrainerContext';
 import './Sidebar.css';
@@ -80,20 +80,23 @@ const LiveIcon = () => (
   </svg>
 );
 
-const Sidebar = ({ isOpen, onClose }) => {
+const Sidebar = ({ isOpen, onClose, externalShowLogoutModal, setExternalShowLogoutModal }) => {
   const navigate = useNavigate();
   const { trainerData, profileImage } = useTrainer();
-  const userName = trainerData.fullname || trainerData.name || "Trainer";
+  const userName = trainerData.fullName || trainerData.fullname || trainerData.name || "Trainer";
   const userInitial = userName.charAt(0).toUpperCase();
-  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [internalShowLogoutModal, setInternalShowLogoutModal] = useState(false);
+
+  // Sync internal modal state with external (for browser back button)
+  useEffect(() => {
+    if (externalShowLogoutModal) setInternalShowLogoutModal(true);
+  }, [externalShowLogoutModal]);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    localStorage.removeItem("loggedUser");
-    localStorage.removeItem("trainerProfileImage");
-    setShowLogoutModal(false);
-    navigate('/trainer/login');
+    localStorage.clear();
+    setInternalShowLogoutModal(false);
+    setExternalShowLogoutModal?.(false);
+    navigate('/student/login');
   };
 
   return (
@@ -193,7 +196,7 @@ const Sidebar = ({ isOpen, onClose }) => {
 
         {/* LOGOUT */}
         <div className="sd-footer">
-          <div className="sd-logout-btn" onClick={() => { onClose(); setShowLogoutModal(true); }}>
+          <div className="sd-logout-btn" onClick={() => { onClose(); setInternalShowLogoutModal(true); }}>
             <span className="sd-icon"><LogoutIcon /></span>
             <span className="sd-text">Logout</span>
           </div>
@@ -201,8 +204,8 @@ const Sidebar = ({ isOpen, onClose }) => {
       </aside>
 
       {/* CONFIRMATION MODAL SC-UI */}
-      {showLogoutModal && (
-        <div className="logout-modal-overlay" onClick={() => setShowLogoutModal(false)}>
+      {internalShowLogoutModal && (
+        <div className="logout-modal-overlay" onClick={() => { setInternalShowLogoutModal(false); setExternalShowLogoutModal?.(false); }}>
           <div className="logout-modal-card" onClick={(e) => e.stopPropagation()}>
             <div className="logout-modal-profile-section">
               <div className="logout-modal-avatar">
@@ -217,11 +220,11 @@ const Sidebar = ({ isOpen, onClose }) => {
 
             <div className="logout-modal-message-section">
               <h2>Are you sure you want to logout?</h2>
-              <p>You will be redirected to the trainer login page.</p>
+              <p>You will be redirected to the sign in page.</p>
             </div>
 
             <div className="logout-modal-button-group">
-              <button className="logout-modal-cancel-btn" onClick={() => setShowLogoutModal(false)}>
+              <button className="logout-modal-cancel-btn" onClick={() => { setInternalShowLogoutModal(false); setExternalShowLogoutModal?.(false); }}>
                 Cancel
               </button>
               <button className="logout-modal-ok-btn" onClick={handleLogout}>
