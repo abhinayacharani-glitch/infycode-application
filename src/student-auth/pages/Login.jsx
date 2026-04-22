@@ -78,23 +78,17 @@ function Login() {
     setIsSignInLoading(true);
     try {
       const data = await studentLogin(signInForm.email.trim(), signInForm.password);
-
       localStorage.setItem("user", JSON.stringify({
         token:    data.token,
         fullName: data.fullName || data.fullname,
         email:    data.email,
         role:     data.role
       }));
-
-      // Role-based navigation
       if (data.role === 'admin')        navigate("/admin-dashboard");
       else if (data.role === 'trainer') navigate("/trainer-dashboard");
       else                              navigate("/student-dashboard");
-    } catch (err) {
-      setSignInApiError(err.message);
-    } finally {
-      setIsSignInLoading(false);
-    }
+    } catch (err) { setSignInApiError(err.message); }
+    finally { setIsSignInLoading(false); }
   };
 
   const handleSignUpSubmit = async (e) => {
@@ -221,34 +215,16 @@ function Login() {
                   <h1>Welcome Back</h1>
                   <p>Sign in to continue your journey</p>
                 </div>
-              )}
-
-              <form onSubmit={handleVerifyOTP}>
-                <input
-                  type="text"
-                  maxLength={6}
-                  placeholder="0 0 0 0 0 0"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                  style={{
-                    width: '100%', padding: '14px', borderRadius: '10px',
-                    border: '2px solid #e2e8f0', fontSize: '22px', textAlign: 'center',
-                    letterSpacing: '8px', marginBottom: '20px', outline: 'none',
-                    color: '#1e293b', fontWeight: '600', transition: 'border-color 0.2s',
-                    fontFamily: 'Urbanist, sans-serif'
-                  }}
-                  className="sa-otp-input-popup"
-                />
-
-                <div style={{ marginBottom: '24px' }}>
-                  {otpExpired ? (
-                    <div style={{
-                      display: 'inline-flex', alignItems: 'center', gap: '6px',
-                      padding: '6px 12px', background: '#fff1f2', color: '#e11d48',
-                      borderRadius: '20px', fontSize: '13px', fontWeight: '600',
-                      fontFamily: 'Urbanist, sans-serif'
-                    }}>
-                      <span>OTP expired</span>
+                {successMessage && <div className="lp-alert lp-alert-success"><CheckCircle size={15} />{successMessage}</div>}
+                {signInApiError && <div className="lp-alert lp-alert-error">⚠ {signInApiError}</div>}
+                <form onSubmit={handleSignInSubmit} noValidate className="lp-form">
+                  <div className="lp-field">
+                    <label>Email Address</label>
+                    <div className="lp-input-wrap">
+                      <Mail size={15} className="lp-icon" />
+                      <input type="email" name="email" placeholder="you@example.com"
+                        value={signInForm.email} onChange={handleSignInChange}
+                        className={`lp-input${signInErrors.email ? " err" : ""}`} autoComplete="email" />
                     </div>
                     {signInErrors.email && <span className="lp-err">{signInErrors.email}</span>}
                   </div>
