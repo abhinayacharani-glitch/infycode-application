@@ -6,8 +6,45 @@
 /* Base Page Wrapper */
 .internal-page {
   width: 100%;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   background: var(--bg, #f4f6f9);
+  position: relative;
+}
+
+/* Back Button */
+.internal-back-btn {
+  position: absolute;
+  top: 100px;
+  left: 5%;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50px;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.internal-back-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateX(-5px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.internal-back-btn svg {
+  transition: transform 0.3s ease;
+}
+
+.internal-back-btn:hover svg {
+  transform: translateX(-3px);
 }
 
 /* Hero Section */
@@ -197,9 +234,9 @@
   filter: grayscale(0%);
 }
 
-/* Dark Floating Content Card (Uniform Height) */
+/* White Floating Content Card (Uniform Height) */
 .expert-content {
-  background: #0f172a;
+  background: #ffffff;
   border-radius: 24px;
   padding: 85px 25px 30px;
   margin-top: -65px;
@@ -207,23 +244,23 @@
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
   text-align: center;
   z-index: 1;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.05);
   transition: all 0.4s ease;
 }
 
 .trainer-expert-card:hover .expert-content {
-  box-shadow: 0 25px 55px rgba(0, 0, 0, 0.4);
-  border-color: rgba(37, 99, 235, 0.25);
-  background: #111827;
+  box-shadow: 0 20px 45px rgba(37, 99, 235, 0.1);
+  border-color: rgba(37, 99, 235, 0.2);
+  background: #ffffff;
 }
 
 .expert-name {
   font-size: 1.3rem;
   font-weight: 800;
-  color:white;
+  color: #1e293b;
   margin-bottom: 6px;
   letter-spacing: -0.3px;
 }
@@ -259,7 +296,7 @@
 .expert-bio {
   font-size: 0.9rem;
   line-height: 1.55;
-  color: white;
+  color: #64748b;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   line-clamp: 3;
@@ -306,7 +343,7 @@
   outline: none;
   font-size: 1rem;
   width: 100%;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   background: #f8fafc;
 }
 
@@ -315,8 +352,26 @@
 }
 
 .trainer-submit-btn {
-  background: var(--blue-600);
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
   color: white;
   margin: 20px auto 0;
   display: block;
+  padding: 18px 50px;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+}
+
+.trainer-submit-btn:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+}
+
+.trainer-submit-btn:active {
+  transform: translateY(0) scale(0.98);
 }

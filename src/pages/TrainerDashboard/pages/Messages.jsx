@@ -125,8 +125,8 @@ const Messages = () => {
               </div>
             </div>
             <div style={{ display: 'flex', gap: '8px' }}>
-              <button style={{ padding: '6px 12px', borderRadius: '8px', border: '1.5px solid var(--border)', background: 'transparent', color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', cursor: 'pointer', fontFamily: '"Urbanist", sans-serif' }}>📞 Call</button>
-              <button style={{ padding: '6px 12px', borderRadius: '8px', border: '1.5px solid var(--blue-200)', background: 'var(--blue-50)', color: 'var(--blue-600)', fontSize: '12px', fontWeight: '600', cursor: 'pointer', fontFamily: '"Urbanist", sans-serif' }}>📁 File</button>
+              <button style={{ padding: '6px 12px', borderRadius: '8px', border: '1.5px solid var(--border)', background: 'transparent', color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', cursor: 'pointer', fontFamily: '"Open Sans", sans-serif' }}>📞 Call</button>
+              <button style={{ padding: '6px 12px', borderRadius: '8px', border: '1.5px solid var(--blue-200)', background: 'var(--blue-50)', color: 'var(--blue-600)', fontSize: '12px', fontWeight: '600', cursor: 'pointer', fontFamily: '"Open Sans", sans-serif' }}>📁 File</button>
             </div>
           </div>
           <div className="card-body" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px', overflowY: 'auto' }}>
@@ -145,7 +145,7 @@ const Messages = () => {
                 placeholder="Type a message..."
                 value={message}
                 onChange={e => setMessage(e.target.value)}
-                style={{ flex: 1, padding: '10px 14px', border: '1.5px solid var(--border)', borderRadius: '10px', fontFamily: '"Urbanist", sans-serif', fontSize: '13px', color: 'var(--text-dark)', outline: 'none', background: 'var(--white)' }}
+                style={{ flex: 1, padding: '10px 14px', border: '1.5px solid var(--border)', borderRadius: '10px', fontFamily: '"Open Sans", sans-serif', fontSize: '13px', color: 'var(--text-dark)', outline: 'none', background: 'var(--white)' }}
               />
               <button style={{ padding: '10px 16px', background: 'linear-gradient(135deg,var(--blue-500),var(--blue-600))', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '16px', cursor: 'pointer' }}>➤</button>
             </div>
@@ -187,7 +187,7 @@ const Messages = () => {
                 '👍 Got it, will get back to you',
               ].map((t, i) => (
                 <button key={i} onClick={() => setMessage(t)}
-                  style={{ display: 'block', width: '100%', textAlign: 'left', padding: '9px 12px', marginBottom: i < 3 ? '8px' : '0', border: '1.5px solid var(--border)', borderRadius: '8px', background: 'transparent', color: 'var(--text-mid)', fontSize: '12px', cursor: 'pointer', fontFamily: '"Urbanist", sans-serif', transition: 'all .2s' }}
+                  style={{ display: 'block', width: '100%', textAlign: 'left', padding: '9px 12px', marginBottom: i < 3 ? '8px' : '0', border: '1.5px solid var(--border)', borderRadius: '8px', background: 'transparent', color: 'var(--text-mid)', fontSize: '12px', cursor: 'pointer', fontFamily: '"Open Sans", sans-serif', transition: 'all .2s' }}
                   onMouseEnter={e => { e.currentTarget.style.background = 'var(--blue-50)'; e.currentTarget.style.borderColor = 'var(--blue-200)'; e.currentTarget.style.color = 'var(--blue-600)'; }}
                   onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-mid)'; }}>
                   {t}

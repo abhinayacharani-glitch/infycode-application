@@ -374,3 +374,54 @@ export const getTrainerDashboard = () => {
     headers: { Authorization: `Bearer ${loggedUser.token || ''}` },
   });
 };
+
+// ─────────────────────────────────────────────
+// FAQS
+// ─────────────────────────────────────────────
+
+/**
+ * GET /api/faqs
+ * Retrieves all published FAQs.
+ */
+export const getPublishedFAQs = () =>
+  request('/api/faqs');
+
+/**
+ * POST /api/faqs
+ * Submits a new user question.
+ */
+export const submitFAQ = (faqData) =>
+  request('/api/faqs', {
+    method: 'POST',
+    body: JSON.stringify(faqData),
+  });
+
+/**
+ * GET /api/faqs/pending (Admin)
+ * Retrieves all pending FAQs for approval.
+ */
+export const getPendingFAQs = () =>
+  request('/api/faqs/pending', {
+    headers: getAuthHeader(),
+  });
+
+/**
+ * PUT /api/faqs/:id (Admin)
+ * Approves/Updates an FAQ.
+ */
+export const updateFAQStatus = (id, updateData) =>
+  request(`/api/faqs/${id}`, {
+    method: 'PUT',
+    headers: getAuthHeader(),
+    body: JSON.stringify(updateData),
+  });
+
+/**
+ * DELETE /api/faqs/:id (Admin)
+ * Deletes an FAQ.
+ */
+export const deleteFAQ = (id) =>
+  request(`/api/faqs/${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeader(),
+  });

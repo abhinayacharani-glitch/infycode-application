@@ -1,79 +1,144 @@
-import React, { useEffect } from "react";
-import AOS from "aos";
-import "aos/dist/aos.css";
-import { FiUsers, FiPlayCircle, FiCheckCircle, FiBriefcase } from "react-icons/fi";
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { FiUsers, FiPlayCircle, FiCheckCircle, FiBriefcase, FiArrowRight } from "react-icons/fi";
 import "./Features.css";
+import skillImg from "../../assets/skill_evaluation.png";
+import practicalImg from "../../assets/practical_learning.png";
+import careerImg from "../../assets/career_preparation.png";
 
-// ✅ Rename array
 const featuresData = [
   {
     id: "01",
     title: "Mentorship & Guidance",
-    desc: "Learn from industry experts and receive continuous support throughout your journey.",
-    icon: <FiUsers />
+    hook: "Expert Support",
+    icon: <FiUsers />,
+    path: "/features/mentorship",
+    color: "#3b82f6",
+    image: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&q=80&w=800",
+    bgMode: "cover"
   },
   {
     id: "02",
     title: "Practical Learning",
-    desc: "Access interactive video lessons and work on real-world projects to build skills.",
-    icon: <FiPlayCircle />
+    hook: "Real-World Projects",
+    icon: <FiPlayCircle />,
+    path: "/features/practical-learning",
+    color: "#10b981",
+    image: practicalImg,
+    bgMode: "cover"
   },
   {
     id: "03",
     title: "Skill Evaluation",
-    desc: "Take assessments to understand your level and access affordable programs tailored to you.",
-    icon: <FiCheckCircle />
+    hook: "Track Progress",
+    icon: <FiCheckCircle />,
+    path: "/features/skill-evaluation",
+    color: "#8b5cf6",
+    image: skillImg,
+    bgMode: "cover",
+    bgColor: "#faf5ff"
   },
   {
     id: "04",
     title: "Career Preparation",
-    desc: "Prepare for interviews with expert trainers and structured guidance to achieve your goals.",
-    icon: <FiBriefcase />
+    hook: "Job Readiness",
+    icon: <FiBriefcase />,
+    path: "/features/career-preparation",
+    color: "#f97316",
+    image: careerImg,
+    bgMode: "cover",
+    bgColor: "#eff6ff"
   }
 ];
 
 export default function Features() {
-
-  // ✅ AOS INIT
-  useEffect(() => {
-    AOS.init({
-      duration: 1000,
-      once: true,
-      easing: "ease-in-out",
-    });
-  }, []);
+  const navigate = useNavigate();
 
   return (
-    <section className="features">
-
-      <p className="subtitle" data-aos="fade-up">
-        InfyCode Features
-      </p>
-
-      <h2 className="title" data-aos="fade-up" data-aos-delay="100">
-        Academic to Professional Journey
-      </h2>
-
-      <div className="features-grid">
-        {featuresData.map((item, index) => (
-          <div
-            className="feature-card"
-            key={item.id}
-            data-aos="zoom-in"
-            data-aos-delay={index * 150}
+    <section className="features-container">
+      <div className="container-custom">
+        <div className="features-intro">
+          <motion.span 
+            className="features-tag"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
           >
-            <div className="badge">{item.id}</div>
+            InfyCode Features
+          </motion.span>
+          <motion.h2 
+            className="features-main-title"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+          >
+            Academic to Professional Journey
+          </motion.h2>
+          <motion.div 
+            className="title-bar"
+            initial={{ width: 0 }}
+            whileInView={{ width: 80 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+          />
+        </div>
 
-            <div className="icon-circle">
-              {item.icon}
-            </div>
+        <div className="features-v4-grid">
+          {featuresData.map((feature, index) => (
+            <motion.div 
+              key={feature.id}
+              className="feature-v4-card"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.15, duration: 0.5 }}
+              whileHover={{ 
+                y: -15,
+                transition: { duration: 0.3, ease: "easeOut" }
+              }}
+              onClick={() => navigate(feature.path)}
+            >
+              {/* Background Image & Overlays */}
+              <div 
+                className="card-bg-v4" 
+                style={{ 
+                  backgroundImage: `url(${feature.image})`,
+                  backgroundSize: feature.bgMode || "cover",
+                  backgroundColor: feature.bgColor || "transparent"
+                }}
+              />
+              <div className="card-overlay-v4" />
+              <div 
+                className="card-hover-overlay-v4" 
+                style={{ background: `linear-gradient(to bottom, transparent, ${feature.color}40)` }} 
+              />
 
-            <h3 className="card-title">{item.title}</h3>
-            <p className="card-desc">{item.desc}</p>
-          </div>
-        ))}
+              <div className="card-content-wrapper-v4">
+                <div className="card-top-v4">
+                  <span className="step-num-v4">{feature.id}</span>
+                  <div className="icon-box-v4" style={{ backgroundColor: `${feature.color}30` }}>
+                    {feature.icon}
+                  </div>
+                </div>
+
+                <div className="card-content-v4">
+                  <h3 className="card-title-v4">{feature.title}</h3>
+                  <p className="card-hook-v4">{feature.hook}</p>
+                </div>
+
+                <div className="card-footer-v4">
+                  <button className="learn-more-v4">
+                    Explore Details <FiArrowRight className="arrow-v4" />
+                  </button>
+                </div>
+              </div>
+              
+            </motion.div>
+          ))}
+        </div>
       </div>
-
     </section>
   );
 }

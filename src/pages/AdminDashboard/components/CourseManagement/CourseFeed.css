@@ -9,7 +9,7 @@
 .cf-page {
   min-height: 100vh;
   background: #f0f4ff;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
 }
 
 /* ── Hero ─────────────────────────────── */
@@ -129,7 +129,7 @@
   font-size: 0.9rem;
   color: #0f172a;
   background: #f8fafc;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 .cf-search:focus {
@@ -157,7 +157,7 @@
   color: #475569;
   cursor: pointer;
   transition: all 0.2s;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
 }
 .cf-chip:hover { border-color: #93c5fd; color: #2563eb; }
 .cf-chip.active {
@@ -313,7 +313,7 @@
   border-radius: 10px;
   cursor: pointer;
   transition: opacity 0.2s, transform 0.2s;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
 }
 .cf-enroll-btn:hover {
   opacity: 0.88;

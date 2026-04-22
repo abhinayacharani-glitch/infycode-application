@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open Sans:wght@300;400;500;600;700&display=swap');
 
 /* ─── Tokens ─────────────────────────────────── */
 :root {
@@ -23,7 +23,7 @@ input::-ms-reveal, input::-ms-clear { display: none; }
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   padding: 24px;
   background: var(--admin-bg);
   position: relative;
@@ -167,7 +167,7 @@ input::-ms-reveal, input::-ms-clear { display: none; }
   width: 100%;
   padding: 14px 48px 14px 48px;
   font-size: 14.5px;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   color: var(--admin-text);
   background: #f8fafc;
   border: 1px solid var(--admin-border);
@@ -228,7 +228,7 @@ input::-ms-reveal, input::-ms-clear { display: none; }
   margin-top: 8px;
   background: var(--admin-primary); /* Themed button */
   color: #fff;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   font-size: 15px;
   font-weight: 600;
   border: none;

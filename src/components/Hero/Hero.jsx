@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { X } from "lucide-react";
 import "./Hero.css";
 import image1 from "../../assets/image1.jpeg";
 import image2 from "../../assets/image2.jpeg";
@@ -127,24 +128,25 @@ function Hero() {
         >
 
           <div
-            className="hero-video"
-            onClick={(e) => e.stopPropagation()}  // prevent closing when clicking video
+            className="hero-video-content"
+            onClick={(e) => e.stopPropagation()}
           >
-
-            <span
+            <button
               className="close-video"
               onClick={() => setShowVideo(false)}
+              aria-label="Close video"
             >
-              ✕
-            </span>
+              <X size={20} />
+            </button>
 
-            <iframe
-              src="https://www.youtube.com/embed/kqtD5dpn9C8?autoplay=1"
-              title="Educational Video"
-              allow="autoplay; encrypted-media"
-              allowFullScreen
-            ></iframe>
-
+            <div className="hero-video-inner">
+              <iframe
+                src="https://www.youtube.com/embed/kqtD5dpn9C8?autoplay=1"
+                title="Educational Video"
+                allow="autoplay; encrypted-media"
+                allowFullScreen
+              ></iframe>
+            </div>
           </div>
 
         </div>

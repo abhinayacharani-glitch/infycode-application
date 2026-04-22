@@ -6,6 +6,7 @@ import adminRoutes from "./routes/adminRoutes.js";
 import trainerRoutes from "./routes/trainerRoutes.js";
 import passwordRoutes from "./routes/passwordRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js";
+import faqRoutes from "./routes/faqRoutes.js";
 
 const app = express();
 
@@ -51,5 +52,6 @@ app.use("/api/admin", adminRoutes);       // /api/admin/dashboard, /api/admin/st
 app.use("/api/trainer", trainerRoutes);   // /api/trainer/register, /api/trainer/verify-otp, /api/trainer/dashboard
 app.use("/api/password", passwordRoutes); // /api/password/forgot-password, /api/password/reset-password
 app.use("/api/courses", courseRoutes);    // /api/courses CRUD
+app.use("/api/faqs", faqRoutes);          // /api/faqs FAQ operations
 
 export default app;

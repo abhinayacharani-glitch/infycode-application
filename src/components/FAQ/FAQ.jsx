@@ -106,11 +106,11 @@ function FAQ() {
           {/* 🔥 BUTTON ANIMATION */}
           <button 
             className="faq-btn"
-            onClick={() => navigate("/courses")}
+            onClick={() => navigate("/faq")}
             data-aos="zoom-in"
             data-aos-delay="300"
           >
-            View Courses
+            FAQs
           </button>
 
         </div>

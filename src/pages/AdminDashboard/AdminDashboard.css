@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open Sans:ital,wght@0,100..900;1,100..900&display=swap');
 
 /* ============================================================
    ADMIN DASHBOARD — SCOPED DESIGN SYSTEM
@@ -41,7 +41,7 @@
   --adm-sidebar-w: 320px;
   --adm-sidebar-collapsed-w: 80px;
 
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   background: var(--adm-bg);
   color: var(--adm-text-dark);
   /* ✅ Lock layout to viewport — prevents window-level scrolling */
@@ -377,7 +377,7 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   letter-spacing: 0.3px;
   outline: none;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
 }
 
 .admin-dashboard-layout .btn-primary:hover:not(:disabled) {
@@ -416,7 +416,7 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   letter-spacing: 0.3px;
   outline: none;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
 }
 
 .admin-dashboard-layout .btn-secondary:hover:not(:disabled) {
@@ -450,7 +450,7 @@
   justify-content: center;
   height: fit-content;
   line-height: 1;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
 }
 
 .admin-dashboard-layout .badge.active-b  { background: var(--adm-green-light); color: #16a34a; }
@@ -571,7 +571,7 @@
   font-weight: 700;
   color: var(--adm-blue-600);
   box-shadow: 0 3px 10px rgba(37, 99, 235, 0.04);
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
 }
 
 .admin-dashboard-layout .qa-btn:hover {
@@ -779,7 +779,7 @@
   border: 1.5px solid var(--adm-border);
   border-radius: 10px;
   font-size: 13.5px;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   color: var(--adm-text-dark);
   background: var(--adm-white);
   outline: none;
@@ -796,7 +796,7 @@
   border: 1.5px solid var(--adm-border);
   border-radius: 10px;
   font-size: 13px;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   color: var(--adm-text-dark);
   background: var(--adm-white);
   outline: none;
@@ -888,7 +888,7 @@
   font-size: 14px;
   background-color: #FFFFFF;
   color: #111827;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   outline: none;
   transition: all 0.2s ease;
   box-sizing: border-box;

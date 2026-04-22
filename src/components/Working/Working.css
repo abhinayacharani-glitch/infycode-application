@@ -1,88 +1,93 @@
 .how-it-works-section {
-  background: linear-gradient(rgba(0, 35, 41, 0.9), rgba(0, 35, 41, 0.9)),
+  background: linear-gradient(rgba(0, 35, 41, 0.92), rgba(0, 35, 41, 0.92)),
   url('https://images.pexels.com/photos/3184328/pexels-photo-3184328.jpeg?auto=compress&cs=tinysrgb&w=1600');
   
   background-size: cover;
   background-position: center;
+  background-attachment: fixed;
 
-  padding: 100px 2rem; /* 🔥 more balanced spacing */
+  padding: 120px 2rem;
   box-sizing: border-box;
   overflow-x: hidden;
 
   color: #ffffff;
   position: relative;
 
-  display: flex;              /* ✅ CENTER FIX */
+  display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
 }
 
-/* CONTAINER CENTER */
 .container {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
 }
 
-/* TITLE */
 .section-head-centered {
   text-align: center;
+  margin-bottom: 3rem;
 }
 
 .sub-label-blue {
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   font-size: 18px;
-  color: #ffffff;
+  color: #3b82f6 !important;
   font-weight: 600;
   letter-spacing: 1px;
+  text-transform: capitalize;
 }
 
 .section-title-white {
-  font-family: 'Urbanist', sans-serif;
-  font-size: 42px;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 48px;
   font-weight: 700;
   margin-top: 10px;
-  color: #ffffff;
+  color: #ffffff !important;
 }
 
-/* STEPS */
 .steps-container {
-  display: flex;              /* 🔥 GRID → FLEX */
-  justify-content: center;
-  align-items: center;
-  gap: 3rem;
-
-  margin-top: 3rem;
-  flex-wrap: wrap; /* ✅ responsive */
-}
-
-/* CARD */
-.step-item {
-  text-align: center;
-  max-width: 280px;
-  position: relative;
-}
-
-/* ICON */
-.step-diamond-wrap {
   display: flex;
-  justify-content: center;
-  margin-bottom: 1rem;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-top: 4rem;
+  max-width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.step-item-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+  position: relative;
+  transition: transform 0.3s ease;
+  z-index: 2;
+}
+
+.step-item-card:hover {
+  transform: translateY(-10px);
+}
+
+.step-card-left {
+  margin-bottom: 25px;
 }
 
 .step-diamond {
   width: 70px;
   height: 70px;
-
-  background: #3b82f6; /* 🔥 CHANGE COLOR HERE */
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
   display: flex;
   align-items: center;
   justify-content: center;
-
   transform: rotate(45deg);
-  border-radius: 0.75rem;
-  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.4);
+  border-radius: 12px;
+  box-shadow: 0 0 30px rgba(59, 130, 246, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .step-diamond svg {
@@ -90,43 +95,70 @@
   color: #ffffff;
 }
 
-/* TITLE TEXT */
+.step-card-right {
+  max-width: 250px;
+}
+
 .step-title {
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 700;
   color: #ffffff;
-  margin-bottom: 0.5rem;
+  margin-bottom: 12px;
 }
 
-/* DESCRIPTION */
 .step-desc {
-  font-family: 'Urbanist', sans-serif;
-  font-size: 16px;
-  color: rgba(255, 255, 255, 0.7);
-  line-height: 1.5rem;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+  margin: 0;
 }
 
-/* ARROWS */
-.step-arrow-wrap {
-  position: absolute;
-  top: 35px;
-  left: 70%;
-  width: 100%;
+.step-arrow-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0;
+  margin-top: 35px;
+  opacity: 0.6;
 }
 
-.step-arrow-svg {
-  width: 100px;
-  height: 35px;
+.step-arrow-divider svg path {
+  stroke: rgba(255, 255, 255, 0.5);
 }
 
-/* MOBILE */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .steps-container {
-    flex-direction: column;
+    gap: 0.5rem;
   }
-
-  .step-arrow-wrap {
+  
+  .step-arrow-divider {
     display: none;
   }
 }
+
+@media (max-width: 768px) {
+  .how-it-works-section {
+    padding: 80px 1.5rem;
+  }
+
+  .section-title-white {
+    font-size: 32px;
+  }
+
+  .steps-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 3rem;
+  }
+  
+  .step-item-card {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .step-card-right {
+    max-width: 100%;
+  }
+}
