@@ -10,6 +10,26 @@
   padding: 0 20px;
 }
 
+/* Nav Back Button */
+.faq-nav-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  color: #64748b;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  margin-bottom: 24px;
+  padding: 8px 0;
+  transition: color 0.2s;
+}
+
+.faq-nav-back:hover {
+  color: #0f172a;
+}
+
 .faq-header {
   text-align: center;
   margin-bottom: 60px;
