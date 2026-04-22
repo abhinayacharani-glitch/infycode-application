@@ -66,6 +66,10 @@ const GalleryPage = lazy(() => import("./pages/InternalPages/GalleryPage"));
 const InstagramPage = lazy(() => import("./pages/InternalPages/InstagramPage"));
 const CourseDetailsPage = lazy(() => import("./pages/CourseDetails/CourseDetails"));
 const FAQPage = lazy(() => import("./pages/InternalPages/FAQPage"));
+const MentorshipPage = lazy(() => import("./pages/Features/MentorshipPage"));
+const PracticalLearningPage = lazy(() => import("./pages/Features/PracticalLearningPage"));
+const SkillEvaluationPage = lazy(() => import("./pages/Features/SkillEvaluationPage"));
+const CareerPreparationPage = lazy(() => import("./pages/Features/CareerPreparationPage"));
 
 // ─── Lazy-loaded — Other ─────────────────────────────────────────────────────
 const BatchCreation = lazy(() => import("./pages/AdminDashboard/pages/BatchCreation"));
@@ -254,6 +258,12 @@ function Layout({ courses, setCourses, onToggleLike, onUpdateCourse, onDeleteCou
             <Route path="/instagram" element={<InstagramPage />} />
             <Route path="/course-details/:id" element={<CourseDetailsPage />} />
             <Route path="/faq" element={<FAQPage />} />
+
+            {/* ── Feature Pages ── */}
+            <Route path="/features/mentorship" element={<MentorshipPage />} />
+            <Route path="/features/practical-learning" element={<PracticalLearningPage />} />
+            <Route path="/features/skill-evaluation" element={<SkillEvaluationPage />} />
+            <Route path="/features/career-preparation" element={<CareerPreparationPage />} />
 
             {/* ── Protected ── */}
             <Route path="/student/test/*" element={<ProtectedRoute><TestApp /></ProtectedRoute>} />
