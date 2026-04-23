@@ -119,7 +119,7 @@ const Topbar = () => {
 
   const handleLogoutConfirm = () => {
     localStorage.clear();
-    navigate('/student/login');
+    navigate('/');
   };
 
   // Sample Messages

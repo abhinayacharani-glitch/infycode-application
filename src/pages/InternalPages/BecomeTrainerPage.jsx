@@ -95,28 +95,28 @@ const BecomeTrainerPage = () => {
           
           <form className="trainer-form">
             <div className="trainer-form-row">
-              <input type="text" placeholder="First Name" className="trainer-input" />
-              <input type="text" placeholder="Last Name" className="trainer-input" />
+              <input type="text" placeholder="First Name *" required className="trainer-input" />
+              <input type="text" placeholder="Last Name *" required className="trainer-input" />
             </div>
             <div className="trainer-form-row">
-              <input type="email" placeholder="Email Address" className="trainer-input" />
-              <input type="tel" placeholder="Phone Number" className="trainer-input" />
+              <input type="email" placeholder="Email Address *" required className="trainer-input" />
+              <input type="tel" placeholder="Phone Number *" required className="trainer-input" />
             </div>
             <div className="trainer-form-row">
-              <select className="trainer-input">
-                <option value="">Primary Expertise</option>
-                <option>Full Stack Development</option>
-                <option>Data Science & AI</option>
-                <option>Cloud & DevOps</option>
-                <option>Cyber Security</option>
-                <option>UI/UX Design</option>
+              <select className="trainer-input" required defaultValue="">
+                <option value="" disabled>Primary Expertise *</option>
+                <option value="Full Stack Development">Full Stack Development</option>
+                <option value="Data Science & AI">Data Science & AI</option>
+                <option value="Cloud & DevOps">Cloud & DevOps</option>
+                <option value="Cyber Security">Cyber Security</option>
+                <option value="UI/UX Design">UI/UX Design</option>
               </select>
-              <input type="text" placeholder="Years of Experience" className="trainer-input" />
+              <input type="text" placeholder="Years of Experience *" required className="trainer-input" />
             </div>
-            <input type="url" placeholder="LinkedIn Profile URL" className="trainer-input" />
+            <input type="url" placeholder="LinkedIn Profile URL *" required className="trainer-input" />
             <input type="url" placeholder="Portfolio / GitHub URL (Optional)" className="trainer-input" />
             
-            <textarea placeholder="Briefly describe your industrial experience and why you want to teach..." rows="5" className="trainer-input textarea"></textarea>
+            <textarea placeholder="Briefly describe your industrial experience and why you want to teach... *" required rows="5" className="trainer-input textarea"></textarea>
             
             <button className="cta-btn trainer-submit-btn">Submit Application</button>
           </form>

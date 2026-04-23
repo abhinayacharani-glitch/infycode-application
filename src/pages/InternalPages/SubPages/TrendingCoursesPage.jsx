@@ -51,10 +51,31 @@ const UsersIcon = () => (
   </svg>
 );
 
+import { useNavigate } from 'react-router-dom';
+
 const TrendingCoursesPage = () => {
+  const navigate = useNavigate();
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const handleEnroll = () => {
+    const userStr = localStorage.getItem("loggedUser");
+    let userObj = null;
+    try {
+      userObj = userStr ? JSON.parse(userStr) : null;
+    } catch {
+      console.error("Session data corrupted, redirecting to login.");
+    }
+
+    if (userObj && userObj.role === "Student") {
+      navigate("/student-dashboard/courses");
+    } else {
+      console.log("Not logged in or corrupted session, navigating to login.");
+      navigate("/login", { state: { redirect: "/student-dashboard/courses" } });
+    }
+  };
 
   return (
     <div className="trending-page">
@@ -88,7 +109,7 @@ const TrendingCoursesPage = () => {
                     <UsersIcon /> {course.students}
                   </span>
 
-                  <button className="trending-enroll-btn">Enroll Now</button>
+                  <button className="trending-enroll-btn" onClick={handleEnroll}>Enroll Now</button>
                 </div>
 
               </div>

@@ -106,7 +106,7 @@ const Topbar = () => {
     localStorage.removeItem("loggedUser");
     localStorage.removeItem("trainerProfileImage");
     setShowLogoutModal(false);
-    navigate('/student/login'); // Redirect to login page
+    navigate('/'); // Redirect to landing page
   };
 
   const markAllRead = () => {
@@ -133,18 +133,7 @@ const Topbar = () => {
 
       {/* ── Search Bar (Center) ── */}
       <div className="tb-left-aligned">
-        <div className={`tb-search-box-new ${searchFocused ? 'focused' : ''}`}>
-          <span className="tb-search-icon-new"><SearchIcon /></span>
-          <input
-            type="text"
-            placeholder="Search & Enter"
-            className="tb-search-input-new"
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-            onFocus={() => setSearchFocused(true)}
-            onBlur={() => setSearchFocused(false)}
-          />
-        </div>
+        {/* Search removed as per request */}
       </div>
 
       <div className="tb-spacer" style={{ flex: 1 }}></div>
@@ -200,10 +189,6 @@ const Topbar = () => {
 
         <div className="tb-user-profile-new" ref={userMenuRef} onClick={() => setShowUserMenu(!showUserMenu)}>
           <img src={profileImage || "https://i.pravatar.cc/150?img=5"} alt={userName} className="tb-user-avatar-new" />
-          <span className="tb-user-name-new">
-            {userName}
-            <span className="tb-chevron-new"><ChevronDownIcon /></span>
-          </span>
           {showUserMenu && (
             <div className="tb-user-dropdown">
               <div className="tb-user-dropdown-header">

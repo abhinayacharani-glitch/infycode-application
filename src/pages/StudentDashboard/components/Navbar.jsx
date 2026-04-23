@@ -85,16 +85,13 @@ const Navbar = ({ onToggleSidebar }) => {
 
   const handleLogout = () => {
     localStorage.clear();
-    navigate('/student/login');
+    navigate('/');
   };
 
   return (
     <nav className="student-topbar">
       <div className="topbar-left">
-        <div className="navbar-search">
-          <Search size={18} className="search-icon" />
-          <input type="text" placeholder="Search & Enter" />
-        </div>
+        {/* Search removed */}
       </div>
 
       <div className="topbar-right">
@@ -171,8 +168,6 @@ const Navbar = ({ onToggleSidebar }) => {
             alt="Profile" 
             className="navbar-avatar" 
           />
-          <span className="navbar-username">{userName}</span>
-          <ChevronDown size={14} className="chevron-icon" />
           
           {activeDropdown === 'profile' && (
             <div className="profile-dropdown-menu">
