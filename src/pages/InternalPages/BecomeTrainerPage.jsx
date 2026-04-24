@@ -3,6 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import './BecomeTrainerPage.css';
 
+import gayathriImg from '../../assets/trainers/gayathri_v2.jpg';
+import karthishaImg from '../../assets/trainers/karthisha_v2.jpg';
+import abhinayaImg from '../../assets/trainers/abhinaya.jpg';
+import nagaharshaImg from '../../assets/trainers/nagaharsha_v2.jpg';
+import mohanImg from '../../assets/trainers/mohan.jpg';
+import rohanImg from '../../assets/trainers/rohan.jpg';
+
 const BecomeTrainerPage = () => {
   const navigate = useNavigate();
   
@@ -31,51 +38,57 @@ const BecomeTrainerPage = () => {
         <div className="trainer-experts-grid">
           {[
             {
-              name: "Dr. Suresh",
-              role: "Senior Java Architect",
-              exp: "12+ Years Experience",
-              bio: "Expert in Spring Boot, Microservices, and Enterprise Architecture with a track record of training 2000+ developers.",
-              img: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=400"
+              name: "Abhinaya",
+              role: "MERN Stack Developer",
+              exp: "2.5 Years Experience",
+              bio: "",
+              img: abhinayaImg
             },
             {
-              name: "Manasa",
-              role: "Python & AI Developer",
-              exp: "8+ Years Experience",
-              bio: "Specialist in Data Science, Machine Learning, and Automation. Passionate about making complex algorithms accessible.",
-              img: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=400"
+              name: "Rohan",
+              role: "Java Full Stack Developer",
+              exp: "1 Year Experience",
+              bio: "",
+              img: rohanImg
             },
             {
-              name: "Michael ",
-              role: "Cybersecurity Lead",
-              exp: "10+ Years Experience",
-              bio: "Certified Ethical Hacker (CEH) with extensive experience in network security, digital forensics, and cloud defense.",
-              img: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=400"
+              name: "Gayathri",
+              role: "Python & AI Specialist",
+              exp: "2 Years Experience",
+              bio: "",
+              img: gayathriImg
             },
             {
-              name: "Priyanka ",
-              role: "Full Stack Specialist",
-              exp: "7+ Years Experience",
-              bio: "MERN Stack expert focused on high-performance web applications and modern frontend architectures like React and Next.js.",
-              img: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=400"
+              name: "Karthisha",
+              role: "Frontend Engineer",
+              exp: "1 Year Experience",
+              bio: "",
+              img: karthishaImg
             },
             {
-              name: "David ",
-              role: "UI/UX Design Master",
-              exp: "9+ Years Experience",
-              bio: "Crafting intuitive digital experiences. David brings industrial design thinking to the modern web and mobile apps.",
-              img: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=400"
+              name: "Mohan",
+              role: "Cloud Solutions Associate",
+              exp: "1.5 Years Experience",
+              bio: "",
+              img: mohanImg
             },
             {
-              name: "Anjali Gupta",
-              role: "Cloud Ops Engineer",
-              exp: "6+ Years Experience",
-              bio: "AWS Certified Solution Architect specialized in DevOps, scaling infrastructure, and CI/CD pipeline automation.",
-              img: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&q=80&w=400"
+              name: "Nagaharsha",
+              role: "UI/UX Designer",
+              exp: "2 Years Experience",
+              bio: "",
+              img: nagaharshaImg
             }
-          ].slice(0, 6).map((expert, index) => (
+          ]
+.slice(0, 6).map((expert, index) => (
             <div key={index} className="trainer-expert-card">
               <div className="expert-image-wrapper">
-                <img src={expert.img} alt={expert.name} className="expert-image" />
+                <img 
+                  src={expert.img} 
+                  alt={expert.name} 
+                  className="expert-image" 
+                  style={expert.name === "Rohan" ? { objectPosition: 'center 10%', transform: 'scale(1.5)' } : {}}
+                />
               </div>
               <div className="expert-content">
                 <h3 className="expert-name">{expert.name}</h3>
@@ -95,28 +108,28 @@ const BecomeTrainerPage = () => {
           
           <form className="trainer-form">
             <div className="trainer-form-row">
-              <input type="text" placeholder="First Name" className="trainer-input" />
-              <input type="text" placeholder="Last Name" className="trainer-input" />
+              <input type="text" placeholder="First Name *" required className="trainer-input" />
+              <input type="text" placeholder="Last Name *" required className="trainer-input" />
             </div>
             <div className="trainer-form-row">
-              <input type="email" placeholder="Email Address" className="trainer-input" />
-              <input type="tel" placeholder="Phone Number" className="trainer-input" />
+              <input type="email" placeholder="Email Address *" required className="trainer-input" />
+              <input type="tel" placeholder="Phone Number *" required className="trainer-input" />
             </div>
             <div className="trainer-form-row">
-              <select className="trainer-input">
-                <option value="">Primary Expertise</option>
-                <option>Full Stack Development</option>
-                <option>Data Science & AI</option>
-                <option>Cloud & DevOps</option>
-                <option>Cyber Security</option>
-                <option>UI/UX Design</option>
+              <select className="trainer-input" required defaultValue="">
+                <option value="" disabled>Primary Expertise *</option>
+                <option value="Full Stack Development">Full Stack Development</option>
+                <option value="Data Science & AI">Data Science & AI</option>
+                <option value="Cloud & DevOps">Cloud & DevOps</option>
+                <option value="Cyber Security">Cyber Security</option>
+                <option value="UI/UX Design">UI/UX Design</option>
               </select>
-              <input type="text" placeholder="Years of Experience" className="trainer-input" />
+              <input type="text" placeholder="Years of Experience *" required className="trainer-input" />
             </div>
-            <input type="url" placeholder="LinkedIn Profile URL" className="trainer-input" />
+            <input type="url" placeholder="LinkedIn Profile URL *" required className="trainer-input" />
             <input type="url" placeholder="Portfolio / GitHub URL (Optional)" className="trainer-input" />
             
-            <textarea placeholder="Briefly describe your industrial experience and why you want to teach..." rows="5" className="trainer-input textarea"></textarea>
+            <textarea placeholder="Briefly describe your industrial experience and why you want to teach... *" required rows="5" className="trainer-input textarea"></textarea>
             
             <button className="cta-btn trainer-submit-btn">Submit Application</button>
           </form>

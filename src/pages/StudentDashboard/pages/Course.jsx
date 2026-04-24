@@ -163,6 +163,7 @@ const CourseDiscovery = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
 
+
   const handleNavigate = (path, state) => {
     navigate(path, { state });
   };

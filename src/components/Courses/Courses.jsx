@@ -217,7 +217,7 @@ const Courses = () => {
   });
 
   return (
-    <div className="courses-page-modern">
+    <div className="courses-page-modern" id="courses">
       {/* Header with Search */}
      <div 
   className="courses-hero"

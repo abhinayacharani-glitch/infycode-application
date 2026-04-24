@@ -85,102 +85,32 @@ const Navbar = ({ onToggleSidebar }) => {
 
   const handleLogout = () => {
     localStorage.clear();
-    navigate('/student/login');
+    navigate('/');
   };
 
   return (
     <nav className="student-topbar">
       <div className="topbar-left">
-        <div className="navbar-search">
-          <Search size={18} className="search-icon" />
-          <input type="text" placeholder="Search & Enter" />
-        </div>
+        {/* Search removed */}
       </div>
 
       <div className="topbar-right">
-        <div className="navbar-actions" style={{ marginRight: '1.5rem' }}>
-          {/* MESSAGES DROPDOWN */}
-          <div className="dropdown-wrapper" ref={messagesRef}>
-            <div className="action-with-badge" onClick={() => toggleDropdown('messages')}>
-              <Mail size={22} className="nav-icon" />
-              <span className="nav-badge blue">3</span>
-            </div>
-            {activeDropdown === 'messages' && (
-              <div className="content-dropdown messages-dropdown">
-                <div className="dropdown-header">
-                  <h3>Messages</h3>
-                  <button className="view-all">View All</button>
-                </div>
-                <div className="dropdown-body">
-                  {messages.map((msg) => (
-                    <div key={msg.id} className={`dropdown-item ${msg.unread ? 'unread' : ''}`}>
-                      <div className="item-icon bg-blue">
-                        <MessageSquare size={16} />
-                      </div>
-                      <div className="item-content">
-                        <div className="item-title">{msg.sender}</div>
-                        <div className="item-snippet">{msg.text}</div>
-                        <div className="item-time">
-                          <Clock size={12} /> {msg.time}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* NOTIFICATIONS DROPDOWN */}
-          <div className="dropdown-wrapper" ref={notificationsRef}>
-            <div className="action-with-badge" onClick={() => toggleDropdown('notifications')}>
-              <Bell size={22} className="nav-icon" />
-              <span className="nav-badge orange">3</span>
-            </div>
-            {activeDropdown === 'notifications' && (
-              <div className="content-dropdown notifications-dropdown">
-                <div className="dropdown-header">
-                  <h3>Notifications</h3>
-                  <button className="view-all">View All</button>
-                </div>
-                <div className="dropdown-body">
-                  {notifications.map((notif) => (
-                    <div key={notif.id} className={`dropdown-item ${notif.type}`}>
-                      <div className={`item-icon ${notif.type}`}>
-                        <Bell size={16} />
-                      </div>
-                      <div className="item-content">
-                        <div className="item-title">{notif.title}</div>
-                        <div className="item-snippet">{notif.message}</div>
-                        <div className="item-time">
-                          <Clock size={12} /> {notif.time}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
 
         {/* PROFILE DROPDOWN */}
         <div className="nav-user-profile" ref={dropdownRef} onClick={() => toggleDropdown('profile')}>
-          <img 
-            src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200&h=200" 
-            alt="Profile" 
-            className="navbar-avatar" 
+          <img
+            src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200&h=200"
+            alt="Profile"
+            className="navbar-avatar"
           />
-          <span className="navbar-username">{userName}</span>
-          <ChevronDown size={14} className="chevron-icon" />
-          
+
           {activeDropdown === 'profile' && (
             <div className="profile-dropdown-menu">
               <div className="profile-dropdown-header">
-                <img 
-                  src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200&h=200" 
-                  alt="Profile" 
-                  className="dropdown-avatar" 
+                <img
+                  src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200&h=200"
+                  alt="Profile"
+                  className="dropdown-avatar"
                 />
                 <div className="dropdown-user-info">
                   <div className="dropdown-name">{userName}</div>
@@ -188,19 +118,19 @@ const Navbar = ({ onToggleSidebar }) => {
                 </div>
               </div>
               <div className="dropdown-divider"></div>
-              
-              <button 
-                className="dropdown-item" 
+
+              <button
+                className="dropdown-item"
                 onClick={(e) => { e.stopPropagation(); setActiveDropdown(null); navigate('/student-dashboard/profile?edit=true'); }}
               >
                 <Edit size={16} />
                 <span>Edit Profile</span>
               </button>
-              
+
               <div className="dropdown-divider"></div>
-              
-              <button 
-                className="dropdown-item logout-item" 
+
+              <button
+                className="dropdown-item logout-item"
                 onClick={(e) => { e.stopPropagation(); setActiveDropdown(null); setShowLogoutModal(true); }}
               >
                 <LogOut size={16} />

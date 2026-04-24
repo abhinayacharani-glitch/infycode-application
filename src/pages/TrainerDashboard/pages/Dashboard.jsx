@@ -96,8 +96,8 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [dashData, setDashData] = useState(null);
 
-  const loggedUser = JSON.parse(localStorage.getItem("loggedUser") || "{}");
-  const userName = loggedUser.username || "Charani";
+  const loggedUser = JSON.parse(localStorage.getItem("user") || localStorage.getItem("loggedUser") || "{}");
+  const userName = loggedUser.fullName || loggedUser.fullname || loggedUser.username || "Trainer";
 
   useEffect(() => {
     const loadData = async () => {
@@ -127,7 +127,7 @@ const Dashboard = () => {
       <div className="dashboard-banner">
         <div className="banner-content">
           <div className="banner-left">
-            <h1>Welcome B, {userName}!</h1>
+            <h1>Welcome Back, {userName}!</h1>
             <p>Here’s what’s happening with your batches today.</p>
           </div>
           <div className="banner-right">
