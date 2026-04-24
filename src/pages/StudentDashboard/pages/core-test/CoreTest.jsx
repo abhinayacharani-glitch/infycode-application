@@ -4,6 +4,7 @@ import Header from './components/Header';
 import Timer from './components/Timer';
 import Question from './components/Question';
 import QuestionNavigation from './components/QuestionNavigation';
+import { saveStudentTestResults } from '../../../../services/api';
 
 const coreQuestions = [
   {
@@ -63,6 +64,7 @@ const CoreTest = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const currentQuestion = coreQuestions[currentIndex];
   const totalQuestions = coreQuestions.length;
@@ -88,40 +90,65 @@ const CoreTest = () => {
     setCurrentIndex(index);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (window.confirm("Submit your Core Test?")) {
-      setIsSubmitted(true);
+      try {
+        setSaving(true);
+        const score = Object.keys(answers).length;
+        await saveStudentTestResults('core', { coreTechnical: score });
+        setIsSubmitted(true);
+      } catch (err) {
+        console.error("Core Test Submit Error:", err);
+        alert("Failed to save results: " + err.message);
+      } finally {
+        setSaving(false);
+      }
     }
   };
 
-  const handleTimeUp = () => {
+  const handleTimeUp = async () => {
     alert("Time is up! Core test auto-submitted.");
-    setIsSubmitted(true);
+    try {
+      setSaving(true);
+      const score = Object.keys(answers).length;
+      await saveStudentTestResults('core', { coreTechnical: score });
+      setIsSubmitted(true);
+    } catch (err) {
+      console.error("Auto-submit failed", err);
+      setIsSubmitted(true);
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (isSubmitted) {
+    const score = Object.keys(answers).length;
     return (
-      <div style={{ padding: '20px', fontFamily: '"Open Sans", sans-serif' }}>
+      <div style={{ minHeight: '100vh', background: '#f8fafc', fontFamily: '"Open Sans", sans-serif' }}>
         <Header />
-        <div style={{ textAlign: 'center', marginTop: '120px' }}>
-          <h2 style={{ fontSize: '2rem', color: '#0A3D91', marginBottom: '15px' }}>Core Test Submitted Successfully!</h2>
-          <p style={{ fontSize: '1.2rem', color: '#333' }}>You attempted {Object.keys(answers).length} out of {totalQuestions} questions.</p>
-          <button 
-            onClick={() => navigate('/student-dashboard/skill-test')}
-            style={{ 
-              marginTop: '30px', 
-              padding: '12px 25px', 
-              background: '#0A3D91', 
-              color: '#fff', 
-              border: 'none', 
-              borderRadius: '8px', 
-              cursor: 'pointer',
-              fontSize: '1rem',
-              fontWeight: '600'
-            }}
-          >
-            Return to Dashboard
-          </button>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '100px 20px' }}>
+          <div className="card" style={{ maxWidth: '600px', width: '100%', textAlign: 'center', padding: '40px', background: '#fff', borderRadius: '16px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}>
+            <div style={{ fontSize: '64px', marginBottom: '20px' }}>🎯</div>
+            <h2 style={{ fontSize: '28px', color: '#1f2937', marginBottom: '10px' }}>Core Test Submitted!</h2>
+            <p style={{ color: '#6b7280', marginBottom: '30px' }}>Your technical assessment is complete. Here is your performance summary:</p>
+            
+            <div style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', color: '#fff', padding: '30px', borderRadius: '16px', marginBottom: '30px' }}>
+              <div style={{ fontSize: '16px', opacity: 0.9, marginBottom: '8px' }}>Core Technical Score</div>
+              <div style={{ fontSize: '48px', fontWeight: 'bold' }}>{score} <span style={{ fontSize: '20px', opacity: 0.8 }}>/ {totalQuestions}</span></div>
+            </div>
+
+            <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '30px' }}>
+              Attempted: <b>{score}</b> questions | Total: <b>{totalQuestions}</b>
+            </p>
+
+            <button 
+              className="btn-primary" 
+              style={{ width: '100%', padding: '14px', fontSize: '16px', background: '#0A3D91' }}
+              onClick={() => navigate('/student-dashboard')}
+            >
+              Back to Dashboard
+            </button>
+          </div>
         </div>
       </div>
     );

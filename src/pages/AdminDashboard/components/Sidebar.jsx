@@ -165,9 +165,9 @@ const Sidebar = ({ isCollapsed, externalShowLogoutModal, setExternalShowLogoutMo
             {!isCollapsed && <span className="adm-nav-label">Counselling Requests</span>}
           </NavLink>
 
-          <NavLink to="/admin-dashboard/reports" className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`}>
+          <NavLink to="/admin-dashboard/student-results" className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`}>
             <span className="adm-nav-icon"><FileIcon /></span>
-            {!isCollapsed && <span className="adm-nav-label">Reports &amp; Logs</span>}
+            {!isCollapsed && <span className="adm-nav-label">Student Results</span>}
           </NavLink>
 
           <NavLink to="/admin-dashboard/faq-management" className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`} title="FAQ Management" data-tooltip="FAQ Management">

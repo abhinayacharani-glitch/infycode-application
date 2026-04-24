@@ -1,0 +1,128 @@
+import db from "../config/firebase.js";
+
+const studentsRef = db.ref("students");
+
+/**
+ * @desc Save student test results
+ * @route POST /api/student/test-results
+ */
+export const saveTestResult = async (req, res) => {
+  try {
+    const { testType, scores } = req.body;
+    let studentId = req.user.id; 
+    const email = req.user.email;
+
+    console.log(`[saveTestResult] Attempting save for: ${email || "unknown email"}, ID: ${studentId || "unknown ID"}`);
+    console.log(`[saveTestResult] Data: type=${testType}, scores=`, scores);
+
+    if (!testType || !scores) {
+      console.warn("[saveTestResult] Missing testType or scores");
+      return res.status(400).json({ success: false, message: "testType and scores are required" });
+    }
+
+    // If ID is not in token, look up by email
+    if (!studentId) {
+      const email = req.user.email;
+      const studentSnap = await studentsRef.orderByChild("email").equalTo(email).once("value");
+      if (!studentSnap.exists()) {
+        return res.status(404).json({ success: false, message: "Student not found" });
+      }
+      studentSnap.forEach(child => { studentId = child.key; });
+    }
+
+    const studentRef = studentsRef.child(studentId);
+
+    const updates = {};
+    if (testType === "foundational") {
+      updates["testResults/aptitude"] = scores.aptitude || 0;
+      updates["testResults/reasoning"] = scores.reasoning || 0;
+      updates["testResults/communication"] = scores.communication || 0;
+      updates["testResults/foundationalCompleted"] = true;
+    } else if (testType === "core") {
+      updates["testResults/coreTechnical"] = scores.coreTechnical || 0;
+      updates["testResults/coreCompleted"] = true;
+    } else {
+      return res.status(400).json({ success: false, message: "Invalid testType" });
+    }
+
+    await studentRef.update(updates);
+
+    res.status(200).json({ success: true, message: "Test results saved successfully" });
+  } catch (error) {
+    console.error("Save Test Result Error:", error);
+    res.status(500).json({ success: false, message: error.message, error: error.message });
+  }
+};
+
+/**
+ * @desc Get all student results (Admin only)
+ * @route GET /api/student/admin/results
+ */
+export const getStudentResults = async (req, res) => {
+  try {
+    const snapshot = await studentsRef.once("value");
+    const studentsData = snapshot.val() || {};
+
+    const results = Object.entries(studentsData).map(([id, data]) => {
+      const results = data.testResults || {};
+      const aptitude = results.aptitude || 0;
+      const reasoning = results.reasoning || 0;
+      const communication = results.communication || 0;
+      const coreTechnical = results.coreTechnical || null;
+      const foundationalCompleted = results.foundationalCompleted || false;
+      const coreCompleted = results.coreCompleted || false;
+
+      return {
+        id,
+        name: data.fullname || data.fullName || data.username || "N/A",
+        email: data.email,
+        aptitude,
+        reasoning,
+        communication,
+        overallScore: aptitude + reasoning + communication,
+        coreTechnical: coreCompleted ? coreTechnical : null,
+        foundationalCompleted,
+        coreCompleted
+      };
+    });
+
+    res.status(200).json({ success: true, results });
+  } catch (error) {
+    console.error("Get Student Results Error:", error);
+    res.status(500).json({ success: false, message: error.message, error: error.message });
+  }
+};
+
+/**
+ * @desc Get current student results
+ * @route GET /api/student/my-results
+ */
+export const getMyResults = async (req, res) => {
+  try {
+    const studentId = req.user.id;
+    const email = req.user.email;
+
+    let finalId = studentId;
+    if (!finalId) {
+      const snapshot = await studentsRef.orderByChild("email").equalTo(email).once("value");
+      if (snapshot.exists()) {
+        snapshot.forEach(child => { finalId = child.key; });
+      }
+    }
+
+    if (!finalId) {
+      return res.status(404).json({ success: false, message: "Student not found" });
+    }
+
+    const snapshot = await studentsRef.child(finalId).once("value");
+    const data = snapshot.val();
+    
+    res.status(200).json({ 
+      success: true, 
+      testResults: data.testResults || {} 
+    });
+  } catch (error) {
+    console.error("Get My Results Error:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
