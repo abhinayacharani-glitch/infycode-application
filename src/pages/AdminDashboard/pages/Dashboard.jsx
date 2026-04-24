@@ -140,8 +140,8 @@ const GraphIcon = () => (
 
 const Dashboard = () => {
   const { stats, students, notifications, courses, batches, trainers } = useAdmin();
-  const loggedUser = JSON.parse(localStorage.getItem("user") || "{}");
-  const userName = loggedUser.fullName || loggedUser.username || "Admin";
+  const loggedUser = JSON.parse(localStorage.getItem("user") || localStorage.getItem("loggedUser") || "{}");
+  const userName = loggedUser.fullName || loggedUser.fullname || loggedUser.username || "Admin";
   const navigate = useNavigate();
 
   const [filter, setFilter] = useState({ course: 'All', date: 'Last 7 Days' });
@@ -207,7 +207,7 @@ const Dashboard = () => {
       <div className="dashboard-banner">
         <div className="banner-content">
           <div className="banner-left">
-            <h2>Welcome back, {userName}! <SettingsIcon /></h2>
+            <h2>Welcome Back, {userName}! <SettingsIcon /></h2>
             <p>
               Showing data for <strong>{filter.course === 'All' ? 'all courses' : filter.course}</strong> ·{' '}
               <strong>{kpiData.total}</strong> registrations in the {kpiData.dateLabel}

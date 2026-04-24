@@ -229,3 +229,28 @@
     max-width: 1400px;
     margin: 0 auto;
 }
+
+/* Motivation Caption Styling */
+.hero-motivation {
+    margin-top: 25px;
+    padding: 12px 24px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    border-radius: 50px;
+    display: inline-block;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    animation: fadeIn 1s ease-out;
+}
+
+.hero-motivation span {
+    font-style: italic;
+    font-size: 15px;
+    color: #e2e8f0;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

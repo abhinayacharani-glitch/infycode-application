@@ -7,7 +7,7 @@ export const COURSE_MAP = {
     students: 12500,
     rating: 4.9,
     level: "Intermediate",
-    progress: 95,
+    progress: 15,
     trainer: {
       name: "Charani",
       role: "Senior Java Architect",
@@ -286,7 +286,7 @@ export const COURSE_MAP = {
     students: 12200,
     rating: 4.8,
     level: "Beginner",
-    progress: 10,
+    progress: 50,
     trainer: {
       name: "Charani",
       role: "Lead Python Developer",

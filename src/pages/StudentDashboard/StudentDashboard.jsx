@@ -14,6 +14,11 @@ import Profile from "./pages/Profile";
 import CourseExplore from "./pages/CourseExplore";
 import CourseOverview from "./pages/Courseoverview";
 import MentorConnection from "./pages/MentorConnection";
+import CounsellingDetail from "./pages/CounsellingDetail";
+import MockTestDetail from "./pages/MockTestDetail";
+import MockTestList from "./pages/MockTestList";
+import ProjectTopics from "./pages/ProjectTopics";
+import PreparationResources from "./pages/PreparationResources";
 import Logout from "./pages/Logout";
 import "./StudentDashboard.css"; // We'll create this to store the layout styles
 
@@ -53,13 +58,18 @@ function StudentDashboard() {
             <Route index element={<Navigate to="courses" replace />} />
             <Route path="dashboard" element={<Navigate to="courses" replace />} />
             <Route path="counselling" element={<Counselling />} />
+            <Route path="counselling/:id" element={<CounsellingDetail />} />
             <Route path="skill-test" element={<SkillTest />} />
             <Route path="course" element={<CourseDiscovery />} />
             <Route path="course-topics" element={<CourseTopics />} />
             <Route path="courses" element={<Courses onNavigate={handleNavigate} />} />
             <Route path="course-overview" element={<CourseOverview />} />
             <Route path="mock-interview" element={<MockInterview />} />
+            <Route path="mock-tests" element={<MockTestList />} />
+            <Route path="mock-test/:id" element={<MockTestDetail />} />
+            <Route path="preparation-resources" element={<PreparationResources />} />
             <Route path="projects" element={<Projects />} />
+            <Route path="project-topics/:id" element={<ProjectTopics />} />
             <Route path="profile" element={<Profile />} />
             <Route path="course-explore" element={<CourseExplore />} />
             <Route path="mentor-connection" element={<MentorConnection />} />

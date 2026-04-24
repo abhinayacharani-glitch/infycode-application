@@ -8,7 +8,6 @@ const Sidebar = ({ externalShowLogoutModal, setExternalShowLogoutModal }) => {
   const navigate = useNavigate();
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
   const [internalShowLogoutModal, setInternalShowLogoutModal] = useState(false);
-  const [showLogoLogoutModal, setShowLogoLogoutModal] = useState(false);
 
   // Sync internal modal state with external (for browser back button)
   useEffect(() => {
@@ -66,7 +65,11 @@ const Sidebar = ({ externalShowLogoutModal, setExternalShowLogoutModal }) => {
       <aside className="student-sd-sidebar">
 
         {/* BRAND — click opens logo logout modal */}
-        <button className="student-sd-brand" onClick={() => setShowLogoLogoutModal(true)}>
+        <button 
+          className="student-sd-brand" 
+          onClick={() => { localStorage.clear(); navigate('/'); }}
+          title="Logout to Home"
+        >
           <div className="brand-wrapper">
             <img src={icLogo} alt="Infycode Logo" className="logo" />
             <div className="brand-text">
@@ -201,35 +204,6 @@ const Sidebar = ({ externalShowLogoutModal, setExternalShowLogoutModal }) => {
               </button>
               <button className="sd-modal-logout" onClick={handleLogout}>
                 Yes, log out
-              </button>
-            </div>
-
-          </div>
-        </div>
-      )}
-
-      {/* ── LOGO LOGOUT CONFIRMATION MODAL (To Landing Page) ── */}
-      {showLogoLogoutModal && (
-        <div className="sd-modal-overlay" onClick={() => setShowLogoLogoutModal(false)}>
-          <div className="sd-logo-modal-card" onClick={e => e.stopPropagation()}>
-            
-            <div className="sd-logo-modal-icon-wrapper">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                <polyline points="16 17 21 12 16 7" />
-                <line x1="21" y1="12" x2="9" y2="12" />
-              </svg>
-            </div>
-
-            <h2 className="sd-logo-modal-title">Logout</h2>
-            <p className="sd-logo-modal-subtitle">Are you sure you want to log out?</p>
-
-            <div className="sd-logo-modal-actions">
-              <button className="sd-logo-modal-cancel" onClick={() => setShowLogoLogoutModal(false)}>
-                Cancel
-              </button>
-              <button className="sd-logo-modal-confirm" onClick={() => { localStorage.clear(); navigate('/student/login'); }}>
-                OK, Logout
               </button>
             </div>
 

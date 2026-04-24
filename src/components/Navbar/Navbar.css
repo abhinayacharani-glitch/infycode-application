@@ -329,3 +329,68 @@ body {
 .nav-links i svg {
   stroke: currentColor;
 }
+
+/* Custom Trainer Button in Navbar */
+.right-group .nav-btn-trainer {
+  background: transparent;
+  color: var(--blue-600, #2563eb) !important;
+  border: 2px solid var(--blue-600, #2563eb);
+  padding: 8px 24px !important;
+  border-radius: 50px;
+  font-weight: 700 !important;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  flex-direction: row !important;
+}
+
+.right-group .nav-btn-trainer:hover {
+  background: rgba(37, 99, 235, 0.05);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+}
+
+.right-group .nav-btn-trainer span {
+  color: var(--blue-600, #2563eb) !important;
+}
+
+/* Combined Auth Group (Signup / Login) */
+.right-group .nav-auth-group {
+  display: flex;
+  align-items: center;
+  background: var(--blue-600, #2563eb);
+  padding: 10px 24px !important;
+  border-radius: 50px;
+  gap: 10px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.15);
+}
+
+.right-group .nav-auth-group:hover {
+  background: #1d4ed8;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.25);
+}
+
+.right-group .auth-nav-link {
+  color: white !important;
+  text-decoration: none !important;
+  font-weight: 700 !important;
+  font-size: 15px !important;
+  transition: all 0.2s;
+  display: inline-block;
+}
+
+.right-group .auth-nav-link:hover {
+  transform: scale(1.05);
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.right-group .auth-divider {
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 300;
+  font-size: 18px;
+  user-select: none;
+}

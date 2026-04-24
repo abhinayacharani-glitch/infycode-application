@@ -119,7 +119,7 @@
 }
 
 .contact-submit-btn {
-  background: var(--blue-600);
+  background: var(--primary, #2563eb);
   color: white;
   align-self: flex-start;
 }
