@@ -1,20 +1,23 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./Testimonals.css";
+import venkatImg from "../../assets/testimonials/venkat.jpg";
+import devendraImg from "../../assets/testimonials/devendra.jpg";
+import phaniImg from "../../assets/testimonials/phani.jpg";
 
 function Testimonals() {
   const original = [
     {
-      name: "Akash",
+      name: "Venkat",
       role: "- Student",
-      img: "https://randomuser.me/api/portraits/men/32.jpg",
+      img: venkatImg,
       text: "There is nothing more important than continuous learning and improving your skills.",
       stars: 5,
       color: "#e8f5e9"
     },
     {
-      name: "Jyothi",
+      name: "Devendra",
       role: "- Student",
-      img: "https://randomuser.me/api/portraits/women/44.jpg",
+      img: devendraImg,
       text: "Learning new skills consistently helps build a strong and successful career.",
       stars: 5,
       color: "#e3f2fd"
@@ -28,9 +31,9 @@ function Testimonals() {
       color: "#fce4ec"
     },
     {
-      name: "Supraja",
+      name: "Phani",
       role: "-Student",
-      img: "https://randomuser.me/api/portraits/women/68.jpg",
+      img: phaniImg,
       text: "A great learning experience with practical knowledge and expert support.",
       stars: 5,
       color: "#fff3e0"
@@ -115,7 +118,11 @@ function Testimonals() {
                     </div>
                     <div className="user-info" style={{ backgroundColor: t.color }}>
                       <div className="avatar-wrapper">
-                        <img src={t.img} alt={t.name} />
+                        <img 
+                          src={t.img} 
+                          alt={t.name} 
+                          style={t.name === "Phani" ? { objectPosition: 'center 15%', transform: 'scale(1.4)' } : {}}
+                        />
                       </div>
                       <div className="user-details">
                         <h3>{t.name}</h3>
