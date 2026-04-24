@@ -482,6 +482,14 @@
   box-shadow: 0 4px 10px rgba(15, 23, 42, 0.15);
 }
 
+.dir-connect-action-btn.disabled {
+  background: #cbd5e1;
+  color: #64748b;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none !important;
+}
+
 .dir-connect-action-btn:hover {
   background: #1e293b;
   transform: translateY(-2px);

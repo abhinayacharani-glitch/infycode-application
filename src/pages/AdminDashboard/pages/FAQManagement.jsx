@@ -17,10 +17,12 @@ const FAQManagement = () => {
     setIsSubmitting(true);
     try {
       await approveFAQ(id, answer);
+      alert("Successfully published");
       setAnsweringId(null);
       setAnswer('');
     } catch (err) {
       console.error("Failed to approve FAQ", err);
+      alert(`Failed to publish FAQ: ${err.message || "Unknown error"}`);
     } finally {
       setIsSubmitting(false);
     }

@@ -54,7 +54,7 @@ const Sidebar = ({ externalShowLogoutModal, setExternalShowLogoutModal }) => {
     { to: "/student-dashboard/skill-test", label: "Skill Based Test" },
     { to: "/student-dashboard/course", label: "Courses" },
     { to: "/student-dashboard/courses", label: "Enrolled Courses" },
-    { to: "/student-dashboard/mentor-connection", label: "Mentor Connect" },
+    { to: "/student-dashboard/mentor-connection", label: "Trainer Connect" },
     { to: "/student-dashboard/mock-interview", label: "Mock Tests & Interviews" },
     { to: "/student-dashboard/projects", label: "Projects & Certificates" },
     { to: "/student-dashboard/profile", label: "My Profile" },

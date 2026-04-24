@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Edit2, Mail, Phone, User, Calendar } from 'lucide-react';
+import React, { useState, useEffect, useRef } from "react";
+import { Edit2, Mail, Phone, User, Calendar, Camera } from 'lucide-react';
 import { useLocation } from "react-router-dom";
 import "./Profile.css";
 
@@ -11,6 +11,20 @@ const Profile = () => {
   );
   const [open, setOpen] = useState("personal");
   const [isEditing, setIsEditing] = useState(false);
+  const editSectionRef = useRef(null);
+  
+  const [isCameraDropdownOpen, setIsCameraDropdownOpen] = useState(false);
+  const cameraDropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutsideCamera = (event) => {
+      if (cameraDropdownRef.current && !cameraDropdownRef.current.contains(event.target)) {
+        setIsCameraDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutsideCamera);
+    return () => document.removeEventListener("mousedown", handleClickOutsideCamera);
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -19,6 +33,18 @@ const Profile = () => {
       setOpen("personal");
     }
   }, [location]);
+
+  const handleEditClick = () => {
+    setOpen("personal");
+    setIsEditing(true);
+    setTimeout(() => {
+      editSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      const fullNameInput = document.querySelector('input[name="fullName"]');
+      if (fullNameInput) {
+        fullNameInput.focus();
+      }
+    }, 100);
+  };
 
   const [personalDetails, setPersonalDetails] = useState({
     fullName: loggedUser.username || "charanistudent",
@@ -67,14 +93,37 @@ const Profile = () => {
 
       {/* 🔷 HEADER */}
       <div className="profile-header">
-        <div className="profile-avatar">{personalDetails.fullName ? personalDetails.fullName.charAt(0).toUpperCase() : 'S'}</div>
+        <div className="profile-avatar-container" ref={cameraDropdownRef}>
+          <div className="profile-avatar">{personalDetails.fullName ? personalDetails.fullName.charAt(0).toUpperCase() : 'S'}</div>
+          <button className="avatar-edit-btn" aria-label="Edit Profile Picture" onClick={() => setIsCameraDropdownOpen(!isCameraDropdownOpen)}>
+            <Camera size={16} />
+          </button>
+          
+          {isCameraDropdownOpen && (
+            <div className="camera-dropdown-menu">
+              <button className="camera-dropdown-item" onClick={() => setIsCameraDropdownOpen(false)}>
+                <span>📷</span> Take a new photo using your camera
+              </button>
+              <button className="camera-dropdown-item" onClick={() => setIsCameraDropdownOpen(false)}>
+                <span>🖼️</span> Choose an existing photo from your gallery
+              </button>
+              <button className="camera-dropdown-item remove-photo" onClick={() => setIsCameraDropdownOpen(false)}>
+                <span>❌</span> Remove current profile picture
+              </button>
+            </div>
+          )}
+        </div>
 
-        <h1 className="profile-name">{personalDetails.fullName}</h1>
+        <div className="profile-name-container">
+          <h1 className="profile-name">{personalDetails.fullName}</h1>
+          <button className="name-edit-icon" onClick={handleEditClick} aria-label="Edit Name">
+            <Edit2 size={20} />
+          </button>
+        </div>
 
-        <div className="profile-id-box">INFY-2024-0892</div>
+        <div className="profile-id-box">INFY-260</div>
 
         <div className="profile-tags">
-          <span>Web Development</span>
           <span>Joined Aug 2024</span>
         </div>
       </div>
@@ -82,17 +131,17 @@ const Profile = () => {
       {/* 🔷 STATS */}
       <div className="profile-stats">
         <div className="stat-card">
-          <h2>10</h2>
+          <h2>2</h2>
           <p>Courses Enrolled</p>
         </div>
 
         <div className="stat-card">
-          <h2>45</h2>
+          <h2>3</h2>
           <p>Assessments Taken</p>
         </div>
 
         <div className="stat-card">
-          <h2>25</h2>
+          <h2>2</h2>
           <p>Tasks Completed</p>
         </div>
       </div>
@@ -129,7 +178,7 @@ const Profile = () => {
 
           {/* PERSONAL */}
           {open === "personal" && (
-            <div className="content-card">
+            <div className="content-card" ref={editSectionRef}>
               <div className="content-header">
                 <h3>Personal Details</h3>
                 {isEditing ? (

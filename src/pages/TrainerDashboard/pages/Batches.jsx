@@ -77,6 +77,9 @@ const Batches = () => {
       { id: 'B2', course: 'Python & Data Science Bootcamp', students: 28, startDate: '2026-02-15', endDate: '2026-06-15', mode: 'Offline', lastUpdated: new Date(Date.now() - 3600000 * 2).toISOString() },
       { id: 'B3', course: 'UI/UX Advanced Design Basics', students: 24, startDate: '2026-03-01', endDate: '2026-05-01', mode: 'Online', lastUpdated: new Date(Date.now() - 86400000).toISOString() },
       { id: 'B4', course: 'AWS & Cloud Architecture Pro', students: 18, startDate: '2026-03-10', endDate: '2026-05-10', mode: 'Online', lastUpdated: new Date(Date.now() - 3600000 * 5).toISOString() },
+      { id: 'B5', course: 'Java Full Stack', students: 20, startDate: '2026-04-01', endDate: '2026-07-01', mode: 'Online', lastUpdated: new Date().toISOString() },
+      { id: 'B6', course: 'Python Fullstack Bootcamp', students: 25, startDate: '2026-04-15', endDate: '2026-08-15', mode: 'Offline', lastUpdated: new Date().toISOString() },
+      { id: 'B7', course: 'Cloud Computing Mastery', students: 15, startDate: '2026-05-01', endDate: '2026-08-01', mode: 'Online', lastUpdated: new Date().toISOString() },
     ];
   });
 

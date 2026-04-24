@@ -195,7 +195,10 @@ const Schedule = () => {
         { id: 'B1', course: 'Full Stack Web Development' },
         { id: 'B2', course: 'Python & Data Science' },
         { id: 'B3', course: 'UI/UX Advanced Design' },
-        { id: 'B4', course: 'AWS & Cloud Architecture' }
+        { id: 'B4', course: 'AWS & Cloud Architecture' },
+        { id: 'B5', course: 'Java Full Stack' },
+        { id: 'B6', course: 'Python Fullstack Bootcamp' },
+        { id: 'B7', course: 'Cloud Computing Mastery' }
       ];
     } catch { return []; }
   });
@@ -314,6 +317,7 @@ const Schedule = () => {
   const resetData = () => {
     if (window.confirm("This will clear your schedule and restore defaults. Proceed?")) {
       localStorage.removeItem('trainer_sessions');
+      localStorage.removeItem('trainer_batches_v2');
       window.location.reload();
     }
   };

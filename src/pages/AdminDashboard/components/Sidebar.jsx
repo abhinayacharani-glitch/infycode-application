@@ -160,9 +160,9 @@ const Sidebar = ({ isCollapsed, externalShowLogoutModal, setExternalShowLogoutMo
             {!isCollapsed && <span className="adm-nav-label">Analytics &amp; Monitoring</span>}
           </NavLink>
 
-          <NavLink to="/admin-dashboard/activation" className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`}>
-            <span className="adm-nav-icon"><ZapIcon /></span>
-            {!isCollapsed && <span className="adm-nav-label">Learning Activation</span>}
+          <NavLink to="/admin-dashboard/counselling-requests" className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`}>
+            <span className="adm-nav-icon"><MessageIcon /></span>
+            {!isCollapsed && <span className="adm-nav-label">Counselling Requests</span>}
           </NavLink>
 
           <NavLink to="/admin-dashboard/reports" className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`}>
