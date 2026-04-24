@@ -1,137 +1,252 @@
-import React from "react";
-import { Star, Clock, Users, ArrowRight, ChevronRight, PlayCircle, BookOpen, Layers } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Star, Search, Eye } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { ALL_COURSES as ORIGINAL_COURSES } from "../../../components/Courses/Courses";
 import "./Course.css";
 
-// ── Course images ──────────────────────────────────────────────
-import imgReact      from "../../../assets/course/react.jpeg";
-import imgWebDev     from "../../../assets/course/Webdev.jpeg";
-import imgPython     from "../../../assets/course/Python.jpeg";
-import imgJava       from "../../../assets/course/java.jpeg";
-import imgAI         from "../../../assets/course/AI.jpeg";
-import imgDataScience from "../../../assets/course/DataScience.jpeg";
-import imgCloud      from "../../../assets/course/cloud.jpeg";
-import imgUIUX       from "../../../assets/course/UI-UX.jpeg";
+// Swap "Ethical Hacking & Cyber Security" and "AWS Cloud Practitioner" for dashboard UI
+const ALL_COURSES = [...ORIGINAL_COURSES];
 
-// components/StatusIcon.jsx (Helper)
-const StatusIcon = ({ name }) => {
-  const icons = { PlayCircle, Star, BookOpen, Layers };
-  const Icon = icons[name] || BookOpen;
-  return <Icon size={12} />;
+const swapCourses = (title1, title2) => {
+  const idx1 = ALL_COURSES.findIndex(c => c.title === title1);
+  const idx2 = ALL_COURSES.findIndex(c => c.title === title2);
+  if (idx1 !== -1 && idx2 !== -1) {
+    const temp = ALL_COURSES[idx1];
+    ALL_COURSES[idx1] = ALL_COURSES[idx2];
+    ALL_COURSES[idx2] = temp;
+  }
 };
 
-const CourseCard = ({ course, index, onExplore }) => {
-  const statusColors = {
-    "BEST SELLER": { bg: "rgba(249, 115, 22, 0.15)", color: "#f97316", icon: "PlayCircle" },
-    "TRENDING":    { bg: "rgba(16, 185, 129, 0.15)", color: "#10b981", icon: "Layers" },
-    "POPULAR":     { bg: "rgba(99, 102, 241, 0.15)", color: "#6366f1", icon: "Star" },
-    "HOT":         { bg: "rgba(220, 38, 38, 0.15)",  color: "#dc2626", icon: "Star" },
-    "NEW":         { bg: "rgba(14, 165, 233, 0.15)", color: "#0ea5e9", icon: "BookOpen" },
-    "ADVANCED":    { bg: "rgba(139, 92, 246, 0.15)", color: "#8b5cf6", icon: "Layers" },
-    "INTERMEDIATE":{ bg: "rgba(13, 148, 136, 0.15)", color: "#0d9488", icon: "Layers" },
-    "BEGINNER":    { bg: "rgba(37, 99, 235, 0.15)",  color: "#2563eb", icon: "BookOpen" },
+swapCourses("Ethical Hacking & Cyber Security", "AWS Cloud Practitioner");
+swapCourses("React JS Full Stack Development", "Python Programming Masterclass");
+swapCourses("Machine Learning Deep Dive", "Java Full Stack Development");
+
+const CATEGORIES = ["All", "Web Dev", "Python", "Java", "AI & Data", "Cybersecurity", "Cloud"];
+
+const DISABLED_COURSES = [
+  "Data Science & AI",
+  "Machine Learning Deep Dive",
+  "Ethical Hacking & Cyber Security",
+  "React JS Full Stack Development",
+  "Next.js 14 Masterclass",
+  "MERN Stack Development",
+  "Angular Enterprise Development",
+  "Flutter Mobile Apps",
+  "Full Stack Python Pro"
+];
+
+const CourseCardModern = ({ course, index, onNavigate }) => {
+  const loggedUserStr = localStorage.getItem("loggedUser");
+  const loggedUser = loggedUserStr ? JSON.parse(loggedUserStr) : { username: "guest" };
+  const userId = loggedUser.username || "guest";
+  const storageKey = `enrolled_courses_${userId}`;
+  
+  const getEnrollments = () => {
+    try {
+      return JSON.parse(localStorage.getItem(storageKey) || "[]");
+    } catch {
+      return [];
+    }
   };
-  const sc = statusColors[course.badge] || statusColors["NEW"];
+  
+  const [isEnrolled, setIsEnrolled] = useState(false);
+
+  useEffect(() => {
+    const enrollments = getEnrollments();
+    if (enrollments.includes(course.title)) {
+      setIsEnrolled(true);
+    }
+  }, [course.title]);
+
+  const handleEnroll = () => {
+    const enrollments = getEnrollments();
+    if (!enrollments.includes(course.title)) {
+      enrollments.push(course.title);
+      localStorage.setItem(storageKey, JSON.stringify(enrollments));
+    }
+    setIsEnrolled(true);
+    alert("You have successfully enrolled in this course.");
+  };
+
+  const isDisabledCard = DISABLED_COURSES.includes(course.title);
+
   return (
-    <motion.div 
-      className="dc-card-premium"
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-      whileHover={{ y: -10, transition: { duration: 0.2 } }}
+    <motion.div
+      className="course-card-modern"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, delay: index * 0.05 }}
+      whileHover={{ y: -10 }}
     >
-      <div className="dc-card-img-wrap">
+      <div className="card-img-banner">
         <img src={course.image} alt={course.title} />
-        <div className="dc-glass-tag">{course.category}</div>
       </div>
-      <div className="dc-card-info">
-        <div className="dc-badge-group">
-          <span className="dc-premium-pill" style={{ background: sc.bg, color: sc.color }}>
-            <StatusIcon name={sc.icon} /> {course.badge}
-          </span>
-          <span className="dc-level-indicator">{course.level}</span>
+
+      <div className="card-content-modern">
+        <h3 className="card-title-modern">{course.title}</h3>
+
+        <div className="card-stats-modern">
+          <div className="stat students-text">
+            {course.students} students
+          </div>
+          <div className="stat stars-container">
+            {[...Array(5)].map((_, idx) => (
+              <Star 
+                key={idx} 
+                size={14} 
+                fill={idx < Math.floor(course.rating) ? "#f59e0b" : "#e2e8f0"} 
+                color={idx < Math.floor(course.rating) ? "#f59e0b" : "#e2e8f0"} 
+                strokeWidth={0}
+              />
+            ))}
+          </div>
         </div>
-        <h3 className="dc-card-head">{course.title}</h3>
-        <div className="dc-meta-row">
-          <div className="dc-meta-item"><Users size={14} className="dc-icon-blue" /><span>{course.students}</span></div>
-          <div className="dc-meta-item"><Star size={14} className="dc-icon-gold" fill="currentColor" /><span>{course.rating}</span></div>
-          <div className="dc-meta-item"><Clock size={14} /><span>{course.duration}</span></div>
-        </div>
-        <div className="dc-card-actions">
-          <button className="dc-btn-enrol-premium" onClick={() => onExplore(course)}>Explore Course <ArrowRight size={16} /></button>
+
+        <div className="card-footer-modern">
+          <div className="footer-actions-left">
+            <div className="details-action-wrapper">
+              <button 
+                className="btn-view-details" 
+                onClick={() => onNavigate(`/course-details/${course.courseId}`)}
+                title="View Course Details"
+              >
+                <Eye size={20} />
+              </button>
+              <span className="action-label">Overview</span>
+            </div>
+          </div>
+          <button 
+            className={`btn-join-now ${isEnrolled ? 'enrolled' : ''}`} 
+            onClick={isDisabledCard || isEnrolled ? undefined : handleEnroll}
+            disabled={isDisabledCard || isEnrolled}
+            style={
+              isDisabledCard 
+                ? { cursor: 'not-allowed', opacity: 0.7 } 
+                : isEnrolled 
+                  ? { backgroundColor: '#10b981', cursor: 'default' } 
+                  : {}
+            }
+          >
+            {isEnrolled ? 'Enrolled' : 'Enroll Now'}
+          </button>
         </div>
       </div>
     </motion.div>
   );
 };
 
-const CourseSection = ({ title, courses, onViewMore, onExplore, sectionIndex }) => (
-  <motion.section 
-    className="dc-section-premium"
-    initial={{ opacity: 0 }}
-    whileInView={{ opacity: 1 }}
-    viewport={{ once: true }}
-    transition={{ duration: 0.6, delay: sectionIndex * 0.2 }}
-  >
-    <div className="dc-sec-header">
-      <div className="dc-sec-intro">
-        <h2 className="dc-sec-title-premium">{title}</h2>
-        <div className="dc-sec-underline"></div>
-      </div>
-      <motion.button className="dc-btn-ghost-premium" onClick={onViewMore} whileHover={{ x: 5 }}>
-        View Library <ChevronRight size={18} />
-      </motion.button>
-    </div>
-    <div className="dc-grid-premium">
-      {courses.map((c, i) => <CourseCard key={i} course={c} index={i} onExplore={onExplore} />)}
-    </div>
-  </motion.section>
-);
-
-const CourseDiscovery = () => {
-  const POPULAR = [
-    { image: imgReact,       title: "Full-Stack React & Next.js Masterclass", category: "Development", badge: "CID-108", rating: 4.9, students: "2.4k", duration: "12 weeks", level: "Intermediate" },
-    { image: imgPython,      title: "Advanced Python for Data Engineering",  category: "Data Science", badge: "CID-109",     rating: 4.8, students: "1.8k", duration: "8 weeks",  level: "Advanced" },
-    { image: imgJava,        title: "Enterprise Java Spring Boot Architecture", category: "Backend",  badge: "CID-110",    rating: 4.9, students: "950+", duration: "10 weeks", level: "Expert" },
-  ];
-
-  const TRENDING = [
-    { image: imgAI,          title: "Generative AI & LLM Systems Design",     category: "Artificial Intelligence", badge: "CID-111",    rating: 5.0, students: "1.2k", duration: "6 weeks",  level: "Intermediate" },
-    { image: imgDataScience, title: "Modern Data Analytics with Power BI",      category: "Business Intelligence",  badge: "CID-112",         rating: 4.8, students: "3.5k", duration: "4 weeks",  level: "Beginner" },
-    { image: imgCloud,       title: "Cloud Infrastructure Specialist (AWS)",    category: "DevOps",        badge: "CID-113",         rating: 4.7, students: "800+", duration: "8 weeks",  level: "Intermediate" },
-  ];
-
-  const RECOMMENDED = [
-    { image: imgWebDev,      title: "Responsive Web Design Professional",       category: "Frontend",      badge: "CID-114",    rating: 4.9, students: "5.6k", duration: "6 weeks",  level: "Beginner" },
-    { image: imgUIUX,        title: "UX Research & Product Design Strategy",    category: "Design",        badge: "CID-115",         rating: 4.8, students: "2.1k", duration: "8 weeks",  level: "Intermediate" },
-    { image: imgPython,       title: "Python for Financial Modeling",            category: "Finance",       badge: "CID-116",     rating: 4.7, students: "1.5k", duration: "5 weeks",  level: "Advanced" },
-  ];
-
-  const navigate = useNavigate();
-  const goToLibrary = () => navigate("/student-dashboard/courses");
-  const handleExplore = (course) => {
-    navigate("/student-dashboard/course-explore", { 
-      state: { courseId: course.badge.toLowerCase(), courseTitle: course.title, category: course.category } 
-    });
-  };
-
+const CourseSection = ({ title, courses, onNavigate }) => {
+  if (courses.length === 0) return null;
   return (
-    <div className="dc-main-viewport">
-      <div className="dc-hero-banner">
-        <motion.div className="dc-hero-text" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}>
-          <h1 className="dc-main-heading">Elevate Your Expertise</h1>
-          <p className="dc-main-desc">Unlock professional-grade tech courses curated by industry leaders.</p>
-        </motion.div>
+    <div className="dc-section">
+      <div className="dc-section-header">
+        <h2 className="dc-section-title">{title}</h2>
       </div>
-      <div className="dc-content-body">
-        <CourseSection title=" Popular Courses" courses={POPULAR} onViewMore={goToLibrary} onExplore={handleExplore} sectionIndex={0} />
-        <CourseSection title=" Trending Courses" courses={TRENDING} onViewMore={goToLibrary} onExplore={handleExplore} sectionIndex={1} />
-        <CourseSection title=" Recommended Courses" courses={RECOMMENDED} onViewMore={goToLibrary} onExplore={handleExplore} sectionIndex={2} />
+      <div className="dc-catalog-grid">
+        {courses.map((course, index) => (
+          <CourseCardModern 
+            key={course.courseId} 
+            course={course} 
+            index={index} 
+            onNavigate={onNavigate} 
+          />
+        ))}
       </div>
     </div>
   );
 };
 
+const CourseDiscovery = () => {
+  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activeCategory, setActiveCategory] = useState("All");
+
+  const handleNavigate = (path, state) => {
+    navigate(path, { state });
+  };
+
+  const filtered = ALL_COURSES.filter(course => {
+    const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = activeCategory === "All" || course.category === activeCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  // Categorize courses (if not searching)
+  const isFiltering = searchTerm !== "" || activeCategory !== "All";
+  
+  const sections = [
+    { title: "Popular Courses", courses: ALL_COURSES.slice(0, 4) },
+    { title: "Trending Courses", courses: ALL_COURSES.slice(4, 8) },
+    { title: "Recommended Courses", courses: ALL_COURSES.slice(8, 12) }
+  ];
+
+  return (
+    <div className="dc-main-viewport">
+      <div className="dc-controls-wrapper">
+        <motion.div 
+          className="dc-hero-card"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <h1>Elevate Your Expertise</h1>
+          <p>
+            Unlock professional-grade tech courses curated by industry leaders.
+          </p>
+        </motion.div>
+
+        <div className="dc-search-bar">
+          <Search size={20} color="#94a3b8" />
+          <input 
+            type="text" 
+            placeholder="Search for courses (e.g. React, Java...)" 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+
+        <div className="dc-categories-bar">
+          {CATEGORIES.map(cat => (
+            <button 
+              key={cat} 
+              className={`dc-cat-btn ${activeCategory === cat ? 'active' : ''}`}
+              onClick={() => setActiveCategory(cat)}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="dc-content-sections" style={{ maxWidth: '1200px', margin: '0 auto' }}>
+        {isFiltering ? (
+          <CourseSection 
+            title={searchTerm ? `Search Results for "${searchTerm}"` : `Filtered Courses: ${activeCategory}`} 
+            courses={filtered} 
+            onNavigate={handleNavigate} 
+          />
+        ) : (
+          sections.map((sec, idx) => (
+            <CourseSection 
+              key={idx} 
+              title={sec.title} 
+              courses={sec.courses} 
+              onNavigate={handleNavigate} 
+            />
+          ))
+        )}
+
+        {isFiltering && filtered.length === 0 && (
+          <div className="no-results">
+            <h3>No courses found</h3>
+            <p>Try adjusting your search or category filter.</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export default CourseDiscovery;
