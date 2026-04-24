@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import './BecomeTrainerPage.css';
 
-import gayathriImg from '../../assets/trainers/gayathri.jpg';
-import karthishaImg from '../../assets/trainers/karthisha.png';
+import gayathriImg from '../../assets/trainers/gayathri_v2.jpg';
+import karthishaImg from '../../assets/trainers/karthisha_v2.jpg';
 import abhinayaImg from '../../assets/trainers/abhinaya.jpg';
-import nagaharshaImg from '../../assets/trainers/nagaharsha.png';
+import nagaharshaImg from '../../assets/trainers/nagaharsha_v2.jpg';
 
 const BecomeTrainerPage = () => {
   const navigate = useNavigate();
