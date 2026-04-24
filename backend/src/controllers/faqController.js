@@ -1,6 +1,8 @@
 import db from "../config/firebase.js";
+import { sendFAQEmail } from "../services/emailService.js";
 
 const faqsRef = db.ref("faqs");
+const newFaqsRef = db.ref("FAQs"); // New node for published FAQs
 
 /**
  * @desc Get all published FAQs
@@ -105,5 +107,62 @@ export const deleteFAQ = async (req, res) => {
   } catch (error) {
     console.error("Error deleting FAQ:", error);
     res.status(500).json({ error: "Failed to delete FAQ" });
+  }
+};
+
+/**
+ * @desc Publish a new FAQ and send email notification
+ * @route POST /publish-faq
+ */
+export const publishFAQ = async (req, res) => {
+  try {
+    const { question, answer, userEmail } = req.body;
+    console.log(`[Backend] Publishing FAQ for: ${userEmail || "Anonymous"}`);
+    
+    if (!question || !answer) {
+      return res.status(400).json({ error: "Question and answer are required" });
+    }
+
+    const emailToUse = userEmail || "gayathria.charani@gmail.com"; // Fallback to admin if user email is missing
+
+    const newFAQRef = newFaqsRef.push();
+    const newFAQ = {
+      id: newFAQRef.key,
+      question,
+      answer,
+      userEmail: emailToUse,
+      createdAt: new Date().toISOString(),
+    };
+
+    // Save data to Firebase under "FAQs" node
+    await newFAQRef.set(newFAQ);
+
+    // Send email to user (don't let email failure block the success response)
+    sendFAQEmail(emailToUse, question, answer).catch(err => {
+      console.error("Email delivery failed during publish:", err);
+    });
+
+    res.status(201).json({ message: "FAQ published successfully", faq: newFAQ });
+  } catch (error) {
+    console.error("Error publishing FAQ:", error);
+    res.status(500).json({ error: "Failed to publish FAQ" });
+  }
+};
+
+/**
+ * @desc Get all FAQs from the new "FAQs" node for the frontend
+ * @route GET /published-faqs
+ */
+export const getNewPublishedFAQs = async (req, res) => {
+  try {
+    const snapshot = await newFaqsRef.once("value");
+    const data = snapshot.val() || {};
+    const faqs = Object.entries(data)
+      .map(([id, faq]) => ({ id, ...faq }))
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    res.status(200).json({ faqs });
+  } catch (error) {
+    console.error("Error fetching published FAQs from FAQs node:", error);
+    res.status(500).json({ error: "Failed to fetch FAQs" });
   }
 };
