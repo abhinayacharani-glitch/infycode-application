@@ -329,3 +329,28 @@ body {
 .nav-links i svg {
   stroke: currentColor;
 }
+
+/* Custom Signup Button in Navbar */
+.right-group .nav-btn-signup {
+  background: var(--blue-600, #2563eb);
+  color: white !important;
+  padding: 10px 24px !important;
+  border-radius: 50px;
+  font-weight: 700 !important;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  flex-direction: row !important;
+}
+
+.right-group .nav-btn-signup:hover {
+  background: #1d4ed8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.right-group .nav-btn-signup span {
+  color: white !important;
+}

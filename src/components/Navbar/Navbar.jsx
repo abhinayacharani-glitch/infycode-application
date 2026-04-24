@@ -2,11 +2,12 @@ import React, { useState, useEffect } from "react";
 import "./Navbar.css";
 import logoimage from "../../assets/infycode-final-logo4-1.png";
 import logoimage1 from "../../assets/color-logo-3.jpeg";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 
 function Navbar() {
   const [sticky, setSticky] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -21,11 +22,31 @@ function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const handleCoursesClick = (e) => {
+    e.preventDefault();
+    if (location.pathname !== "/") {
+      navigate("/");
+      setTimeout(() => {
+        document.getElementById("courses")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
+    } else {
+      document.getElementById("courses")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
   return (
     <div className={sticky ? "header sticky" : "header"}>
       <nav className="navbar">
         {/* CLICKABLE LOGO */}
-        <Link to="/" className="logo">   
+        <Link 
+          to="/" 
+          className="logo"
+          onClick={() => {
+            if (location.pathname === "/") {
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+          }}
+        >   
           <img src={logoimage} alt="Infycode logo"/>
           <div className="logo-text">
             <img src={logoimage1} alt="Infycode logo"/>
@@ -45,6 +66,7 @@ function Navbar() {
 
             <li className="dropdown">
               <span 
+                onClick={handleCoursesClick}
                 className={location.pathname.startsWith("/courses") ? "nav-link active-link" : "nav-link"}
                 style={{ cursor: "pointer" }}
               >
@@ -53,7 +75,9 @@ function Navbar() {
               <ul className="dropdown-menu">
                 <li><NavLink to="/courses/popular" className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}> Popular</NavLink></li>
                 <li><NavLink to="/courses/trending" className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}> Trending</NavLink></li>
-                <li><NavLink to="/courses" end className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}> All Courses</NavLink></li>
+                <li>
+                  <a href="/#courses" onClick={handleCoursesClick} className="nav-link"> All Courses</a>
+                </li>
               </ul>
             </li>
 
@@ -121,6 +145,13 @@ function Navbar() {
                 className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
               >
                 <span>Login</span>
+              </NavLink>
+
+              <NavLink 
+                to="/register" 
+                className="nav-btn-signup"
+              >
+                <span>Sign Up</span>
               </NavLink>
             </div>
           </li>

@@ -63,7 +63,11 @@ const VideoModulesPage = () => {
   const chapters = chaptersByCourse[standardizedId] || chaptersByCourse.java;
   const title = courseTitles[standardizedId] || "Technical Training";
 
-  const toggleModule = (id) => {
+  const toggleModule = (id, isLocked) => {
+    if (isLocked) {
+        document.getElementById('unlock-section')?.scrollIntoView({ behavior: 'smooth' });
+        return;
+    }
     setExpandedId(expandedId === id ? null : id);
   };
 
@@ -126,7 +130,7 @@ const VideoModulesPage = () => {
                                         justifyContent: 'space-between',
                                         transition: 'all 0.2s'
                                     }}
-                                    onClick={() => toggleModule(chapter.id)}
+                                    onClick={() => toggleModule(chapter.id, isChapterLocked)}
                                 >
                                     <div className="vc-hdr-main">
                                         {isChapterLocked ? <Lock size={18} color="#94a3b8" /> : <PlayCircle size={18} color="#2563eb" />}
@@ -139,7 +143,9 @@ const VideoModulesPage = () => {
                                         <span style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '1px', color: isChapterLocked ? '#94a3b8' : '#10b981' }}>
                                             {!isChapterLocked ? "FREE ACCESS" : "ENROLL TO UNLOCK"}
                                         </span>
-                                        <ChevronDown className={`vc-module-arrow ${isOpen ? 'open' : ''}`} size={20} />
+                                        {!isChapterLocked && (
+                                            <ChevronDown className={`vc-module-arrow ${isOpen ? 'open' : ''}`} size={20} />
+                                        )}
                                     </div>
                                 </div>
 
@@ -171,13 +177,7 @@ const VideoModulesPage = () => {
                                                 </div>
                                             ))}
                                             
-                                            {isChapterLocked && (
-                                                <div className="vc-locked-overlay">
-                                                    <Lock size={28} color="#f59e0b" style={{ marginBottom: '10px' }} />
-                                                    <h4>Enroll for Full Access</h4>
-                                                    <p>Get instant access to this chapter and all remaining modules of {title}.</p>
-                                                </div>
-                                            )}
+                                            {/* Locked overlay removed, scroll to bottom instead */}
                                         </div>
                                     </motion.div>
                                 )}
@@ -188,7 +188,7 @@ const VideoModulesPage = () => {
                 </div>
 
                 {!isUnlocked && (
-                    <div style={{ marginTop: '50px', background: 'white', padding: '50px 40px', borderRadius: '32px', textAlign: 'center', boxShadow: '0 20px 50px rgba(37, 99, 235, 0.08)', border: '1px solid #eef2f6' }}>
+                    <div id="unlock-section" style={{ marginTop: '50px', background: 'white', padding: '50px 40px', borderRadius: '32px', textAlign: 'center', boxShadow: '0 20px 50px rgba(37, 99, 235, 0.08)', border: '1px solid #eef2f6' }}>
                         <div style={{ background: '#eff6ff', width: '60px', height: '60px', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
                             <Lock size={30} color="#2563eb" />
                         </div>
@@ -198,8 +198,8 @@ const VideoModulesPage = () => {
                         </p>
                         <button 
                             className="btn-primary" 
-                            style={{ padding: '20px 60px', fontSize: '1.1rem', borderRadius: '18px', fontWeight: 700 }}
-                            onClick={() => navigate(`/video-courses/payment/${standardizedId}`)}
+                            style={{ padding: '20px 60px', fontSize: '1.1rem', borderRadius: '18px', fontWeight: 700, opacity: 0.6, cursor: 'not-allowed' }}
+                            disabled
                         >
                             Enroll to Unlock Full Course
                         </button>
