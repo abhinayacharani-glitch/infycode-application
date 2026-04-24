@@ -1,7 +1,7 @@
 export const COURSE_MAP = {
   'java-fs-01': {
     id: 'java-fs-01',
-    title: "Java Full Stack",
+    title: "Java Full Stack Development",
     description: "Master the complete Java ecosystem from core fundamentals to enterprise Spring Boot and React integration.",
     duration: "6 Months",
     students: 12500,
@@ -280,7 +280,7 @@ export const COURSE_MAP = {
   },
   'python-fs-01': {
     id: 'python-fs-01',
-    title: "Python Fullstack Bootcamp",
+    title: "Python Programming Masterclass",
     description: "Learn Python, Django, and React to build robust, scalable web applications.",
     duration: "5 Months",
     students: 12200,
@@ -604,7 +604,7 @@ export const COURSE_MAP = {
 
   'cloud-comp-01': {
     id: 'cloud-comp-01',
-    title: "Cloud Computing Mastery",
+    title: "AWS Cloud Practitioner",
     description: "Master AWS, Azure, and Google Cloud and deploy enterprise applications at scale.",
     duration: "4 Months",
     students: 9800,
