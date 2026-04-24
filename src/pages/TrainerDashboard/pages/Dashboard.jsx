@@ -130,22 +130,6 @@ const Dashboard = () => {
             <h1>Welcome Back, {userName}!</h1>
             <p>Here’s what’s happening with your batches today.</p>
           </div>
-          <div className="banner-right">
-            <div className="banner-stat-item">
-              <span className="banner-stat-value"><Counter target={128} /></span>
-              <span className="banner-stat-label">Total Students</span>
-            </div>
-            <div className="banner-divider"></div>
-            <div className="banner-stat-item">
-              <span className="banner-stat-value"><Counter target={4} /></span>
-              <span className="banner-stat-label">Active Batches</span>
-            </div>
-            <div className="banner-divider"></div>
-            <div className="banner-stat-item">
-              <span className="banner-stat-value"><Counter target={3} /></span>
-              <span className="banner-stat-label">Live Sessions</span>
-            </div>
-          </div>
         </div>
       </div>
 

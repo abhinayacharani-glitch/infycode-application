@@ -302,9 +302,6 @@ const CounsellingRequests = () => {
 
 /* ─── Main component ─────────────────────────────────────────── */
 /* ── SVG Icons ── */
-const SettingsIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.72V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.72V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></svg>
-);
 
 const UsersIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="8.5" cy="7" r="4" /><polyline points="17 11 19 13 23 9" /></svg>
@@ -411,27 +408,11 @@ const Dashboard = () => {
       <div className="dashboard-banner">
         <div className="banner-content">
           <div className="banner-left">
-            <h2>Welcome Back, {userName}! <SettingsIcon /></h2>
+            <h2>Welcome Back, {userName}!</h2>
             <p>
               Showing data for <strong>{filter.course === 'All' ? 'all courses' : filter.course}</strong> ·{' '}
               <strong>{kpiData.total}</strong> registrations in the {kpiData.dateLabel}
             </p>
-          </div>
-          <div className="banner-right">
-            <div className="banner-stat-item">
-              <span className="banner-stat-value"><Counter key={`total-${animKey}`} target={kpiData.total} /></span>
-              <span className="banner-stat-label">Total Students</span>
-            </div>
-            <div className="banner-divider"></div>
-            <div className="banner-stat-item">
-              <span className="banner-stat-value"><Counter key={`trainers-${animKey}`} target={stats.trainers.active} /></span>
-              <span className="banner-stat-label">Active Trainers</span>
-            </div>
-            <div className="banner-divider"></div>
-            <div className="banner-stat-item">
-              <span className="banner-stat-value"><Counter key={`batches-${animKey}`} target={kpiData.activeBatches} /></span>
-              <span className="banner-stat-label">Live Batches</span>
-            </div>
           </div>
         </div>
       </div>

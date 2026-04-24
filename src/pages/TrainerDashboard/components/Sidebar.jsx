@@ -96,7 +96,7 @@ const Sidebar = ({ isOpen, onClose, externalShowLogoutModal, setExternalShowLogo
     localStorage.clear();
     setInternalShowLogoutModal(false);
     setExternalShowLogoutModal?.(false);
-    navigate('/student/login');
+    navigate('/');
   };
 
   return (
