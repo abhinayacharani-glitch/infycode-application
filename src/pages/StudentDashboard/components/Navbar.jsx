@@ -9,7 +9,6 @@ const Navbar = ({ onToggleSidebar }) => {
   const [activeDropdown, setActiveDropdown] = useState(null); // 'profile', 'notifications', 'messages', or null
   const dropdownRef = useRef(null);
   const notificationsRef = useRef(null);
-  const messagesRef = useRef(null);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const userString = localStorage.getItem('user');
@@ -41,37 +40,13 @@ const Navbar = ({ onToggleSidebar }) => {
     }
   ];
 
-  const messages = [
-    {
-      id: 1,
-      sender: "Charani (Mentor)",
-      text: "Don't forget to push your code for the latest assignment.",
-      time: "10m ago",
-      unread: true
-    },
-    {
-      id: 2,
-      sender: "Admin",
-      text: "System maintenance scheduled for tonight at 2 AM.",
-      time: "3h ago",
-      unread: false
-    },
-    {
-      id: 3,
-      sender: "Placement Cell",
-      text: "New internship opportunity at TechCorp for React Developers.",
-      time: "1d ago",
-      unread: false
-    }
-  ];
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       const isOutsideDropdown = dropdownRef.current && !dropdownRef.current.contains(event.target);
       const isOutsideNotifications = notificationsRef.current && !notificationsRef.current.contains(event.target);
-      const isOutsideMessages = messagesRef.current && !messagesRef.current.contains(event.target);
 
-      if (isOutsideDropdown && isOutsideNotifications && isOutsideMessages) {
+      if (isOutsideDropdown && isOutsideNotifications) {
         setActiveDropdown(null);
       }
     };
@@ -91,51 +66,19 @@ const Navbar = ({ onToggleSidebar }) => {
   return (
     <nav className="student-topbar">
       <div className="topbar-left">
-        <div className="navbar-search">
-          <Search size={18} className="search-icon" />
-          <input type="text" placeholder="Search & Enter" />
-        </div>
+        {/* Search bar removed as requested */}
       </div>
 
       <div className="topbar-right">
         <div className="navbar-actions" style={{ marginRight: '1.5rem' }}>
-          {/* MESSAGES DROPDOWN */}
-          <div className="dropdown-wrapper" ref={messagesRef}>
-            <div className="action-with-badge" onClick={() => toggleDropdown('messages')}>
-              <Mail size={22} className="nav-icon" />
-              <span className="nav-badge blue">3</span>
-            </div>
-            {activeDropdown === 'messages' && (
-              <div className="content-dropdown messages-dropdown">
-                <div className="dropdown-header">
-                  <h3>Messages</h3>
-                  <button className="view-all">View All</button>
-                </div>
-                <div className="dropdown-body">
-                  {messages.map((msg) => (
-                    <div key={msg.id} className={`dropdown-item ${msg.unread ? 'unread' : ''}`}>
-                      <div className="item-icon bg-blue">
-                        <MessageSquare size={16} />
-                      </div>
-                      <div className="item-content">
-                        <div className="item-title">{msg.sender}</div>
-                        <div className="item-snippet">{msg.text}</div>
-                        <div className="item-time">
-                          <Clock size={12} /> {msg.time}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
 
           {/* NOTIFICATIONS DROPDOWN */}
           <div className="dropdown-wrapper" ref={notificationsRef}>
             <div className="action-with-badge" onClick={() => toggleDropdown('notifications')}>
               <Bell size={22} className="nav-icon" />
-              <span className="nav-badge orange">3</span>
+              {notifications.length > 0 && (
+                <span className="nav-badge orange">{notifications.length}</span>
+              )}
             </div>
             {activeDropdown === 'notifications' && (
               <div className="content-dropdown notifications-dropdown">
@@ -171,7 +114,6 @@ const Navbar = ({ onToggleSidebar }) => {
             alt="Profile" 
             className="navbar-avatar" 
           />
-          <span className="navbar-username">{userName}</span>
           <ChevronDown size={14} className="chevron-icon" />
           
           {activeDropdown === 'profile' && (

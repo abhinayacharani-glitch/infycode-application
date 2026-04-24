@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Edit2, Mail, Phone, User, Calendar } from 'lucide-react';
+import { Edit2, Mail, Phone, User, Calendar, Camera } from 'lucide-react';
 import { useLocation } from "react-router-dom";
 import "./Profile.css";
 
@@ -11,6 +11,37 @@ const Profile = () => {
   );
   const [open, setOpen] = useState("personal");
   const [isEditing, setIsEditing] = useState(false);
+  const [profileImage, setProfileImage] = useState(localStorage.getItem("profileImage") || null);
+  const [showCameraMenu, setShowCameraMenu] = useState(false);
+  
+  // Dynamic Stats State
+  const [stats, setStats] = useState({
+    courses: 2,
+    assessments: 3,
+    tasks: 2
+  });
+
+  // Dynamic Courses State
+  const [courses, setCourses] = useState([
+    { id: 1, name: "Web Development", lessons: 8, duration: "3h" },
+    { id: 2, name: "React JS", lessons: 10, duration: "5h" },
+    { id: 3, name: "JavaScript", lessons: 6, duration: "2h" }
+  ]);
+
+  const fileInputRef = React.useRef(null);
+  const cameraInputRef = React.useRef(null);
+  const nameInputRef = React.useRef(null);
+  const cameraMenuRef = React.useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (cameraMenuRef.current && !cameraMenuRef.current.contains(e.target)) {
+        setShowCameraMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -60,6 +91,26 @@ const Profile = () => {
     setLoggedUser(updatedUser);
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileImage(reader.result);
+        localStorage.setItem("profileImage", reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleEditName = () => {
+    setOpen("personal");
+    setIsEditing(true);
+    setTimeout(() => {
+      if (nameInputRef.current) nameInputRef.current.focus();
+    }, 100);
+  };
+
   return (
     <div className="profile-container">
 
@@ -67,14 +118,61 @@ const Profile = () => {
 
       {/* 🔷 HEADER */}
       <div className="profile-header">
-        <div className="profile-avatar">{personalDetails.fullName ? personalDetails.fullName.charAt(0).toUpperCase() : 'S'}</div>
+        <input 
+          type="file" 
+          ref={fileInputRef} 
+          style={{ display: 'none' }} 
+          accept="image/*" 
+          onChange={handleImageChange} 
+        />
+        <input 
+          type="file" 
+          ref={cameraInputRef} 
+          style={{ display: 'none' }} 
+          accept="image/*" 
+          capture="user"
+          onChange={handleImageChange} 
+        />
+        
+        <div className="profile-avatar-container">
+          <div className="profile-avatar">
+            {profileImage ? (
+              <img src={profileImage} alt="Profile" className="avatar-preview-img" />
+            ) : (
+              personalDetails.fullName ? personalDetails.fullName.charAt(0).toUpperCase() : 'S'
+            )}
+          </div>
+          <div className="profile-avatar-edit" onClick={() => setShowCameraMenu(!showCameraMenu)}>
+            <Camera size={16} />
+          </div>
 
-        <h1 className="profile-name">{personalDetails.fullName}</h1>
+          {showCameraMenu && (
+            <div className="camera-action-menu" ref={cameraMenuRef}>
+              <button onClick={() => { cameraInputRef.current.click(); setShowCameraMenu(false); }}>
+                <Camera size={14} /> Take Photo
+              </button>
+              <button onClick={() => { fileInputRef.current.click(); setShowCameraMenu(false); }}>
+                <User size={14} /> Choose from Gallery
+              </button>
+              {profileImage && (
+                <button onClick={() => { setProfileImage(null); localStorage.removeItem("profileImage"); setShowCameraMenu(false); }} className="remove-photo">
+                  <Edit2 size={14} /> Remove Photo
+                </button>
+              )}
+            </div>
+          )}
+        </div>
 
-        <div className="profile-id-box">INFY-2024-0892</div>
+        <div className="profile-name-wrapper" onClick={handleEditName}>
+          <h1 className="profile-name">{personalDetails.fullName}</h1>
+          <button className="profile-name-edit-btn">
+            <Edit2 size={18} />
+          </button>
+        </div>
+
+        <div className="profile-id-box">INFY-260</div>
 
         <div className="profile-tags">
-          <span>Web Development</span>
           <span>Joined Aug 2024</span>
         </div>
       </div>
@@ -82,17 +180,17 @@ const Profile = () => {
       {/* 🔷 STATS */}
       <div className="profile-stats">
         <div className="stat-card">
-          <h2>10</h2>
+          <h2>{stats.courses}</h2>
           <p>Courses Enrolled</p>
         </div>
 
         <div className="stat-card">
-          <h2>45</h2>
+          <h2>{stats.assessments}</h2>
           <p>Assessments Taken</p>
         </div>
 
         <div className="stat-card">
-          <h2>25</h2>
+          <h2>{stats.tasks}</h2>
           <p>Tasks Completed</p>
         </div>
       </div>
@@ -142,7 +240,18 @@ const Profile = () => {
               <div className="content-grid">
                 <div>
                   <label>Full Name</label>
-                  {isEditing ? <input type="text" name="fullName" value={personalDetails.fullName} onChange={handleInputChange} className="profile-input" /> : <p>{personalDetails.fullName}</p>}
+                  {isEditing ? (
+                    <input 
+                      type="text" 
+                      name="fullName" 
+                      ref={nameInputRef}
+                      value={personalDetails.fullName} 
+                      onChange={handleInputChange} 
+                      className="profile-input" 
+                    />
+                  ) : (
+                    <p>{personalDetails.fullName}</p>
+                  )}
                 </div>
                 <div>
                   <label>Phone</label>
@@ -222,18 +331,12 @@ const Profile = () => {
               </div>
 
               <div className="course-list">
-                <div className="course-item">
-                  <p>Web Development</p>
-                  <span>8 Lessons • 3h</span>
-                </div>
-                <div className="course-item">
-                  <p>React JS</p>
-                  <span>10 Lessons • 5h</span>
-                </div>
-                <div className="course-item">
-                  <p>JavaScript</p>
-                  <span>6 Lessons • 2h</span>
-                </div>
+                {courses.map(course => (
+                  <div key={course.id} className="course-item">
+                    <p>{course.name}</p>
+                    <span>{course.lessons} Lessons • {course.duration}</span>
+                  </div>
+                ))}
               </div>
             </div>
           )}
