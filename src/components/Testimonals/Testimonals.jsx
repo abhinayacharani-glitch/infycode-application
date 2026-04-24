@@ -1,39 +1,70 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./Testimonals.css";
+import venkatImg from "../../assets/testimonials/venkat.jpg";
+import devendraImg from "../../assets/testimonials/devendra.jpg";
+import phaniImg from "../../assets/testimonials/phani.jpg";
+import anjaliImg from "../../assets/testimonials/anjali.jpg";
+import hemasunderImg from "../../assets/testimonials/hemasunder.jpg";
+import lavanyaImg from "../../assets/testimonials/lavanya.jpg";
+import nikhilImg from "../../assets/testimonials/nikhil.jpg";
 
 function Testimonals() {
   const original = [
     {
-      name: "Akash",
+      name: "Venkat",
       role: "- Student",
-      img: "https://randomuser.me/api/portraits/men/32.jpg",
+      img: venkatImg,
       text: "There is nothing more important than continuous learning and improving your skills.",
       stars: 5,
       color: "#e8f5e9"
     },
     {
-      name: "Jyothi",
+      name: "Devendra",
       role: "- Student",
-      img: "https://randomuser.me/api/portraits/women/44.jpg",
+      img: devendraImg,
       text: "Learning new skills consistently helps build a strong and successful career.",
       stars: 5,
       color: "#e3f2fd"
     },
     {
-      name: "Archana",
+      name: "Anjali",
       role: "- Student",
-      img: "https://randomuser.me/api/portraits/women/65.jpg",
+      img: anjaliImg,
       text: "With the right guidance and practice, anyone can achieve their goals.",
       stars: 5,
       color: "#fce4ec"
     },
     {
-      name: "Supraja",
+      name: "Phani",
       role: "-Student",
-      img: "https://randomuser.me/api/portraits/women/68.jpg",
+      img: phaniImg,
       text: "A great learning experience with practical knowledge and expert support.",
       stars: 5,
       color: "#fff3e0"
+    },
+    {
+      name: "Hema Sunder",
+      role: "- Student",
+      img: hemasunderImg,
+      text: "The curriculum is perfectly designed for career growth and skill mastery.",
+      stars: 5,
+      color: "#f3e5f5"
+    },
+    {
+      name: "Lavanya",
+      role: "- Student",
+      img: lavanyaImg,
+      text: "Highly recommended for anyone looking to transition into a tech career.",
+      stars: 5,
+      color: "#fffde7"
+    },
+    {
+      name: "Nikhil",
+      role: "- Student",
+      img: nikhilImg,
+      text: "Practical projects and industry-relevant curriculum helped me land my dream job.",
+      stars: 5,
+      color: "#f1f8e9"
     }
   ];
 
@@ -115,7 +146,11 @@ function Testimonals() {
                     </div>
                     <div className="user-info" style={{ backgroundColor: t.color }}>
                       <div className="avatar-wrapper">
-                        <img src={t.img} alt={t.name} />
+                        <img 
+                          src={t.img} 
+                          alt={t.name} 
+                          style={t.name === "Phani" ? { objectPosition: 'center 15%', transform: 'scale(1.4)' } : {}}
+                        />
                       </div>
                       <div className="user-details">
                         <h3>{t.name}</h3>

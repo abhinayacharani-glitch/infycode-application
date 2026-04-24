@@ -47,7 +47,7 @@ const BecomeTrainerPage = () => {
             {
               name: "Rohan",
               role: "Java Full Stack Developer",
-              exp: "1 Year Experience",
+              exp: "1.5 Year Experience",
               bio: "",
               img: rohanImg
             },
