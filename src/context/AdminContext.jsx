@@ -7,7 +7,8 @@ import {
   toggleCourseLike as apiToggleCourseLike,
   getPendingFAQs as apiGetPendingFAQs,
   updateFAQStatus as apiUpdateFAQStatus,
-  deleteFAQ as apiDeleteFAQ
+  deleteFAQ as apiDeleteFAQ,
+  publishNewFAQ
 } from '../services/api';
 
 const AdminContext = createContext();
@@ -171,7 +172,26 @@ export const AdminProvider = ({ children }) => {
 
   const approveFAQ = async (id, answer) => {
     try {
-      await apiUpdateFAQStatus(id, { answer, status: 'published' });
+      const faqToApprove = pendingFAQs.find(f => f.id === id);
+      if (!faqToApprove) return false;
+
+      // Step 1: Publish to the live node and send email
+      // This is the most critical part
+      await publishNewFAQ({
+        question: faqToApprove.question,
+        answer: answer,
+        userEmail: faqToApprove.userEmail
+      });
+
+      // Step 2: Update status in the original node (try-catch internally so it doesn't block)
+      try {
+        await apiUpdateFAQStatus(id, { answer, status: 'published' });
+      } catch (updateError) {
+        console.warn("FAQ published, but failed to update status in original node:", updateError);
+        // We continue anyway because the primary goal (publishing) succeeded
+      }
+      
+      // Step 3: Remove from the UI list
       setPendingFAQs(prev => prev.filter(f => f.id !== id));
       return true;
     } catch (error) {

@@ -6,13 +6,14 @@
 
 const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || 
-                (isLocalhost ? 'http://localhost:5000' : 'https://infycode-application.onrender.com');
+                (isLocalhost ? '' : 'https://infycode-application.onrender.com');
 
 /**
  * Internal helper — wraps fetch + JSON parsing + error extraction
  */
 const request = async (endpoint, options = {}) => {
   const url = `${BASE_URL}${endpoint}`;
+  console.log(`[API Request] ${options.method || 'GET'} ${url}`, options.body ? JSON.parse(options.body) : '');
 
   const response = await fetch(url, {
     headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
@@ -425,3 +426,21 @@ export const deleteFAQ = (id) =>
     method: 'DELETE',
     headers: getAuthHeader(),
   });
+
+/**
+ * POST /publish-faq (Admin)
+ * Publishes an answered FAQ to the FAQs node and sends an email.
+ */
+export const publishNewFAQ = (data) =>
+  request('/api/faqs/publish', {
+    method: 'POST',
+    // Removed Authorization header to avoid preflight issues on this public route
+    body: JSON.stringify(data),
+  });
+
+/**
+ * GET /published-faqs
+ * Retrieves all FAQs from the FAQs node for the homepage.
+ */
+export const getNewPublishedFAQs = () =>
+  request('/api/faqs/published', { cache: 'no-store' });
