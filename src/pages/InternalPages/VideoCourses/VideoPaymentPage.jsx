@@ -175,7 +175,7 @@ const VideoPaymentPage = () => {
                 type="submit"
                 className="btn-primary vc-payment-btn" 
                 disabled={loading}
-                style={{ width: '100%', padding: '16px', borderRadius: '16px', fontWeight: 800, fontSize: '16px' }}
+                style={{ width: '100%', padding: '16px', borderRadius: '16px', fontWeight: 800, fontSize: '16px', border: 'none', boxShadow: '0 10px 25px rgba(37, 99, 235, 0.2)' }}
             >
                 {loading ? "Securely Processing..." : `Complete Enrollment`}
             </button>
@@ -205,7 +205,7 @@ const VideoPaymentPage = () => {
                 <button 
                     className="btn-primary" 
                     onClick={finalizeUnlock}
-                    style={{ width: '100%', padding: '18px', borderRadius: '16px' }}
+                    style={{ width: '100%', padding: '18px', borderRadius: '16px', border: 'none', boxShadow: '0 10px 25px rgba(37, 99, 235, 0.2)' }}
                 >
                     Start Learning
                 </button>

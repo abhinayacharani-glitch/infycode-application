@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Clock, Users, Star, PlayCircle, ArrowRight } from 'lucide-react';
 import '../CoursesPage.css'; // Reuse existing styles
 import './VideoCourses.css';
+import heroBg from '../../../assets/video-courses-hero.png';
 
 const videoCoursesData = [
   {
@@ -46,16 +47,19 @@ const VideoCoursesPage = () => {
     <div className="courses-page">
       <div
         className="courses-hero"
-        style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80&w=1920)' }}
+        style={{ backgroundImage: `url(${heroBg})` }}
       >
         <div className="courses-hero-content">
-          <h1>Self-Paced Video Learning</h1>
-          <p>Professional video-based courses designed to let you learn at your own pace anytime, anywhere.</p>
+          <h1>Expert-Led <br /> Video Master Classes</h1>
+          <p>Access high-definition recorded sessions from industry experts. Master new skills at your own pace with unlimited playback.</p>
+          <div className="hero-motivation">
+            <span>"The expert in anything was once a beginner. Start your mastery today."</span>
+          </div>
         </div>
       </div>
 
       <div className="video-courses-section">
-        <h2 className="courses-section-title">Available Video Courses</h2>
+        <h2 className="courses-section-title">Available Recorded Sessions</h2>
         <div className="courses-grid">
           {videoCoursesData.map((course, i) => (
             <motion.div 

@@ -135,24 +135,16 @@ function Navbar() {
             <div className="right-group">
               <NavLink 
                 to="/become-trainer" 
-                className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
+                className="nav-btn-trainer"
               >
                 <span>Become a Trainer</span>
               </NavLink>
-
-              <NavLink 
-                to="/login" 
-                className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
-              >
-                <span>Login</span>
-              </NavLink>
-
-              <NavLink 
-                to="/register" 
-                className="nav-btn-signup"
-              >
-                <span>Sign Up</span>
-              </NavLink>
+              
+              <div className="nav-auth-group">
+                <NavLink to="/register" className="auth-nav-link">Sign Up</NavLink>
+                <span className="auth-divider">/</span>
+                <NavLink to="/login" className="auth-nav-link">Login</NavLink>
+              </div>
             </div>
           </li>
         </ul>

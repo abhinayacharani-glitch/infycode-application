@@ -198,8 +198,8 @@ const VideoModulesPage = () => {
                         </p>
                         <button 
                             className="btn-primary" 
-                            style={{ padding: '20px 60px', fontSize: '1.1rem', borderRadius: '18px', fontWeight: 700, opacity: 0.6, cursor: 'not-allowed' }}
-                            disabled
+                            style={{ padding: '20px 60px', fontSize: '1.1rem', borderRadius: '18px', fontWeight: 700, border: 'none', boxShadow: '0 10px 25px rgba(37, 99, 235, 0.2)' }}
+                            onClick={() => navigate(`/video-courses/payment/${courseId}`)}
                         >
                             Enroll to Unlock Full Course
                         </button>
