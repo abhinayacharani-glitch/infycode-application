@@ -4,9 +4,7 @@
  * Merged version: Includes advanced Auth (Student/Trainer/Admin) + Course Management
  */
 
-const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 
-                (isLocalhost ? 'http://localhost:5000' : 'https://infycode-application.onrender.com');
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://infycode-application.onrender.com';
 
 /**
  * Internal helper — wraps fetch + JSON parsing + error extraction
