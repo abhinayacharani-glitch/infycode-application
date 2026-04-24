@@ -183,6 +183,15 @@ const Sidebar = ({ isOpen, onClose, externalShowLogoutModal, setExternalShowLogo
             </div>
           </NavLink>
 
+          <NavLink to="/trainer-dashboard/counselling"
+            onClick={onClose}
+            className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
+            <div className="sd-box">
+              <span className="sd-icon"><LiveIcon /></span>
+              <span className="sd-text">Counselling Sessions</span>
+            </div>
+          </NavLink>
+
           <NavLink to="/trainer-dashboard/feedback"
             onClick={onClose}
             className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>

@@ -15,6 +15,7 @@ import Schedule from "./pages/Schedule";
 import Materials from "./pages/Materials";
 import Attendance from "./pages/Attendance";
 import Feedback from "./pages/Feedback";
+import TrainerCounselling from "./pages/TrainerCounselling";
 import Messages from "./pages/Messages";
 import LiveSession from "./pages/LiveSession";
 import Logout from "./pages/Logout";
@@ -63,6 +64,7 @@ const TrainerDashboard = () => {
               <Route path="schedule" element={<Schedule />} />
               <Route path="materials" element={<Materials />} />
               <Route path="attendance" element={<Attendance />} />
+              <Route path="counselling" element={<TrainerCounselling />} />
               <Route path="feedback" element={<Feedback />} />
               <Route path="messages" element={<Messages />} />
               <Route path="live-session" element={<LiveSession />} />
