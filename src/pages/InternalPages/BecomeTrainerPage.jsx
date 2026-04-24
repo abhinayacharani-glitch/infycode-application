@@ -7,6 +7,8 @@ import gayathriImg from '../../assets/trainers/gayathri_v2.jpg';
 import karthishaImg from '../../assets/trainers/karthisha_v2.jpg';
 import abhinayaImg from '../../assets/trainers/abhinaya.jpg';
 import nagaharshaImg from '../../assets/trainers/nagaharsha_v2.jpg';
+import mohanImg from '../../assets/trainers/mohan.jpg';
+import rohanImg from '../../assets/trainers/rohan.jpg';
 
 const BecomeTrainerPage = () => {
   const navigate = useNavigate();
@@ -36,18 +38,25 @@ const BecomeTrainerPage = () => {
         <div className="trainer-experts-grid">
           {[
             {
-              name: "Gayathri",
-              role: "Python & AI Specialist",
-              exp: "2 Years Experience",
+              name: "Abhinaya",
+              role: "MERN Stack Developer",
+              exp: "2.5 Years Experience",
               bio: "",
-              img: gayathriImg
+              img: abhinayaImg
             },
             {
               name: "Rohan",
               role: "Java Full Stack Developer",
               exp: "1 Year Experience",
               bio: "",
-              img: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=400"
+              img: rohanImg
+            },
+            {
+              name: "Gayathri",
+              role: "Python & AI Specialist",
+              exp: "2 Years Experience",
+              bio: "",
+              img: gayathriImg
             },
             {
               name: "Karthisha",
@@ -57,18 +66,11 @@ const BecomeTrainerPage = () => {
               img: karthishaImg
             },
             {
-              name: "Abhinaya",
-              role: "MERN Stack Developer",
-              exp: "2.5 Years Experience",
-              bio: "",
-              img: abhinayaImg
-            },
-            {
               name: "Mohan",
               role: "Cloud Solutions Associate",
               exp: "1.5 Years Experience",
               bio: "",
-              img: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=400"
+              img: mohanImg
             },
             {
               name: "Nagaharsha",
@@ -81,7 +83,12 @@ const BecomeTrainerPage = () => {
 .slice(0, 6).map((expert, index) => (
             <div key={index} className="trainer-expert-card">
               <div className="expert-image-wrapper">
-                <img src={expert.img} alt={expert.name} className="expert-image" />
+                <img 
+                  src={expert.img} 
+                  alt={expert.name} 
+                  className="expert-image" 
+                  style={expert.name === "Rohan" ? { objectPosition: 'center 10%', transform: 'scale(1.5)' } : {}}
+                />
               </div>
               <div className="expert-content">
                 <h3 className="expert-name">{expert.name}</h3>
