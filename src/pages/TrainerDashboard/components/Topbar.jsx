@@ -8,13 +8,13 @@ import icLogo from '../../../assets/infycode-final-logo4-1.png';
 
 const EnvelopeIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="#606d80">
-    <path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0l-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z"/>
+    <path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0l-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z" />
   </svg>
 );
 
 const BellSolidIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="#606d80">
-    <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+    <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
   </svg>
 );
 
@@ -117,9 +117,9 @@ const Topbar = () => {
     <header className="tb-root">
       {/* ── Brand / Logo ── */}
       <div className="adm-brand-section-tb">
-        <div 
-          className="brand-wrapper" 
-          onClick={() => { setModalType('brand-logo'); setShowLogoutModal(true); }} 
+        <div
+          className="brand-wrapper"
+          onClick={() => { setModalType('brand-logo'); setShowLogoutModal(true); }}
           style={{ cursor: 'pointer' }}
           title="Logout"
         >
@@ -140,52 +140,6 @@ const Topbar = () => {
 
       {/* ── Right Items (User Profile + Icons) ── */}
       <div className="tb-right-aligned">
-        <div className="tb-icon-badge-wrap" style={{ marginRight: '24px' }}>
-          <div className="tb-icon-box" ref={notifRef} onClick={() => setShowNotifications(!showNotifications)}>
-            <BellSolidIcon />
-            <span className="tb-badge orange">{notifications.filter(n => !n.read).length}</span>
-            {showNotifications && (
-              <div className="tb-dropdown modern">
-                <div className="tb-dropdown-header">Notifications</div>
-                <div className="tb-dropdown-list">
-                  {notifications.map(n => (
-                    <div className={`tb-dropdown-item ${!n.read ? 'unread' : ''}`} key={n.id}>
-                      <div className="tb-item-icon"><NotifIcon type={n.type} /></div>
-                      <div className="tb-item-content">
-                        <div className="tb-item-title">{n.title}</div>
-                        <div className="tb-item-text">{n.text}</div>
-                        <div className="tb-item-time">{n.time}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="tb-dropdown-footer" onClick={markAllRead}>Mark all as read</div>
-              </div>
-            )}
-          </div>
-          <div className="tb-icon-box" ref={msgRef} onClick={() => setShowMessages(!showMessages)}>
-            <EnvelopeIcon />
-            <span className="tb-badge teal">{messages.filter(m => m.unread).length}</span>
-            {showMessages && (
-              <div className="tb-dropdown modern">
-                <div className="tb-dropdown-header">Messages</div>
-                <div className="tb-dropdown-list">
-                  {messages.map(m => (
-                    <div className={`tb-dropdown-item ${m.unread ? 'unread' : ''}`} key={m.id}>
-                      <div className="tb-item-avatar">{m.sender.charAt(0)}</div>
-                      <div className="tb-item-content">
-                        <div className="tb-item-sender">{m.sender}</div>
-                        <div className="tb-item-text">{m.text}</div>
-                        <div className="tb-item-time">{m.time}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="tb-dropdown-footer">View All Messages</div>
-              </div>
-            )}
-          </div>
-        </div>
 
         <div className="tb-user-profile-new" ref={userMenuRef} onClick={() => setShowUserMenu(!showUserMenu)}>
           <img src={profileImage || "https://i.pravatar.cc/150?img=5"} alt={userName} className="tb-user-avatar-new" />
@@ -200,12 +154,12 @@ const Topbar = () => {
               </div>
               <div className="tb-user-dropdown-divider" />
               <button className="tb-udrop-item" onClick={(e) => { e.stopPropagation(); setShowUserMenu(false); navigate('/trainer-dashboard/profile'); }}>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4" /><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" /></svg>
                 My Profile
               </button>
               <div className="tb-user-dropdown-divider" />
               <button className="tb-udrop-item tb-udrop-logout" onClick={(e) => { e.stopPropagation(); setShowUserMenu(false); setModalType('user-menu'); setShowLogoutModal(true); }}>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>
                 Logout
               </button>
             </div>

@@ -3,15 +3,15 @@ import { Settings } from 'lucide-react';
 import "./DashboardHero.css";
 
 const DashboardHero = () => {
-    const userString = localStorage.getItem('user');
-    const user = userString ? JSON.parse(userString) : { fullname: "Anjali Syamala" };
-    const userName = user.fullname || user.fullName || "Anjali Syamala";
+    const userString = localStorage.getItem('user') || localStorage.getItem('loggedUser');
+    const user = userString ? JSON.parse(userString) : { fullName: "Anjali Syamala" };
+    const userName = user.fullName || user.fullname || "Anjali Syamala";
 
     return (
         <div className="dashboard-banner">
             <div className="banner-content">
                 <div className="banner-left">
-                    <h2>Welcome back, {userName}! <Settings size={22} className="settings-icon" /></h2>
+                    <h2>Welcome Back, {userName}! <Settings size={22} className="settings-icon" /></h2>
                     <p>
                         Showing data for <strong>all courses</strong> · 0 modules completed this month
                     </p>
