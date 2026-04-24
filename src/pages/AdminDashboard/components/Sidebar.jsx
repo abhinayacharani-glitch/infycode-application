@@ -212,7 +212,7 @@ const Sidebar = ({ isCollapsed, externalShowLogoutModal, setExternalShowLogoutMo
                 localStorage.clear();
                 setInternalShowLogoutModal(false);
                 setExternalShowLogoutModal?.(false);
-                navigate("/student/login");
+                navigate("/");
               }}>OK</button>
             </div>
           </div>

@@ -472,26 +472,16 @@
   color: #f87171;
 }
 
-/* ================= LOGO LOGOUT MODAL ================= */
 
-.sd-logo-modal-card {
-  background: #ffffff;
-  border-radius: 20px;
-  padding: 40px 48px;
-  width: auto;
-  min-width: 420px;
-  max-width: 92vw;
-  box-shadow:
-    0 25px 50px -12px rgba(0, 0, 0, 0.25),
-    0 0 0 1px rgba(0, 0, 0, 0.05);
-  text-align: center;
+/* ================= LOGOUT MODAL (RED VARIANT) ================= */
+
+.sd-modal-logout-icon {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  animation: sd-card-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  justify-content: center;
+  margin-bottom: 24px;
 }
 
-.sd-logo-modal-icon-wrapper {
+.logout-icon-circle-red {
   width: 64px;
   height: 64px;
   border-radius: 50%;
@@ -499,73 +489,31 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 20px;
   box-shadow: 0 8px 16px rgba(239, 68, 68, 0.1);
 }
 
-.sd-logo-modal-title {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: #0f172a;
-  margin: 0 0 10px;
-  letter-spacing: -0.01em;
-}
-
-.sd-logo-modal-subtitle {
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: #64748b;
-  margin: 0 0 32px;
-  line-height: 1.5;
-}
-
-.sd-logo-modal-actions {
-  display: flex;
-  gap: 16px;
-  width: 100%;
-}
-
-.sd-logo-modal-cancel {
-  flex: 1;
-  padding: 14px 24px;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-  background: #ffffff;
-  color: #475569;
-  font-size: 0.95rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: inherit;
-}
-
-.sd-logo-modal-cancel:hover {
-  background: #f8fafc;
-  border-color: #cbd5e1;
-  color: #1e293b;
-}
-
-.sd-logo-modal-confirm {
+.sd-modal-logout-red {
   flex: 1;
   padding: 14px 24px;
   border-radius: 12px;
   border: none;
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  background: #ef4444;
   color: #ffffff;
   font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
   font-family: inherit;
-  box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.3);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
 }
 
-.sd-logo-modal-confirm:hover {
+.sd-modal-logout-red:hover {
+  background: #dc2626;
   transform: translateY(-2px);
-  box-shadow: 0 12px 20px -3px rgba(239, 68, 68, 0.4);
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.3);
 }
 
-.sd-logo-modal-confirm:active {
+.sd-modal-logout-red:active {
   transform: translateY(0);
 }
 

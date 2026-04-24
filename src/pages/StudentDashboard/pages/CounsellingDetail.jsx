@@ -192,19 +192,17 @@ const CounsellingDetail = () => {
 
             <div className="modal-slots-grid">
               {timeSlots.map(slot => {
-                const isPast = currentTime.getHours() >= slot.endHour;
                 const isSelected = selectedSlot?.id === slot.id;
                 return (
                   <button
                     key={slot.id}
-                    className={`modal-slot-card ${isPast ? 'past' : ''} ${isSelected ? 'selected' : ''}`}
-                    onClick={() => !isPast && setSelectedSlot(slot)}
-                    disabled={isPast}
+                    className={`modal-slot-card ${isSelected ? 'selected' : ''}`}
+                    onClick={() => setSelectedSlot(slot)}
                   >
                     <Clock size={18} />
                     <span className="slot-time-text">{slot.label}</span>
-                    <span className={`slot-avail-badge ${isPast ? 'ended' : 'available'}`}>
-                      {isPast ? 'Ended' : 'Available'}
+                    <span className="slot-avail-badge available">
+                      Available
                     </span>
                   </button>
                 );

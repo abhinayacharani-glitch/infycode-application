@@ -764,6 +764,7 @@ small, .small {
   margin: 0;
   font-size: 28px;
   font-weight: 700;
+  line-height: 1.4;
   color: white;
   display: flex;
   align-items: center;

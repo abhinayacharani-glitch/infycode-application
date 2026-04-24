@@ -98,7 +98,7 @@
    ═══════════════════════════════════════════════ */
 .admin-dashboard-layout .adm-content {
   flex: 1;
-  padding: 20px;
+  padding: 32px 40px;
   overflow-y: visible;
   min-height: 0;
 }

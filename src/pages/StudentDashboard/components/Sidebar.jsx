@@ -46,7 +46,7 @@ const Sidebar = ({ externalShowLogoutModal, setExternalShowLogoutModal }) => {
 
   const handleLogout = () => {
     localStorage.clear();
-    navigate('/student/login');
+    navigate('/');
   };
 
   const navItems = [
@@ -64,11 +64,12 @@ const Sidebar = ({ externalShowLogoutModal, setExternalShowLogoutModal }) => {
     <>
       <aside className="student-sd-sidebar">
 
-        {/* BRAND — click opens logo logout modal */}
-        <button 
+        {/* BRAND — click opens logout modal */}
+        <div 
           className="student-sd-brand" 
-          onClick={() => { localStorage.clear(); navigate('/'); }}
-          title="Logout to Home"
+          onClick={() => setInternalShowLogoutModal(true)}
+          style={{ cursor: 'pointer' }}
+          title="Logout"
         >
           <div className="brand-wrapper">
             <img src={icLogo} alt="Infycode Logo" className="logo" />
@@ -77,7 +78,7 @@ const Sidebar = ({ externalShowLogoutModal, setExternalShowLogoutModal }) => {
               <span className="logo-subtitle">Infinite Learning Solutions</span>
             </div>
           </div>
-        </button>
+        </div>
 
         {/* USER PROFILE CARD - Click opens Edit Profile Modal */}
         <div className="student-sd-user-link" onClick={() => setShowEditProfileModal(true)}>
@@ -182,31 +183,31 @@ const Sidebar = ({ externalShowLogoutModal, setExternalShowLogoutModal }) => {
         </div>
       )}
 
-      {/* ── LOGOUT CONFIRMATION MODAL (To Sign In) ── */}
+      {/* ── LOGOUT CONFIRMATION MODAL ── */}
       {internalShowLogoutModal && (
         <div className="sd-modal-overlay" onClick={() => { setInternalShowLogoutModal(false); setExternalShowLogoutModal?.(false); }}>
           <div className="sd-modal-card" onClick={e => e.stopPropagation()}>
-
-            <div className="sd-modal-user-header">
-              <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200&h=200" alt="Profile" className="sd-modal-avatar" />
-              <div className="sd-modal-user-info">
-                <span className="sd-modal-name">{formData.fullname}</span>
-                <span className="sd-modal-role">{formData.role}</span>
+            <div className="sd-modal-logout-icon">
+              <div className="logout-icon-circle-red">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                  <polyline points="16 17 21 12 16 7" />
+                  <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
               </div>
             </div>
 
-            <h2 className="sd-modal-title">Log out to Sign in Page?</h2>
-            <p className="sd-modal-subtitle">You will be redirected to the sign in page.</p>
+            <h2 className="sd-modal-title">Logout</h2>
+            <p className="sd-modal-subtitle">Are you sure you want to log out?</p>
 
             <div className="sd-modal-actions">
               <button className="sd-modal-cancel" onClick={() => { setInternalShowLogoutModal(false); setExternalShowLogoutModal?.(false); }}>
                 Cancel
               </button>
-              <button className="sd-modal-logout" onClick={handleLogout}>
-                Yes, log out
+              <button className="sd-modal-logout-red" onClick={handleLogout}>
+                OK, Logout
               </button>
             </div>
-
           </div>
         </div>
       )}
