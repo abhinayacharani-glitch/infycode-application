@@ -7,6 +7,7 @@ import trainerRoutes from "./routes/trainerRoutes.js";
 import passwordRoutes from "./routes/passwordRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js";
 import faqRoutes from "./routes/faqRoutes.js";
+import studentRoutes from "./routes/studentRoutes.js";
 
 const app = express();
 
@@ -16,6 +17,9 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
   "http://localhost:3000",
+  "http://127.0.0.1:5173",
+  "http://127.0.0.1:5174",
+  "http://127.0.0.1:3000",
   "https://infycode-application.vercel.app",
   process.env.FRONTEND_URL,
 ].filter(Boolean);
@@ -37,7 +41,10 @@ app.use(
 );
 
 // Middleware
-//app.use(cors());
+app.use((req, res, next) => {
+  console.log(`[Request] ${req.method} ${req.url}`);
+  next();
+});
 app.use(express.json());
 
 // Health check
@@ -53,5 +60,6 @@ app.use("/api/trainer", trainerRoutes);   // /api/trainer/register, /api/trainer
 app.use("/api/password", passwordRoutes); // /api/password/forgot-password, /api/password/reset-password
 app.use("/api/courses", courseRoutes);    // /api/courses CRUD
 app.use("/api/faqs", faqRoutes);          // /api/faqs FAQ operations
+app.use("/api/student", studentRoutes);   // /api/student operations
 
 export default app;

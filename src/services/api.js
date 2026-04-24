@@ -4,9 +4,18 @@
  * Merged version: Includes advanced Auth (Student/Trainer/Admin) + Course Management
  */
 
-const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 
-                (isLocalhost ? 'http://localhost:5000' : 'https://infycode-application.onrender.com');
+const hostname = window.location.hostname;
+const isLocalhost = hostname === 'localhost' || 
+                    hostname === '127.0.0.1' || 
+                    hostname.startsWith('192.168.') || 
+                    hostname.startsWith('10.') ||
+                    hostname.endsWith('.local');
+
+// Force local server for development unless VITE_API_BASE_URL is explicitly set to production
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
+console.log(`[API Service] Hostname: ${hostname}`);
+console.log(`[API Service] Using BASE_URL: ${BASE_URL}`);
 
 /**
  * Internal helper — wraps fetch + JSON parsing + error extraction
@@ -14,9 +23,14 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL ||
 const request = async (endpoint, options = {}) => {
   const url = `${BASE_URL}${endpoint}`;
 
+  const { headers, ...otherOptions } = options;
+  
   const response = await fetch(url, {
-    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
-    ...options,
+    headers: { 
+      'Content-Type': 'application/json', 
+      ...(headers || {}) 
+    },
+    ...otherOptions,
   });
 
   let data;
@@ -101,6 +115,18 @@ export const createBatch = (batchData) => {
   });
 };
 
+/**
+ * GET /api/student/admin/results
+ * Retrieves all student test results for the admin dashboard.
+ */
+export const getAdminStudentResults = () => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return request('/api/student/admin/results', {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${user.token || ''}` },
+  });
+};
+
 // ─────────────────────────────────────────────
 // STUDENT AUTH
 // ─────────────────────────────────────────────
@@ -170,6 +196,31 @@ export const studentResetPassword = (token, newPassword, confirmPassword) =>
     method: 'POST',
     body: JSON.stringify({ token, newPassword, confirmPassword }),
   });
+
+/**
+ * POST /api/student/test-results
+ * Saves foundational or core test results for the current student.
+ */
+export const saveStudentTestResults = (testType, scores) => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return request('/api/student/test-results', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${user.token || ''}` },
+    body: JSON.stringify({ testType, scores }),
+  });
+};
+
+/**
+ * GET /api/student/my-results
+ * Retrieves the current student's test results.
+ */
+export const getStudentMyResults = () => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return request('/api/student/my-results', {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${user.token || ''}` },
+  });
+};
 
 
 // ─────────────────────────────────────────────
