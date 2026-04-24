@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getPublishedFAQs, submitFAQ } from "../../services/api";
+import { getNewPublishedFAQs, submitFAQ } from "../../services/api";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiSearch, FiChevronDown, FiMail, FiUser, FiMessageSquare, FiArrowLeft } from "react-icons/fi";
 import "./FAQPage.css";
@@ -25,7 +25,7 @@ const FAQPage = () => {
 
   const fetchFAQs = async () => {
     try {
-      const data = await getPublishedFAQs();
+      const data = await getNewPublishedFAQs();
       setFaqs(data.faqs || []);
     } catch (err) {
       console.error("Failed to load FAQs", err);

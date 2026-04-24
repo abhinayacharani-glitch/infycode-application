@@ -96,11 +96,212 @@ const filterByDate = (students, dateFilter) => {
   return students;
 };
 
+/* ─── Counselling Requests Panel ──────────────────────────────── */
+const VideoIcon2 = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="23 7 16 12 23 17 23 7" /><rect x="1" y="5" width="15" height="14" rx="2" ry="2" /></svg>
+);
+
+const CounsellingRequests = () => {
+  const { trainers: contextTrainers } = useAdmin();
+  const [bookings, setBookings] = React.useState([]);
+  const [actionMsg, setActionMsg] = React.useState(null);
+
+  // Fallback mock trainers if none exist
+  const trainers = contextTrainers.length > 0 ? contextTrainers : [
+    { id: 't1', fullName: 'John Doe (Senior Mentor)' },
+    { id: 't2', fullName: 'Sarah Smith (Career Coach)' },
+    { id: 't3', fullName: 'Mike Johnson (Tech Lead)' }
+  ];
+
+  const loadBookings = () => {
+    const all = JSON.parse(localStorage.getItem('counselling_bookings') || '[]');
+    setBookings(all);
+  };
+
+  React.useEffect(() => {
+    loadBookings();
+    const interval = setInterval(loadBookings, 2000); // poll every 2s for new requests
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleAccept = (booking) => {
+    const all = JSON.parse(localStorage.getItem('counselling_bookings') || '[]');
+    const updated = all.map(b => b.id === booking.id ? { ...b, status: 'accepted' } : b);
+    localStorage.setItem('counselling_bookings', JSON.stringify(updated));
+
+    const notifications = JSON.parse(localStorage.getItem('counselling_notifications') || '[]');
+    const filtered = notifications.filter(n => n.bookingId !== booking.id);
+    filtered.push({
+      bookingId: booking.id,
+      studentId: booking.studentId,
+      serviceId: booking.serviceId,
+      serviceTitle: booking.serviceTitle,
+      slotId: booking.slotId,
+      slotLabel: booking.slotLabel,
+      meetingLink: 'https://meet.google.com/wxs-wifp-tti',
+      status: 'accepted',
+      acceptedAt: new Date().toISOString(),
+    });
+    localStorage.setItem('counselling_notifications', JSON.stringify(filtered));
+
+    loadBookings();
+    setActionMsg({ type: 'success', text: `✅ Booking accepted for ${booking.studentName}` });
+    setTimeout(() => setActionMsg(null), 3000);
+  };
+
+  const handleReject = (booking) => {
+    const all = JSON.parse(localStorage.getItem('counselling_bookings') || '[]');
+    const updated = all.map(b => b.id === booking.id ? { ...b, status: 'rejected' } : b);
+    localStorage.setItem('counselling_bookings', JSON.stringify(updated));
+
+    const notifications = JSON.parse(localStorage.getItem('counselling_notifications') || '[]');
+    const filtered = notifications.filter(n => n.bookingId !== booking.id);
+    filtered.push({ bookingId: booking.id, studentId: booking.studentId, serviceId: booking.serviceId, status: 'rejected' });
+    localStorage.setItem('counselling_notifications', JSON.stringify(filtered));
+
+    loadBookings();
+    setActionMsg({ type: 'error', text: `❌ Booking rejected for ${booking.studentName}` });
+    setTimeout(() => setActionMsg(null), 3000);
+  };
+
+  const handleAssignTrainer = (bookingId, trainerId) => {
+    const all = JSON.parse(localStorage.getItem('counselling_bookings') || '[]');
+    const selectedTrainer = trainers.find(t => t.id === trainerId);
+    
+    const updated = all.map(b => 
+      b.id === bookingId ? { ...b, assignedTrainerId: trainerId, assignedTrainerName: selectedTrainer?.fullName || selectedTrainer?.name || 'Trainer' } : b
+    );
+    localStorage.setItem('counselling_bookings', JSON.stringify(updated));
+    loadBookings();
+    
+    setActionMsg({ type: 'success', text: `✅ Assigned: ${selectedTrainer?.fullName || 'Trainer'} for this session.` });
+    setTimeout(() => setActionMsg(null), 3000);
+  };
+
+  const statusColor = { pending: '#f59e0b', accepted: '#10b981', rejected: '#ef4444' };
+  const statusBg   = { pending: '#fef3c7', accepted: '#ecfdf5', rejected: '#fef2f2' };
+
+  return (
+    <div className="card" style={{ marginBottom: '24px' }}>
+      <div className="card-header">
+        <div>
+          <div className="card-title"><VideoIcon2 /> Counselling Requests</div>
+          <div className="card-sub">{bookings.length} total request{bookings.length !== 1 ? 's' : ''}</div>
+        </div>
+        {bookings.length > 0 && (
+          <span className="badge active-b" style={{ fontSize: '11px' }}>
+            {bookings.filter(b => b.status === 'pending').length} Pending
+          </span>
+        )}
+      </div>
+
+      {actionMsg && (
+        <div style={{
+          margin: '0 20px 12px',
+          padding: '10px 16px',
+          borderRadius: '8px',
+          background: actionMsg.type === 'success' ? '#ecfdf5' : '#fef2f2',
+          color: actionMsg.type === 'success' ? '#065f46' : '#991b1b',
+          fontSize: '13px',
+          fontWeight: 600,
+        }}>
+          {actionMsg.text}
+        </div>
+      )}
+
+      <div className="card-body" style={{ padding: '0 20px 20px' }}>
+        {bookings.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)', fontSize: '13px' }}>
+            <div style={{ fontSize: '2rem', marginBottom: '8px' }}>📅</div>
+            No counselling requests yet.
+          </div>
+        ) : (
+          <table className="batch-table" style={{ marginTop: '8px' }}>
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Service</th>
+                <th>Requested Slot</th>
+                <th>Trainer Assigned</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {bookings.map(b => (
+                <tr key={b.id}>
+                  <td><strong>{b.studentName}</strong><br /><span style={{ fontSize: '11px', color: '#64748b' }}>{b.studentEmail}</span></td>
+                  <td>{b.serviceTitle}</td>
+                  <td><span style={{ fontWeight: 600, color: '#3b82f6' }}>{b.slotLabel}</span></td>
+                  <td>
+                    <select 
+                      value={b.assignedTrainerId || ""} 
+                      onChange={(e) => handleAssignTrainer(b.id, e.target.value)}
+                      style={{
+                        padding: '4px 8px',
+                        borderRadius: '6px',
+                        border: '1px solid #e2e8f0',
+                        fontSize: '12px',
+                        background: '#f8fafc',
+                        fontWeight: 600,
+                        color: '#475569',
+                        cursor: 'pointer',
+                        width: '100%'
+                      }}
+                    >
+                      <option value="" disabled>Assign Trainer</option>
+                      {trainers.map(t => (
+                        <option key={t.id} value={t.id}>{t.fullName || t.name}</option>
+                      ))}
+                    </select>
+                  </td>
+                  <td>
+                    <span style={{
+                      background: statusBg[b.status] || '#f1f5f9',
+                      color: statusColor[b.status] || '#64748b',
+                      padding: '3px 10px',
+                      borderRadius: '20px',
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      textTransform: 'uppercase',
+                    }}>
+                      {b.status}
+                    </span>
+                  </td>
+                  <td>
+                    {b.status === 'pending' ? (
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <button
+                          onClick={() => handleAccept(b)}
+                          style={{ background: '#10b981', color: 'white', border: 'none', padding: '5px 12px', borderRadius: '6px', fontWeight: 700, cursor: 'pointer', fontSize: '12px' }}
+                        >
+                          ✅ Accept
+                        </button>
+                        <button
+                          onClick={() => handleReject(b)}
+                          style={{ background: '#ef4444', color: 'white', border: 'none', padding: '5px 12px', borderRadius: '6px', fontWeight: 700, cursor: 'pointer', fontSize: '12px' }}
+                        >
+                          ❌ Reject
+                        </button>
+                      </div>
+                    ) : (
+                      <span style={{ color: statusColor[b.status], fontWeight: 700, fontSize: '12px' }}>
+                        {b.status === 'accepted' ? '✅ Accepted' : '❌ Rejected'}
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  );
+};
+
 /* ─── Main component ─────────────────────────────────────────── */
 /* ── SVG Icons ── */
-const SettingsIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.72V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.72V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></svg>
-);
 
 const UsersIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="8.5" cy="7" r="4" /><polyline points="17 11 19 13 23 9" /></svg>
@@ -207,27 +408,11 @@ const Dashboard = () => {
       <div className="dashboard-banner">
         <div className="banner-content">
           <div className="banner-left">
-            <h2>Welcome Back, {userName}! <SettingsIcon /></h2>
+            <h2>Welcome Back, {userName}!</h2>
             <p>
               Showing data for <strong>{filter.course === 'All' ? 'all courses' : filter.course}</strong> ·{' '}
               <strong>{kpiData.total}</strong> registrations in the {kpiData.dateLabel}
             </p>
-          </div>
-          <div className="banner-right">
-            <div className="banner-stat-item">
-              <span className="banner-stat-value"><Counter key={`total-${animKey}`} target={kpiData.total} /></span>
-              <span className="banner-stat-label">Total Students</span>
-            </div>
-            <div className="banner-divider"></div>
-            <div className="banner-stat-item">
-              <span className="banner-stat-value"><Counter key={`trainers-${animKey}`} target={stats.trainers.active} /></span>
-              <span className="banner-stat-label">Active Trainers</span>
-            </div>
-            <div className="banner-divider"></div>
-            <div className="banner-stat-item">
-              <span className="banner-stat-value"><Counter key={`batches-${animKey}`} target={kpiData.activeBatches} /></span>
-              <span className="banner-stat-label">Live Batches</span>
-            </div>
           </div>
         </div>
       </div>
@@ -370,6 +555,9 @@ const Dashboard = () => {
 
         </div>
       </div>
+
+      {/* ── Counselling Requests Panel ── */}
+      <CounsellingRequests />
 
       <div className="grid-2">
         {/* Pipeline overview — filtered */}

@@ -13,7 +13,7 @@ import TrainerApproval from "./pages/TrainerApproval";
 import BatchCreation from "./pages/BatchCreation";
 import EnrollmentMapping from "./pages/EnrollmentMapping";
 import Analytics from "./pages/Analytics";
-import LearningActivation from "./pages/LearningActivation";
+import CounsellingRequests from "./pages/CounsellingRequests";
 import Reports from "./pages/Reports";
 import Logout from "./pages/Logout";
 import AccountSettings from "./pages/AccountSettings";
@@ -59,6 +59,8 @@ const AdminDashboard = () => {
               <Route path="analytics"            element={<Analytics />} />
               <Route path="activation"           element={<LearningActivation />} />
               <Route path="student-results"      element={<Reports />} />
+              <Route path="counselling-requests" element={<CounsellingRequests />} />
+              
               <Route path="faq-management"       element={<FAQManagement />} />
               <Route path="settings/account"     element={<AccountSettings />} />
               <Route path="settings/account"     element={<AccountSettings />} />

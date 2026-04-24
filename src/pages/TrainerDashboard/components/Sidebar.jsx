@@ -96,7 +96,7 @@ const Sidebar = ({ isOpen, onClose, externalShowLogoutModal, setExternalShowLogo
     localStorage.clear();
     setInternalShowLogoutModal(false);
     setExternalShowLogoutModal?.(false);
-    navigate('/student/login');
+    navigate('/');
   };
 
   return (
@@ -180,6 +180,15 @@ const Sidebar = ({ isOpen, onClose, externalShowLogoutModal, setExternalShowLogo
             <div className="sd-box">
               <span className="sd-icon"><ClipboardIcon /></span>
               <span className="sd-text">Attendance</span>
+            </div>
+          </NavLink>
+
+          <NavLink to="/trainer-dashboard/counselling"
+            onClick={onClose}
+            className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
+            <div className="sd-box">
+              <span className="sd-icon"><LiveIcon /></span>
+              <span className="sd-text">Counselling Sessions</span>
             </div>
           </NavLink>
 

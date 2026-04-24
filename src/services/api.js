@@ -476,3 +476,20 @@ export const deleteFAQ = (id) =>
     method: 'DELETE',
     headers: getAuthHeader(),
   });
+/**
+ * POST /api/faqs/publish (Admin)
+ * Publishes an answered FAQ to the FAQs node and sends an email.
+ */
+export const publishNewFAQ = (data) =>
+  request('/api/faqs/publish', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+
+/**
+ * GET /api/faqs/published
+ * Retrieves all FAQs from the FAQs node for the homepage.
+ */
+export const getNewPublishedFAQs = () =>
+  request('/api/faqs/published', { cache: 'no-store' });
+

@@ -11,28 +11,9 @@ const DashboardHero = () => {
         <div className="dashboard-banner">
             <div className="banner-content">
                 <div className="banner-left">
-                    <h2>Welcome Back, {userName}! <Settings size={22} className="settings-icon" /></h2>
-                    <p>
-                        Showing data for <strong>all courses</strong> · 0 modules completed this month
-                    </p>
+                    <h2>Welcome Back, {userName}!</h2>
                 </div>
                 
-                <div className="banner-right">
-                    <div className="banner-stat-item">
-                        <span className="banner-stat-value">00</span>
-                        <span className="banner-stat-label">Enrolled Courses</span>
-                    </div>
-                    <div className="banner-divider"></div>
-                    <div className="banner-stat-item">
-                        <span className="banner-stat-value">00</span>
-                        <span className="banner-stat-label">Earned Certificates</span>
-                    </div>
-                    <div className="banner-divider"></div>
-                    <div className="banner-stat-item">
-                        <span className="banner-stat-value">00</span>
-                        <span className="banner-stat-label">Live Classes</span>
-                    </div>
-                </div>
             </div>
         </div>
     );
