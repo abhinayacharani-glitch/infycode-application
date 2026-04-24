@@ -1,11 +1,15 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FaLock } from 'react-icons/fa';
 import './Projects.css';
 
 import CertificateModule from '../components/CertificateModule';
 
 const Projects = () => {
+  const navigate = useNavigate();
   const loggedUser = JSON.parse(localStorage.getItem("loggedUser") || "{}");
   const userName = loggedUser.username || "Student";
+// ... (omitting middle part as I'll target the card map)
 
   const projectCards = [
     {
@@ -39,7 +43,7 @@ const Projects = () => {
         <h3 className="section-title-blue">Projects Status</h3> {/* Renamed Heading */}
         <div className="p-grid-equal">
           {projectCards.map((p, idx) => (
-            <div key={idx} className="p-card-premium-equal">
+            <div key={idx} className={`p-card-premium-equal ${idx > 0 ? 'p-card-locked' : ''}`}>
               <div className="p-img-box">
                 <img src={p.img} alt={p.title} />
               </div>
@@ -55,7 +59,26 @@ const Projects = () => {
                     <div className="p-p-fill" style={{ width: `${p.progress}%` }}></div>
                   </div>
                 </div>
+                {idx === 0 && (
+                  <button 
+                    className="view-project-btn" 
+                    onClick={() => navigate(`/student-dashboard/project-topics/${idx}`)}
+                  >
+                    View Details
+                  </button>
+                )}
               </div>
+              
+              {/* Lock Overlay for blurred projects */}
+              {idx > 0 && (
+                <div className="p-lock-overlay">
+                  <div className="p-lock-content">
+                    <FaLock className="p-lock-icon" />
+                    <span>Locked</span>
+                    <p>Complete current project to unlock</p>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>

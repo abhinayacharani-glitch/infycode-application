@@ -108,6 +108,8 @@ const CourseDiscovery = () => {
     { image: imgPython,       title: "Python for Financial Modeling",            category: "Finance",       badge: "CID-116",     rating: 4.7, students: "1.5k", duration: "5 weeks",  level: "Advanced" },
   ];
 
+  const ALL_COURSES = [...POPULAR, ...TRENDING, ...RECOMMENDED];
+
   const navigate = useNavigate();
   const goToLibrary = () => navigate("/student-dashboard/courses");
   const handleExplore = (course) => {
@@ -118,16 +120,8 @@ const CourseDiscovery = () => {
 
   return (
     <div className="dc-main-viewport">
-      <div className="dc-hero-banner">
-        <motion.div className="dc-hero-text" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}>
-          <h1 className="dc-main-heading">Elevate Your Expertise</h1>
-          <p className="dc-main-desc">Unlock professional-grade tech courses curated by industry leaders.</p>
-        </motion.div>
-      </div>
       <div className="dc-content-body">
-        <CourseSection title=" Popular Courses" courses={POPULAR} onViewMore={goToLibrary} onExplore={handleExplore} sectionIndex={0} />
-        <CourseSection title=" Trending Courses" courses={TRENDING} onViewMore={goToLibrary} onExplore={handleExplore} sectionIndex={1} />
-        <CourseSection title=" Recommended Courses" courses={RECOMMENDED} onViewMore={goToLibrary} onExplore={handleExplore} sectionIndex={2} />
+        <CourseSection title="All Available Courses" courses={ALL_COURSES} onViewMore={goToLibrary} onExplore={handleExplore} sectionIndex={0} />
       </div>
     </div>
   );
