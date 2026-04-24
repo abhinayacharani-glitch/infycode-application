@@ -1,8 +1,11 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FaLaptopCode, FaUserGraduate, FaCheckCircle, FaCode, FaUsers, FaClipboardList } from 'react-icons/fa';
 import './MockInterview.css';
 
 const MockInterview = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="page-container">
       <header className="page-header-centered">
@@ -28,7 +31,12 @@ const MockInterview = () => {
                 <span>⏱ 90 Minutes</span>
                 <span>📝 60 Questions</span>
               </div>
-              <button className="primary-action-btn mt-auto">Take Mock Test</button>
+              <button 
+                className="primary-action-btn mt-auto"
+                onClick={() => navigate('/student-dashboard/mock-tests')}
+              >
+                Take Mock Test
+              </button>
             </div>
           </div>
         </div>
@@ -50,7 +58,12 @@ const MockInterview = () => {
                 <li><FaCheckCircle className="text-success" /> Review common Database schema designs.</li>
                 <li><FaCheckCircle className="text-success" /> Conduct mock peer-to-peer technical reviews.</li>
               </ul>
-              <button className="secondary-action-btn mt-auto">Access All Resources</button>
+              <button 
+                className="secondary-action-btn mt-auto"
+                onClick={() => navigate('/student-dashboard/preparation-resources')}
+              >
+                Access All Resources
+              </button>
             </div>
           </div>
         </div>
