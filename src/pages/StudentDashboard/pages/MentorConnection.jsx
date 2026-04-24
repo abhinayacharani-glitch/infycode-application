@@ -81,7 +81,7 @@ const MentorConnection = () => {
         <div className="mentor-viewport">
           <div className="mentor-top-header directory-header">
             <div className="header-text-content">
-              <h1 className="mentor-top-title">Mentor Directory</h1>
+              <h1 className="mentor-top-title">Trainer Directory</h1>
               <p className="mentor-top-subtitle">Browse professional profiles and connect directly with industry experts.</p>
             </div>
           </div>
@@ -118,7 +118,11 @@ const MentorConnection = () => {
                          <span>{m.availability}</span>
                        </div>
 
-                       <button className="dir-connect-action-btn" onClick={() => setSelected(i)}>
+                       <button 
+                         className={`dir-connect-action-btn ${i !== 0 ? 'disabled' : ''}`} 
+                         onClick={() => i === 0 && setSelected(i)}
+                         disabled={i !== 0}
+                       >
                           <MessageCircle size={18} />
                           <span>Connect</span>
                        </button>
@@ -139,7 +143,7 @@ const MentorConnection = () => {
             <ArrowLeft size={20} />
           </button>
           <div>
-            <h1 className="mentor-top-title">Mentor Connect</h1>
+            <h1 className="mentor-top-title">Trainer Connect</h1>
             <p className="mentor-top-subtitle">Chat with industry experts and get your technical doubts resolved 1:1.</p>
           </div>
         </div>

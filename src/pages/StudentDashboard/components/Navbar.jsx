@@ -67,9 +67,9 @@ const Navbar = ({ onToggleSidebar }) => {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      const isOutsideDropdown = dropdownRef.current && !dropdownRef.current.contains(event.target);
-      const isOutsideNotifications = notificationsRef.current && !notificationsRef.current.contains(event.target);
-      const isOutsideMessages = messagesRef.current && !messagesRef.current.contains(event.target);
+      const isOutsideDropdown = !dropdownRef.current || !dropdownRef.current.contains(event.target);
+      const isOutsideNotifications = !notificationsRef.current || !notificationsRef.current.contains(event.target);
+      const isOutsideMessages = !messagesRef.current || !messagesRef.current.contains(event.target);
 
       if (isOutsideDropdown && isOutsideNotifications && isOutsideMessages) {
         setActiveDropdown(null);
@@ -94,7 +94,41 @@ const Navbar = ({ onToggleSidebar }) => {
         {/* Search removed */}
       </div>
 
-      <div className="topbar-right">
+      <div className="topbar-right" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+
+        {/* NOTIFICATIONS DROPDOWN */}
+        <div className="dropdown-wrapper" ref={notificationsRef} onClick={() => toggleDropdown('notifications')}>
+          <div className="action-with-badge">
+            <Bell size={24} />
+            <span className="nav-badge blue">3</span>
+          </div>
+
+          {activeDropdown === 'notifications' && (
+            <div className="content-dropdown" onClick={(e) => e.stopPropagation()}>
+              <div className="dropdown-header">
+                <h3>Notifications</h3>
+                <button className="view-all">Mark all read</button>
+              </div>
+              <div className="dropdown-body">
+                {notifications.map(notif => (
+                  <div key={notif.id} className={`dropdown-item ${notif.type === 'warning' ? 'unread' : ''}`}>
+                    <div className={`item-icon ${notif.type}`}>
+                      <Bell size={20} />
+                    </div>
+                    <div className="item-content">
+                      <div className="item-title">{notif.title}</div>
+                      <div className="item-snippet">{notif.message}</div>
+                      <div className="item-time">
+                        <Clock size={12} />
+                        {notif.time}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* PROFILE DROPDOWN */}
         <div className="nav-user-profile" ref={dropdownRef} onClick={() => toggleDropdown('profile')}>
@@ -102,6 +136,14 @@ const Navbar = ({ onToggleSidebar }) => {
             src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200&h=200"
             alt="Profile"
             className="navbar-avatar"
+          />
+          <ChevronDown 
+            size={18} 
+            className="chevron-icon" 
+            style={{ 
+              transform: activeDropdown === 'profile' ? 'rotate(180deg)' : 'rotate(0)', 
+              transition: 'transform 0.2s' 
+            }} 
           />
 
           {activeDropdown === 'profile' && (
