@@ -145,13 +145,7 @@ const EnrollCourses = ({ onNavigate }) => {
 
   return (
     <div className="enroll-page">
-      <DashboardHero />
-      
       <div className="enroll-course-grid">
-        <header className="grid-header">
-          <span className="enroll-badge">Enrolled Courses</span>
-          <h2>Track Your Progress</h2>
-        </header>
         {enrolledCourses.length > 0 ? (
           <div className="enroll-cards-wrapper">
             {enrolledCourses.map((course) => (

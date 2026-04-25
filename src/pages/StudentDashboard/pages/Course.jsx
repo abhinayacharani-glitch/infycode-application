@@ -184,42 +184,6 @@ const CourseDiscovery = () => {
 
   return (
     <div className="dc-main-viewport">
-      <div className="dc-controls-wrapper">
-        <motion.div 
-          className="dc-hero-card"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <h1>Elevate Your Expertise</h1>
-          <p>
-            Unlock professional-grade tech courses curated by industry leaders.
-          </p>
-        </motion.div>
-
-        <div className="dc-search-bar">
-          <Search size={20} color="#94a3b8" />
-          <input 
-            type="text" 
-            placeholder="Search for courses (e.g. React, Java...)" 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-
-        <div className="dc-categories-bar">
-          {CATEGORIES.map(cat => (
-            <button 
-              key={cat} 
-              className={`dc-cat-btn ${activeCategory === cat ? 'active' : ''}`}
-              onClick={() => setActiveCategory(cat)}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-      </div>
-
       <div className="dc-content-sections" style={{ maxWidth: '1200px', margin: '0 auto' }}>
         {isFiltering ? (
           <CourseSection 
@@ -244,6 +208,30 @@ const CourseDiscovery = () => {
             <p>Try adjusting your search or category filter.</p>
           </div>
         )}
+      </div>
+
+      <div className="dc-controls-wrapper" style={{ marginTop: '40px' }}>
+        <div className="dc-search-bar">
+          <Search size={20} color="#94a3b8" />
+          <input 
+            type="text" 
+            placeholder="Search for courses (e.g. React, Java...)" 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+
+        <div className="dc-categories-bar">
+          {CATEGORIES.map(cat => (
+            <button 
+              key={cat} 
+              className={`dc-cat-btn ${activeCategory === cat ? 'active' : ''}`}
+              onClick={() => setActiveCategory(cat)}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

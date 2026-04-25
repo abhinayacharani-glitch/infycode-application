@@ -197,8 +197,7 @@ const Sidebar = ({ isOpen, onClose, externalShowLogoutModal, setExternalShowLogo
             className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
             <div className="sd-box">
               <span className="sd-icon"><MessageIcon /></span>
-              <span className="sd-text">Feedback & Queries</span>
-
+              <span className="sd-text">Student Connect</span>
             </div>
           </NavLink>
         </div>

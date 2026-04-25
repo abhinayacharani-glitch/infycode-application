@@ -72,7 +72,7 @@ function StudentDashboard() {
             <Route path="project-topics/:id" element={<ProjectTopics />} />
             <Route path="profile" element={<Profile />} />
             <Route path="course-explore" element={<CourseExplore />} />
-            <Route path="mentor-connection" element={<MentorConnection />} />
+            <Route path="trainer-connect" element={<MentorConnection />} />
             <Route path="logout" element={<Logout />} />
           </Routes>
         </main>
