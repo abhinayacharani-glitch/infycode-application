@@ -39,36 +39,6 @@ const TrainerCounselling = () => {
             <div className="tc-empty-icon"><Bell size={48} /></div>
             <h3>No Sessions Assigned</h3>
             <p>You haven't been assigned to any counselling sessions yet. Check back later!</p>
-            <button 
-              className="tc-join-btn"
-              onClick={() => {
-                const sample = {
-                  id: 'sample-' + Date.now(),
-                  studentId: 's123',
-                  studentName: 'Demo Student',
-                  studentEmail: 'student@example.com',
-                  serviceId: 'career-guidance',
-                  serviceTitle: 'Career Guidance',
-                  slotId: 'slot-1',
-                  slotLabel: '10:00 AM - 11:00 AM',
-                  status: 'accepted',
-                  assignedTrainerId: currentTrainerId, // Match the current logged in trainer
-                  assignedTrainerName: trainerData.fullName || trainerData.name || 'Trainer',
-                  submittedAt: new Date().toISOString()
-                };
-                const all = JSON.parse(localStorage.getItem('counselling_bookings') || '[]');
-                all.push(sample);
-                localStorage.setItem('counselling_bookings', JSON.stringify(all));
-                loadSessions();
-              }}
-              style={{
-                marginTop: '1.5rem',
-                maxWidth: '250px',
-                marginInline: 'auto'
-              }}
-            >
-              Generate Demo Session
-            </button>
           </div>
         ) : (
           sessions.map(session => (
@@ -76,7 +46,7 @@ const TrainerCounselling = () => {
               <div className="tc-card-status">
                 <span className={`tc-status-tag ${session.status}`}>{session.status}</span>
               </div>
-              
+
               <div className="tc-card-body">
                 <div className="tc-student-profile">
                   <div className="tc-avatar">{session.studentName.charAt(0)}</div>
@@ -112,10 +82,10 @@ const TrainerCounselling = () => {
               </div>
 
               <div className="tc-card-footer">
-                <a 
-                  href="https://meet.google.com/wxs-wifp-tti" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
+                <a
+                  href="https://meet.google.com/wxs-wifp-tti"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="tc-join-btn"
                 >
                   <ExternalLink size={18} />
