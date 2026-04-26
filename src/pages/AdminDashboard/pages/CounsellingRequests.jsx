@@ -4,7 +4,7 @@ import { useAdmin } from '../../../context/AdminContext';
 import './CounsellingRequests.css';
 
 const CounsellingRequests = () => {
-  const { trainers: contextTrainers } = useAdmin();
+  const { trainers: contextTrainers, students } = useAdmin();
   const [bookings, setBookings] = useState([]);
   const [actionMsg, setActionMsg] = useState(null);
 
@@ -25,6 +25,27 @@ const CounsellingRequests = () => {
     const interval = setInterval(loadBookings, 3000);
     return () => clearInterval(interval);
   }, []);
+
+  // Pre-populate with real student data if empty
+  useEffect(() => {
+    const all = JSON.parse(localStorage.getItem('counselling_bookings') || '[]');
+    if (all.length === 0 && students.length > 0) {
+      const initial = students.slice(0, 5).map((s, i) => ({
+        id: `auto_${Date.now()}_${i}`,
+        studentId: s.id || s.email,
+        studentName: s.fullName || s.name || 'Student',
+        studentEmail: s.email,
+        serviceId: i % 2,
+        serviceTitle: i % 2 === 0 ? '1-1 Career Counselling' : '1-Many Counselling',
+        slotId: `slot${(i % 4) + 1}`,
+        slotLabel: ['10:00 AM – 11:00 AM', '11:00 AM – 12:00 PM', '2:00 PM – 3:00 PM', '3:00 PM – 4:00 PM'][i % 4],
+        status: 'pending',
+        submittedAt: new Date(Date.now() - (i * 86400000 / 4)).toISOString() // staggered times
+      }));
+      localStorage.setItem('counselling_bookings', JSON.stringify(initial));
+      setBookings(initial);
+    }
+  }, [students]);
 
   const handleAccept = (booking) => {
     const all = JSON.parse(localStorage.getItem('counselling_bookings') || '[]');
@@ -69,13 +90,13 @@ const CounsellingRequests = () => {
   const handleAssignTrainer = (bookingId, trainerId) => {
     const all = JSON.parse(localStorage.getItem('counselling_bookings') || '[]');
     const selectedTrainer = trainers.find(t => t.id === trainerId);
-    
-    const updated = all.map(b => 
+
+    const updated = all.map(b =>
       b.id === bookingId ? { ...b, assignedTrainerId: trainerId, assignedTrainerName: selectedTrainer?.fullName || selectedTrainer?.name || 'Trainer' } : b
     );
     localStorage.setItem('counselling_bookings', JSON.stringify(updated));
     loadBookings();
-    
+
     setActionMsg({ type: 'success', text: `Assigned: ${selectedTrainer?.fullName || 'Trainer'} will handle this session.` });
     setTimeout(() => setActionMsg(null), 3000);
   };
@@ -110,41 +131,8 @@ const CounsellingRequests = () => {
         {bookings.length === 0 ? (
           <div className="cr-empty-state">
             <div className="cr-empty-icon"><Calendar size={48} /></div>
-            <h3>No Requests Found</h3>
-            <p>Any student booking requests will appear here for your review.</p>
-            <button 
-              className="cr-btn-sample"
-              onClick={() => {
-                const sample = {
-                  id: 'sample-' + Date.now(),
-                  studentId: 's123',
-                  studentName: 'Demo Student',
-                  studentEmail: 'student@example.com',
-                  serviceId: 'career-guidance',
-                  serviceTitle: 'Career Guidance',
-                  slotId: 'slot-1',
-                  slotLabel: '10:00 AM - 11:00 AM',
-                  status: 'pending',
-                  submittedAt: new Date().toISOString()
-                };
-                const all = [sample];
-                localStorage.setItem('counselling_bookings', JSON.stringify(all));
-                loadBookings();
-              }}
-              style={{
-                marginTop: '1.5rem',
-                padding: '0.8rem 1.5rem',
-                background: '#3b82f6',
-                color: 'white',
-                border: 'none',
-                borderRadius: '12px',
-                fontWeight: 700,
-                cursor: 'pointer',
-                boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'
-              }}
-            >
-              Generate Sample Request
-            </button>
+            <h3>No Active Requests</h3>
+            <p>All student counselling requests have been processed or none have been submitted yet.</p>
           </div>
         ) : (
           <div className="cr-table-responsive">
@@ -180,8 +168,8 @@ const CounsellingRequests = () => {
                     </td>
                     <td>
                       <div className="cr-trainer-assign-cell">
-                        <select 
-                          value={b.assignedTrainerId || ""} 
+                        <select
+                          value={b.assignedTrainerId || ""}
                           onChange={(e) => handleAssignTrainer(b.id, e.target.value)}
                           className="cr-trainer-select"
                         >

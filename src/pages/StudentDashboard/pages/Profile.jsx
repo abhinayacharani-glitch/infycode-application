@@ -13,18 +13,9 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const editSectionRef = useRef(null);
   
-  const [isCameraDropdownOpen, setIsCameraDropdownOpen] = useState(false);
-  const cameraDropdownRef = useRef(null);
+  const fileInputRef = useRef(null);
 
-  useEffect(() => {
-    const handleClickOutsideCamera = (event) => {
-      if (cameraDropdownRef.current && !cameraDropdownRef.current.contains(event.target)) {
-        setIsCameraDropdownOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutsideCamera);
-    return () => document.removeEventListener("mousedown", handleClickOutsideCamera);
-  }, []);
+
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -52,8 +43,30 @@ const Profile = () => {
     email: loggedUser.email || "charanistudent@gmail.com",
     dob: loggedUser.dob || "03 April 2004",
     gender: loggedUser.gender || "Female",
-    location: loggedUser.location || "India"
+    location: loggedUser.location || "India",
+    profileImage: loggedUser.profileImage || null
   });
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result;
+        setPersonalDetails(prev => ({ ...prev, profileImage: base64String }));
+        const updatedUser = { ...loggedUser, profileImage: base64String };
+        localStorage.setItem("loggedUser", JSON.stringify(updatedUser));
+        setLoggedUser(updatedUser);
+        
+        // Also update the 'user' key if it exists to keep them in sync
+        const mainUser = JSON.parse(localStorage.getItem("user") || "{}");
+        if (mainUser.email === updatedUser.email || !mainUser.email) {
+          localStorage.setItem("user", JSON.stringify({ ...mainUser, profileImage: base64String }));
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const [isEditingAcademic, setIsEditingAcademic] = useState(false);
   const [academicDetails, setAcademicDetails] = useState({
@@ -93,25 +106,26 @@ const Profile = () => {
 
       {/* 🔷 HEADER */}
       <div className="profile-header">
-        <div className="profile-avatar-container" ref={cameraDropdownRef}>
-          <div className="profile-avatar">{personalDetails.fullName ? personalDetails.fullName.charAt(0).toUpperCase() : 'S'}</div>
-          <button className="avatar-edit-btn" aria-label="Edit Profile Picture" onClick={() => setIsCameraDropdownOpen(!isCameraDropdownOpen)}>
+        <div className="profile-avatar-container">
+          {personalDetails.profileImage ? (
+            <img src={personalDetails.profileImage} alt="Profile" className="profile-avatar" style={{ objectFit: 'cover' }} />
+          ) : (
+            <div className="profile-avatar">{personalDetails.fullName ? personalDetails.fullName.charAt(0).toUpperCase() : 'S'}</div>
+          )}
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            accept="image/*"
+            style={{ display: 'none' }}
+          />
+          <button 
+            className="avatar-edit-btn" 
+            aria-label="Edit Profile Picture" 
+            onClick={() => fileInputRef.current.click()}
+          >
             <Camera size={16} />
           </button>
-          
-          {isCameraDropdownOpen && (
-            <div className="camera-dropdown-menu">
-              <button className="camera-dropdown-item" onClick={() => setIsCameraDropdownOpen(false)}>
-                <span>📷</span> Take a new photo using your camera
-              </button>
-              <button className="camera-dropdown-item" onClick={() => setIsCameraDropdownOpen(false)}>
-                <span>🖼️</span> Choose an existing photo from your gallery
-              </button>
-              <button className="camera-dropdown-item remove-photo" onClick={() => setIsCameraDropdownOpen(false)}>
-                <span>❌</span> Remove current profile picture
-              </button>
-            </div>
-          )}
         </div>
 
         <div className="profile-name-container">
