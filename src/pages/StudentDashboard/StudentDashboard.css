@@ -6,7 +6,8 @@
   height: 100vh;
   overflow: hidden;
   font-family: 'Open Sans', sans-serif;
-  background: #f1f5f9; /* Soft background */
+  background: #f1f5f9;
+  /* Soft background */
 }
 
 .student-dashboard-layout.full-screen {
@@ -62,6 +63,7 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

@@ -8,6 +8,7 @@ const Sidebar = ({ externalShowLogoutModal, setExternalShowLogoutModal }) => {
   const navigate = useNavigate();
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
   const [internalShowLogoutModal, setInternalShowLogoutModal] = useState(false);
+  const fileInputRef = React.useRef(null);
 
   // Sync internal modal state with external (for browser back button)
   useEffect(() => {
@@ -19,20 +20,35 @@ const Sidebar = ({ externalShowLogoutModal, setExternalShowLogoutModal }) => {
     const user = userString ? JSON.parse(userString) : { fullName: "Student", role: "student" };
     return {
       fullname: user.fullName || user.fullname || "Student",
-      role: user.role || "student"
+      role: user.role || "student",
+      profileImage: user.profileImage || null
     };
   };
 
   const [user, setUser] = useState(getInitialUser());
   const [formData, setFormData] = useState({
     fullname: user.fullname,
-    role: user.role
+    role: user.role,
+    profileImage: user.profileImage
   });
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result;
+        setFormData(prev => ({ ...prev, profileImage: base64String }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   useEffect(() => {
     setFormData({
       fullname: user.fullname || "Student",
-      role: user.role || "student"
+      role: user.role || "student",
+      profileImage: user.profileImage || null
     });
   }, [user]);
 
@@ -54,7 +70,7 @@ const Sidebar = ({ externalShowLogoutModal, setExternalShowLogoutModal }) => {
     { to: "/student-dashboard/skill-test", label: "Skill Based Test" },
     { to: "/student-dashboard/course", label: "Courses" },
     { to: "/student-dashboard/courses", label: "Enrolled Courses" },
-    { to: "/student-dashboard/mentor-connection", label: "Trainer Connect" },
+    { to: "/student-dashboard/trainer-connect", label: "Trainer Connect" },
     { to: "/student-dashboard/mock-interview", label: "Mock Tests & Interviews" },
     { to: "/student-dashboard/projects", label: "Projects & Certificates" },
     { to: "/student-dashboard/profile", label: "My Profile" },
@@ -85,7 +101,7 @@ const Sidebar = ({ externalShowLogoutModal, setExternalShowLogoutModal }) => {
           <div className="student-sd-user">
             <div className="student-sd-avatar-wrap">
               <img
-                src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200&h=200"
+                src={formData.profileImage || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200&h=200"}
                 alt="User"
                 className="student-sd-avatar"
               />
@@ -138,11 +154,18 @@ const Sidebar = ({ externalShowLogoutModal, setExternalShowLogoutModal }) => {
               <div className="sd-avatar-upload">
                 <div className="sd-avatar-container">
                   <img
-                    src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200&h=200"
+                    src={formData.profileImage || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200&h=200"}
                     alt="Profile"
                     className="sd-modal-large-avatar"
                   />
-                  <div className="sd-camera-overlay">
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                  />
+                  <div className="sd-camera-overlay" onClick={() => fileInputRef.current.click()}>
                     <Camera size={20} color="#ffffff" />
                   </div>
                 </div>

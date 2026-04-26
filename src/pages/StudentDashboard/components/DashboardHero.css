@@ -1,28 +1,40 @@
 /* DashboardHero.css - Standardized for Shared Banner */
 
-.dashboard-banner .settings-icon {
-    opacity: 0.8;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    color: #ffffff;
-    margin-left: 8px;
-    vertical-align: middle;
+.dc-hero-card-shared {
+    background: #0f172a;
+    border-radius: 24px;
+    padding: 48px 60px;
+    margin-bottom: 40px;
+    color: white;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    width: 100%;
 }
 
-.dashboard-banner .settings-icon:hover {
-    transform: rotate(90deg) scale(1.1);
-    opacity: 1;
+.dc-hero-card-shared h1 {
+    font-size: 2.8rem;
+    font-weight: 800;
+    margin-bottom: 16px;
+    color: white;
 }
 
-/* Local responsive adjustments if needed */
-@media (max-width: 900px) {
-    .dashboard-banner {
-        padding: 24px;
+.dc-hero-card-shared p {
+    font-size: 1.15rem;
+    color: #94a3b8;
+    max-width: 600px;
+    line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+    .dc-hero-card-shared {
+        padding: 32px 24px;
+        border-radius: 16px;
     }
     
-    .dashboard-banner .banner-content {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 24px;
+    .dc-hero-card-shared h1 {
+        font-size: 2rem;
+    }
+    
+    .dc-hero-card-shared p {
+        font-size: 1rem;
     }
 }
