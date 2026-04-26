@@ -7,6 +7,7 @@ import trainerRoutes from "./routes/trainerRoutes.js";
 import passwordRoutes from "./routes/passwordRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js";
 import faqRoutes from "./routes/faqRoutes.js";
+import studentRoutes from "./routes/studentRoutes.js";
 import { publishFAQ, getNewPublishedFAQs } from "./controllers/faqController.js";
 
 const app = express();
@@ -56,5 +57,6 @@ app.use("/api/trainer", trainerRoutes);   // /api/trainer/register, /api/trainer
 app.use("/api/password", passwordRoutes); // /api/password/forgot-password, /api/password/reset-password
 app.use("/api/courses", courseRoutes);    // /api/courses CRUD
 app.use("/api/faqs", faqRoutes);          // /api/faqs FAQ operations
+app.use("/api/student", studentRoutes);   // /api/student/enroll, /api/student/enrolled-courses
 
 export default app;

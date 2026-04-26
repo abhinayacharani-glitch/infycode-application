@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { getEnrolledCourses } from '../../../services/api';
 import { COURSE_MAP } from './data/extraCourses';
 import { ALL_COURSES } from '../../../components/Courses/Courses';
 import DashboardHero from '../components/DashboardHero';
@@ -128,20 +129,48 @@ const EnrolledCourseCard = ({ course, onNavigate }) => {
 };
 
 const EnrollCourses = ({ onNavigate }) => {
-  const loggedUserStr = localStorage.getItem("loggedUser");
-  const loggedUser = loggedUserStr ? JSON.parse(loggedUserStr) : { username: "guest" };
-  const userId = loggedUser.username || "guest";
-  const storageKey = `enrolled_courses_${userId}`;
-  
-  let enrolledTitles = [];
-  try {
-    enrolledTitles = JSON.parse(localStorage.getItem(storageKey) || "[]");
-  } catch {
-    enrolledTitles = [];
-  }
+  const [enrolledCourses, setEnrolledCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const allCourses = Object.values(COURSE_MAP);
-  const enrolledCourses = allCourses.filter(c => enrolledTitles.includes(c.title));
+  useEffect(() => {
+    const fetchEnrolled = async () => {
+      try {
+        const data = await getEnrolledCourses();
+        // Assuming data is an array of IDs or an object with an enrolledCourses array
+        const enrolledIds = Array.isArray(data) ? data : (data.enrolledCourses || []);
+        
+        const enrolled = [];
+        enrolledIds.forEach(id => {
+          if (COURSE_MAP[id]) {
+            enrolled.push(COURSE_MAP[id]);
+          } else {
+            const matchedAllCourse = ALL_COURSES.find(c => c.courseId === id);
+            if (matchedAllCourse) {
+              const matchedMapCourse = Object.values(COURSE_MAP).find(c => c.title === matchedAllCourse.title);
+              if (matchedMapCourse) {
+                enrolled.push(matchedMapCourse);
+              }
+            }
+          }
+        });
+        
+        setEnrolledCourses(enrolled);
+      } catch (err) {
+        console.error("Failed to fetch enrolled courses:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEnrolled();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="enroll-page" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '300px' }}>
+        <div className="loader">Loading your courses...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="enroll-page">

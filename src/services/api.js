@@ -311,6 +311,25 @@ export const getAllCourses = () =>
   });
 
 /**
+ * POST /api/student/enroll/:courseId
+ * Enrolls the logged-in student in a course.
+ */
+export const enrollInCourse = (courseId) =>
+  request(`/api/student/enroll/${courseId}`, {
+    method: 'POST',
+    headers: getAuthHeader(),
+  });
+
+/**
+ * GET /api/student/enrolled-courses
+ * Fetches all courses the logged-in student is currently enrolled in.
+ */
+export const getEnrolledCourses = () =>
+  request('/api/student/enrolled-courses', {
+    headers: getAuthHeader(),
+  });
+
+/**
  * GET /api/courses/:id
  * Retrieves a single course by Firebase key.
  * @returns {{ course: Course }}
