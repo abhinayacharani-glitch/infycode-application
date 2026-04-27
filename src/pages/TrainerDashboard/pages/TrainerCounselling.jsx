@@ -1,25 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { Video, Clock, User, Calendar, ExternalLink, Bell, CheckCircle } from 'lucide-react';
-import { useTrainer } from '../../../context/TrainerContext';
+import { Video, Clock, Calendar, ExternalLink, Bell } from 'lucide-react';
+import { getTrainerCounsellingSessions } from '../../../services/api';
 import './TrainerCounselling.css';
 
 const TrainerCounselling = () => {
-  const { trainerData } = useTrainer();
   const [sessions, setSessions] = useState([]);
-  const currentTrainerId = trainerData.id || trainerData.email;
-
-  const loadSessions = () => {
-    const allBookings = JSON.parse(localStorage.getItem('counselling_bookings') || '[]');
-    // Filter sessions assigned to THIS trainer
-    const mySessions = allBookings.filter(b => b.assignedTrainerId === currentTrainerId);
-    setSessions(mySessions);
+  const loadSessions = async () => {
+    try {
+      const res = await getTrainerCounsellingSessions();
+      if (res.success) {
+        setSessions(res.sessions);
+      }
+    } catch (err) {
+      console.error("Failed to fetch trainer sessions:", err);
+    }
   };
 
   useEffect(() => {
     loadSessions();
-    const interval = setInterval(loadSessions, 3000);
+    const interval = setInterval(loadSessions, 5000);
     return () => clearInterval(interval);
-  }, [currentTrainerId]);
+  }, []);
 
   return (
     <div className="tc-container">

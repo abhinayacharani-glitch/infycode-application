@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calendar, Clock, Video, Info, CheckCircle, X, Bell, ExternalLink } from 'lucide-react';
+import { bookCounsellingSlot, getStudentCounsellingSessions } from '../../../services/api';
 import './Counselling.css';
 
 /* ── Helpers ── */
 const MEETING_LINK = 'https://meet.google.com/wxs-wifp-tti';
-
-const getBookings = () => JSON.parse(localStorage.getItem('counselling_bookings') || '[]');
-const saveBookings = (arr) => localStorage.setItem('counselling_bookings', JSON.stringify(arr));
-const getNotifications = () => JSON.parse(localStorage.getItem('counselling_notifications') || '[]');
 
 const CounsellingDetail = () => {
   const { id } = useParams();
@@ -20,6 +17,7 @@ const CounsellingDetail = () => {
   const [bookingStatus, setBookingStatus] = useState(null); // null | 'pending' | 'accepted' | 'rejected'
   const [acceptedSlot, setAcceptedSlot] = useState(null);
   const [toast, setToast] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
 
   const timeSlots = [
     { id: 'slot1', label: '10:00 AM – 11:00 AM', startHour: 10, endHour: 11, display: '10 AM – 11 AM' },
@@ -27,6 +25,35 @@ const CounsellingDetail = () => {
     { id: 'slot3', label: '2:00 PM – 3:00 PM',   startHour: 14, endHour: 15, display: '2 PM – 3 PM'   },
     { id: 'slot4', label: '3:00 PM – 4:00 PM',   startHour: 15, endHour: 16, display: '3 PM – 4 PM'   },
   ];
+
+  /* ── Get Monday to Friday of current week ── */
+  const getWeekDays = () => {
+    const dates = [];
+    const today = new Date();
+    const dayOfWeek = today.getDay(); // 0 (Sun) to 6 (Sat)
+    
+    // Calculate Monday of this week
+    const first = today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1);
+    
+    for (let i = 0; i < 5; i++) {
+      const d = new Date(today);
+      d.setDate(first + i);
+      dates.push({
+        date: d.toISOString().split('T')[0],
+        display: d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+      });
+    }
+    return dates;
+  };
+
+  const weekDays = getWeekDays();
+
+  // Initialize selectedDate with today if today is Mon-Fri, else Monday
+  useEffect(() => {
+    const todayStr = new Date().toISOString().split('T')[0];
+    const found = weekDays.find(d => d.date === todayStr);
+    setSelectedDate(found ? found.date : weekDays[0].date);
+  }, []);
 
   const cards = [
     {
@@ -77,35 +104,31 @@ const CounsellingDetail = () => {
     return () => clearInterval(t);
   }, []);
 
-  /* ── Load booking/notification state ── */
+  /* ── Load booking state from Backend ── */
   useEffect(() => {
     if (!card) return;
-    const user = JSON.parse(localStorage.getItem('loggedUser') || localStorage.getItem('user') || '{}');
-    const studentId = user.id || user.email || 'guest';
 
-    // Check existing booking for this student + service
-    const bookings = getBookings();
-    const myBooking = bookings.find(b => b.studentId === studentId && b.serviceId === card.id);
-
-    if (myBooking) {
-      setBookingStatus(myBooking.status);
-
-      // Check if admin has accepted → look in notifications
-      const notifications = getNotifications();
-      const myNotif = notifications.find(n => n.bookingId === myBooking.id);
-      if (myNotif && myNotif.status === 'accepted') {
-        setBookingStatus('accepted');
-        setAcceptedSlot(timeSlots.find(s => s.id === myNotif.slotId) || null);
-        // Keep booking in sync
-        if (myBooking.status !== 'accepted') {
-          myBooking.status = 'accepted';
-          saveBookings(bookings);
+    const fetchMyBookings = async () => {
+      try {
+        const res = await getStudentCounsellingSessions();
+        if (res.success) {
+          const myBooking = res.sessions.find(b => b.serviceId === card.id);
+          if (myBooking) {
+            setBookingStatus(myBooking.status);
+            if (myBooking.status === 'accepted') {
+              setAcceptedSlot(timeSlots.find(s => s.id === myBooking.slotId) || null);
+            }
+          }
         }
-      } else if (myNotif && myNotif.status === 'rejected') {
-        setBookingStatus('rejected');
+      } catch (err) {
+        console.error("Failed to fetch bookings:", err);
       }
-    }
-  }, [id, currentTime]); // re-check every second so status updates in real-time
+    };
+
+    fetchMyBookings();
+    const interval = setInterval(fetchMyBookings, 5000);
+    return () => clearInterval(interval);
+  }, [id, card]);
 
   if (!card) return <div className="detail-error">Service not found.</div>;
 
@@ -132,34 +155,53 @@ const CounsellingDetail = () => {
 
   const meetState = getMeetingButtonState();
 
-  /* ── Submit booking ── */
-  const handleSubmitBooking = () => {
-    if (!selectedSlot) return;
-    const user = JSON.parse(localStorage.getItem('loggedUser') || localStorage.getItem('user') || '{}');
-    const studentId = user.id || user.email || 'guest';
-    const studentName = user.fullName || user.fullname || user.name || user.username || 'Student';
-    const studentEmail = user.email || 'student@infycode.com';
+  /* ── Slot Validity Helper ── */
+  const getSlotStatus = (slot, dateStr) => {
+    const now = new Date();
+    const todayStr = now.toISOString().split('T')[0];
+    
+    // If selecting a past date (this shouldn't happen with Mon-Fri logic but safe check)
+    if (dateStr < todayStr) return { valid: false, reason: "This day has already passed." };
 
-    const booking = {
-      id: `booking_${Date.now()}`,
-      studentId,
-      studentName,
-      studentEmail,
-      serviceId: card.id,
-      serviceTitle: card.title,
-      slotId: selectedSlot.id,
-      slotLabel: selectedSlot.label,
-      submittedAt: new Date().toISOString(),
-      status: 'pending',
-    };
+    // If selecting a future date, it's always valid
+    if (dateStr > todayStr) return { valid: true };
 
-    const existing = getBookings().filter(b => !(b.studentId === studentId && b.serviceId === card.id));
-    saveBookings([...existing, booking]);
+    // If selecting today, apply 2-hour gap
+    const slotTime = new Date(now);
+    slotTime.setHours(slot.startHour, 0, 0, 0);
+    
+    const diffInMs = slotTime - now;
+    const diffInHours = diffInMs / (1000 * 60 * 60);
+    
+    if (diffInHours < 0) return { valid: false, reason: "This slot has already passed." };
+    if (diffInHours < 2) return { valid: false, reason: "Slots must be booked at least 2 hours in advance for today." };
+    
+    return { valid: true };
+  };
 
-    setBookingStatus('pending');
-    setSelectedSlot(null);
-    setShowModal(false);
-    showToast('✅ Slot request submitted! Awaiting admin approval.');
+  /* ── Submit booking to Backend ── */
+  const handleSubmitBooking = async () => {
+    if (!selectedSlot || !selectedDate) return;
+
+    try {
+      const res = await bookCounsellingSlot({
+        serviceId: card.id,
+        serviceTitle: card.title,
+        slotId: selectedSlot.id,
+        slotLabel: selectedSlot.label,
+        slotDate: selectedDate,
+        startHour: selectedSlot.startHour
+      });
+
+      if (res.success) {
+        setBookingStatus('pending');
+        setSelectedSlot(null);
+        setShowModal(false);
+        showToast('✅ Slot request submitted! Awaiting admin approval.');
+      }
+    } catch (err) {
+      showToast('❌ ' + err.message);
+    }
   };
 
   /* ── Toast ── */
@@ -190,19 +232,39 @@ const CounsellingDetail = () => {
               <button className="modal-close-btn" onClick={() => setShowModal(false)}><X size={20} /></button>
             </div>
 
+            <div className="modal-date-tabs">
+              {weekDays.map(day => (
+                <button
+                  key={day.date}
+                  className={`date-tab-btn ${selectedDate === day.date ? 'active' : ''}`}
+                  onClick={() => { setSelectedDate(day.date); setSelectedSlot(null); }}
+                >
+                  {day.display}
+                </button>
+              ))}
+            </div>
+
             <div className="modal-slots-grid">
               {timeSlots.map(slot => {
                 const isSelected = selectedSlot?.id === slot.id;
+                const status = getSlotStatus(slot, selectedDate);
+
                 return (
                   <button
                     key={slot.id}
-                    className={`modal-slot-card ${isSelected ? 'selected' : ''}`}
-                    onClick={() => setSelectedSlot(slot)}
+                    className={`modal-slot-card ${isSelected ? 'selected' : ''} ${!status.valid ? 'disabled' : 'available-green'}`}
+                    onClick={() => {
+                      if (status.valid) {
+                        setSelectedSlot(slot);
+                      } else {
+                        showToast(`⚠️ ${status.reason}`);
+                      }
+                    }}
                   >
                     <Clock size={18} />
                     <span className="slot-time-text">{slot.label}</span>
-                    <span className="slot-avail-badge available">
-                      Available
+                    <span className={`slot-avail-badge ${status.valid ? 'available' : 'unavailable'}`}>
+                      {status.valid ? 'Available' : 'Unavailable'}
                     </span>
                   </button>
                 );

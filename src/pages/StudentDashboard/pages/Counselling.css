@@ -656,6 +656,40 @@
   color: #64748b;
 }
 
+.modal-date-tabs {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  overflow-x: auto;
+  border-bottom: 1px solid #f1f5f9;
+  background: #f8fafc;
+}
+
+.date-tab-btn {
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #64748b;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.date-tab-btn:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+.date-tab-btn.active {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+  box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+}
+
 .modal-close-btn {
   background: #f1f5f9;
   border: none;
@@ -707,10 +741,29 @@
   color: white;
 }
 
-.modal-slot-card.past {
-  opacity: 0.45;
+.modal-slot-card.past,
+.modal-slot-card.disabled {
+  opacity: 0.5;
   cursor: not-allowed;
+  background: #f1f5f9;
+  border-color: #e2e8f0;
   filter: grayscale(1);
+}
+
+.modal-slot-card.available-green {
+  border-color: #10b981;
+  background: #f0fdf4;
+}
+
+.modal-slot-card.available-green:hover:not(.selected) {
+  background: #dcfce7;
+  border-color: #059669;
+}
+
+.modal-slot-card.available-green.selected {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: white;
 }
 
 .slot-time-text {
@@ -727,6 +780,7 @@
 }
 
 .slot-avail-badge.available { background: #ecfdf5; color: #10b981; }
+.slot-avail-badge.unavailable { background: #fee2e2; color: #ef4444; }
 .slot-avail-badge.ended     { background: #f1f5f9; color: #94a3b8; }
 .modal-slot-card.selected .slot-avail-badge { background: rgba(255,255,255,0.25); color: white; }
 
