@@ -28,6 +28,7 @@ const ADMIN_PASSWORD = "Admin@520";
 // POST /api/login
 // ---------------------------------------------------------------------------
 export const unifiedLogin = async (req, res) => {
+  let userData; // Declare here so it's available in all branches
   try {
     const { email, password } = req.body;
 
@@ -142,7 +143,6 @@ export const unifiedLogin = async (req, res) => {
       });
     }
 
-    let userData;
     snapshot.forEach((child) => {
       userData = child.val();
       userData.id = child.key;

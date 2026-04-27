@@ -136,25 +136,6 @@ const Sidebar = ({ isOpen, onClose, externalShowLogoutModal, setExternalShowLogo
             </div>
           </NavLink>
 
-          <NavLink to="/trainer-dashboard/profile"
-            onClick={onClose}
-            className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
-            <div className="sd-box">
-              <span className="sd-icon"><UserIcon /></span>
-              <span className="sd-text">My Profile</span>
-            </div>
-          </NavLink>
-
-          <NavLink to="/trainer-dashboard/batches"
-            onClick={onClose}
-            className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
-            <div className="sd-box">
-              <span className="sd-icon"><BookIcon /></span>
-              <span className="sd-text">Batches</span>
-
-            </div>
-          </NavLink>
-
           <NavLink to="/trainer-dashboard/schedule"
             onClick={onClose}
             className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
@@ -164,13 +145,39 @@ const Sidebar = ({ isOpen, onClose, externalShowLogoutModal, setExternalShowLogo
             </div>
           </NavLink>
 
+          <NavLink to="/trainer-dashboard/batches"
+            onClick={onClose}
+            className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
+            <div className="sd-box">
+              <span className="sd-icon"><BookIcon /></span>
+              <span className="sd-text">Batches</span>
+            </div>
+          </NavLink>
+
+          <NavLink to="/trainer-dashboard/counselling"
+            onClick={onClose}
+            className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
+            <div className="sd-box">
+              <span className="sd-icon"><LiveIcon /></span>
+              <span className="sd-text">Counselling sessions</span>
+            </div>
+          </NavLink>
+
           <NavLink to="/trainer-dashboard/materials"
             onClick={onClose}
             className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
             <div className="sd-box">
               <span className="sd-icon"><PaperclipIcon /></span>
-              <span className="sd-text">Courses & Materials</span>
+              <span className="sd-text">Course & material</span>
+            </div>
+          </NavLink>
 
+          <NavLink to="/trainer-dashboard/feedback"
+            onClick={onClose}
+            className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
+            <div className="sd-box">
+              <span className="sd-icon"><MessageIcon /></span>
+              <span className="sd-text">Student connect</span>
             </div>
           </NavLink>
 
@@ -183,21 +190,12 @@ const Sidebar = ({ isOpen, onClose, externalShowLogoutModal, setExternalShowLogo
             </div>
           </NavLink>
 
-          <NavLink to="/trainer-dashboard/counselling"
+          <NavLink to="/trainer-dashboard/profile"
             onClick={onClose}
             className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
             <div className="sd-box">
-              <span className="sd-icon"><LiveIcon /></span>
-              <span className="sd-text">Counselling Sessions</span>
-            </div>
-          </NavLink>
-
-          <NavLink to="/trainer-dashboard/feedback"
-            onClick={onClose}
-            className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
-            <div className="sd-box">
-              <span className="sd-icon"><MessageIcon /></span>
-              <span className="sd-text">Student Connect</span>
+              <span className="sd-icon"><UserIcon /></span>
+              <span className="sd-text">My profile</span>
             </div>
           </NavLink>
         </div>
