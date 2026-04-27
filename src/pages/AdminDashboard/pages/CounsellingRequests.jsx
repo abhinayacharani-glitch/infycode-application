@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Video, Check, X, Clock, User, Mail, Calendar, UserPlus } from 'lucide-react';
+import { Check, X, Clock, Calendar } from 'lucide-react';
 import { useAdmin } from '../../../context/AdminContext';
+import { getAdminCounsellingRequests, assignCounsellingTrainer } from '../../../services/api';
 import './CounsellingRequests.css';
 
 const CounsellingRequests = () => {
@@ -15,90 +16,97 @@ const CounsellingRequests = () => {
     { id: 't3', fullName: 'Mike Johnson (Tech Lead)' }
   ];
 
-  const loadBookings = () => {
-    const all = JSON.parse(localStorage.getItem('counselling_bookings') || '[]');
-    setBookings(all);
+  const loadBookings = async () => {
+    try {
+      const res = await getAdminCounsellingRequests();
+      if (res.success) {
+        setBookings(res.requests);
+      }
+    } catch (err) {
+      console.error("Failed to fetch counselling requests:", err);
+    }
   };
 
   useEffect(() => {
     loadBookings();
-    const interval = setInterval(loadBookings, 3000);
+    const interval = setInterval(loadBookings, 5000);
     return () => clearInterval(interval);
   }, []);
 
-  // Pre-populate with real student data if empty
-  useEffect(() => {
-    const all = JSON.parse(localStorage.getItem('counselling_bookings') || '[]');
-    if (all.length === 0 && students.length > 0) {
-      const initial = students.slice(0, 5).map((s, i) => ({
-        id: `auto_${Date.now()}_${i}`,
-        studentId: s.id || s.email,
-        studentName: s.fullName || s.name || 'Student',
-        studentEmail: s.email,
-        serviceId: i % 2,
-        serviceTitle: i % 2 === 0 ? '1-1 Career Counselling' : '1-Many Counselling',
-        slotId: `slot${(i % 4) + 1}`,
-        slotLabel: ['10:00 AM – 11:00 AM', '11:00 AM – 12:00 PM', '2:00 PM – 3:00 PM', '3:00 PM – 4:00 PM'][i % 4],
-        status: 'pending',
-        submittedAt: new Date(Date.now() - (i * 86400000 / 4)).toISOString() // staggered times
-      }));
-      localStorage.setItem('counselling_bookings', JSON.stringify(initial));
-      setBookings(initial);
+  // Calculate counts for 1-Many slots
+  const groupCounts = bookings
+    .filter(b => b.serviceId === 1 && b.status === 'pending')
+    .reduce((acc, b) => {
+      const key = `${b.slotDate}_${b.slotId}`;
+      acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    }, {});
+
+  const handleAccept = async (booking) => {
+    const key = `${booking.slotDate}_${booking.slotId}`;
+    if (booking.serviceId === 1 && (groupCounts[key] || 0) < 10) {
+      setActionMsg({ type: 'error', text: `Minimum 10 students required for 1-Many session.` });
+      setTimeout(() => setActionMsg(null), 4000);
+      return;
     }
-  }, [students]);
 
-  const handleAccept = (booking) => {
-    const all = JSON.parse(localStorage.getItem('counselling_bookings') || '[]');
-    const updated = all.map(b => b.id === booking.id ? { ...b, status: 'accepted' } : b);
-    localStorage.setItem('counselling_bookings', JSON.stringify(updated));
+    try {
+      const res = await assignCounsellingTrainer({
+        bookingId: booking.id,
+        trainerId: booking.assignedTrainerId,
+        trainerName: booking.assignedTrainerName,
+        status: 'accepted'
+      });
 
-    const notifications = JSON.parse(localStorage.getItem('counselling_notifications') || '[]');
-    const filtered = notifications.filter(n => n.bookingId !== booking.id);
-    filtered.push({
-      bookingId: booking.id,
-      studentId: booking.studentId,
-      serviceId: booking.serviceId,
-      serviceTitle: booking.serviceTitle,
-      slotId: booking.slotId,
-      slotLabel: booking.slotLabel,
-      meetingLink: 'https://meet.google.com/wxs-wifp-tti',
-      status: 'accepted',
-      acceptedAt: new Date().toISOString(),
-    });
-    localStorage.setItem('counselling_notifications', JSON.stringify(filtered));
-
-    loadBookings();
-    setActionMsg({ type: 'success', text: `Confirmed: Session for ${booking.studentName} is now active.` });
-    setTimeout(() => setActionMsg(null), 4000);
+      if (res.success) {
+        loadBookings();
+        setActionMsg({ type: 'success', text: `Confirmed: Session for ${booking.studentName} is now active.` });
+        setTimeout(() => setActionMsg(null), 4000);
+      }
+    } catch (err) {
+      setActionMsg({ type: 'error', text: err.message });
+      setTimeout(() => setActionMsg(null), 4000);
+    }
   };
 
-  const handleReject = (booking) => {
-    const all = JSON.parse(localStorage.getItem('counselling_bookings') || '[]');
-    const updated = all.map(b => b.id === booking.id ? { ...b, status: 'rejected' } : b);
-    localStorage.setItem('counselling_bookings', JSON.stringify(updated));
+  const handleReject = async (booking) => {
+    try {
+      const res = await assignCounsellingTrainer({
+        bookingId: booking.id,
+        status: 'rejected'
+      });
 
-    const notifications = JSON.parse(localStorage.getItem('counselling_notifications') || '[]');
-    const filtered = notifications.filter(n => n.bookingId !== booking.id);
-    filtered.push({ bookingId: booking.id, studentId: booking.studentId, serviceId: booking.serviceId, status: 'rejected' });
-    localStorage.setItem('counselling_notifications', JSON.stringify(filtered));
-
-    loadBookings();
-    setActionMsg({ type: 'error', text: `Rejected: Request from ${booking.studentName} has been cancelled.` });
-    setTimeout(() => setActionMsg(null), 4000);
+      if (res.success) {
+        loadBookings();
+        setActionMsg({ type: 'error', text: `Rejected: Request from ${booking.studentName} has been cancelled.` });
+        setTimeout(() => setActionMsg(null), 4000);
+      }
+    } catch (err) {
+      setActionMsg({ type: 'error', text: err.message });
+      setTimeout(() => setActionMsg(null), 4000);
+    }
   };
 
-  const handleAssignTrainer = (bookingId, trainerId) => {
-    const all = JSON.parse(localStorage.getItem('counselling_bookings') || '[]');
+  const handleAssignTrainer = async (bookingId, trainerId) => {
     const selectedTrainer = trainers.find(t => t.id === trainerId);
 
-    const updated = all.map(b =>
-      b.id === bookingId ? { ...b, assignedTrainerId: trainerId, assignedTrainerName: selectedTrainer?.fullName || selectedTrainer?.name || 'Trainer' } : b
-    );
-    localStorage.setItem('counselling_bookings', JSON.stringify(updated));
-    loadBookings();
+    try {
+      const res = await assignCounsellingTrainer({
+        bookingId,
+        trainerId,
+        trainerName: selectedTrainer?.fullName || selectedTrainer?.name || 'Trainer',
+        status: 'pending' // Just assigning, not accepting yet
+      });
 
-    setActionMsg({ type: 'success', text: `Assigned: ${selectedTrainer?.fullName || 'Trainer'} will handle this session.` });
-    setTimeout(() => setActionMsg(null), 3000);
+      if (res.success) {
+        loadBookings();
+        setActionMsg({ type: 'success', text: `Assigned: ${selectedTrainer?.fullName || 'Trainer'} will handle this session.` });
+        setTimeout(() => setActionMsg(null), 3000);
+      }
+    } catch (err) {
+      setActionMsg({ type: 'error', text: err.message });
+      setTimeout(() => setActionMsg(null), 4000);
+    }
   };
 
   return (
@@ -141,6 +149,7 @@ const CounsellingRequests = () => {
                 <tr>
                   <th>Student Detail</th>
                   <th>Service Requested</th>
+                  <th>Slot Date</th>
                   <th>Preferred Slot</th>
                   <th>Trainer Assigned</th>
                   <th>Status</th>
@@ -159,7 +168,22 @@ const CounsellingRequests = () => {
                         </div>
                       </div>
                     </td>
-                    <td><span className="cr-service-tag">{b.serviceTitle}</span></td>
+                    <td>
+                      <div className="cr-service-cell">
+                        <span className="cr-service-tag">{b.serviceTitle}</span>
+                        {b.serviceId === 1 && (
+                          <div className={`cr-batch-count ${groupCounts[`${b.slotDate}_${b.slotId}`] >= 10 ? 'ready' : 'waiting'}`}>
+                            {groupCounts[`${b.slotDate}_${b.slotId}`] || 0}/10 students
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                    <td>
+                      <div className="cr-date-cell">
+                        <Calendar size={14} />
+                        <span>{b.slotDate}</span>
+                      </div>
+                    </td>
                     <td>
                       <div className="cr-slot-cell">
                         <Clock size={14} />
