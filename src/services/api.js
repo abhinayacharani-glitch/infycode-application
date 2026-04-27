@@ -6,7 +6,7 @@
 
 const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || 
-                (isLocalhost ? 'http://localhost:5000' : 'https://infycode-application.onrender.com');
+                (isLocalhost ? 'http://localhost:5001' : 'https://infycode-application.onrender.com');
 
 console.log(`[API Service] Using BASE_URL: ${BASE_URL}`);
 

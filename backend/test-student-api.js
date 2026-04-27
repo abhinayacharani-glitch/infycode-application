@@ -1,6 +1,6 @@
 // Built-in fetch is used (Node 18+)
 
-const BASE_URL = 'http://localhost:5000/api';
+const BASE_URL = 'http://localhost:5001/api';
 
 // UPDATE THESE WITH REAL VALUES AFTER LOGGING IN
 const STUDENT_EMAIL = 'test@example.com'; 
