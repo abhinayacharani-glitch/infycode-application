@@ -23,7 +23,7 @@ const SkillTest = () => {
         }
       } catch (err) {
         console.error("Error checking test status:", err);
-        setError("Unable to sync test status with server. Showing local status.");
+        setError(err.message || "Unable to sync test status with server. Showing local status.");
         // Fallback to localStorage if API fails
         if (localStorage.getItem("foundationalTestCompleted") === "true") {
           setIsUnlocked(true);
