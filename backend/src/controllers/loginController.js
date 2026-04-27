@@ -102,6 +102,7 @@ export const unifiedLogin = async (req, res) => {
         });
       }
 
+      let userData;
       snapshot.forEach((child) => {
         userData = child.val();
         userData.id = child.key;
