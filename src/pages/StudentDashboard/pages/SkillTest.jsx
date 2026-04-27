@@ -1,16 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import { FaArrowRight } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { getStudentMyResults } from '../../../services/api';
 import './SkillTest.css';
 
 const SkillTest = () => {
   const navigate = useNavigate();
   const [isUnlocked, setIsUnlocked] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (localStorage.getItem("foundationalTestCompleted") === "true") {
-      setIsUnlocked(true);
-    }
+    const checkCompletion = async () => {
+      try {
+        setLoading(true);
+        const data = await getStudentMyResults();
+        if (data.success && data.testResults?.foundationalCompleted) {
+          setIsUnlocked(true);
+        } else {
+          setIsUnlocked(false);
+        }
+      } catch (err) {
+        console.error("Error checking test status:", err);
+        // Fallback to localStorage if API fails
+        if (localStorage.getItem("foundationalTestCompleted") === "true") {
+          setIsUnlocked(true);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkCompletion();
   }, []);
 
   return (
@@ -24,7 +44,7 @@ const SkillTest = () => {
         <p>
           ⚠️Mandatory Step:Students must first complete 
            Aptitude, Reasoning, and Communication tests before attempting the 
-          Core Technical Test.
+           Core Technical Test.
         </p>
       </div>
 
@@ -54,11 +74,11 @@ const SkillTest = () => {
             <h3>Core Technical Test</h3>
             <p>Deep dive into DSA, System Design, and niche technologies to prove your technical expertise.</p>
             <button 
-              className={`start-btn-modern ${!isUnlocked ? "locked" : ""}`} 
-              onClick={() => isUnlocked && navigate("/student/core-test")}
-              disabled={!isUnlocked}
+              className={`start-btn-modern ${!isUnlocked || loading ? "locked" : ""}`} 
+              onClick={() => !loading && isUnlocked && navigate("/student/core-test")}
+              disabled={loading || !isUnlocked}
             >
-              {isUnlocked ? "Start Core Test" : "Join Waiting List"}
+              {loading ? "Checking Status..." : isUnlocked ? "Start Core Test" : "Join Waiting List"}
             </button>
           </div>
         </div>

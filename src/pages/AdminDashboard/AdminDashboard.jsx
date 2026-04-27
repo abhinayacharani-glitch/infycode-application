@@ -57,8 +57,10 @@ const AdminDashboard = () => {
               <Route path="batch-setup"          element={<BatchCreation />} />
               <Route path="enrollment"           element={<EnrollmentMapping />} />
               <Route path="analytics"            element={<Analytics />} />
+              <Route path="activation"           element={<LearningActivation />} />
+              <Route path="student-results"      element={<Reports />} />
               <Route path="counselling-requests" element={<CounsellingRequests />} />
-              <Route path="reports"              element={<Reports />} />
+              
               <Route path="faq-management"       element={<FAQManagement />} />
               <Route path="settings/account"     element={<AccountSettings />} />
               <Route path="settings/account"     element={<AccountSettings />} />

@@ -102,9 +102,9 @@ export const unifiedLogin = async (req, res) => {
         });
       }
 
-      let userData;
       snapshot.forEach((child) => {
         userData = child.val();
+        userData.id = child.key;
       });
 
       // Validate password
@@ -145,6 +145,7 @@ export const unifiedLogin = async (req, res) => {
     let userData;
     snapshot.forEach((child) => {
       userData = child.val();
+      userData.id = child.key;
     });
 
     const isMatch = await bcrypt.compare(password, userData.password);

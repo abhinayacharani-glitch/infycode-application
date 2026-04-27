@@ -14,6 +14,7 @@ import jwt from "jsonwebtoken";
 // ─── VERIFY TOKEN ────────────────────────────────────────────────────────────
 export const verifyToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
+  console.log(`[verifyToken] Authorization Header: ${authHeader ? "Present" : "Missing"}`);
 
   if (!authHeader) {
     return res.status(401).json({ success: false, message: "No token provided" });
@@ -22,9 +23,11 @@ export const verifyToken = (req, res, next) => {
   try {
     const token   = authHeader.split(" ")[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log(`[verifyToken] Decoded Token:`, decoded);
     req.user      = decoded;
     next();
   } catch (error) {
+    console.error(`[verifyToken] JWT Error:`, error.message);
     res.status(401).json({ success: false, message: "Invalid or expired token" });
   }
 };
