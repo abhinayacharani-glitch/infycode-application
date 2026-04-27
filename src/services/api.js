@@ -404,3 +404,36 @@ export const publishNewFAQ = (data) =>
 
 export const getNewPublishedFAQs = () =>
   request('/api/faqs/published', { cache: 'no-store' });
+
+// ─────────────────────────────────────────────
+// COUNSELLING
+// ─────────────────────────────────────────────
+
+export const bookCounsellingSlot = (bookingData) =>
+  request('/api/counselling/book', {
+    method: 'POST',
+    headers: getAuthHeader(),
+    body: JSON.stringify(bookingData),
+  });
+
+export const getAdminCounsellingRequests = () =>
+  request('/api/counselling/requests', {
+    headers: getAuthHeader(),
+  });
+
+export const assignCounsellingTrainer = (assignmentData) =>
+  request('/api/counselling/assign-trainer', {
+    method: 'PUT',
+    headers: getAuthHeader(),
+    body: JSON.stringify(assignmentData),
+  });
+
+export const getTrainerCounsellingSessions = () =>
+  request('/api/counselling/trainer-sessions', {
+    headers: getAuthHeader(),
+  });
+
+export const getStudentCounsellingSessions = () =>
+  request('/api/counselling/student-sessions', {
+    headers: getAuthHeader(),
+  });
