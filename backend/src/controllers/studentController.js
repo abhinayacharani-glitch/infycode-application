@@ -135,7 +135,14 @@ export const getMyResults = async (req, res) => {
 export const enrollInCourse = async (req, res) => {
   try {
     const { courseId } = req.params;
-    const { email } = req.user;
+    const email = req.user?.email;
+
+    console.log(`[enrollInCourse] Request for course: ${courseId} from user: ${email}`);
+
+    if (!email) {
+      console.error("[enrollInCourse] Unauthorized: No email in token");
+      return res.status(401).json({ error: "Unauthorized: No email in token" });
+    }
 
     if (!courseId) {
       return res.status(400).json({ error: "Course ID is required" });
@@ -149,9 +156,10 @@ export const enrollInCourse = async (req, res) => {
       status: "active"
     });
 
+    console.log(`[enrollInCourse] Successfully enrolled ${email} in ${courseId}`);
     res.status(200).json({ message: "Enrolled successfully", courseId });
   } catch (error) {
-    console.error("Enrollment Error:", error);
+    console.error("[enrollInCourse] Error:", error);
     res.status(500).json({ error: "Failed to enroll in course" });
   }
 };
@@ -162,7 +170,13 @@ export const enrollInCourse = async (req, res) => {
  */
 export const getEnrolledCourses = async (req, res) => {
   try {
-    const { email } = req.user;
+    const email = req.user?.email;
+    console.log(`[getEnrolledCourses] Fetching for user: ${email}`);
+
+    if (!email) {
+      console.error("[getEnrolledCourses] Unauthorized: No email in token");
+      return res.status(401).json({ error: "Unauthorized: No email in token" });
+    }
     const sanitizedEmail = email.replace(/\./g, ",");
 
     const snapshot = await enrollmentsRef.child(sanitizedEmail).once("value");
@@ -171,9 +185,10 @@ export const getEnrolledCourses = async (req, res) => {
     // Return just the keys (course IDs)
     const enrolledIds = Object.keys(data);
     
+    console.log(`[getEnrolledCourses] Found ${enrolledIds.length} courses for ${email}`);
     res.status(200).json(enrolledIds);
   } catch (error) {
-    console.error("Fetch Enrolled Error:", error);
+    console.error("[getEnrolledCourses] Error:", error);
     res.status(500).json({ error: "Failed to fetch enrolled courses" });
   }
 };
