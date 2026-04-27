@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { FiUsers, FiPlayCircle, FiCheckCircle, FiBriefcase, FiArrowRight } from "react-icons/fi";
+import { FiArrowRight } from "react-icons/fi";
 import "./Features.css";
 import skillImg from "../../assets/skill_evaluation.png";
 import practicalImg from "../../assets/practical_learning.png";
@@ -11,8 +11,7 @@ const featuresData = [
   {
     id: "01",
     title: "Mentorship & Guidance",
-    hook: "Expert Support",
-    icon: <FiUsers />,
+
     path: "/features/mentorship",
     color: "#3b82f6",
     image: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&q=80&w=800",
@@ -21,8 +20,7 @@ const featuresData = [
   {
     id: "02",
     title: "Practical Learning",
-    hook: "Real-World Projects",
-    icon: <FiPlayCircle />,
+
     path: "/features/practical-learning",
     color: "#10b981",
     image: practicalImg,
@@ -31,8 +29,7 @@ const featuresData = [
   {
     id: "03",
     title: "Skill Evaluation",
-    hook: "Track Progress",
-    icon: <FiCheckCircle />,
+
     path: "/features/skill-evaluation",
     color: "#8b5cf6",
     image: skillImg,
@@ -42,8 +39,7 @@ const featuresData = [
   {
     id: "04",
     title: "Career Preparation",
-    hook: "Job Readiness",
-    icon: <FiBriefcase />,
+
     path: "/features/career-preparation",
     color: "#f97316",
     image: careerImg,
@@ -118,17 +114,10 @@ export default function Features() {
               <div className="card-content-wrapper-v4">
                 <div className="card-top-v4">
                   <span className="step-num-v4">{feature.id}</span>
-                  <div className="icon-box-v4" style={{ backgroundColor: `${feature.color}30` }}>
-                    {feature.icon}
-                  </div>
-                </div>
-
-                <div className="card-content-v4">
-                  <h3 className="card-title-v4">{feature.title}</h3>
-                  <p className="card-hook-v4">{feature.hook}</p>
                 </div>
 
                 <div className="card-footer-v4">
+                  <h3 className="card-title-v4">{feature.title}</h3>
                   <button className="learn-more-v4">
                     Explore Details <FiArrowRight className="arrow-v4" />
                   </button>

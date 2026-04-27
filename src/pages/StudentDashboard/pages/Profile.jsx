@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Edit2, Mail, Phone, User, Calendar, Camera } from 'lucide-react';
+import { Edit2, Mail, Phone, User, Calendar, Camera, X } from 'lucide-react';
 import { useLocation } from "react-router-dom";
 import "./Profile.css";
 
@@ -13,18 +13,109 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const editSectionRef = useRef(null);
   
+  const [profileImage, setProfileImage] = useState(loggedUser.profileImage || null);
+  const fileInputRef = useRef(null);
+
   const [isCameraDropdownOpen, setIsCameraDropdownOpen] = useState(false);
   const cameraDropdownRef = useRef(null);
 
+  const [isCameraModalOpen, setIsCameraModalOpen] = useState(false);
+  const [capturedImage, setCapturedImage] = useState(null);
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const streamRef = useRef(null);
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileImage(reader.result);
+        const updatedUser = { ...loggedUser, profileImage: reader.result };
+        localStorage.setItem("loggedUser", JSON.stringify(updatedUser));
+        setLoggedUser(updatedUser);
+        setIsCameraDropdownOpen(false);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const openCamera = async () => {
+    setIsCameraDropdownOpen(false);
+    setIsCameraModalOpen(true);
+    setCapturedImage(null);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+    } catch (err) {
+      console.error("Error accessing camera:", err);
+      alert("Unable to access camera. Please check your permissions.");
+      setIsCameraModalOpen(false);
+    }
+  };
+
+  const closeCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+    }
+    setIsCameraModalOpen(false);
+  };
+
+  const capturePhoto = () => {
+    if (videoRef.current && canvasRef.current) {
+      const context = canvasRef.current.getContext('2d');
+      canvasRef.current.width = videoRef.current.videoWidth;
+      canvasRef.current.height = videoRef.current.videoHeight;
+      context.drawImage(videoRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height);
+      const imageDataUrl = canvasRef.current.toDataURL('image/jpeg');
+      setCapturedImage(imageDataUrl);
+    }
+  };
+
+  const saveCapturedPhoto = () => {
+    setProfileImage(capturedImage);
+    const updatedUser = { ...loggedUser, profileImage: capturedImage };
+    localStorage.setItem("loggedUser", JSON.stringify(updatedUser));
+    setLoggedUser(updatedUser);
+    closeCamera();
+  };
+
+  const removePhoto = () => {
+    setProfileImage(null);
+    const updatedUser = { ...loggedUser, profileImage: null };
+    localStorage.setItem("loggedUser", JSON.stringify(updatedUser));
+    setLoggedUser(updatedUser);
+    setIsCameraDropdownOpen(false);
+  };
+
   useEffect(() => {
-    const handleClickOutsideCamera = (event) => {
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
       if (cameraDropdownRef.current && !cameraDropdownRef.current.contains(event.target)) {
         setIsCameraDropdownOpen(false);
       }
     };
-    document.addEventListener("mousedown", handleClickOutsideCamera);
-    return () => document.removeEventListener("mousedown", handleClickOutsideCamera);
-  }, []);
+
+    if (isCameraDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isCameraDropdownOpen]);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -94,20 +185,34 @@ const Profile = () => {
       {/* 🔷 HEADER */}
       <div className="profile-header">
         <div className="profile-avatar-container" ref={cameraDropdownRef}>
-          <div className="profile-avatar">{personalDetails.fullName ? personalDetails.fullName.charAt(0).toUpperCase() : 'S'}</div>
+          <div className={`profile-avatar ${profileImage ? 'has-image' : ''}`}>
+            {profileImage ? (
+              <img src={profileImage} alt="Profile" className="profile-avatar-img" />
+            ) : (
+              personalDetails.fullName ? personalDetails.fullName.charAt(0).toUpperCase() : 'S'
+            )}
+          </div>
           <button className="avatar-edit-btn" aria-label="Edit Profile Picture" onClick={() => setIsCameraDropdownOpen(!isCameraDropdownOpen)}>
             <Camera size={16} />
           </button>
           
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            onChange={handleFileUpload} 
+            accept="image/*" 
+            style={{ display: 'none' }} 
+          />
+
           {isCameraDropdownOpen && (
             <div className="camera-dropdown-menu">
-              <button className="camera-dropdown-item" onClick={() => setIsCameraDropdownOpen(false)}>
+              <button className="camera-dropdown-item" onClick={openCamera}>
                 <span>📷</span> Take a new photo using your camera
               </button>
-              <button className="camera-dropdown-item" onClick={() => setIsCameraDropdownOpen(false)}>
+              <button className="camera-dropdown-item" onClick={() => { setIsCameraDropdownOpen(false); fileInputRef.current?.click(); }}>
                 <span>🖼️</span> Choose an existing photo from your gallery
               </button>
-              <button className="camera-dropdown-item remove-photo" onClick={() => setIsCameraDropdownOpen(false)}>
+              <button className="camera-dropdown-item remove-photo" onClick={removePhoto}>
                 <span>❌</span> Remove current profile picture
               </button>
             </div>
@@ -290,6 +395,45 @@ const Profile = () => {
         </div>
       </div>
 
+      {/* 📷 CAMERA MODAL */}
+      {isCameraModalOpen && (
+        <div className="camera-modal-overlay" onClick={closeCamera}>
+          <div className="camera-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="camera-modal-header">
+              <h3>Take a Profile Photo</h3>
+              <button className="camera-modal-close" onClick={closeCamera}>
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="camera-viewfinder">
+              {!capturedImage ? (
+                <video ref={videoRef} autoPlay playsInline muted />
+              ) : (
+                <img src={capturedImage} alt="Captured preview" />
+              )}
+              <canvas ref={canvasRef} style={{ display: 'none' }} />
+            </div>
+
+            <div className="camera-modal-actions">
+              {!capturedImage ? (
+                <button className="camera-action-btn capture" onClick={capturePhoto}>
+                  <Camera size={18} /> Capture Photo
+                </button>
+              ) : (
+                <>
+                  <button className="camera-action-btn retake" onClick={() => setCapturedImage(null)}>
+                    Retake
+                  </button>
+                  <button className="camera-action-btn save" onClick={saveCapturedPhoto}>
+                    Save Photo
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
