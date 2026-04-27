@@ -663,3 +663,43 @@
   .fb-search-v7 { width: 100%; }
   .fb-meet-card-v7 { grid-template-columns: 1fr; gap: 16px; }
 }
+
+/* EMPTY STATE */
+.fb-empty-state-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  border: 1.5px dashed var(--border-light);
+  margin-top: 40px;
+}
+
+.fb-empty-icon-wrap {
+  width: 100px;
+  height: 100px;
+  background: #EFF6FF;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-blue);
+  margin-bottom: 24px;
+}
+
+.fb-empty-title {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 12px;
+  color: var(--text-main);
+}
+
+.fb-empty-text {
+  font-size: 16px;
+  color: var(--text-muted);
+  max-width: 400px;
+  line-height: 1.6;
+}
