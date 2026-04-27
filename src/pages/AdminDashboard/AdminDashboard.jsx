@@ -21,6 +21,7 @@ import SecuritySettings from "./pages/SecuritySettings";
 import PreferenceSettings from "./pages/PreferenceSettings";
 import AdminProfile from "./pages/AdminProfile";
 import FAQManagement from "./pages/FAQManagement";
+import LearningActivation from "./pages/LearningActivation";
 
 const AdminDashboard = () => {
   const [showLogoutModal, setShowLogoutModal] = React.useState(false);
@@ -62,7 +63,6 @@ const AdminDashboard = () => {
               <Route path="counselling-requests" element={<CounsellingRequests />} />
               
               <Route path="faq-management"       element={<FAQManagement />} />
-              <Route path="settings/account"     element={<AccountSettings />} />
               <Route path="settings/account"     element={<AccountSettings />} />
               <Route path="settings/security"    element={<SecuritySettings />} />
               <Route path="settings/preferences" element={<PreferenceSettings />} />
