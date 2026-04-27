@@ -10,8 +10,8 @@ const enrollmentsRef = db.ref("enrollments");
 export const saveTestResult = async (req, res) => {
   try {
     const { testType, scores } = req.body;
-    let studentId = req.user.id; 
-    const email = req.user.email;
+    let studentId = req.user?.id; 
+    const email = req.user?.email;
 
     console.log(`[saveTestResult] Attempting save for: ${email || "unknown email"}, ID: ${studentId || "unknown ID"}`);
     console.log(`[saveTestResult] Data: type=${testType}, scores=`, scores);
@@ -22,13 +22,17 @@ export const saveTestResult = async (req, res) => {
     }
 
     // If ID is not in token, look up by email
-    if (!studentId) {
-      const email = req.user.email;
+    if (!studentId && email) {
+      console.log(`[saveTestResult] No ID in token, searching by email: ${email}`);
       const studentSnap = await studentsRef.orderByChild("email").equalTo(email).once("value");
-      if (!studentSnap.exists()) {
-        return res.status(404).json({ success: false, message: "Student not found" });
+      if (studentSnap.exists()) {
+        studentSnap.forEach(child => { studentId = child.key; });
       }
-      studentSnap.forEach(child => { studentId = child.key; });
+    }
+
+    if (!studentId) {
+      console.error("[saveTestResult] Student ID not found in token or database");
+      return res.status(404).json({ success: false, message: "Student not found" });
     }
 
     const studentRef = studentsRef.child(studentId);
@@ -50,7 +54,7 @@ export const saveTestResult = async (req, res) => {
 
     res.status(200).json({ success: true, message: "Test results saved successfully" });
   } catch (error) {
-    console.error("Save Test Result Error:", error);
+    console.error("[saveTestResult] Error:", error);
     res.status(500).json({ success: false, message: error.message, error: error.message });
   }
 };
@@ -103,8 +107,11 @@ export const getMyResults = async (req, res) => {
     const studentId = req.user.id;
     const email = req.user.email;
 
+    console.log(`[getMyResults] Fetching results for ID: ${studentId}, Email: ${email}`);
+
     let finalId = studentId;
     if (!finalId) {
+      console.log(`[getMyResults] No ID in token, searching by email: ${email}`);
       const snapshot = await studentsRef.orderByChild("email").equalTo(email).once("value");
       if (snapshot.exists()) {
         snapshot.forEach(child => { finalId = child.key; });
@@ -112,18 +119,25 @@ export const getMyResults = async (req, res) => {
     }
 
     if (!finalId) {
+      console.warn(`[getMyResults] Student not found for email: ${email}`);
       return res.status(404).json({ success: false, message: "Student not found" });
     }
 
     const snapshot = await studentsRef.child(finalId).once("value");
     const data = snapshot.val();
     
+    if (!data) {
+      console.warn(`[getMyResults] Student data is null for ID: ${finalId}`);
+      return res.status(404).json({ success: false, message: "Student data not found" });
+    }
+
+    console.log(`[getMyResults] Success. testResults:`, data.testResults || "None");
     res.status(200).json({ 
       success: true, 
       testResults: data.testResults || {} 
     });
   } catch (error) {
-    console.error("Get My Results Error:", error);
+    console.error("[getMyResults] Error:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -135,7 +149,14 @@ export const getMyResults = async (req, res) => {
 export const enrollInCourse = async (req, res) => {
   try {
     const { courseId } = req.params;
-    const { email } = req.user;
+    const email = req.user?.email;
+
+    console.log(`[enrollInCourse] Request for course: ${courseId} from user: ${email}`);
+
+    if (!email) {
+      console.error("[enrollInCourse] Unauthorized: No email in token");
+      return res.status(401).json({ error: "Unauthorized: No email in token" });
+    }
 
     if (!courseId) {
       return res.status(400).json({ error: "Course ID is required" });
@@ -149,9 +170,10 @@ export const enrollInCourse = async (req, res) => {
       status: "active"
     });
 
+    console.log(`[enrollInCourse] Successfully enrolled ${email} in ${courseId}`);
     res.status(200).json({ message: "Enrolled successfully", courseId });
   } catch (error) {
-    console.error("Enrollment Error:", error);
+    console.error("[enrollInCourse] Error:", error);
     res.status(500).json({ error: "Failed to enroll in course" });
   }
 };
@@ -162,7 +184,13 @@ export const enrollInCourse = async (req, res) => {
  */
 export const getEnrolledCourses = async (req, res) => {
   try {
-    const { email } = req.user;
+    const email = req.user?.email;
+    console.log(`[getEnrolledCourses] Fetching for user: ${email}`);
+
+    if (!email) {
+      console.error("[getEnrolledCourses] Unauthorized: No email in token");
+      return res.status(401).json({ error: "Unauthorized: No email in token" });
+    }
     const sanitizedEmail = email.replace(/\./g, ",");
 
     const snapshot = await enrollmentsRef.child(sanitizedEmail).once("value");
@@ -171,9 +199,10 @@ export const getEnrolledCourses = async (req, res) => {
     // Return just the keys (course IDs)
     const enrolledIds = Object.keys(data);
     
+    console.log(`[getEnrolledCourses] Found ${enrolledIds.length} courses for ${email}`);
     res.status(200).json(enrolledIds);
   } catch (error) {
-    console.error("Fetch Enrolled Error:", error);
+    console.error("[getEnrolledCourses] Error:", error);
     res.status(500).json({ error: "Failed to fetch enrolled courses" });
   }
 };

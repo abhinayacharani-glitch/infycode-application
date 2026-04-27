@@ -5,8 +5,9 @@
  */
 
 const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 
-                (isLocalhost ? 'http://localhost:5001' : 'https://infycode-application.onrender.com');
+const rawApiUrl = import.meta.env.VITE_API_BASE_URL || 
+                 (isLocalhost ? 'http://localhost:5001' : 'https://infycode-application.onrender.com');
+const BASE_URL = rawApiUrl.endsWith('/') ? rawApiUrl.slice(0, -1) : rawApiUrl;
 
 console.log(`[API Service] Using BASE_URL: ${BASE_URL}`);
 
@@ -14,29 +15,34 @@ console.log(`[API Service] Using BASE_URL: ${BASE_URL}`);
  * Internal helper — wraps fetch + JSON parsing + error extraction
  */
 const request = async (endpoint, options = {}) => {
-  const url = `${BASE_URL}${endpoint}`;
+  const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  const url = `${BASE_URL}${normalizedEndpoint}`;
   console.log(`[API Request] ${options.method || 'GET'} ${url}`);
 
   const { headers, ...otherOptions } = options;
 
-  const response = await fetch(url, {
-    headers: { 'Content-Type': 'application/json', ...(headers || {}) },
-    ...otherOptions,
-  });
-
-  let data;
   try {
-    data = await response.json();
-  } catch {
-    data = {};
-  }
+    const response = await fetch(url, {
+      headers: { 'Content-Type': 'application/json', ...(headers || {}) },
+      ...otherOptions,
+    });
 
-  if (!response.ok) {
-    // Backend returns either { message } or { error }
-    throw new Error(data.message || data.error || 'Something went wrong. Please try again.');
-  }
+    let data;
+    try {
+      data = await response.json();
+    } catch {
+      data = {};
+    }
 
-  return data;
+    if (!response.ok) {
+      throw new Error(data.message || data.error || 'Something went wrong. Please try again.');
+    }
+
+    return data;
+  } catch (error) {
+    console.error(`[API Error] ${error.message}`);
+    throw error;
+  }
 };
 
 // ─────────────────────────────────────────────

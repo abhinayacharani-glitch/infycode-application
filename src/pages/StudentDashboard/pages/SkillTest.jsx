@@ -8,6 +8,8 @@ const SkillTest = () => {
   const navigate = useNavigate();
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
 
   useEffect(() => {
     const checkCompletion = async () => {
@@ -21,11 +23,13 @@ const SkillTest = () => {
         }
       } catch (err) {
         console.error("Error checking test status:", err);
+        setError(err.message || "Unable to sync test status with server. Showing local status.");
         // Fallback to localStorage if API fails
         if (localStorage.getItem("foundationalTestCompleted") === "true") {
           setIsUnlocked(true);
         }
       } finally {
+
         setLoading(false);
       }
     };
@@ -39,6 +43,9 @@ const SkillTest = () => {
         <h2>Skill Based Test</h2>
         <p>Evaluate your strengths and get categorized into the right learning path.</p>
       </header>
+
+      {error && <div className="error-alert-banner" style={{ background: '#fee2e2', color: '#b91c1c', padding: '12px', borderRadius: '8px', marginBottom: '20px', textAlign: 'center', border: '1px solid #fecaca' }}>{error}</div>}
+
 
       <div className="special-note-box">
         <p>
