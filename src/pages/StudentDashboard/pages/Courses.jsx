@@ -52,8 +52,8 @@ const EnrolledCourseCard = ({ course, onNavigate }) => {
   const courseImage = courseMeta.image || course.image;
 
   return (
-    <motion.div 
-      className="enrolled-course-card" 
+    <motion.div
+      className="enrolled-course-card"
       onClick={handleRowClick}
       whileHover={{ y: -5 }}
       initial={{ opacity: 0, y: 20 }}
@@ -108,13 +108,13 @@ const EnrolledCourseCard = ({ course, onNavigate }) => {
       </div>
 
       <div className="ecc-footer">
-        <button 
-          className="ecc-resume-btn" 
+        <button
+          className="ecc-resume-btn"
           style={{ background: dynamicProgress === 100 ? '#10b981' : '#2563eb' }}
-          onClick={(e) => { 
-            e.stopPropagation(); 
-            if(currentTopic && dynamicProgress < 100) {
-              onNavigate('/student-dashboard/course-explore', { courseId: course.id, topicId: currentTopic.id }); 
+          onClick={(e) => {
+            e.stopPropagation();
+            if (currentTopic && dynamicProgress < 100) {
+              onNavigate('/student-dashboard/course-explore', { courseId: course.id, topicId: currentTopic.id });
             } else {
               onNavigate('/student-dashboard/course-overview', course.id);
             }
@@ -138,7 +138,7 @@ const EnrollCourses = ({ onNavigate }) => {
         const data = await getEnrolledCourses();
         // Assuming data is an array of IDs or an object with an enrolledCourses array
         const enrolledIds = Array.isArray(data) ? data : (data.enrolledCourses || []);
-        
+
         const enrolled = [];
         enrolledIds.forEach(id => {
           if (COURSE_MAP[id]) {
@@ -153,7 +153,7 @@ const EnrollCourses = ({ onNavigate }) => {
             }
           }
         });
-        
+
         setEnrolledCourses(enrolled);
       } catch (err) {
         console.error("Failed to fetch enrolled courses:", err);
@@ -182,9 +182,9 @@ const EnrollCourses = ({ onNavigate }) => {
             ))}
           </div>
         ) : (
-          <div style={{ 
-            textAlign: 'center', 
-            padding: '80px 40px', 
+          <div style={{
+            textAlign: 'center',
+            padding: '80px 40px',
             color: '#ffffff',
             backgroundImage: "linear-gradient(90deg, rgba(47, 91, 211, 0.9) 0%, rgba(30, 60, 114, 0.9) 45%, rgba(42, 167, 214, 0.9) 100%), url('/course-bg.png')",
             backgroundSize: 'cover',
