@@ -40,136 +40,147 @@ const statusColors = {
 
 export const ALL_COURSES = [
   {
-    image: imgAI,
-    title: "Machine Learning Deep Dive",
-    category: "AI & Data",
-    badge: "ADVANCED",
-    color: "#8b5cf6",
+    image: imgJava,
+    title: "Java Full Stack Development",
+    category: "Java",
+    badge: "Bestseller",
+    color: "#e11d48",
     rating: 4.8,
-    students: "7k",
+    students: "15k",
     duration: "6 months",
-    level: "Advanced",
-    price: "6 months"
+    level: "Intermediate",
+    price: "4 months",
+    courseId: "java-fs-01"
   },
   {
     image: imgDataScience,
     title: "Data Science & AI",
     category: "AI & Data",
-    badge: "BEGINNER",
-    color: "#f59e0b",
-    rating: 5.0,
+    badge: "Trending",
+    color: "#2563eb",
+    rating: 4.9,
     students: "9k",
-    duration: "6 months",
-    level: "Intermediate",
-    price: "4 months"
-  },
-  {
-    image: imgJava,
-    title: "Java Full Stack Development",
-    category: "Java",
-    badge: "ADVANCED",
-    color: "#818cf8",
-    rating: 4.9,
-    students: "15k",
     duration: "5 months",
-    level: "Intermediate",
-    price: "3 months"
+    level: "Advanced",
+    price: "6 months",
+    courseId: "data-sci-01"
   },
   {
-    image: imgCloud,
-    title: "AWS Cloud Practitioner",
-    category: "Cloud",
-    badge: "INTERMEDIATE",
-    color: "#fbbf24",
-    rating: 4.8,
-    students: "12k",
-    duration: "3 months",
-    level: "Beginner",
-    price: "6 months"
-  },
-  {
-    image: imgReact,
-    title: "React JS Full Stack Development",
-    category: "Web Dev",
-    badge: "BEGINNER",
-    color: "#38bdf8",
-    rating: 4.9,
-    students: "18k",
-    duration: "6 months",
-    level: "Beginner",
-    price: "6 months"
-  },
-  {
-    image: imgPython,
-    title: "Python Programming Masterclass",
-    category: "Python",
-    badge: "INTERMEDIATE",
-    color: "#10b981",
-    rating: 4.8,
-    students: "22k",
-    duration: "4 months",
-    level: "All Levels",
-    price: "4 months"
-  },
-  {
-    image: imgWebDev,
-    title: "Next.js 14 Masterclass",
-    category: "Web Dev",
-    badge: "BEGINNER",
-    color: "#0ea5e9",
-    rating: 4.9,
-    students: "14k",
+    image: imgAI,
+    title: "Machine Learning Deep Dive",
+    category: "AI & Data",
+    badge: "NEW",
+    color: "#7c3aed",
+    rating: 4.7,
+    students: "7k",
     duration: "4 months",
     level: "Advanced",
-    price: "3 months"
-  },
-  {
-    image: imgWebDev,
-    title: "MERN Stack Development",
-    category: "Web Dev",
-    badge: "INTERMEDIATE",
-    color: "#0ea5e9",
-    rating: 4.7,
-    students: "11k",
-    duration: "5 months",
-    level: "Beginner",
-    price: "4 months"
+    price: "4 months",
+    courseId: "ml-deep-01"
   },
   {
     image: imgUIUX,
     title: "Ethical Hacking & Cyber Security",
     category: "Cybersecurity",
-    badge: "BEGINNER",
-    color: "#0d9488",
-    rating: 4.9,
-    students: "5k",
+    badge: "Popular",
+    color: "#059669",
+    rating: 4.8,
+    students: "12k",
     duration: "4 months",
     level: "Intermediate",
-    price: "2 months"
+    price: "4 months",
+    courseId: "cyber-sec-01"
+  },
+  {
+    image: imgReact,
+    title: "React JS Full Stack Development",
+    category: "Web Dev",
+    badge: "Bestseller",
+    color: "#0ea5e9",
+    rating: 4.9,
+    students: "20k",
+    duration: "3 months",
+    level: "Intermediate",
+    price: "4 months",
+    courseId: "react-fs-01"
+  },
+  {
+    image: imgPython,
+    title: "Python Programming Masterclass",
+    category: "Python",
+    badge: "Top Rated",
+    color: "#3776ab",
+    rating: 4.9,
+    students: "25k",
+    duration: "2 months",
+    level: "Beginner",
+    price: "2 months",
+    courseId: "python-master-01"
+  },
+  {
+    image: imgCloud,
+    title: "AWS Cloud Practitioner",
+    category: "Cloud",
+    badge: "Hot",
+    color: "#ff9900",
+    rating: 4.8,
+    students: "10k",
+    duration: "3 months",
+    level: "Beginner",
+    price: "3 months",
+    courseId: "aws-cloud-01"
+  },
+  {
+    image: imgWebDev,
+    title: "Next.js 14 Masterclass",
+    category: "Web Dev",
+    badge: "NEW",
+    color: "#000000",
+    rating: 4.8,
+    students: "5k",
+    duration: "2 months",
+    level: "Advanced",
+    price: "2 months",
+    courseId: "nextjs-14-01"
+  },
+  {
+    image: imgWebDev,
+    title: "MERN Stack Development",
+    category: "Web Dev",
+    badge: "Bestseller",
+    color: "#47A248",
+    rating: 4.9,
+    students: "18k",
+    duration: "5 months",
+    level: "Intermediate",
+    price: "5 months",
+    courseId: "mern-stack-01"
   },
   {
     image: imgWebDev,
     title: "Angular Enterprise Development",
     category: "Web Dev",
-    badge: "ADVANCED",
-    color: "#dd0031",
+    badge: "Professional",
+    color: "#DD0031",
     rating: 4.7,
     students: "8k",
-    duration: "6 months",
-    level: "Intermediate",
-    price: "3 months"
+    duration: "4 months",
+    level: "Advanced",
+    price: "4 months",
+    courseId: "angular-ent-01"
   },
   {
     image: imgWebDev,
     title: "Flutter Mobile Apps",
-    category: "Web Dev",
-    badge: "INTERMEDIATE",
-    color: "#02569b",
+    category: "App Dev",
+    badge: "NEW",
+    color: "#02569B",
     rating: 4.8,
-    students: "10k",
+    students: "11k",
     duration: "5 months",
     level: "Beginner",
-    price: "6 months"
+    price: "6 months",
+    courseId: "flutter-mob-01"
   },
   {
     image: imgPython,
@@ -181,12 +192,10 @@ export const ALL_COURSES = [
     students: "16k",
     duration: "6 months",
     level: "Beginner",
-    price: "2 months"
+    price: "2 months",
+    courseId: "python-fullstack-01"
   }
-].map((course, index) => ({
-  ...course,
-  courseId: `CID-${101 + index}`
-}));
+];
 
 const Courses = () => {
   const navigate = useNavigate();

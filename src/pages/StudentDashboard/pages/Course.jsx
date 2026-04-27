@@ -9,19 +9,27 @@ import "./Course.css";
 // Swap "Ethical Hacking & Cyber Security" and "AWS Cloud Practitioner" for dashboard UI
 const ALL_COURSES = [...ORIGINAL_COURSES];
 
-const swapCourses = (title1, title2) => {
-  const idx1 = ALL_COURSES.findIndex(c => c.title === title1);
-  const idx2 = ALL_COURSES.findIndex(c => c.title === title2);
-  if (idx1 !== -1 && idx2 !== -1) {
-    const temp = ALL_COURSES[idx1];
-    ALL_COURSES[idx1] = ALL_COURSES[idx2];
-    ALL_COURSES[idx2] = temp;
-  }
-};
+// Ensure "Java Full Stack Development" is first for Popular Courses
+// And "AWS Cloud Practitioner" is in the Recommended section (index 8+)
+const JavaIdx = ALL_COURSES.findIndex(c => c.title === "Java Full Stack Development");
+if (JavaIdx !== -1) {
+  const java = ALL_COURSES.splice(JavaIdx, 1)[0];
+  ALL_COURSES.unshift(java);
+}
 
-swapCourses("Ethical Hacking & Cyber Security", "AWS Cloud Practitioner");
-swapCourses("React JS Full Stack Development", "Python Programming Masterclass");
-swapCourses("Machine Learning Deep Dive", "Java Full Stack Development");
+const AWSIdx = ALL_COURSES.findIndex(c => c.title === "AWS Cloud Practitioner");
+if (AWSIdx !== -1) {
+  const aws = ALL_COURSES.splice(AWSIdx, 1)[0];
+  // Insert at index 8 (start of Recommended section)
+  ALL_COURSES.splice(8, 0, aws);
+}
+
+const PythonIdx = ALL_COURSES.findIndex(c => c.title === "Python Programming Masterclass");
+if (PythonIdx !== -1) {
+  const python = ALL_COURSES.splice(PythonIdx, 1)[0];
+  // Insert at index 4 (start of Trending section)
+  ALL_COURSES.splice(4, 0, python);
+}
 
 const CATEGORIES = ["All", "Web Dev", "Python", "Java", "AI & Data", "Cybersecurity", "Cloud"];
 
