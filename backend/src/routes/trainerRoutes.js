@@ -1,7 +1,7 @@
 import express from "express";
 const router = express.Router();
 
-import { trainerRegister, trainerVerifyOtp, trainerDashboard } from "../controllers/trainerRegController.js";
+import { trainerRegister, trainerVerifyOtp, trainerDashboard, getTrainerProfile, updateTrainerProfile } from "../controllers/trainerRegController.js";
 import { verifyToken, isTrainer } from "../middleware/authMiddleware.js";
 import { checkRole } from "../middleware/roleMiddleware.js";
 
@@ -15,5 +15,9 @@ router.post("/verify-otp", trainerVerifyOtp);
 
 // ✅ Trainer Dashboard  — GET /api/trainer/dashboard (protected)
 router.get("/dashboard", verifyToken, checkRole(["trainer"]), trainerDashboard);
+
+// ✅ Trainer Profile — GET & PUT /api/trainer/profile (protected)
+router.get("/profile", verifyToken, isTrainer, getTrainerProfile);
+router.put("/profile", verifyToken, isTrainer, updateTrainerProfile);
 
 export default router;

@@ -18,6 +18,7 @@ import {
   ChevronRight,
   ArrowRight
 } from 'lucide-react';
+import { useTrainer } from '../../../context/TrainerContext';
 import LiveSessionCard from '../components/LiveSessionCard';
 import './Dashboard.css';
 
@@ -95,9 +96,8 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [dashData, setDashData] = useState(null);
-
-  const loggedUser = JSON.parse(localStorage.getItem("user") || localStorage.getItem("loggedUser") || "{}");
-  const userName = loggedUser.fullName || loggedUser.fullname || loggedUser.username || "Trainer";
+  const { trainerData } = useTrainer();
+  const userName = trainerData.fullName || trainerData.fullname || trainerData.name || "Trainer";
 
   useEffect(() => {
     const loadData = async () => {
@@ -109,10 +109,10 @@ const Dashboard = () => {
   }, []);
 
   const kpis = [
-    { label: 'Active Batches', value: 4, trend: '+5%', icon: <Layers size={22} />, color: 'blue' },
-    { label: 'Total Students', value: 128, trend: '+12%', icon: <Users size={22} />, color: 'green' },
+    { label: 'Active Batches', value: parseInt(trainerData.activeBatches || 4), trend: '+5%', icon: <Layers size={22} />, color: 'blue' },
+    { label: 'Total Students', value: parseInt(trainerData.totalStudents || 128), trend: '+12%', icon: <Users size={22} />, color: 'green' },
     { label: 'Sessions Today', value: 3, trend: 'On track', icon: <Calendar size={22} />, color: 'amber' },
-    { label: 'Avg Attendance', value: 92, trend: '+3%', icon: <CheckCircle size={22} />, color: 'purple', suffix: '%' }
+    { label: 'Avg Attendance', value: parseInt(trainerData.avgAttendance || 92), trend: '+3%', icon: <CheckCircle size={22} />, color: 'purple', suffix: '%' }
   ];
 
   const [schedule, setSchedule] = useState([

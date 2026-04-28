@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { getTrainerProfileAPI, updateTrainerProfileAPI } from '../services/api';
 
 const TrainerContext = createContext();
 
@@ -27,21 +28,69 @@ export const TrainerProvider = ({ children }) => {
     return userData.profileImage || localStorage.getItem('trainerProfileImage') || null;
   });
 
-  const updateTrainerProfile = (newData, newImage) => {
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await getTrainerProfileAPI();
+        if (response.success && response.profile) {
+          setTrainerData(prev => {
+            const updated = { ...prev, ...response.profile };
+            const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+            localStorage.setItem('user', JSON.stringify({ ...currentUser, ...updated }));
+            return updated;
+          });
+          if (response.profile.profileImage) {
+            setProfileImage(response.profile.profileImage);
+            localStorage.setItem('trainerProfileImage', response.profile.profileImage);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching trainer profile:", error);
+      }
+    };
+    fetchProfile();
+  }, []);
+
+  const updateTrainerProfile = async (newData, newImage) => {
+    // 1. Update UI state immediately (optimistic update)
     setTrainerData(prev => {
-      const updated = { ...prev, ...newData };
+      const updated = { ...prev, ...(newData || {}) };
       
-      // If image is provided, include it in the object
       if (newImage) {
         updated.profileImage = newImage;
         setProfileImage(newImage);
         localStorage.setItem('trainerProfileImage', newImage);
       }
       
-      localStorage.setItem('user', JSON.stringify(updated));
-      localStorage.setItem('loggedUser', JSON.stringify(updated));
+      // Ensure we keep the token from the existing storage if it's not in updated
+      const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+      const finalUser = { ...currentUser, ...updated };
+      localStorage.setItem('user', JSON.stringify(finalUser));
+      
       return updated;
     });
+
+    try {
+      const payload = { ...(newData || {}) };
+      if (newImage) payload.profileImage = newImage;
+      
+      const response = await updateTrainerProfileAPI(payload);
+      if (response.success && response.profile) {
+        // Sync state with the actual data from DB
+        setTrainerData(prev => {
+          const updated = { ...prev, ...response.profile, role: "trainer" };
+          const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+          localStorage.setItem('user', JSON.stringify({ ...currentUser, ...updated }));
+          return updated;
+        });
+        return response;
+      } else {
+        throw new Error(response.message || "Update failed");
+      }
+    } catch (error) {
+      console.error("Error updating trainer profile in backend:", error);
+      throw error;
+    }
   };
 
   const value = {

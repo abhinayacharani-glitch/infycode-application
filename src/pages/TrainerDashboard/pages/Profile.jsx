@@ -25,46 +25,69 @@ const Profile = () => {
   const fileInputRef = useRef(null);
 
   const [tempData, setTempData] = useState({
-    name: trainerData.fullname || trainerData.name || "Trainer",
-    role: trainerData.role || "Senior Trainer",
-    email: trainerData.email || "trainer@infycode.com",
-    phone: trainerData.phone || "+91 98765 43210",
-    location: trainerData.location || "Vijayawada, AP",
-    experience: trainerData.experience || "5+ Years",
-    expertise: trainerData.expertise || "Full Stack Development, React, Node.js",
-    courses: trainerData.courses || "3 Active Batches",
-    mode: trainerData.mode || "Online & Offline",
-    about: trainerData.about || "Experienced trainer focused on building industry-ready developers with practical skills and real-world projects."
+    name: trainerData.fullName || trainerData.fullname || trainerData.name || "",
+    role: trainerData.role ? trainerData.role.toUpperCase() : "",
+    email: trainerData.email || "",
+    phone: trainerData.phone || "",
+    location: trainerData.location || "",
+    experience: trainerData.experience || "",
+    expertise: trainerData.expertise || "",
+    courses: trainerData.courses || "",
+    mode: trainerData.mode || "",
+    about: trainerData.about || ""
   });
 
   const [localImage, setLocalImage] = useState(profileImage);
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
 
-  // Sync with context if it changes elsewhere
+  // Sync with context if it changes elsewhere (like after backend fetch)
   useEffect(() => {
+    console.log("[Profile] trainerData updated:", trainerData);
+    if (!isEditing && trainerData && (trainerData.email || trainerData.fullName || trainerData.name)) {
+      setTempData({
+        name: trainerData.fullName || trainerData.fullname || trainerData.name || "",
+        role: trainerData.role ? trainerData.role.toUpperCase() : "TRAINER",
+        email: trainerData.email || "",
+        phone: trainerData.phone || trainerData.phno || "",
+        location: trainerData.location || "",
+        experience: trainerData.experience || "",
+        expertise: trainerData.expertise || "",
+        courses: trainerData.courses || "",
+        mode: trainerData.mode || "",
+        about: trainerData.about || ""
+      });
+      setIsDataLoaded(true);
+    }
     setLocalImage(profileImage);
-  }, [profileImage]);
+  }, [trainerData, profileImage, isEditing]);
 
   const handleEditToggle = () => {
     if (isEditing) {
       setTempData({
-        name: trainerData.fullname || trainerData.name || "Trainer",
-        role: trainerData.role || "Senior Trainer",
-        email: trainerData.email || "trainer@infycode.com",
-        phone: trainerData.phone || "+91 98765 43210",
-        location: trainerData.location || "Vijayawada, AP",
-        experience: trainerData.experience || "5+ Years",
-        expertise: trainerData.expertise || "Full Stack Development, React, Node.js",
-        courses: trainerData.courses || "3 Active Batches",
-        mode: trainerData.mode || "Online & Offline",
-        about: trainerData.about || "Experienced trainer focused on building industry-ready developers with practical skills and real-world projects."
+        name: trainerData.fullName || trainerData.fullname || trainerData.name || "",
+        role: trainerData.role ? trainerData.role.toUpperCase() : "",
+        email: trainerData.email || "",
+        phone: trainerData.phone || "",
+        location: trainerData.location || "",
+        experience: trainerData.experience || "",
+        expertise: trainerData.expertise || "",
+        courses: trainerData.courses || "",
+        mode: trainerData.mode || "",
+        about: trainerData.about || ""
       });
     }
     setIsEditing(!isEditing);
   };
 
-  const handleSave = () => {
-    updateTrainerProfile({ ...tempData, fullname: tempData.name }, localImage);
-    setIsEditing(false);
+  const handleSave = async () => {
+    try {
+      const result = await updateTrainerProfile({ ...tempData, fullName: tempData.name, phone: tempData.phone }, localImage);
+      setIsEditing(false);
+      // Optional: Show success toast/alert here if result is successful
+    } catch (error) {
+      console.error("Failed to save profile:", error);
+      alert("Failed to save profile: " + (error.message || "Unknown error"));
+    }
   };
 
   const handleChange = (e) => {
@@ -96,12 +119,12 @@ const Profile = () => {
   };
 
   const stats = [
-    { label: 'Active Batches', value: '4', icon: <Layers size={18} />, color: 'blue' },
-    { label: 'Total Students', value: '128', icon: <Users size={18} />, color: 'green' },
-    { label: 'Avg Attendance', value: '92%', icon: <Star size={18} />, color: 'purple' }
+    { label: 'Active Batches', value: trainerData.activeBatches || '4', icon: <Layers size={18} />, color: 'blue' },
+    { label: 'Total Students', value: trainerData.totalStudents || '128', icon: <Users size={18} />, color: 'green' },
+    { label: 'Avg Attendance', value: (trainerData.avgAttendance || '92') + '%', icon: <Star size={18} />, color: 'purple' }
   ];
 
-  const displayName = trainerData.fullname || trainerData.name || "Trainer";
+  const displayName = trainerData.fullName || trainerData.fullname || trainerData.name || "";
 
   return (
     <div className="profile-saas-container">
@@ -137,8 +160,8 @@ const Profile = () => {
 
             <div className="profile-identity-centered">
               <h1 className="trainer-name-centered">{displayName}</h1>
-              <p className="trainer-role-minimal">{trainerData.role || "Senior Trainer"}</p>
-              <p className="trainer-email-centered">{trainerData.email || "trainer@infycode.com"}</p>
+              <p className="trainer-role-minimal">{trainerData.role ? trainerData.role.toUpperCase() : ""}</p>
+              <p className="trainer-email-centered">{trainerData.email || ""}</p>
               <div className="trainer-id-status-row">
                 <span className="trainer-id-centered">TRN-1024</span>
                 <span className="trainer-status-pill">
@@ -196,7 +219,7 @@ const Profile = () => {
               {isEditing ? (
                 <input name="name" value={tempData.name} onChange={handleChange} className="edit-input-saas" />
               ) : (
-                <div className="item-value-saas">{displayName}</div>
+                <div className="value-box-saas">{displayName}</div>
               )}
             </div>
             <div className="info-item-saas">
@@ -204,7 +227,7 @@ const Profile = () => {
               {isEditing ? (
                 <input name="email" value={tempData.email} onChange={handleChange} className="edit-input-saas" />
               ) : (
-                <div className="item-value-saas text-blue">{trainerData.email || "trainer@infycode.com"}</div>
+                <div className="value-box-saas text-blue">{trainerData.email || ""}</div>
               )}
             </div>
             <div className="info-item-saas">
@@ -212,12 +235,16 @@ const Profile = () => {
               {isEditing ? (
                 <input name="phone" value={tempData.phone} onChange={handleChange} className="edit-input-saas" />
               ) : (
-                <div className="item-value-saas">{trainerData.phone || "+91 98765 43210"}</div>
+                <div className="value-box-saas">{trainerData.phone || ""}</div>
               )}
             </div>
             <div className="info-item-saas">
               <div className="item-label-saas"><MapPin size={14} /> Location</div>
-              <div className="item-value-saas">{trainerData.location || "Vijayawada, AP"}</div>
+              {isEditing ? (
+                <input name="location" value={tempData.location} onChange={handleChange} className="edit-input-saas" />
+              ) : (
+                <div className="value-box-saas">{trainerData.location || ""}</div>
+              )}
             </div>
           </div>
         </div>
@@ -231,7 +258,7 @@ const Profile = () => {
               {isEditing ? (
                 <input name="experience" value={tempData.experience} onChange={handleChange} className="edit-input-saas" />
               ) : (
-                <div className="item-value-saas">{trainerData.experience || "5+ Years"}</div>
+                <div className="value-box-saas">{trainerData.experience || ""}</div>
               )}
             </div>
             <div className="info-item-saas">
@@ -239,16 +266,24 @@ const Profile = () => {
               {isEditing ? (
                 <input name="expertise" value={tempData.expertise} onChange={handleChange} className="edit-input-saas" />
               ) : (
-                <div className="item-value-saas">{trainerData.expertise || "Full Stack Development, React, Node.js"}</div>
+                <div className="value-box-saas">{trainerData.expertise || ""}</div>
               )}
             </div>
             <div className="info-item-saas">
               <div className="item-label-saas"><Layers size={14} /> Courses Handling</div>
-              <div className="item-value-saas">{trainerData.courses || "3 Active Batches"}</div>
+              {isEditing ? (
+                <input name="courses" value={tempData.courses} onChange={handleChange} className="edit-input-saas" />
+              ) : (
+                <div className="value-box-saas">{trainerData.courses || ""}</div>
+              )}
             </div>
             <div className="info-item-saas">
               <div className="item-label-saas"><Monitor size={14} /> Training Mode</div>
-              <div className="item-value-saas">{trainerData.mode || "Online & Offline"}</div>
+              {isEditing ? (
+                <input name="mode" value={tempData.mode} onChange={handleChange} className="edit-input-saas" />
+              ) : (
+                <div className="value-box-saas">{trainerData.mode || ""}</div>
+              )}
             </div>
           </div>
         </div>
@@ -265,7 +300,7 @@ const Profile = () => {
               rows="4"
             />
           ) : (
-            <p className="about-text-saas">{trainerData.about || "Experienced trainer focused on building industry-ready developers with practical skills and real-world projects."}</p>
+            <p className="about-text-saas">{trainerData.about || ""}</p>
           )}
         </div>
 
