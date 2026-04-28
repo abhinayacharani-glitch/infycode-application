@@ -13,6 +13,20 @@ const StudentVerification = () => {
   const [viewingStudent, setViewingStudent] = useState(null);
   const [exportState, setExportState] = useState('idle'); // idle | downloading | success
 
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "N/A";
+    try {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      });
+    } catch (e) {
+      return dateStr;
+    }
+  };
+
   const handleExportCSV = () => {
     if (exportState !== 'idle') return;
     setExportState('downloading');
@@ -56,11 +70,17 @@ const StudentVerification = () => {
     }, 1500);
   };
 
-  const filteredStudents = students.filter(s => {
-    const matchesSearch = s.name.toLowerCase().includes(searchTerm.toLowerCase()) || s.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = filterStatus === "All" || s.status === filterStatus;
-    return matchesSearch && matchesFilter;
-  });
+  const filteredStudents = students
+    .filter(s => {
+      const matchesSearch = s.name.toLowerCase().includes(searchTerm.toLowerCase()) || s.email.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesFilter = filterStatus === "All" || s.status === filterStatus;
+      return matchesSearch && matchesFilter;
+    })
+    .sort((a, b) => {
+      const dateA = new Date(a.createdAt || a.date || 0);
+      const dateB = new Date(b.createdAt || b.date || 0);
+      return dateB - dateA;
+    });
 
   const toggleSelect = (id) => {
     setSelectedStudents(prev => 
@@ -79,8 +99,7 @@ const StudentVerification = () => {
   const getStatusBadge = (status) => {
     switch (status) {
       case 'Pending': return <span className="badge upcoming">Pending</span>;
-      case 'Verified': return <span className="badge active-b">Verified</span>;
-      case 'Assigned': return <span className="badge success" style={{ background: '#dcfce7', color: '#166534', padding: '2px 8px', borderRadius: '4px' }}>Assigned</span>;
+      case 'Enrolled': return <span className="badge active-b">Enrolled</span>;
       default: return <span className="badge amber">{status}</span>;
     }
   };
@@ -125,15 +144,8 @@ const StudentVerification = () => {
              >
                <option value="All">All Status</option>
                <option value="Pending">Pending</option>
-               <option value="Verified">Verified</option>
-               <option value="Assigned">Assigned</option>
+               <option value="Enrolled">Enrolled</option>
              </select>
-             {selectedStudents.length > 0 && (
-               <div style={{ display: 'flex', gap: '8px', marginLeft: 'auto' }}>
-                 <button className="btn-primary btn-small" onClick={() => selectedStudents.forEach(id => approveStudent(id))}>Approve Selected</button>
-                 <button className="btn-secondary btn-small" onClick={() => selectedStudents.forEach(id => rejectStudent(id))}>Reject Selected</button>
-               </div>
-             )}
            </div>
         </div>
 
@@ -142,11 +154,9 @@ const StudentVerification = () => {
                <thead>
                  <tr>
                    <th style={{ width: '40px' }}><input type="checkbox" checked={selectedStudents.length === filteredStudents.length && filteredStudents.length > 0} onChange={selectAll} /></th>
-                   <th>Name</th>
-                   <th>Specialization</th>
-                   <th>Date</th>
-                   <th>Status</th>
-                   <th>Actions</th>
+                   <th style={{ width: '45%' }}>Name</th>
+                   <th style={{ textAlign: 'center', width: '25%' }}>Date</th>
+                   <th style={{ textAlign: 'center', width: '25%' }}>Status</th>
                  </tr>
                </thead>
                <tbody>
@@ -160,25 +170,13 @@ const StudentVerification = () => {
                           <span style={{ fontSize: '12px', color: '#666' }}>{student.email}</span>
                         </div>
                       </td>
-                      <td>{student.course}</td>
-                      <td>{student.date}</td>
-                      <td>{getStatusBadge(student.status)}</td>
-                      <td>
-                        <div style={{ display: 'flex', gap: '6px' }}>
-                          {student.status === 'Pending' && (
-                            <>
-                              <button className="btn-primary btn-small" onClick={() => approveStudent(student.id)}>Verify</button>
-                              <button className="btn-secondary btn-small" onClick={() => rejectStudent(student.id)}>Reject</button>
-                            </>
-                          )}
-                          <button className="btn-secondary btn-small" onClick={() => setViewingStudent(student)}>View Details</button>
-                        </div>
-                      </td>
+                      <td style={{ textAlign: 'center' }}>{formatDate(student.createdAt || student.date)}</td>
+                      <td style={{ textAlign: 'center' }}>{getStatusBadge(student.status)}</td>
                     </tr>
                    ))
                  ) : (
                    <tr>
-                     <td colSpan="6" style={{ textAlign: 'center', padding: '40px', color: '#666' }}>No students found matching your criteria.</td>
+                     <td colSpan="4" style={{ textAlign: 'center', padding: '40px', color: '#666' }}>No students found matching your criteria.</td>
                    </tr>
                  )}
                </tbody>
