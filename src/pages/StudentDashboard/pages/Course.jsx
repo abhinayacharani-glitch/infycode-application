@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Star, Search, Eye } from "lucide-react";
+import { Star, Search, Eye, Calendar, User as UserIcon, Clock, Users } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { enrollInCourse, getEnrolledCourses } from "../../../services/api";
@@ -78,24 +78,21 @@ const CourseCardModern = ({ course, index, onNavigate, enrolledIds }) => {
       </div>
 
       <div className="card-content-modern">
-        <h3 className="card-title-modern">{course.title}</h3>
-
         <div className="card-stats-modern">
-          <div className="stat students-text">
-            {course.students} students
-          </div>
           <div className="stat stars-container">
-            {[...Array(5)].map((_, idx) => (
-              <Star 
-                key={idx} 
-                size={14} 
-                fill={idx < Math.floor(course.rating) ? "#f59e0b" : "#e2e8f0"} 
-                color={idx < Math.floor(course.rating) ? "#f59e0b" : "#e2e8f0"} 
-                strokeWidth={0}
+            {[...Array(5)].map((_, i) => (
+              <Star
+                key={i}
+                size={14}
+                fill={i < Math.floor(course.rating) ? "#f59e0b" : "transparent"}
+                color="#f59e0b"
               />
             ))}
           </div>
+          <span className="stat students-text">{course.students}</span>
         </div>
+
+        <h3 className="card-title-modern">{course.title}</h3>
 
         <div className="card-footer-modern">
           <div className="footer-actions-left">
@@ -103,26 +100,14 @@ const CourseCardModern = ({ course, index, onNavigate, enrolledIds }) => {
               <button 
                 className="btn-view-details" 
                 onClick={() => onNavigate(`/course-details/${course.courseId}`)}
-                title="View Course Details"
               >
                 <Eye size={20} />
               </button>
               <span className="action-label">Overview</span>
             </div>
           </div>
-          <button 
-            className={`btn-join-now ${isEnrolled ? 'enrolled' : ''}`} 
-            onClick={isDisabledCard || isEnrolled || loading ? undefined : handleEnroll}
-            disabled={isDisabledCard || isEnrolled || loading}
-            style={
-              isDisabledCard 
-                ? { cursor: 'not-allowed', opacity: 0.7 } 
-                : isEnrolled 
-                  ? { backgroundColor: '#10b981', cursor: 'default' } 
-                  : {}
-            }
-          >
-            {loading ? 'Processing...' : isEnrolled ? 'Enrolled' : 'Enroll Now'}
+          <button className="btn-join-now">
+            Enroll Now
           </button>
         </div>
       </div>
