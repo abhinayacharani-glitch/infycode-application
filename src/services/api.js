@@ -210,6 +210,36 @@ export const getStudentMyResults = () => {
   });
 };
 
+/**
+ * GET /api/student/profile
+ * Retrieves the current student's full profile.
+ */
+export const getStudentProfile = () => {
+  const user = JSON.parse(localStorage.getItem('user') || localStorage.getItem('loggedUser') || '{}');
+  return request('/api/student/profile', {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${user.token || ''}` },
+  });
+};
+
+/**
+ * PUT /api/student/profile
+ * Updates student profile fields.
+ */
+export const updateStudentProfile = (profileData) => {
+  const user = JSON.parse(localStorage.getItem('user') || localStorage.getItem('loggedUser') || '{}');
+  return request('/api/student/profile', {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${user.token || ''}` },
+    body: JSON.stringify(profileData),
+  });
+};
+
+/**
+ * Alias for Profile.jsx compatibility
+ */
+export const getMyResults = getStudentMyResults;
+
 
 // ─────────────────────────────────────────────
 // TRAINER AUTH

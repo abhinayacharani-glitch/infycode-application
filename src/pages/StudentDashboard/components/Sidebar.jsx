@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink, Link, useNavigate } from 'react-router-dom';
-import { Camera, X } from 'lucide-react';
+import { NavLink, useNavigate } from 'react-router-dom';
 import "./Sidebar.css";
 import icLogo from '../../../assets/infycode-final-logo4-1.png';
 
 const Sidebar = ({ externalShowLogoutModal, setExternalShowLogoutModal }) => {
   const navigate = useNavigate();
-  const [showEditProfileModal, setShowEditProfileModal] = useState(false);
   const [internalShowLogoutModal, setInternalShowLogoutModal] = useState(false);
-  const fileInputRef = React.useRef(null);
+  const [logoutDest, setLogoutDest] = useState('/');
 
   // Sync internal modal state with external (for browser back button)
   useEffect(() => {
@@ -16,53 +14,35 @@ const Sidebar = ({ externalShowLogoutModal, setExternalShowLogoutModal }) => {
   }, [externalShowLogoutModal]);
 
   const getInitialUser = () => {
-    const userString = localStorage.getItem('user');
-    const user = userString ? JSON.parse(userString) : { fullName: "Student", role: "student" };
+    const userString = localStorage.getItem('loggedUser') || localStorage.getItem('user');
+    const user = userString ? JSON.parse(userString) : { fullName: "Student", role: "Student" };
     return {
-      fullname: user.fullName || user.fullname || "Student",
-      role: user.role || "student",
+      fullname: user.fullName || user.fullname || user.username || "Student",
+      role: user.role || "Student",
       profileImage: user.profileImage || null
     };
   };
 
   const [user, setUser] = useState(getInitialUser());
-  const [formData, setFormData] = useState({
-    fullname: user.fullname,
-    role: user.role,
-    profileImage: user.profileImage
-  });
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result;
-        setFormData(prev => ({ ...prev, profileImage: base64String }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
+  // Listen for profile updates globally
   useEffect(() => {
-    setFormData({
-      fullname: user.fullname || "Student",
-      role: user.role || "student",
-      profileImage: user.profileImage || null
-    });
-  }, [user]);
+    const handleProfileSync = () => {
+      setUser(getInitialUser());
+    };
 
-  const handleSaveProfile = (e) => {
-    e.preventDefault();
-    const updatedUser = { ...user, ...formData };
-    localStorage.setItem('user', JSON.stringify(updatedUser));
-    setUser(updatedUser);
-    setShowEditProfileModal(false);
-  };
+    window.addEventListener('profileUpdate', handleProfileSync);
+    window.addEventListener('storage', handleProfileSync); // Sync across tabs
 
-  const handleLogout = () => {
+    return () => {
+      window.removeEventListener('profileUpdate', handleProfileSync);
+      window.removeEventListener('storage', handleProfileSync);
+    };
+  }, []);
+
+  const handleLogout = (dest = '/') => {
     localStorage.clear();
-    navigate('/');
+    navigate(dest);
   };
 
   const navItems = [
@@ -80,12 +60,10 @@ const Sidebar = ({ externalShowLogoutModal, setExternalShowLogoutModal }) => {
     <>
       <aside className="student-sd-sidebar">
 
-        {/* BRAND — click opens logout modal */}
-        <div 
-          className="student-sd-brand" 
-          onClick={() => setInternalShowLogoutModal(true)}
-          style={{ cursor: 'pointer' }}
-          title="Logout"
+        {/* BRAND */}
+        <div
+          className="student-sd-brand"
+          onClick={() => { setLogoutDest('/'); setInternalShowLogoutModal(true); }}
         >
           <div className="brand-wrapper">
             <img src={icLogo} alt="Infycode Logo" className="logo" />
@@ -96,25 +74,25 @@ const Sidebar = ({ externalShowLogoutModal, setExternalShowLogoutModal }) => {
           </div>
         </div>
 
-        {/* USER PROFILE CARD - Click opens Edit Profile Modal */}
-        <div className="student-sd-user-link" onClick={() => setShowEditProfileModal(true)}>
-          <div className="student-sd-user">
-            <div className="student-sd-avatar-wrap">
-              <img
-                src={formData.profileImage || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200&h=200"}
-                alt="User"
-                className="student-sd-avatar"
-              />
-              <span className="student-sd-status-dot"></span>
-            </div>
-            <div className="student-sd-user-info">
-              <div className="student-sd-name">{formData.fullname}</div>
-              <div className="student-sd-role">{formData.role}</div>
-            </div>
+        {/* USER CARD WITH DYNAMIC PHOTO */}
+        <div className="student-sd-user-card" onClick={() => navigate('/student-dashboard/profile')}>
+          <div className="student-sd-avatar-section">
+            {user.profileImage ? (
+              <img src={user.profileImage} alt="Profile" className="student-sd-mini-avatar" />
+            ) : (
+              <div className="student-sd-mini-avatar-placeholder">
+                {user.fullname.charAt(0).toUpperCase()}
+              </div>
+            )}
+            <span className="student-sd-status-dot-mini"></span>
+          </div>
+          <div className="student-sd-user-info">
+            <span className="student-sd-name">{user.fullname}</span>
+            <span className="student-sd-role">{user.role}</span>
           </div>
         </div>
 
-        {/* NAV — text only, no icons */}
+        {/* NAV */}
         <nav className="student-sd-nav">
           {navItems.map((item, i) => (
             <NavLink key={i} to={item.to}
@@ -128,8 +106,8 @@ const Sidebar = ({ externalShowLogoutModal, setExternalShowLogoutModal }) => {
 
         {/* FOOTER LOGOUT */}
         <div className="student-sd-footer">
-          <button className="student-sd-logout-btn" onClick={() => setInternalShowLogoutModal(true)}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <button className="student-sd-logout-btn" onClick={() => { setLogoutDest('/login'); setInternalShowLogoutModal(true); }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
               <polyline points="16 17 21 12 16 7" />
               <line x1="21" y1="12" x2="9" y2="12" />
@@ -138,73 +116,6 @@ const Sidebar = ({ externalShowLogoutModal, setExternalShowLogoutModal }) => {
           </button>
         </div>
       </aside>
-
-      {/* ── EDIT PROFILE MODAL ── */}
-      {showEditProfileModal && (
-        <div className="sd-modal-overlay" onClick={() => setShowEditProfileModal(false)}>
-          <div className="sd-edit-profile-modal" onClick={e => e.stopPropagation()}>
-            <div className="sd-modal-header">
-              <h3>Edit Profile</h3>
-              <button className="sd-modal-close" onClick={() => setShowEditProfileModal(false)}>
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="sd-modal-body">
-              <div className="sd-avatar-upload">
-                <div className="sd-avatar-container">
-                  <img
-                    src={formData.profileImage || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200&h=200"}
-                    alt="Profile"
-                    className="sd-modal-large-avatar"
-                  />
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    accept="image/*"
-                    style={{ display: 'none' }}
-                  />
-                  <div className="sd-camera-overlay" onClick={() => fileInputRef.current.click()}>
-                    <Camera size={20} color="#ffffff" />
-                  </div>
-                </div>
-                <p className="sd-upload-hint">Click the camera icon to upload a photo</p>
-              </div>
-
-              <form onSubmit={handleSaveProfile} className="sd-edit-profile-form">
-                <div className="sd-form-group">
-                  <label>FULL NAME</label>
-                  <input
-                    type="text"
-                    value={formData.fullname}
-                    onChange={(e) => setFormData({ ...formData, fullname: e.target.value })}
-                    placeholder="Enter full name"
-                  />
-                </div>
-                <div className="sd-form-group">
-                  <label>ROLE</label>
-                  <input
-                    type="text"
-                    value={formData.role}
-                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                    placeholder="Enter role"
-                  />
-                </div>
-
-                <div className="sd-modal-footer">
-                  <button type="button" className="sd-btn-cancel" onClick={() => setShowEditProfileModal(false)}>
-                    Cancel
-                  </button>
-                  <button type="submit" className="sd-btn-save">
-                    Save Changes
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ── LOGOUT CONFIRMATION MODAL ── */}
       {internalShowLogoutModal && (
@@ -221,13 +132,13 @@ const Sidebar = ({ externalShowLogoutModal, setExternalShowLogoutModal }) => {
             </div>
 
             <h2 className="sd-modal-title">Logout</h2>
-            <p className="sd-modal-subtitle">Are you sure you want to log out?</p>
+            <p className="sd-modal-subtitle">Are you sure you want to log out from InfyCode?</p>
 
             <div className="sd-modal-actions">
               <button className="sd-modal-cancel" onClick={() => { setInternalShowLogoutModal(false); setExternalShowLogoutModal?.(false); }}>
                 Cancel
               </button>
-              <button className="sd-modal-logout-red" onClick={handleLogout}>
+               <button className="sd-modal-logout-red" onClick={() => handleLogout(logoutDest)}>
                 OK, Logout
               </button>
             </div>
