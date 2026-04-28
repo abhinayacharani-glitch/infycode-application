@@ -4,7 +4,13 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 .ap-page {
   min-height: 100vh;
@@ -32,9 +38,9 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: rgba(255,255,255,0.7);
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 50px;
   padding: 6px 16px;
   font-size: 0.8125rem;
@@ -43,8 +49,9 @@
   transition: all 0.2s;
   margin-bottom: 1.75rem;
 }
+
 .ap-back-btn:hover {
-  background: rgba(255,255,255,0.15);
+  background: rgba(255, 255, 255, 0.15);
   color: #fff;
 }
 
@@ -52,8 +59,8 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(99,179,255,0.18);
-  border: 1px solid rgba(99,179,255,0.35);
+  background: rgba(99, 179, 255, 0.18);
+  border: 1px solid rgba(99, 179, 255, 0.35);
   color: #93c5fd;
   padding: 5px 16px;
   border-radius: 50px;
@@ -74,7 +81,7 @@
 }
 
 .ap-hero-sub {
-  color: rgba(255,255,255,0.65);
+  color: rgba(255, 255, 255, 0.65);
   font-size: 1.0625rem;
   line-height: 1.6;
 }
@@ -87,15 +94,21 @@
   opacity: 0.35;
   pointer-events: none;
 }
+
 .ap-blur-1 {
-  width: 380px; height: 380px;
+  width: 380px;
+  height: 380px;
   background: #3b82f6;
-  top: -100px; right: -80px;
+  top: -100px;
+  right: -80px;
 }
+
 .ap-blur-2 {
-  width: 260px; height: 260px;
+  width: 260px;
+  height: 260px;
   background: #818cf8;
-  bottom: -60px; left: -40px;
+  bottom: -60px;
+  left: -40px;
 }
 
 /* ── Body / Form wrapper ──────────────── */
@@ -111,7 +124,7 @@
   background: #ffffff;
   border-radius: 20px;
   padding: 2.5rem 2.25rem;
-  box-shadow: 0 24px 60px rgba(15,23,42,0.12);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
   border: 1px solid #e2e8f0;
 }
 
@@ -128,10 +141,14 @@
   margin-bottom: 1.25rem;
   margin-top: 2rem;
 }
-.ap-section-label:first-of-type { margin-top: 0; }
+
+.ap-section-label:first-of-type {
+  margin-top: 0;
+}
 
 .ap-section-label span {
-  width: 26px; height: 26px;
+  width: 26px;
+  height: 26px;
   background: linear-gradient(135deg, #2563eb, #7c3aed);
   color: #fff;
   border-radius: 8px;
@@ -158,12 +175,25 @@
   margin-bottom: 0.5rem;
 }
 
-.ap-col-span-2 { grid-column: span 2; }
-.ap-col-span-3 { grid-column: span 3; }
+.ap-col-span-2 {
+  grid-column: span 2;
+}
+
+.ap-col-span-3 {
+  grid-column: span 3;
+}
 
 @media (max-width: 720px) {
-  .ap-grid-2, .ap-grid-3 { grid-template-columns: 1fr; }
-  .ap-col-span-2, .ap-col-span-3 { grid-column: span 1; }
+
+  .ap-grid-2,
+  .ap-grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .ap-col-span-2,
+  .ap-col-span-3 {
+    grid-column: span 1;
+  }
 }
 
 /* ── Fields ───────────────────────────── */
@@ -206,7 +236,7 @@
 .ap-field textarea:focus {
   outline: none;
   border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
   background: #fff;
 }
 
@@ -276,14 +306,16 @@
 }
 
 .ap-preview img {
-  width: 100%; height: 100%;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
 }
 
 .ap-preview-badge {
   position: absolute;
-  top: 10px; right: 10px;
-  background: rgba(0,0,0,0.55);
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.55);
   color: #fff;
   padding: 4px 12px;
   border-radius: 20px;
@@ -310,14 +342,14 @@
   border-radius: 12px;
   cursor: pointer;
   transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
-  box-shadow: 0 6px 24px rgba(37,99,235,0.35);
+  box-shadow: 0 6px 24px rgba(37, 99, 235, 0.35);
   letter-spacing: 0.01em;
 }
 
 .ap-submit-btn:hover:not(:disabled) {
   opacity: 0.92;
   transform: translateY(-2px);
-  box-shadow: 0 12px 32px rgba(37,99,235,0.4);
+  box-shadow: 0 12px 32px rgba(37, 99, 235, 0.4);
 }
 
 .ap-submit-btn:disabled {
@@ -328,14 +360,19 @@
 /* spinner */
 .ap-spinner {
   display: inline-block;
-  width: 18px; height: 18px;
-  border: 2.5px solid rgba(255,255,255,0.35);
+  width: 18px;
+  height: 18px;
+  border: 2.5px solid rgba(255, 255, 255, 0.35);
   border-top-color: #fff;
   border-radius: 50%;
   animation: ap-spin 0.7s linear infinite;
 }
 
-@keyframes ap-spin { to { transform: rotate(360deg); } }
+@keyframes ap-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 
 /* ── Success screen ───────────────────── */
 .ap-success-screen {
@@ -349,24 +386,31 @@
 .ap-success-card {
   text-align: center;
   padding: 3rem 2.5rem;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 24px;
   backdrop-filter: blur(12px);
   max-width: 420px;
   margin: 1rem;
-  animation: ap-pop 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  animation: ap-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 @keyframes ap-pop {
-  from { opacity:0; transform: scale(0.8); }
-  to   { opacity:1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .ap-success-icon {
   color: #34d399;
   margin-bottom: 1.25rem;
-  animation: ap-pop 0.5s 0.1s cubic-bezier(0.34,1.56,0.64,1) both;
+  animation: ap-pop 0.5s 0.1s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 .ap-success-card h2 {
@@ -377,7 +421,7 @@
 }
 
 .ap-success-card p {
-  color: rgba(255,255,255,0.7);
+  color: rgba(255, 255, 255, 0.7);
   font-size: 1rem;
   line-height: 1.6;
   margin-bottom: 1.75rem;
@@ -386,7 +430,7 @@
 .ap-success-loader {
   height: 4px;
   border-radius: 4px;
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.1);
   overflow: hidden;
 }
 
@@ -400,8 +444,13 @@
 }
 
 @keyframes ap-load {
-  from { width: 0%; }
-  to   { width: 100%; }
+  from {
+    width: 0%;
+  }
+
+  to {
+    width: 100%;
+  }
 }
 
 /* ── Error banner ─────────────────────── */

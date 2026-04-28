@@ -4,7 +4,13 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 .cf-page {
   min-height: 100vh;
@@ -32,8 +38,8 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(99,179,255,0.18);
-  border: 1px solid rgba(99,179,255,0.35);
+  background: rgba(99, 179, 255, 0.18);
+  border: 1px solid rgba(99, 179, 255, 0.35);
   color: #93c5fd;
   padding: 5px 16px;
   border-radius: 50px;
@@ -54,7 +60,7 @@
 }
 
 .cf-hero-sub {
-  color: rgba(255,255,255,0.65);
+  color: rgba(255, 255, 255, 0.65);
   font-size: 1.0625rem;
   margin-bottom: 2rem;
   line-height: 1.6;
@@ -73,11 +79,12 @@
   border: none;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
 }
+
 .cf-publish-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 /* Blobs */
@@ -88,8 +95,22 @@
   opacity: 0.3;
   pointer-events: none;
 }
-.cf-blob-1 { width:400px; height:400px; background:#3b82f6; top:-120px; right:-80px; }
-.cf-blob-2 { width:280px; height:280px; background:#818cf8; bottom:-70px; left:-50px; }
+
+.cf-blob-1 {
+  width: 400px;
+  height: 400px;
+  background: #3b82f6;
+  top: -120px;
+  right: -80px;
+}
+
+.cf-blob-2 {
+  width: 280px;
+  height: 280px;
+  background: #818cf8;
+  bottom: -70px;
+  left: -50px;
+}
 
 /* ── Controls Bar ─────────────────────── */
 .cf-controls {
@@ -103,7 +124,7 @@
   position: sticky;
   top: 0;
   z-index: 10;
-  box-shadow: 0 2px 12px rgba(15,23,42,0.06);
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
 }
 
 .cf-search-wrap {
@@ -132,10 +153,11 @@
   font-family: 'Open Sans', sans-serif;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
+
 .cf-search:focus {
   outline: none;
   border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
   background: #fff;
 }
 
@@ -159,12 +181,17 @@
   transition: all 0.2s;
   font-family: 'Open Sans', sans-serif;
 }
-.cf-chip:hover { border-color: #93c5fd; color: #2563eb; }
+
+.cf-chip:hover {
+  border-color: #93c5fd;
+  color: #2563eb;
+}
+
 .cf-chip.active {
   background: #2563eb;
   border-color: #2563eb;
   color: #fff;
-  box-shadow: 0 3px 10px rgba(37,99,235,0.25);
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.25);
 }
 
 /* ── Body / Grid ──────────────────────── */
@@ -190,9 +217,10 @@
   flex-direction: column;
   transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
 }
+
 .cf-card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 20px 48px rgba(15,23,42,0.1);
+  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.1);
   border-color: #93c5fd;
 }
 
@@ -201,19 +229,23 @@
   height: 80px;
   overflow: hidden;
 }
+
 .cf-card-img img {
-  width: 100%; height: 100%;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   transition: transform 0.4s ease;
 }
+
 .cf-card:hover .cf-card-img img {
   transform: scale(1.04);
 }
 
 .cf-category-tag {
   position: absolute;
-  top: 12px; right: 12px;
-  background: rgba(15,23,42,0.7);
+  top: 12px;
+  right: 12px;
+  background: rgba(15, 23, 42, 0.7);
   color: #fff;
   font-size: 0.7rem;
   font-weight: 700;
@@ -237,7 +269,8 @@
 }
 
 .cf-avatar {
-  width: 30px; height: 30px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   background: linear-gradient(135deg, #2563eb, #7c3aed);
   color: #fff;
@@ -315,6 +348,7 @@
   transition: opacity 0.2s, transform 0.2s;
   font-family: 'Open Sans', sans-serif;
 }
+
 .cf-enroll-btn:hover {
   opacity: 0.88;
   transform: translateY(-1px);
@@ -330,16 +364,19 @@
   text-align: center;
   color: #94a3b8;
 }
+
 .cf-empty h3 {
   font-size: 1.25rem;
   font-weight: 800;
   color: #334155;
 }
+
 .cf-empty p {
   font-size: 0.9rem;
   max-width: 360px;
   line-height: 1.6;
 }
+
 .cf-empty-btn {
   margin-top: 0.5rem;
   background: linear-gradient(135deg, #2563eb, #7c3aed);
@@ -371,14 +408,38 @@
   transition: background 0.15s, color 0.15s;
   font-family: 'Inter', sans-serif;
 }
-.cf-action-btn:hover { background: #f1f5f9; color: #0f172a; }
-.cf-action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.cf-action-btn.cf-liked { color: #ef4444; }
-.cf-action-btn.cf-liked:hover { background: #fee2e2; }
-.cf-ml-auto { margin-left: auto; }
 
-.cf-edit-btn:hover  { background: #eff6ff; color: #2563eb; }
-.cf-delete-btn:hover { background: #fee2e2; color: #ef4444; }
+.cf-action-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.cf-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cf-action-btn.cf-liked {
+  color: #ef4444;
+}
+
+.cf-action-btn.cf-liked:hover {
+  background: #fee2e2;
+}
+
+.cf-ml-auto {
+  margin-left: auto;
+}
+
+.cf-edit-btn:hover {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.cf-delete-btn:hover {
+  background: #fee2e2;
+  color: #ef4444;
+}
 
 /* ── Inline edit card ─────────────────── */
 .cf-edit-card {
@@ -422,6 +483,7 @@
   width: 100%;
   resize: vertical;
 }
+
 .cf-edit-input:focus {
   outline: none;
   border-color: #2563eb;
@@ -456,7 +518,11 @@
   font-family: 'Inter', sans-serif;
   transition: opacity 0.2s;
 }
-.cf-edit-save:disabled { opacity: 0.65; cursor: not-allowed; }
+
+.cf-edit-save:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
 
 .cf-edit-cancel {
   flex: 1;
@@ -475,10 +541,16 @@
   font-family: 'Inter', sans-serif;
   transition: background 0.2s;
 }
-.cf-edit-cancel:hover { background: #e2e8f0; }
+
+.cf-edit-cancel:hover {
+  background: #e2e8f0;
+}
 
 /* ── Skeleton loader ──────────────────── */
-.cf-skeleton { pointer-events: none; border: 1px solid #e2e8f0; }
+.cf-skeleton {
+  pointer-events: none;
+  border: 1px solid #e2e8f0;
+}
 
 .cf-skeleton-img {
   height: 190px;
@@ -496,12 +568,23 @@
   margin-bottom: 10px;
   width: 100%;
 }
-.cf-sk-short  { width: 55%; }
-.cf-sk-medium { width: 75%; }
+
+.cf-sk-short {
+  width: 55%;
+}
+
+.cf-sk-medium {
+  width: 75%;
+}
 
 @keyframes cf-shimmer {
-  0%   { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 /* ── Deleting state ───────────────────── */
@@ -525,13 +608,23 @@
   font-size: 0.9rem;
   font-weight: 600;
   font-family: 'Inter', sans-serif;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
   z-index: 9999;
   animation: cf-slide-up 0.3s ease forwards;
   white-space: nowrap;
 }
-.cf-toast-error   { background: #fef2f2; color: #dc2626; border: 1.5px solid #fca5a5; }
-.cf-toast-success { background: #f0fdf4; color: #16a34a; border: 1.5px solid #86efac; }
+
+.cf-toast-error {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1.5px solid #fca5a5;
+}
+
+.cf-toast-success {
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1.5px solid #86efac;
+}
 
 .cf-toast button {
   background: none;
@@ -544,29 +637,50 @@
 }
 
 @keyframes cf-slide-up {
-  from { opacity: 0; transform: translate(-50%, 12px); }
-  to   { opacity: 1; transform: translate(-50%, 0); }
+  from {
+    opacity: 0;
+    transform: translate(-50%, 12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
 }
 
 /* ── Spinner for buttons ──────────────── */
 .cf-btn-spinner {
   display: inline-block;
-  width: 14px; height: 14px;
-  border: 2px solid rgba(255,255,255,0.35);
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
   border-top-color: #fff;
   border-radius: 50%;
   animation: ap-spin 0.7s linear infinite;
 }
+
 .cf-del-spinner {
-  border-color: rgba(239,68,68,0.3);
+  border-color: rgba(239, 68, 68, 0.3);
   border-top-color: #ef4444;
 }
 
-@keyframes ap-spin { to { transform: rotate(360deg); } }
+@keyframes ap-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 
 /* ── Responsive ──────────────────────── */
 @media (max-width: 600px) {
-  .cf-controls { padding: 0.875rem 1rem; }
-  .cf-body     { padding: 1.5rem 1rem 3rem; }
-  .cf-edit-row { grid-template-columns: 1fr; }
+  .cf-controls {
+    padding: 0.875rem 1rem;
+  }
+
+  .cf-body {
+    padding: 1.5rem 1rem 3rem;
+  }
+
+  .cf-edit-row {
+    grid-template-columns: 1fr;
+  }
 }
