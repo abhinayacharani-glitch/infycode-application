@@ -133,6 +133,35 @@
   box-shadow: 0 6px 16px rgba(14, 165, 233, 0.3);
 }
 
+.trainer-stat {
+  display: flex;
+  align-items: center;
+  gap: 12px !important;
+}
+
+.cd-mini-download {
+  background: #0ea5e9;
+  color: white;
+  border: none;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-left: 4px;
+}
+
+.cd-mini-download:hover {
+  background: #0284c7;
+  transform: scale(1.05);
+}
+
 .cd-hero-pricing {
   background: #0ea5e9;
   color: white;
