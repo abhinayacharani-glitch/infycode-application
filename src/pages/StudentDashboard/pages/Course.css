@@ -130,12 +130,13 @@
 .course-card-modern {
   background: #ffffff;
   border: none;
-  border-radius: 12px;
-  padding: 12px;
+  border-radius: 16px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f1f5f9;
 }
 
 .course-card-modern:hover {
@@ -145,8 +146,8 @@
 
 .card-img-banner {
   position: relative;
-  height: 180px;
-  border-radius: 10px;
+  height: 130px;
+  border-radius: 12px;
   overflow: hidden;
 }
 
@@ -162,19 +163,24 @@
 }
 
 .card-content-modern {
-  padding: 16px 4px 4px 4px;
+  padding: 12px 4px 4px 4px;
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .card-title-modern {
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   font-weight: 800;
   line-height: 1.3;
   color: #1e293b;
   margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.6rem;
 }
 
 .card-stats-modern {
@@ -196,10 +202,39 @@
 }
 
 .card-footer-modern {
-  margin-top: 10px;
+  margin-top: 6px;
   display: flex;
   justify-content: space-between;
+  align-items: flex-end;
+  padding-top: 10px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.footer-info-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.info-item {
+  display: flex;
   align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.info-item svg {
+  color: #94a3b8;
+  width: 13px;
+  height: 13px;
+}
+
+.duration-highlight {
+  color: #475569 !important;
+  font-weight: 700;
 }
 
 .footer-actions-left {
@@ -212,38 +247,36 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
 }
 
 .btn-view-details {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  border: 1.5px solid #e2e8f0;
-  background: #ffffff;
-  color: #475569;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  border: none;
+  background: #0ea5e9;
+  color: #ffffff;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  box-shadow: 0 4px 10px rgba(14, 165, 233, 0.2);
 }
 
 .btn-view-details:hover {
-  background: #f1f5f9;
-  color: #2563eb;
-  border-color: #2563eb;
+  background: #0284c7;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+  box-shadow: 0 6px 14px rgba(2, 132, 199, 0.3);
 }
 
 .action-label {
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   font-weight: 700;
-  color: #64748b;
+  color: #0ea5e9;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.4px;
 }
 
 .btn-join-now {
