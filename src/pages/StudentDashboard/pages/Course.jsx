@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Star, Search, Eye, Calendar, User as UserIcon, Clock } from "lucide-react";
+import { Star, Search, Eye, Calendar, User as UserIcon, Clock, Users } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { enrollInCourse, getEnrolledCourses } from "../../../services/api";
@@ -78,34 +78,37 @@ const CourseCardModern = ({ course, index, onNavigate, enrolledIds }) => {
       </div>
 
       <div className="card-content-modern">
+        <div className="card-stats-modern">
+          <div className="stat stars-container">
+            {[...Array(5)].map((_, i) => (
+              <Star
+                key={i}
+                size={14}
+                fill={i < Math.floor(course.rating) ? "#f59e0b" : "transparent"}
+                color="#f59e0b"
+              />
+            ))}
+          </div>
+          <span className="stat students-text">{course.students}</span>
+        </div>
+
         <h3 className="card-title-modern">{course.title}</h3>
 
         <div className="card-footer-modern">
-          <div className="footer-info-left">
-            <div className="info-item">
-              <UserIcon size={14} />
-              <span>{course.trainer}</span>
-            </div>
-            <div className="info-item">
-              <Calendar size={14} />
-              <span>{course.startDate}</span>
-            </div>
-            <div className="info-item duration-highlight">
-              <Clock size={14} />
-              <span>{course.duration}</span>
+          <div className="footer-actions-left">
+            <div className="details-action-wrapper">
+              <button 
+                className="btn-view-details" 
+                onClick={() => onNavigate(`/course-details/${course.courseId}`)}
+              >
+                <Eye size={20} />
+              </button>
+              <span className="action-label">Overview</span>
             </div>
           </div>
-
-          <div className="details-action-wrapper">
-            <button 
-              className="btn-view-details" 
-              onClick={() => onNavigate(`/course-details/${course.courseId}`)}
-              title="View Course Details"
-            >
-              <Eye size={20} />
-            </button>
-            <span className="action-label">View Course</span>
-          </div>
+          <button className="btn-join-now">
+            Enroll Now
+          </button>
         </div>
       </div>
     </motion.div>
