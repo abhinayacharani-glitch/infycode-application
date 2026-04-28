@@ -2,7 +2,7 @@
  * trainerRegController.js
  *
  * Trainer-specific registration endpoint that satisfies:
- *   - Email MUST end with @trainer.in
+ *   - Email MUST end with @outlook.com
  *   - OTP is SIMULATED (dev mode) — verification always succeeds regardless of value
  *   - Saves trainer under  users/trainer_<id>/  AND  trainers/<push-id>/  in Firebase
  *
@@ -52,10 +52,10 @@ export const trainerRegister = async (req, res) => {
     }
 
     // ── Trainer domain restriction ──────────────────────────────────────────
-    if (!normalizedEmail.endsWith("@trainer.in")) {
+    if (!normalizedEmail.endsWith("@outlook.com")) {
       return res.status(400).json({
         success: false,
-        message: "Trainer email must end with @trainer.in",
+        message: "Trainer email must end with @outlook.com",
       });
     }
 
@@ -174,5 +174,95 @@ export const trainerDashboard = async (req, res) => {
   } catch (error) {
     console.error("[trainerDashboard] Error:", error.message);
     res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// GET /api/trainer/profile
+// ═══════════════════════════════════════════════════════════════════════════
+export const getTrainerProfile = async (req, res) => {
+  try {
+    const { email, id } = req.user;
+    let trainerKey = id;
+    
+    let snapshot = await trainersRef.child(trainerKey).once("value");
+    
+    if (!snapshot.exists()) {
+      console.log(`[getTrainerProfile] Trainer not found by ID (${trainerKey}), falling back to email lookup...`);
+      const emailSnapshot = await trainersRef.orderByChild("email").equalTo(email).once("value");
+      if (!emailSnapshot.exists()) {
+        return res.status(404).json({ success: false, message: "Trainer not found" });
+      }
+      emailSnapshot.forEach(child => {
+        trainerKey = child.key;
+        snapshot = child; // Re-assign for child.val()
+      });
+    }
+    
+    let profileData = snapshot.val ? snapshot.val() : snapshot;
+    profileData.id = trainerKey;
+    profileData.role = "trainer"; // Hardcode for safety
+    
+    delete profileData.password;
+    
+    return res.status(200).json({ success: true, profile: profileData });
+  } catch (error) {
+    console.error("[getTrainerProfile] Error:", error.message);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PUT /api/trainer/profile
+// ═══════════════════════════════════════════════════════════════════════════
+export const updateTrainerProfile = async (req, res) => {
+  try {
+    const { email, id } = req.user;
+    let trainerKey = id;
+
+    // 1. Verify trainer exists (try ID first, then fallback to Email lookup)
+    let snapshot = await trainersRef.child(trainerKey).once("value");
+    
+    if (!snapshot.exists()) {
+      console.log(`[updateTrainerProfile] Trainer not found by ID (${trainerKey}), falling back to email lookup...`);
+      const emailSnapshot = await trainersRef.orderByChild("email").equalTo(email).once("value");
+      if (!emailSnapshot.exists()) {
+        console.error(`[updateTrainerProfile] Trainer NOT found even by email: ${email}`);
+        return res.status(404).json({ success: false, message: `Trainer account not found for email: ${email}` });
+      }
+      emailSnapshot.forEach(child => {
+        trainerKey = child.key;
+      });
+    }
+    
+    const fields = ['fullName', 'phone', 'location', 'experience', 'expertise', 'courses', 'mode', 'about', 'profileImage', 'role'];
+    const updateData = {};
+    
+    fields.forEach(field => {
+      if (req.body[field] !== undefined) {
+        updateData[field] = req.body[field];
+      }
+    });
+    
+    if (Object.keys(updateData).length > 0) {
+      await trainersRef.child(trainerKey).update(updateData);
+    }
+    
+    // Fetch the absolute latest data from DB to ensure sync
+    const updatedSnapshot = await trainersRef.child(trainerKey).once("value");
+    const fullProfile = updatedSnapshot.val();
+    fullProfile.id = trainerKey;
+    fullProfile.role = "trainer"; // Hardcode for safety
+    delete fullProfile.password;
+    
+    return res.status(200).json({ 
+      success: true, 
+      message: "Profile updated successfully", 
+      profile: fullProfile,
+      data: updateData
+    });
+  } catch (error) {
+    console.error("[updateTrainerProfile] CRITICAL ERROR:", error.message);
+    res.status(500).json({ success: false, message: "Internal server error: " + error.message });
   }
 };

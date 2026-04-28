@@ -51,7 +51,7 @@ const request = async (endpoint, options = {}) => {
  * POST /api/login
  * Single endpoint that resolves role by email:
  *   admin@charani.in           → role: "admin"
- *   *@trainer.in               → role: "trainer"
+ *   *@outlook.com               → role: "trainer"
  *   anything else              → role: "student"
  * @returns {{ success, role, token, email, fullName, message }}
  */
@@ -216,7 +216,7 @@ export const getStudentMyResults = () => {
 // ─────────────────────────────────────────────
 
 /**
- * POST /api/login  (trainer credentials — email must end with @trainer.in)
+ * POST /api/login  (trainer credentials — email must end with @outlook.com)
  * Alias kept so trainer Login.jsx import continues to work without changes.
  * @returns {{ success, role, token, fullName, email }}
  */
@@ -243,6 +243,27 @@ export const trainerVerifyOtp = (email, otp) =>
     method: 'POST',
     body: JSON.stringify({ email, otp }),
   });
+
+// ─────────────────────────────────────────────
+// TRAINER PROFILE
+// ─────────────────────────────────────────────
+
+export const getTrainerProfileAPI = () => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return request('/api/trainer/profile', {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${user.token || ''}` },
+  });
+};
+
+export const updateTrainerProfileAPI = (profileData) => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return request('/api/trainer/profile', {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${user.token || ''}` },
+    body: JSON.stringify(profileData),
+  });
+};
 
 // ─────────────────────────────────────────────
 // PASSWORD RESET FLOW  (shared — admin & trainer)

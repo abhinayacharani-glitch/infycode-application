@@ -157,7 +157,7 @@ export const verifyRegistrationOTP = async (req, res) => {
   try {
     const { email, otp, role } = req.body;
 
-    const isTrainerEmail = email?.trim().toLowerCase().endsWith("@trainer.in");
+    const isTrainerEmail = email?.trim().toLowerCase().endsWith("@outlook.com");
 
     if (!email || (!isTrainerEmail && !otp) || !role) {
       return res.status(400).json({ message: "Email, OTP, and role are required" });
@@ -238,7 +238,7 @@ export const verifyRegistrationOTP = async (req, res) => {
 
     const finalUserData = {
       ...userData,
-      role: isTrainerEmail ? "trainer" : (userData.role || role),
+      role: isTrainerEmail ? "trainer" : (role.toLowerCase() === "admin" ? "admin" : "student"),
       createdAt: new Date().toISOString(),
     };
 
