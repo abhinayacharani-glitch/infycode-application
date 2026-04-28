@@ -8,7 +8,9 @@ import {
   getPendingFAQs as apiGetPendingFAQs,
   updateFAQStatus as apiUpdateFAQStatus,
   deleteFAQ as apiDeleteFAQ,
-  publishNewFAQ
+  publishNewFAQ,
+  getAdminProfileAPI,
+  updateAdminProfileAPI
 } from '../services/api';
 
 const AdminContext = createContext();
@@ -28,6 +30,10 @@ export const AdminProvider = ({ children }) => {
   const [courses, setCourses] = useState([]);
   const [batches, setBatches] = useState([]);
   const [pendingFAQs, setPendingFAQs] = useState([]);
+  const [adminData, setAdminData] = useState(() => {
+    const savedUser = localStorage.getItem('user');
+    return JSON.parse(savedUser || '{}');
+  });
 
   const [notifications, setNotifications] = useState([
     { id: 1, message: 'New student registration: Harvey Specter', type: 'info', read: false, time: '2 mins ago' },
@@ -211,6 +217,37 @@ export const AdminProvider = ({ children }) => {
     }
   };
 
+  const fetchAdminProfile = async () => {
+    try {
+      const response = await getAdminProfileAPI();
+      if (response.success && response.profile) {
+        setAdminData(prev => ({ ...prev, ...response.profile }));
+        const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+        localStorage.setItem('user', JSON.stringify({ ...currentUser, ...response.profile }));
+      }
+    } catch (error) {
+      console.error("Error fetching admin profile:", error);
+    }
+  };
+
+  const updateAdminProfile = async (newData, newImage) => {
+    try {
+      const payload = { ...(newData || {}) };
+      if (newImage) payload.profileImage = newImage;
+      
+      const response = await updateAdminProfileAPI(payload);
+      if (response.success && response.profile) {
+        setAdminData(prev => ({ ...prev, ...response.profile }));
+        const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+        localStorage.setItem('user', JSON.stringify({ ...currentUser, ...response.profile }));
+        return response;
+      }
+    } catch (error) {
+      console.error("Error updating admin profile:", error);
+      throw error;
+    }
+  };
+
   const fetchDashboardStats = async () => {
     try {
       const data = await getAdminStats();
@@ -252,8 +289,9 @@ export const AdminProvider = ({ children }) => {
 
   useEffect(() => {
     fetchDashboardStats();
-    loadCourses(); // Load courses separately
+    loadCourses(); 
     loadPendingFAQs();
+    fetchAdminProfile();
 
     const interval = setInterval(() => {
       fetchDashboardStats();
@@ -285,6 +323,9 @@ export const AdminProvider = ({ children }) => {
     approveFAQ,
     deleteFAQ,
     loadPendingFAQs,
+    adminData,
+    updateAdminProfile,
+    fetchAdminProfile
   };
 
   return <AdminContext.Provider value={value}>{children}</AdminContext.Provider>;

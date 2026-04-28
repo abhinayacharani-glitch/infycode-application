@@ -134,9 +134,9 @@ const Sidebar = ({ isCollapsed, externalShowLogoutModal, setExternalShowLogoutMo
             {!isCollapsed && <span className="adm-nav-badge green">3</span>}
           </NavLink>
 
-          <NavLink to="/admin-dashboard/student-verification" className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`} title="Student verification" data-tooltip="Student verification">
+          <NavLink to="/admin-dashboard/student-verification" className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`} title="Register Profiles" data-tooltip="Register Profiles">
             <span className="adm-nav-icon"><UserCheckIcon /></span>
-            {!isCollapsed && <span className="adm-nav-label">Student verification</span>}
+            {!isCollapsed && <span className="adm-nav-label">Register Profiles</span>}
             {!isCollapsed && <span className="adm-nav-badge amber">12</span>}
           </NavLink>
 

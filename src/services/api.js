@@ -110,6 +110,23 @@ export const createBatch = (batchData) => {
   });
 };
 
+export const getAdminProfileAPI = () => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return request('/api/admin/profile', {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${user.token || ''}` },
+  });
+};
+
+export const updateAdminProfileAPI = (profileData) => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return request('/api/admin/profile', {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${user.token || ''}` },
+    body: JSON.stringify(profileData),
+  });
+};
+
 /**
  * GET /api/student/admin/results
  * Retrieves all student test results for the admin dashboard.

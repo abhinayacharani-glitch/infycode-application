@@ -162,7 +162,7 @@ export const enrollInCourse = async (req, res) => {
       return res.status(400).json({ error: "Course ID is required" });
     }
 
-    const sanitizedEmail = email.replace(/\./g, ",");
+    const sanitizedEmail = email.trim().toLowerCase().replace(/\./g, ",");
     
     // Add courseId to student's enrollment list
     await enrollmentsRef.child(sanitizedEmail).child(courseId).set({
@@ -191,7 +191,7 @@ export const getEnrolledCourses = async (req, res) => {
       console.error("[getEnrolledCourses] Unauthorized: No email in token");
       return res.status(401).json({ error: "Unauthorized: No email in token" });
     }
-    const sanitizedEmail = email.replace(/\./g, ",");
+    const sanitizedEmail = email.trim().toLowerCase().replace(/\./g, ",");
 
     const snapshot = await enrollmentsRef.child(sanitizedEmail).once("value");
     const data = snapshot.val() || {};
