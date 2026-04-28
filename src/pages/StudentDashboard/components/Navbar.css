@@ -130,12 +130,30 @@
   background: #f1f5f9;
 }
 
-.navbar-avatar {
-  width: 48px;
-  height: 48px;
+.navbar-avatar,
+.navbar-avatar-placeholder {
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #f1f5f9;
+  transition: all 0.2s ease;
+}
+
+.navbar-avatar-placeholder {
+  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.navbar-avatar:hover,
+.navbar-avatar-placeholder:hover {
+  transform: scale(1.05);
+  border-color: #3b82f6;
 }
 
 .navbar-username {
@@ -188,13 +206,24 @@
   background: #f8fafc;
 }
 
-.dropdown-avatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
+.dropdown-avatar,
+.dropdown-avatar-placeholder {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
   object-fit: cover;
   border: 2px solid white;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-avatar-placeholder {
+  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.3rem;
 }
 
 .dropdown-user-info {

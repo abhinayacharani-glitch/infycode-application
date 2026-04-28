@@ -10,7 +10,7 @@ const enrollmentsRef = db.ref("enrollments");
 export const saveTestResult = async (req, res) => {
   try {
     const { testType, scores } = req.body;
-    let studentId = req.user?.id; 
+    let studentId = req.user?.id;
     const email = req.user?.email;
 
     console.log(`[saveTestResult] Attempting save for: ${email || "unknown email"}, ID: ${studentId || "unknown ID"}`);
@@ -125,16 +125,16 @@ export const getMyResults = async (req, res) => {
 
     const snapshot = await studentsRef.child(finalId).once("value");
     const data = snapshot.val();
-    
+
     if (!data) {
       console.warn(`[getMyResults] Student data is null for ID: ${finalId}`);
       return res.status(404).json({ success: false, message: "Student data not found" });
     }
 
     console.log(`[getMyResults] Success. testResults:`, data.testResults || "None");
-    res.status(200).json({ 
-      success: true, 
-      testResults: data.testResults || {} 
+    res.status(200).json({
+      success: true,
+      testResults: data.testResults || {}
     });
   } catch (error) {
     console.error("[getMyResults] Error:", error);
@@ -195,14 +195,136 @@ export const getEnrolledCourses = async (req, res) => {
 
     const snapshot = await enrollmentsRef.child(sanitizedEmail).once("value");
     const data = snapshot.val() || {};
-    
-    // Return just the keys (course IDs)
-    const enrolledIds = Object.keys(data);
-    
-    console.log(`[getEnrolledCourses] Found ${enrolledIds.length} courses for ${email}`);
-    res.status(200).json(enrolledIds);
+
+    // Return unique, active enrollment IDs
+    const enrolledIds = Object.keys(data).filter(id => data[id].status === "active");
+    const uniqueIds = [...new Set(enrolledIds)];
+
+    console.log(`[getEnrolledCourses] Found ${uniqueIds.length} active courses for ${email}`);
+    res.status(200).json(uniqueIds);
   } catch (error) {
     console.error("[getEnrolledCourses] Error:", error);
     res.status(500).json({ error: "Failed to fetch enrolled courses" });
   }
 };
+
+export const getStudentProfile = async (req, res) => {
+  try {
+    const email = req.user?.email?.toLowerCase();
+    const idFromToken = req.user?.id;
+
+    if (!email && !idFromToken) {
+      return res.status(401).json({ success: false, message: "Unauthorized: Missing identity in token" });
+    }
+
+    let studentData = null;
+
+    // 1. Try direct ID lookup
+    if (idFromToken) {
+      const snapshot = await studentsRef.child(idFromToken).once("value");
+      if (snapshot.exists()) {
+        studentData = { id: idFromToken, ...snapshot.val() };
+      }
+    }
+
+    // 2. Try email fallback
+    if (!studentData && email) {
+      const allStudentsSnap = await studentsRef.once("value");
+      const allStudents = allStudentsSnap.val() || {};
+      for (const key in allStudents) {
+        if (allStudents[key].email?.toLowerCase() === email) {
+          studentData = { id: key, ...allStudents[key] };
+          break;
+        }
+      }
+    }
+
+    if (!studentData) {
+      return res.status(404).json({ success: false, message: "Student record not found in database." });
+    }
+
+    // Auto-migrate: Generate studentId if missing or non-numeric
+    if (!studentData.studentId || isNaN(studentData.studentId)) {
+      const snapshot = await studentsRef.once("value");
+      const count = snapshot.numChildren();
+      // Generate a more robust unique number
+      const newStudentId = (1001 + count).toString();
+
+      await studentsRef.child(studentData.id).update({ studentId: newStudentId });
+      studentData.studentId = newStudentId;
+    }
+
+    res.status(200).json({ success: true, profile: studentData });
+  } catch (error) {
+    console.error("[getStudentProfile] Error:", error);
+    res.status(500).json({ success: false, message: "Database error. Please try again later." });
+  }
+};
+
+export const updateStudentProfile = async (req, res) => {
+  try {
+    const email = req.user?.email?.toLowerCase();
+    const idFromToken = req.user?.id;
+    const body = req.body;
+
+    console.log(`[updateStudentProfile] Called — email: ${email}, id: ${idFromToken}`);
+
+    if (!email && !idFromToken) {
+      return res.status(401).json({ success: false, message: "Unauthorized: no identity in token" });
+    }
+
+    // ── 1. Resolve student Firebase key ──────────────────────────────────
+    let studentId = idFromToken;
+
+    if (!studentId && email) {
+      console.log(`[updateStudentProfile] ID not in token, searching by email: ${email}`);
+      const snap = await studentsRef.once("value");
+      const all = snap.val() || {};
+      for (const key in all) {
+        const stored = all[key].email?.toLowerCase();
+        if (stored === email) { studentId = key; break; }
+      }
+    }
+
+    if (!studentId) {
+      console.error("[updateStudentProfile] Student not found in DB");
+      return res.status(404).json({ success: false, message: "Student record not found in database." });
+    }
+
+    // ── 2. Build a clean, allowlisted payload ─────────────────────────────
+    const ALLOWED = [
+      "fullName", "fullname", "phone", "location",
+      "dob", "gender", "college", "degree",
+      "branch", "passOutYear", "cgpa", "profileImage"
+    ];
+
+    const sanitized = {};
+    for (const key of ALLOWED) {
+      const val = body[key];
+      // Only include truthy strings (skip null, undefined, empty string)
+      if (val !== undefined && val !== null && val !== "") {
+        sanitized[key] = val;
+      }
+    }
+
+    console.log(`[updateStudentProfile] Saving ${Object.keys(sanitized).length} fields for student ${studentId}`);
+
+    if (Object.keys(sanitized).length === 0) {
+      return res.status(200).json({ success: true, message: "No changes to save." });
+    }
+
+    // ── 3. Write to Firebase ──────────────────────────────────────────────
+    await studentsRef.child(studentId).update(sanitized);
+
+    console.log(`[updateStudentProfile] SUCCESS for student ${studentId}`);
+    res.status(200).json({ success: true, message: "Profile updated successfully." });
+
+  } catch (error) {
+    console.error("[updateStudentProfile] FATAL:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error: " + error.message
+    });
+  }
+};
+

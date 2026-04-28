@@ -207,7 +207,12 @@
 
 .card-footer-v4 {
   margin-top: auto;
-  padding-top: 25px;
+  padding-top: 0;
+  border-top: none;
+}
+
+.card-content-v4 {
+  margin-bottom: 20px;
 }
 
 .learn-more-v4 {

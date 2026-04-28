@@ -118,17 +118,12 @@ export default function Features() {
               <div className="card-content-wrapper-v4">
                 <div className="card-top-v4">
                   <span className="step-num-v4">{feature.id}</span>
-                  <div className="icon-box-v4" style={{ backgroundColor: `${feature.color}30` }}>
-                    {feature.icon}
-                  </div>
-                </div>
-
-                <div className="card-content-v4">
-                  <h3 className="card-title-v4">{feature.title}</h3>
-                  <p className="card-hook-v4">{feature.hook}</p>
                 </div>
 
                 <div className="card-footer-v4">
+                  <div className="card-content-v4">
+                    <h3 className="card-title-v4">{feature.title}</h3>
+                  </div>
                   <button className="learn-more-v4">
                     Explore Details <FiArrowRight className="arrow-v4" />
                   </button>

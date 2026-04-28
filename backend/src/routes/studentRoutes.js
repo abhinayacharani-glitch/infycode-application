@@ -1,9 +1,21 @@
 import express from "express";
 const router = express.Router();
 
-import { saveTestResult, getStudentResults, getMyResults, enrollInCourse, getEnrolledCourses } from "../controllers/studentController.js";
+import { 
+  saveTestResult, 
+  getStudentResults, 
+  getMyResults, 
+  enrollInCourse, 
+  getEnrolledCourses,
+  getStudentProfile,
+  updateStudentProfile
+} from "../controllers/studentController.js";
 import { verifyToken, isAdmin } from "../middleware/authMiddleware.js";
 import { checkRole } from "../middleware/roleMiddleware.js";
+
+// ✅ Profile Management
+router.get("/profile", verifyToken, getStudentProfile);
+router.put("/profile", verifyToken, updateStudentProfile);
 
 // ✅ Student save results
 router.post("/test-results", verifyToken, saveTestResult);
