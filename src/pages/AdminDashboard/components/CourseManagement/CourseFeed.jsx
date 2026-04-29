@@ -8,9 +8,9 @@ import {
 import './CourseFeed.css';
 
 const LEVEL_COLORS = {
-  Beginner:     { bg: '#dcfce7', color: '#16a34a' },
+  Beginner: { bg: '#dcfce7', color: '#16a34a' },
   Intermediate: { bg: '#fef9c3', color: '#b45309' },
-  Advanced:     { bg: '#fee2e2', color: '#dc2626' },
+  Advanced: { bg: '#fee2e2', color: '#dc2626' },
 };
 
 function Toast({ message, type = 'error', onClose }) {
@@ -55,13 +55,13 @@ const CourseFeed = ({ courses, onToggleLike, onUpdateCourse, onDeleteCourse, isE
   const startEdit = (course) => {
     setEditingId(course.id);
     setEditData({
-      title:       course.title,
+      title: course.title,
       description: course.description,
-      category:    course.category    || 'Development',
-      level:       course.level       || 'Beginner',
-      duration:    course.duration    || '',
-      instructor:  course.instructor  || '',
-      curriculum:  course.curriculum  || '',
+      category: course.category || 'Development',
+      level: course.level || 'Beginner',
+      duration: course.duration || '',
+      instructor: course.instructor || '',
+      curriculum: course.curriculum || '',
     });
   };
 
@@ -191,7 +191,7 @@ const CourseFeed = ({ courses, onToggleLike, onUpdateCourse, onDeleteCourse, isE
           <div className="cf-grid">
             {filtered.map((course, idx) => {
               const lvl = LEVEL_COLORS[course.level] || LEVEL_COLORS.Beginner;
-              
+
               if (editingId === course.id) {
                 return (
                   <article key={course.id || idx} className="cf-card cf-edit-card">
