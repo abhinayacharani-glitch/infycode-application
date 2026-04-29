@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAdmin } from "../../../context/AdminContext";
 import "./AdminProfile.css";
 
 /* ── Icons ── */
@@ -43,21 +44,29 @@ const CheckIcon = () => (
 const AdminProfile = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
-  
-  // Load initial state from localStorage
-  const loggedUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const { adminData, updateAdminProfile, stats } = useAdmin();
   
   const [isEditing, setIsEditing] = useState(false);
   const [showToast, setShowToast] = useState(false);
-  
+  const [previewImage, setPreviewImage] = useState(null);
   const [formData, setFormData] = useState({
-    fullName: loggedUser.fullName || loggedUser.fullname || "Admin User",
-    email: loggedUser.email || "admin@infycode.com",
-    role: loggedUser.role || "Administrator",
-    profileImage: loggedUser.profileImage || "https://i.pravatar.cc/150?img=5"
+    fullName: "",
+    email: "",
+    role: "admin",
+    profileImage: ""
   });
 
-  const [previewImage, setPreviewImage] = useState(null);
+  // Sync with context
+  useEffect(() => {
+    if (adminData && Object.keys(adminData).length > 0) {
+      setFormData({
+        fullName: adminData.fullName || "Admin",
+        email: adminData.email || "",
+        role: adminData.role || "admin",
+        profileImage: adminData.profileImage || "https://i.pravatar.cc/150?img=5"
+      });
+    }
+  }, [adminData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -73,36 +82,24 @@ const AdminProfile = () => {
     }
   };
 
-  const handleSave = () => {
-    const updatedUser = {
-      ...loggedUser,
-      fullName: formData.fullName,
-      fullname: formData.fullName, // Consistency
-      email: formData.email,
-      role: formData.role,
-      profileImage: previewImage || formData.profileImage
-    };
-    
-    localStorage.setItem("user", JSON.stringify(updatedUser));
-    setFormData(prev => ({ ...prev, profileImage: updatedUser.profileImage }));
-    setPreviewImage(null);
-    setIsEditing(false);
-    
-    // Show success toast
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 3000);
-    
-    // Dispatch events to notify other components (Sidebar, Topbar)
-    window.dispatchEvent(new Event('storage'));
-    window.dispatchEvent(new Event('adminProfileUpdate'));
+  const handleSave = async () => {
+    try {
+      await updateAdminProfile({ fullName: formData.fullName }, previewImage);
+      setIsEditing(false);
+      setPreviewImage(null);
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+    } catch (error) {
+      console.error("Save error:", error);
+    }
   };
 
   const handleCancel = () => {
     setFormData({
-      fullName: loggedUser.fullName || loggedUser.fullname || "Admin User",
-      email: loggedUser.email || "admin@infycode.com",
-      role: loggedUser.role || "Administrator",
-      profileImage: loggedUser.profileImage || "https://i.pravatar.cc/150?img=5"
+      fullName: adminData.fullName || "Admin",
+      email: adminData.email || "",
+      role: adminData.role || "admin",
+      profileImage: adminData.profileImage || "https://i.pravatar.cc/150?img=5"
     });
     setPreviewImage(null);
     setIsEditing(false);
@@ -158,7 +155,7 @@ const AdminProfile = () => {
               ) : (
                 <h1 className="ap-name">{formData.fullName}</h1>
               )}
-              <span className="ap-role-badge">{formData.role}</span>
+              <span className="ap-role-badge">{formData.role.toUpperCase()}</span>
             </div>
 
             <div className="ap-action-buttons">
@@ -207,16 +204,7 @@ const AdminProfile = () => {
               <div className="ap-info-icon"><MailIcon /></div>
               <div className="ap-info-content">
                 <div className="ap-info-label">Email Address</div>
-                {isEditing ? (
-                  <input 
-                    className="ap-edit-input"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                  />
-                ) : (
-                  <div className="ap-info-value">{formData.email}</div>
-                )}
+                <div className="ap-info-value">{formData.email}</div>
               </div>
             </div>
 
@@ -224,16 +212,7 @@ const AdminProfile = () => {
               <div className="ap-info-icon"><RoleIcon /></div>
               <div className="ap-info-content">
                 <div className="ap-info-label">System Role</div>
-                {isEditing ? (
-                  <input 
-                    className="ap-edit-input"
-                    name="role"
-                    value={formData.role}
-                    onChange={handleChange}
-                  />
-                ) : (
-                  <div className="ap-info-value">{formData.role}</div>
-                )}
+                <div className="ap-info-value">{formData.role}</div>
               </div>
             </div>
 
@@ -244,18 +223,13 @@ const AdminProfile = () => {
           {/* Stats Row */}
           <div className="ap-stats-row">
             <div className="ap-stat">
-              <div className="ap-stat-num">12</div>
-              <div className="ap-stat-label">Pending Verifications</div>
+              <div className="ap-stat-num">{stats.totalStudents?.pending || 0}</div>
+              <div className="ap-stat-label">Pending Profiles</div>
             </div>
             <div className="ap-stat-divider" />
             <div className="ap-stat">
-              <div className="ap-stat-num">8</div>
+              <div className="ap-stat-num">{stats.activeBatches || 0}</div>
               <div className="ap-stat-label">Active Batches</div>
-            </div>
-            <div className="ap-stat-divider" />
-            <div className="ap-stat">
-              <div className="ap-stat-num">24</div>
-              <div className="ap-stat-label">System Reports</div>
             </div>
           </div>
 

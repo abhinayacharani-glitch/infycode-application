@@ -140,9 +140,12 @@ export const adminLogin = async (req, res) => {
     }
 
     let userData;
+    let adminId;
     snapshot.forEach((child) => {
       userData = child.val();
+      adminId = child.key;
     });
+    userData.id = adminId;
 
     // 3. Step 3 — Check Password
     const isMatch = await bcrypt.compare(password, userData.password);
@@ -181,25 +184,33 @@ export const adminDashboard = async (req, res) => {
  */
 export const getDashboardStats = async (req, res) => {
   try {
-    const [studentsSnap, trainersSnap, batchesSnap, coursesSnap] = await Promise.all([
+    const [studentsSnap, trainersSnap, batchesSnap, coursesSnap, enrollmentsSnap] = await Promise.all([
       studentsRef.once("value"),
       trainersRef.once("value"),
       batchesRef.once("value"),
-      coursesRef.once("value")
+      coursesRef.once("value"),
+      enrollmentsRef.once("value")
     ]);
 
     const studentsRaw = studentsSnap.val() || {};
     const trainersRaw = trainersSnap.val() || {};
     const batchesRaw = batchesSnap.val() || {};
     const coursesRaw = coursesSnap.val() || {};
+    const enrollmentsRaw = enrollmentsSnap.val() || {};
 
-    const students = Object.entries(studentsRaw).map(([id, data]) => ({
-      id,
-      ...data,
-      name: data.fullname || data.fullName || data.username || data.name || "N/A",
-      status: data.status || "Pending",
-      createdAt: data.createdAt || new Date().toISOString()
-    }));
+    const students = Object.entries(studentsRaw).map(([id, data]) => {
+      const rawEmail = (data.email || "").trim().toLowerCase();
+      const sanitizedEmail = rawEmail.replace(/\./g, ",");
+      const hasEnrollments = enrollmentsRaw[sanitizedEmail] && Object.keys(enrollmentsRaw[sanitizedEmail]).length > 0;
+      
+      return {
+        id,
+        ...data,
+        name: data.fullname || data.fullName || data.username || data.name || "N/A",
+        status: hasEnrollments ? "Enrolled" : "Pending",
+        createdAt: data.createdAt || new Date().toISOString()
+      };
+    });
 
     const trainers = Object.entries(trainersRaw).map(([id, data]) => ({
       id,
@@ -224,7 +235,7 @@ export const getDashboardStats = async (req, res) => {
     const stats = {
       totalStudents: students.length,
       activeTrainers: trainers.filter(t => !t.status || matchesStatus(t.status, ["Active", "Onboarded"])).length,
-      activeBatches: batches.filter(b => !matchesStatus(b.status, ["Completed"])).length,
+      activeBatches: batches.filter(b => matchesStatus(b.status, ["Active"])).length, 
       pendingVerifications: students.filter(s => matchesStatus(s.status, ["Pending"])).length,
       coursesCount: Object.keys(coursesRaw).length
     };
@@ -280,4 +291,37 @@ export const createBatch = async (req, res) => {
   }
 };
 
+// ✅ Get Admin Profile
+export const getAdminProfile = async (req, res) => {
+  try {
+    const adminSnap = await adminsRef.child(req.user.id).once("value");
+    if (!adminSnap.exists()) return res.status(404).json({ success: false, message: "Admin not found" });
+    
+    const adminData = adminSnap.val();
+    delete adminData.password;
+    adminData.id = req.user.id;
+    
+    res.status(200).json({ success: true, profile: adminData });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
+// ✅ Update Admin Profile
+export const updateAdminProfile = async (req, res) => {
+  try {
+    const updateData = req.body;
+    const allowedFields = ["fullName", "profileImage", "phone"];
+    const filteredData = {};
+    allowedFields.forEach(field => { if (updateData[field] !== undefined) filteredData[field] = updateData[field]; });
+
+    await adminsRef.child(req.user.id).update(filteredData);
+    const updatedSnap = await adminsRef.child(req.user.id).once("value");
+    const fullProfile = updatedSnap.val();
+    delete fullProfile.password;
+
+    res.status(200).json({ success: true, message: "Profile updated successfully", profile: fullProfile });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
