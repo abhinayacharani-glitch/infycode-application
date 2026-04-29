@@ -1,30 +1,25 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate, useLocation }                        from 'react-router-dom';
-import { ShieldCheck, RefreshCw }                          from 'lucide-react';
-
-import AuthLayout   from '../components/AuthLayout';
-import AuthFormCard from '../components/AuthFormCard';
-import PageWrapper  from '../components/PageWrapper';
-import "../styles/Login.css";
+import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { ShieldCheck, RefreshCw, ArrowLeft } from 'lucide-react';
 import { studentVerifyRegistrationOTP, studentVerifyResetOTP, studentForgotPassword } from '../../services/api';
+import ModernAuthLayout from '../components/ModernAuthLayout';
+import "../styles/ModernAuth.css";
 
-
-const OTP_DIGITS    = 6;
+const OTP_DIGITS = 6;
 const TIMER_SECONDS = 60;
 
 const VerifyOtp = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { email = '', type = 'registration' } = location.state || {}; // type can be 'registration' or 'password-reset'
+  const { email = '', type = 'registration' } = location.state || {};
 
-
-  const [otp,       setOtp      ] = useState(Array(OTP_DIGITS).fill(''));
-  const [timeLeft,  setTimeLeft ] = useState(TIMER_SECONDS);
-  const [expired,   setExpired  ] = useState(false);
-  const [loading,   setLoading  ] = useState(false);
+  const [otp, setOtp] = useState(Array(OTP_DIGITS).fill(''));
+  const [timeLeft, setTimeLeft] = useState(TIMER_SECONDS);
+  const [expired, setExpired] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
-  const [error,     setError    ] = useState('');
-  const [successMsg,setSuccessMsg] = useState(location.state?.message || '');
+  const [error, setError] = useState('');
+  const [successMsg, setSuccessMsg] = useState(location.state?.message || '');
   const inputRefs = useRef([]);
 
   /* Timer */
@@ -33,27 +28,6 @@ const VerifyOtp = () => {
     const id = setInterval(() => setTimeLeft(t => t - 1), 1000);
     return () => clearInterval(id);
   }, [timeLeft]);
-
-  /* Auto-redirect on Expiry */
-  useEffect(() => {
-    if (expired) {
-      const timeout = setTimeout(() => {
-        navigate('/student/login', { replace: true });
-      }, 3000);
-      return () => clearTimeout(timeout);
-    }
-  }, [expired, navigate]);
-
-  /* Back-button guard */
-  useEffect(() => {
-    const guard = () => {
-      window.history.pushState(null, '', window.location.href);
-      window.location.replace('/student/login');
-    };
-    window.history.pushState(null, '', window.location.href);
-    window.addEventListener('popstate', guard);
-    return () => window.removeEventListener('popstate', guard);
-  }, []);
 
   /* Auto-dismiss success banner */
   useEffect(() => {
@@ -68,17 +42,18 @@ const VerifyOtp = () => {
   const getTimerColor = (s) =>
     s > 30 ? '#10b981' : s > 10 ? '#f59e0b' : '#ef4444';
 
-  /* OTP input handlers */
   const handleOtpChange = (i, val) => {
     if (!/^\d?$/.test(val)) return;
     const next = [...otp]; next[i] = val; setOtp(next); setError('');
     if (val && i < OTP_DIGITS - 1) inputRefs.current[i + 1]?.focus();
   };
+
   const handleKeyDown = (i, e) => {
     if (e.key === 'Backspace' && !otp[i] && i > 0) inputRefs.current[i - 1]?.focus();
-    if (e.key === 'ArrowLeft'  && i > 0)            inputRefs.current[i - 1]?.focus();
-    if (e.key === 'ArrowRight' && i < OTP_DIGITS-1) inputRefs.current[i + 1]?.focus();
+    if (e.key === 'ArrowLeft' && i > 0) inputRefs.current[i - 1]?.focus();
+    if (e.key === 'ArrowRight' && i < OTP_DIGITS - 1) inputRefs.current[i + 1]?.focus();
   };
+
   const handlePaste = (e) => {
     e.preventDefault();
     const pasted = e.clipboardData.getData('text').replace(/\D/g,'').slice(0, OTP_DIGITS);
@@ -88,7 +63,6 @@ const VerifyOtp = () => {
     inputRefs.current[Math.min(pasted.length, OTP_DIGITS - 1)]?.focus();
   };
 
-  /* Verify OTP — uses studentVerifyOTP from api.js */
   const handleVerify = async () => {
     const code = otp.join('');
     if (code.length < OTP_DIGITS) { setError('Please enter the complete 6-digit OTP'); return; }
@@ -100,20 +74,16 @@ const VerifyOtp = () => {
           state: { otpVerified: true, email, resetToken: data.token },
         });
       } else {
-        // Default to registration
         await studentVerifyRegistrationOTP(email, code);
-        alert('Registration successful! Please login.');
-        navigate('/student/login', { replace: true });
+        navigate('/student/login', { state: { fromRegister: true }, replace: true });
       }
     } catch (err) {
-
       setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  /* Resend OTP — uses studentForgotPassword (same endpoint, re-generates OTP) */
   const handleResend = useCallback(async () => {
     if (resending || loading) return;
     setResending(true); setError(''); setSuccessMsg('');
@@ -131,103 +101,84 @@ const VerifyOtp = () => {
   }, [email, resending, loading]);
 
   return (
-    <PageWrapper>
-      <div className="studentLogin-wrapper">
-        <div className="studentLogin-container studentLogin-active">
-          <div className="studentLogin-form-container studentLogin-sign-up">
-            <form className="sa-form" onSubmit={(e) => e.preventDefault()}>
-              <h1 className="sa-form-heading">Verify OTP</h1>
-              <p  className="sa-form-sub">
-                {email
-                  ? <>6-digit code sent to <strong>{email}</strong></>
-                  : 'Enter the 6-digit OTP sent to your email'}
-              </p>
-
-              {/* Success banner */}
-              {successMsg && !error && (
-                <div className="sa-banner sa-banner--success" style={{ marginBottom: 12 }}>
-                  <ShieldCheck size={14} /><span>{successMsg}</span>
-                </div>
-              )}
-              {/* Expired banner */}
-              {expired && (
-                <div className="sa-banner sa-banner--error" style={{ marginBottom: 12 }}>
-                  <span>OTP has expired. Please request a new one.</span>
-                </div>
-              )}
-
-              {/* OTP digit inputs */}
-              <div className="sa-otp-wrap">
-                {otp.map((digit, i) => (
-                  <input
-                    key={i}
-                    ref={(el) => (inputRefs.current[i] = el)}
-                    type="text" inputMode="numeric" maxLength={1}
-                    value={digit}
-                    onChange={(e) => handleOtpChange(i, e.target.value)}
-                    onKeyDown={(e)  => handleKeyDown(i, e)}
-                    onPaste={i === 0 ? handlePaste : undefined}
-                    className={`sa-otp-digit${error ? ' sa-otp-digit--error':''}${digit ? ' sa-otp-digit--filled':''}`}
-                    disabled={loading || expired}
-                    autoFocus={i === 0}
-                    aria-label={`OTP digit ${i + 1}`}
-                  />
-                ))}
-              </div>
-
-              {error && (
-                <span className="sa-error-text" style={{ textAlign:'center', display:'block', width: '100%' }}>
-                  {error}
-                </span>
-              )}
-
-              {/* Timer */}
-              <div className="sa-otp-timer">
-                {expired
-                  ? 'OTP has expired'
-                  : <>Expires in <span className="sa-otp-timer__count" style={{ color: getTimerColor(timeLeft) }}>{formatTime(timeLeft)}</span></>}
-              </div>
-
-              {/* Verify + Resend buttons */}
-              <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', width: '100%', marginTop: '16px' }}>
-                <button
-                  type="button"
-                  className="sa-submit-btn"
-                  style={{ width: '160px', flex: '0 0 auto', margin: 0, height: '44px', whiteSpace: 'nowrap', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  onClick={handleVerify}
-                  disabled={loading || expired}
-                >
-                  {loading
-                    ? <span className="sa-btn-inner"><span className="sa-spinner" />VERIFYING...</span>
-                    : 'Verify OTP'}
-                </button>
-                <button
-                  type="button"
-                  className="sa-submit-btn"
-                  style={{ width: '160px', flex: '0 0 auto', margin: 0, height: '44px', whiteSpace: 'nowrap', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  onClick={handleResend}
-                  disabled={resending || loading}
-                >
-                  {resending
-                    ? <span className="sa-btn-inner"><RefreshCw size={14} style={{ animation: 'saSpin 0.7s linear infinite' }} /></span>
-                    : <span className="sa-btn-inner"><RefreshCw size={14} style={{ marginRight: 6 }} />Resend OTP</span>}
-                </button>
-              </div>
-            </form>
-          </div>
-
-          <div className="studentLogin-toggle-container">
-            <div className="studentLogin-toggle">
-              <div className="studentLogin-toggle-panel studentLogin-toggle-left">
-                <h1>Verify OTP</h1>
-                <p>Enter the OTP sent to your email to continue</p>
-                <button className="studentLogin-hidden" onClick={() => navigate('/student/login')} type="button">Back to Login</button>
-              </div>
-            </div>
-          </div>
+    <ModernAuthLayout 
+      title="Verify OTP"
+      subtitle={email ? <>6-digit code sent to <strong>{email}</strong></> : 'Enter the 6-digit OTP sent to your email'}
+    >
+      {/* Success banner */}
+      {successMsg && !error && (
+        <div className="auth-alert auth-alert-success">
+          <ShieldCheck size={15} /><span>{successMsg}</span>
         </div>
+      )}
+      
+      {/* Error banner */}
+      {error && (
+        <div className="auth-alert auth-alert-error">
+          <span>{error}</span>
+        </div>
+      )}
+
+      {/* Expired banner */}
+      {expired && (
+        <div className="auth-alert auth-alert-error">
+          <span>OTP has expired. Please request a new one.</span>
+        </div>
+      )}
+
+      <form onSubmit={(e) => e.preventDefault()}>
+        <div className="otp-inputs-row">
+          {otp.map((digit, i) => (
+            <input
+              key={i}
+              ref={(el) => (inputRefs.current[i] = el)}
+              type="text" inputMode="numeric" maxLength={1}
+              value={digit}
+              onChange={(e) => handleOtpChange(i, e.target.value)}
+              onKeyDown={(e) => handleKeyDown(i, e)}
+              onPaste={i === 0 ? handlePaste : undefined}
+              className="otp-input"
+              disabled={loading || expired}
+              autoFocus={i === 0}
+            />
+          ))}
+        </div>
+
+        <div style={{ textAlign: 'center', marginBottom: '24px', fontSize: '14px' }}>
+          {expired
+            ? <span style={{ color: '#ef4444' }}>OTP has expired</span>
+            : <>Expires in <span style={{ color: getTimerColor(timeLeft), fontWeight: 700 }}>{formatTime(timeLeft)}</span></>}
+        </div>
+
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button
+            type="button"
+            className="submit-button"
+            style={{ flex: 1 }}
+            onClick={handleVerify}
+            disabled={loading || expired}
+          >
+            {loading ? <><span className="spinner" /> Verifying...</> : 'Verify OTP'}
+          </button>
+          
+          <button
+            type="button"
+            className="submit-button"
+            style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
+            onClick={handleResend}
+            disabled={resending || loading}
+          >
+            {resending ? <RefreshCw size={17} className="spinner" /> : <><RefreshCw size={17} /> Resend</>}
+          </button>
+        </div>
+      </form>
+
+      <div style={{ textAlign: 'center' }}>
+        <Link to="/student/login" className="back-home">
+          <ArrowLeft size={14} /> Back to Sign In
+        </Link>
       </div>
-    </PageWrapper>
+    </ModernAuthLayout>
   );
 };
 

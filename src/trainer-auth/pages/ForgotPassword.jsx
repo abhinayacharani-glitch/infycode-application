@@ -1,14 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail } from 'lucide-react';
+import { Mail, ArrowLeft } from 'lucide-react';
 import { validateEmail } from '../utils/validation';
 import { sendOTP } from '../../services/api';
-import '../styles/login.css';
-import '../styles/trainerForgot.css';
+import ModernAuthLayout from '../../student-auth/components/ModernAuthLayout';
+import "../../student-auth/styles/ModernAuth.css";
 
 const ForgotPassword = () => {
   const navigate = useNavigate();
-
 
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
@@ -34,71 +33,45 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="auth-wrapper">
-      <div className="auth-card">
+    <ModernAuthLayout 
+      title="Forgot Password?"
+      subtitle="Enter your registered email to receive an OTP."
+    >
+      {error && (
+        <div className="auth-alert auth-alert-error">
+          {error}
+        </div>
+      )}
 
-        {/* ── LEFT: Branded Visual ── */}
-        <div className="auth-image-section">
-          <img src="/mnt/data/a2b9b7ca-6bdc-4eb8-96f3-d8165e900f1f.png" alt="" className="auth-image" />
-          <div className="auth-image-overlay" />
-          <div className="auth-image-content">
-            <h2 className="auth-tagline">
-              Forgot Your
-              <span>Password?</span>
-            </h2>
-            <p className="auth-tagline-sub">
-              No worries — we'll send you a secure OTP right away.
-            </p>
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="fp-email">Email Address</label>
+          <div className="input-container">
+            <Mail size={17} className="input-icon" />
+            <input
+              id="fp-email"
+              type="email"
+              placeholder="name@example.com"
+              value={email}
+              onChange={(e) => { setEmail(e.target.value); setError(''); }}
+              className="auth-input"
+              autoComplete="email"
+              disabled={isLoading}
+            />
           </div>
         </div>
 
-        {/* ── RIGHT: Form ── */}
-        <div className="auth-form-section">
-          <div className="auth-header">
-            <h1>Forgot Password</h1>
-            <p>Enter your registered email to receive an OTP.</p>
-          </div>
+        <button type="submit" className="submit-button" disabled={isLoading}>
+          {isLoading ? <><span className="spinner" /> Sending OTP...</> : 'Send OTP →'}
+        </button>
+      </form>
 
-          <form className="auth-form" onSubmit={handleSubmit}>
-
-            <div className="form-group">
-              <label htmlFor="fp-email">Email Address</label>
-              <div className="input-wrapper">
-                <Mail size={17} className="input-icon" />
-                <input
-                  id="fp-email"
-                  type="email"
-                  placeholder="name@example.com"
-                  value={email}
-                  onChange={(e) => { setEmail(e.target.value); setError(''); }}
-                  className={error ? 'error' : ''}
-                  autoComplete="email"
-                  disabled={isLoading}
-                />
-              </div>
-            </div>
-
-            {error && <span className="error-text">{error}</span>}
-
-            <button type="submit" className="submit-btn" disabled={isLoading}>
-              {isLoading ? 'Sending OTP…' : 'Send OTP'}
-            </button>
-          </form>
-
-          <div className="auth-footer">
-            Remembered your password?
-            <Link 
-              to="/trainer/login"
-              onClick={(e) => {
-                e.preventDefault();
-                navigate(-1);
-              }}
-            >Back to Login</Link>
-          </div>
-        </div>
-
+      <div style={{ textAlign: 'center' }}>
+        <Link to="/trainer/login" className="back-home">
+          <ArrowLeft size={14} /> Back to Sign In
+        </Link>
       </div>
-    </div>
+    </ModernAuthLayout>
   );
 };
 
