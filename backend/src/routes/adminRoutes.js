@@ -21,5 +21,9 @@ router.put("/profile", verifyToken, checkRole(["admin"]), updateAdminProfile);
 
 // ✅ Admin Trainer Management (protected — admin only)
 router.put("/trainers/:id/status", verifyToken, checkRole(["admin"]), updateApplicationStatus);
+import { markAllStudentResultsAsSeen } from "../controllers/studentController.js";
+
+// ✅ Admin Student Results Management (protected — admin only)
+router.put("/student-results/mark-seen", verifyToken, checkRole(["admin"]), markAllStudentResultsAsSeen);
 
 export default router;

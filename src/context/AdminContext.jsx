@@ -11,7 +11,8 @@ import {
   publishNewFAQ,
   getAdminProfileAPI,
   updateAdminProfileAPI,
-  updateTrainerApplicationStatusAPI
+  updateTrainerApplicationStatusAPI,
+  markAllStudentResultsAsSeenAPI
 } from '../services/api';
 
 const AdminContext = createContext();
@@ -47,6 +48,8 @@ export const AdminProvider = ({ children }) => {
     activeBatches: 0,
     trainers: { active: 0, pending: 0 },
     coursesCount: 0,
+    pendingCounsellingRequests: 0,
+    pendingStudentResults: 0
   });
 
   // --- ACTIONS ---
@@ -60,11 +63,53 @@ export const AdminProvider = ({ children }) => {
   };
 
   const updateTrainerStatus = async (id, action) => {
+    const targetTrainer = trainers.find(t => t.id === id);
+    if (!targetTrainer) return;
+
+    const stages = ['Applied', 'Screening', 'Interview', 'Selected', 'Onboarded'];
+    let newStatus = targetTrainer.status;
+    let newPrevStatus = targetTrainer.prevStatus;
+
+    if (action === 'hold') {
+      if (targetTrainer.status === 'Hold') {
+        newStatus = targetTrainer.prevStatus || 'Applied';
+      } else {
+        newPrevStatus = targetTrainer.status;
+        newStatus = 'Hold';
+      }
+    } else if (action === 'reject') {
+      newStatus = 'Rejected';
+    } else if (action === 'next') {
+      const baseStatus = targetTrainer.status === 'Hold' ? (targetTrainer.prevStatus || 'Applied') : targetTrainer.status;
+      const currentIndex = stages.indexOf(baseStatus);
+      if (currentIndex < stages.length - 1) {
+        newStatus = stages[currentIndex + 1];
+        newPrevStatus = newStatus;
+      }
+    }
+
+    // Apply Optimistic Update
+    setTrainers(prev => prev.map(t => t.id === id ? { ...t, status: newStatus, prevStatus: newPrevStatus } : t));
+    
+    if (targetTrainer.status === 'Applied' && newStatus !== 'Applied') {
+      setStats(prev => ({
+        ...prev,
+        trainers: { ...prev.trainers, pending: Math.max(0, prev.trainers.pending - 1) }
+      }));
+    }
+
     try {
-      await updateTrainerApplicationStatusAPI(id, action);
-      await fetchDashboardStats();
+      // Fire API call in background
+      updateTrainerApplicationStatusAPI(id, action).then(() => {
+        // Sync full stats silently in the background after success
+        fetchDashboardStats();
+      }).catch(error => {
+        throw error;
+      });
     } catch (error) {
       console.error('Error updating trainer status:', error);
+      // Revert Optimistic Update on failure
+      setTrainers(prev => prev.map(t => t.id === id ? { ...t, status: targetTrainer.status, prevStatus: targetTrainer.prevStatus } : t));
       alert(error.message || 'Failed to update trainer status');
     }
   };
@@ -211,6 +256,7 @@ export const AdminProvider = ({ children }) => {
         setAdminData(prev => ({ ...prev, ...response.profile }));
         const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
         localStorage.setItem('user', JSON.stringify({ ...currentUser, ...response.profile }));
+        window.dispatchEvent(new Event('adminProfileUpdate'));
       }
     } catch (error) {
       console.error("Error fetching admin profile:", error);
@@ -227,6 +273,10 @@ export const AdminProvider = ({ children }) => {
         setAdminData(prev => ({ ...prev, ...response.profile }));
         const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
         localStorage.setItem('user', JSON.stringify({ ...currentUser, ...response.profile }));
+        
+        // Notify other components (Sidebar, Topbar) that profile has changed
+        window.dispatchEvent(new Event('adminProfileUpdate'));
+        
         return response;
       }
     } catch (error) {
@@ -249,9 +299,11 @@ export const AdminProvider = ({ children }) => {
         activeBatches: apiStats?.activeBatches || 0,
         trainers: {
           active: apiStats?.activeTrainers || 0,
-          pending: (apiTrainers?.length || 0) - (apiStats?.activeTrainers || 0)
+          pending: apiStats?.pendingTrainers || 0
         },
         coursesCount: apiStats?.coursesCount || 0,
+        pendingCounsellingRequests: apiStats?.pendingCounsellingRequests || 0,
+        pendingStudentResults: apiStats?.pendingStudentResults || 0
       });
 
       if (apiStudents) setStudents(apiStudents);
@@ -261,7 +313,18 @@ export const AdminProvider = ({ children }) => {
 
       console.log("Frontend: Successfully synchronized with Live Firebase data.");
     } catch (error) {
-      console.error("Frontend: Error fetching live dashboard data:", error.message);
+      console.log("Frontend: Error fetching live dashboard data:", error.message);
+    }
+  };
+
+  const markAllStudentResultsAsSeen = async () => {
+    try {
+      if (stats.pendingStudentResults > 0) {
+        await markAllStudentResultsAsSeenAPI();
+        fetchDashboardStats();
+      }
+    } catch (error) {
+      console.error("Error marking student results as seen:", error);
     }
   };
 
@@ -312,7 +375,8 @@ export const AdminProvider = ({ children }) => {
     loadPendingFAQs,
     adminData,
     updateAdminProfile,
-    fetchAdminProfile
+    fetchAdminProfile,
+    markAllStudentResultsAsSeen
   };
 
   return <AdminContext.Provider value={value}>{children}</AdminContext.Provider>;

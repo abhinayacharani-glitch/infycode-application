@@ -63,7 +63,7 @@ const MessageIcon = () => (
 const Sidebar = ({ isCollapsed, externalShowLogoutModal, setExternalShowLogoutModal }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { pendingFAQs } = useAdmin();
+  const { pendingFAQs, stats } = useAdmin();
   const loggedUser = JSON.parse(localStorage.getItem("user") || "{}");
   const userName = loggedUser.fullName || loggedUser.fullname || loggedUser.username || "Admin";
 
@@ -131,13 +131,13 @@ const Sidebar = ({ isCollapsed, externalShowLogoutModal, setExternalShowLogoutMo
           <NavLink to="/admin-dashboard/trainer-approval" className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`} title="Trainer Approval" data-tooltip="Trainer Approval">
             <span className="adm-nav-icon"><UserPlusIcon /></span>
             {!isCollapsed && <span className="adm-nav-label">Trainer Approval</span>}
-            {!isCollapsed && <span className="adm-nav-badge green">3</span>}
+            {!isCollapsed && stats.trainers.pending > 0 && <span className="adm-nav-badge green">{stats.trainers.pending}</span>}
           </NavLink>
 
           <NavLink to="/admin-dashboard/student-verification" className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`} title="Register Profiles" data-tooltip="Register Profiles">
             <span className="adm-nav-icon"><UserCheckIcon /></span>
             {!isCollapsed && <span className="adm-nav-label">Register Profiles</span>}
-            {!isCollapsed && <span className="adm-nav-badge amber">12</span>}
+            {!isCollapsed && stats.totalStudents.pending > 0 && <span className="adm-nav-badge amber">{stats.totalStudents.pending}</span>}
           </NavLink>
 
           <NavLink to="/admin-dashboard/course-config" className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`} title="Course management" data-tooltip="Course management">
@@ -158,11 +158,13 @@ const Sidebar = ({ isCollapsed, externalShowLogoutModal, setExternalShowLogoutMo
           <NavLink to="/admin-dashboard/student-results" className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`} title="Student results" data-tooltip="Student results">
             <span className="adm-nav-icon"><FileIcon /></span>
             {!isCollapsed && <span className="adm-nav-label">Student results</span>}
+            {!isCollapsed && stats.pendingStudentResults > 0 && <span className="adm-nav-badge green">{stats.pendingStudentResults}</span>}
           </NavLink>
 
           <NavLink to="/admin-dashboard/counselling-requests" className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`} title="Counselling request" data-tooltip="Counselling request">
             <span className="adm-nav-icon"><MessageIcon /></span>
             {!isCollapsed && <span className="adm-nav-label">Counselling request</span>}
+            {!isCollapsed && stats.pendingCounsellingRequests > 0 && <span className="adm-nav-badge blue">{stats.pendingCounsellingRequests}</span>}
           </NavLink>
 
           <NavLink to="/admin-dashboard/analytics" className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`} title="Analytics & Monitoring" data-tooltip="Analytics & Monitoring">

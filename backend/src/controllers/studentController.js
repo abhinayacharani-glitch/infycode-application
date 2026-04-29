@@ -50,6 +50,9 @@ export const saveTestResult = async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid testType" });
     }
 
+    // Set isSeen to false so admin gets a notification
+    updates["testResults/isSeen"] = false;
+
     await studentRef.update(updates);
 
     res.status(200).json({ success: true, message: "Test results saved successfully" });
@@ -320,11 +323,40 @@ export const updateStudentProfile = async (req, res) => {
     res.status(200).json({ success: true, message: "Profile updated successfully." });
 
   } catch (error) {
-    console.error("[updateStudentProfile] FATAL:", error.message);
     res.status(500).json({
       success: false,
       message: "Server error: " + error.message
     });
+  }
+};
+
+/**
+ * @desc Mark all student test results as seen (Admin only)
+ * @route PUT /api/admin/student-results/mark-seen
+ */
+export const markAllStudentResultsAsSeen = async (req, res) => {
+  try {
+    const snapshot = await studentsRef.once("value");
+    if (!snapshot.exists()) {
+      return res.json({ success: true, message: "No students found" });
+    }
+
+    const updates = {};
+    snapshot.forEach((child) => {
+      const student = child.val();
+      if (student.testResults && student.testResults.isSeen === false) {
+        updates[`${child.key}/testResults/isSeen`] = true;
+      }
+    });
+
+    if (Object.keys(updates).length > 0) {
+      await studentsRef.update(updates);
+    }
+
+    res.json({ success: true, message: "All student results marked as seen" });
+  } catch (error) {
+    console.error("Error marking student results as seen:", error);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
