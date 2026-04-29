@@ -2,8 +2,12 @@ import express from "express";
 const router = express.Router();
 
 import { trainerRegister, trainerVerifyOtp, trainerDashboard, getTrainerProfile, updateTrainerProfile } from "../controllers/trainerRegController.js";
+import { submitApplication } from "../controllers/trainerApplicationController.js";
 import { verifyToken, isTrainer } from "../middleware/authMiddleware.js";
 import { checkRole } from "../middleware/roleMiddleware.js";
+
+// ✅ Trainer Application Form — POST /api/trainer/apply (public)
+router.post("/apply", submitApplication);
 
 // ✅ Trainer Register  — POST /api/trainer/register
 // Accepts: { email, password } — email MUST end with @trainer.com

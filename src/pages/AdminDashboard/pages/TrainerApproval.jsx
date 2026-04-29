@@ -16,6 +16,7 @@ const TrainerApproval = () => {
       case 'Selected': return '#10b981';
       case 'Onboarded': return '#8b5cf6';
       case 'Hold': return '#ef4444';
+      case 'Rejected': return '#e11d48';
       default: return '#ccc';
     }
   };
@@ -36,40 +37,65 @@ const TrainerApproval = () => {
             <thead>
               <tr>
                 <th>Trainer Name</th>
-                <th>Expertise</th>
                 <th>Current Stage</th>
-                <th>Progress</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {trainers.map(trainer => (
                 <tr key={trainer.id}>
-                  <td>
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                      <span style={{ fontWeight: '600' }}>{trainer.name}</span>
-                      <span style={{ fontSize: '12px', color: '#666' }}>{trainer.specialty}</span>
+                  <td style={{ padding: '24px 12px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span style={{ fontWeight: '600', fontSize: '15px' }}>{trainer.name}</span>
+                        <span style={{ fontSize: '13px', color: '#666' }}>{trainer.specialty}</span>
+                      </div>
+                      <div style={{ position: 'relative', marginTop: '16px', width: '380px' }}>
+                        <div style={{ position: 'absolute', top: '10px', left: 0, right: 0, height: '2px', background: '#e2e8f0', zIndex: 0 }}></div>
+                        <div style={{
+                          position: 'absolute', top: '10px', left: 0,
+                          width: `${Math.max(0, (stages.indexOf(trainer.status === 'Hold' ? (trainer.prevStatus || 'Applied') : trainer.status) / (stages.length - 1))) * 100}%`,
+                          height: '2px', background: getStatusColor(trainer.status), zIndex: 1,
+                          transition: 'width 0.4s ease'
+                        }}></div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', zIndex: 2, position: 'relative' }}>
+                          {stages.map((stage, idx) => {
+                            const currentStageIdx = stages.indexOf(trainer.status === 'Hold' ? (trainer.prevStatus || 'Applied') : trainer.status);
+                            const isCompleted = currentStageIdx >= idx;
+                            const isCurrent = trainer.status === stage;
+                            return (
+                              <div key={stage} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
+                                <div style={{
+                                  width: '20px', height: '20px', borderRadius: '50%',
+                                  background: isCompleted ? getStatusColor(stage) : 'white',
+                                  border: `2px solid ${isCompleted ? getStatusColor(stage) : '#e2e8f0'}`,
+                                  display: 'flex', justifyContent: 'center', alignItems: 'center',
+                                  color: isCompleted ? 'white' : '#666', fontWeight: 'bold', fontSize: '10px',
+                                  transition: 'all 0.3s ease'
+                                }}>
+                                  {isCompleted && currentStageIdx > idx ? '✓' : idx + 1}
+                                </div>
+                                <span style={{
+                                  marginTop: '4px', fontSize: '9px', fontWeight: isCurrent ? 'bold' : '500',
+                                  color: isCurrent ? 'var(--text-dark)' : '#94a3b8',
+                                  textAlign: 'center'
+                                }}>{stage}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
                     </div>
                   </td>
-                  <td>{trainer.specialty}</td>
-                  <td>
+                  <td style={{ padding: '24px 12px' }}>
                     <span className="badge" style={{
                       background: getStatusColor(trainer.status) + '15',
                       color: getStatusColor(trainer.status),
-                      border: `1px solid ${getStatusColor(trainer.status)}`
+                      border: `1px solid ${getStatusColor(trainer.status)}`,
+                      padding: '6px 12px'
                     }}>{trainer.status}</span>
                   </td>
-                  <td style={{ width: '200px' }}>
-                    <div style={{ width: '100%', background: '#f1f5f9', height: '8px', borderRadius: '4px', overflow: 'hidden' }}>
-                      <div style={{
-                        width: `${trainer.progress}%`,
-                        background: getStatusColor(trainer.status),
-                        height: '100%',
-                        transition: 'width 0.4s ease'
-                      }}></div>
-                    </div>
-                  </td>
-                  <td>
+                  <td style={{ padding: '24px 12px' }}>
                     <div style={{ display: 'flex', gap: '6px' }}>
                       <button
                         className="btn-secondary btn-small"
@@ -81,12 +107,6 @@ const TrainerApproval = () => {
                           className="badge active-b"
                           onClick={() => updateTrainerStatus(trainer.id, 'next')}
                         >Promote</button>
-                      )}
-                      {trainer.status !== 'Applied' && (
-                        <button
-                          className="badge offline"
-                          onClick={() => updateTrainerStatus(trainer.id, 'prev')}
-                        >Demote</button>
                       )}
                     </div>
                   </td>
@@ -151,6 +171,11 @@ const TrainerApproval = () => {
                       marginTop: '8px', fontSize: '12px', fontWeight: isCurrent ? 'bold' : '500',
                       color: isCurrent ? 'var(--text-dark)' : '#94a3b8'
                     }}>{stage}</span>
+                    {isCurrent && (
+                      <span style={{ fontSize: '10px', color: getStatusColor(stage), fontWeight: '600', marginTop: '2px', textAlign: 'center' }}>
+                        {viewingTrainer.name}
+                      </span>
+                    )}
                   </div>
                 );
               })}
@@ -160,10 +185,21 @@ const TrainerApproval = () => {
               <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '8px' }}>
                 <h4 style={{ marginTop: 0 }}>Application Summary</h4>
                 <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr', gap: '12px', fontSize: '14px' }}>
-                  <div style={{ color: '#64748b' }}>Experience:</div><div>8+ Years</div>
-                  <div style={{ color: '#64748b' }}>Skills:</div><div>React, Node.js, AWS, Kubernetes</div>
-                  <div style={{ color: '#64748b' }}>Location:</div><div>Remote</div>
-                  <div style={{ color: '#64748b' }}>Resume:</div><div style={{ color: 'var(--blue-600)', cursor: 'pointer' }}>📄 View PDF Attachment</div>
+                  <div style={{ color: '#64748b' }}>Experience:</div><div>{viewingTrainer.experience} Years</div>
+                  <div style={{ color: '#64748b' }}>Skills:</div><div>{viewingTrainer.specialty}</div>
+                  <div style={{ color: '#64748b' }}>Location:</div><div>{viewingTrainer.location || 'Not provided'}</div>
+                  <div style={{ color: '#64748b' }}>Resume:</div>
+                  <div>
+                    {viewingTrainer.resume ? (
+                      <a 
+                        href={viewingTrainer.resume} 
+                        download={`Resume_${viewingTrainer.name.replace(/\s+/g, '_')}.pdf`}
+                        style={{ color: 'var(--blue-600)', cursor: 'pointer', textDecoration: 'none', fontWeight: '600' }}
+                      >📄 Download PDF Resume</a>
+                    ) : (
+                      <span style={{ color: '#94a3b8' }}>No resume uploaded</span>
+                    )}
+                  </div>
                 </div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -171,13 +207,23 @@ const TrainerApproval = () => {
                   className="btn-primary"
                   style={{ width: '100%', margin: 0 }}
                   onClick={() => updateTrainerStatus(viewingTrainer.id, 'next')}
-                  disabled={viewingTrainer.status === 'Onboarded'}
+                  disabled={viewingTrainer.status === 'Onboarded' || viewingTrainer.status === 'Rejected'}
                 >Promote Stage</button>
                 <button
                   className="btn-secondary"
                   style={{ width: '100%', margin: 0, color: '#e11d48', borderColor: '#fecdd3' }}
                   onClick={() => updateTrainerStatus(viewingTrainer.id, 'hold')}
                 >{viewingTrainer.status === 'Hold' ? 'Release Hold' : 'Hold'}</button>
+                <button
+                  className="btn-secondary"
+                  style={{ width: '100%', margin: 0, color: '#e11d48', border: '1px solid #fecdd3', background: '#fff1f2' }}
+                  onClick={() => {
+                    if (window.confirm("Are you sure you want to reject this trainer?")) {
+                      updateTrainerStatus(viewingTrainer.id, 'reject');
+                    }
+                  }}
+                  disabled={viewingTrainer.status === 'Rejected'}
+                >Reject</button>
                 <button
                   className="btn-secondary"
                   style={{ width: '100%', margin: 0 }}
