@@ -5,6 +5,7 @@ import { validateEmail, validatePassword, validateFullName, validatePhone } from
 import { studentLogin, studentRegister, studentVerifyRegistrationOTP, resendRegistrationOTP } from "../../services/api";
 import logoIcon from "../../assets/infycode-final-logo4-1.png";
 import logoText from "../../assets/color-logo-3.jpeg";
+import LoginBackground from "../components/LoginBackground";
 import "../styles/Login.css";
 
 function Login() {
@@ -127,31 +128,8 @@ function Login() {
 
   return (
     <div className="lp-root">
-      {/* ── ANIMATED BACKGROUND ── */}
-      <div className="lp-bg">
-        <div className="lp-grad" />
-        {/* Particles */}
-        {[...Array(40)].map((_, i) => (
-          <div 
-            key={i} 
-            className={`lp-particle lp-particle-${['sm','md','lg'][i % 3]}`} 
-            style={{ 
-              left: `${Math.random() * 100}%`, 
-              top: `${Math.random() * 100}%`,
-              '--del': `${Math.random() * 10}s`,
-              '--dur': `${10 + Math.random() * 10}s`
-            }} 
-          />
-        ))}
-        {/* Floating geometric shapes */}
-        {[...Array(18)].map((_, i) => (
-          <div key={i} className={`lp-shape lp-shape-${(i % 4) + 1}`} style={{ '--i': i }} />
-        ))}
-        {/* Floating orbs */}
-        <div className="lp-orb lp-orb-a" />
-        <div className="lp-orb lp-orb-b" />
-        <div className="lp-orb lp-orb-c" />
-      </div>
+      {/* ── NEW INTERACTIVE BACKGROUND ── */}
+      <LoginBackground />
 
       {/* ── OTP POPUP ── */}
       {showOTP && (
@@ -204,13 +182,13 @@ function Login() {
           </div>
         </div>
 
-        {/* RIGHT — Form */}
+        {/* RIGHT — Form with Flip Effect */}
         <div className="lp-right">
-          <div className="lp-card">
-
-            {/* SIGN IN */}
-            {!isActive && (
-              <>
+          <div className={`lp-flip-container ${isActive ? "is-flipped" : ""}`}>
+            <div className="lp-flip-inner">
+              
+              {/* FRONT SIDE — SIGN IN */}
+              <div className="lp-card lp-card-front">
                 <div className="lp-card-header">
                   <h1>Welcome Back</h1>
                   <p>Sign in to continue your journey</p>
@@ -251,12 +229,10 @@ function Login() {
                 <div className="lp-card-footer">
                   <Link to="/" className="lp-back"><ArrowLeft size={14} /> Back to Home</Link>
                 </div>
-              </>
-            )}
+              </div>
 
-            {/* SIGN UP */}
-            {isActive && (
-              <>
+              {/* BACK SIDE — SIGN UP */}
+              <div className="lp-card lp-card-back">
                 <div className="lp-card-header">
                   <h1>Create Account</h1>
                   <p>Join 10,000+ students transforming their careers</p>
@@ -328,9 +304,9 @@ function Login() {
                 <div className="lp-card-footer">
                   <Link to="/" className="lp-back"><ArrowLeft size={14} /> Back to Home</Link>
                 </div>
-              </>
-            )}
+              </div>
 
+            </div>
           </div>
         </div>
       </div>
