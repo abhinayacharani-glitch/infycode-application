@@ -141,6 +141,14 @@ export const getAdminStudentResults = () => {
   });
 };
 
+export const markAllStudentResultsAsSeenAPI = () => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return request('/api/admin/student-results/mark-seen', {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${user.token || ''}` },
+  });
+};
+
 // ─────────────────────────────────────────────
 // STUDENT AUTH
 // ─────────────────────────────────────────────

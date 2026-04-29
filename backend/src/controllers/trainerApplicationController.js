@@ -29,6 +29,7 @@ export const submitApplication = async (req, res) => {
       resume, // Base64 string
       status: 'Applied',
       progress: 0,
+      isSeen: false, // Notification badge flag
       createdAt: new Date().toISOString()
     };
 
@@ -139,7 +140,12 @@ export const updateApplicationStatus = async (req, res) => {
       }
     }
 
-    await trainersRef.child(id).update({ status: newStatus, progress: newProgress, prevStatus: newStatus });
+    await trainersRef.child(id).update({ 
+      status: newStatus, 
+      progress: newProgress, 
+      prevStatus: newStatus,
+      isSeen: true // Clear from notifications once acted upon
+    });
 
     if (sendNotifyEmail) {
       await sendEmail({
@@ -152,6 +158,33 @@ export const updateApplicationStatus = async (req, res) => {
     res.json({ success: true, message: `Trainer updated to ${newStatus}`, status: newStatus });
   } catch (error) {
     console.error("Error updating trainer status:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// ✅ MARK ALL APPLICATIONS AS SEEN (Admin Only)
+export const markAllApplicationsAsSeen = async (req, res) => {
+  try {
+    const snapshot = await trainersRef.once("value");
+    if (!snapshot.exists()) {
+      return res.json({ success: true, message: "No applications found" });
+    }
+
+    const updates = {};
+    snapshot.forEach((child) => {
+      const trainer = child.val();
+      if (trainer.isSeen === false || trainer.isSeen === undefined) {
+        updates[`${child.key}/isSeen`] = true;
+      }
+    });
+
+    if (Object.keys(updates).length > 0) {
+      await trainersRef.update(updates);
+    }
+
+    res.json({ success: true, message: "All applications marked as seen" });
+  } catch (error) {
+    console.error("Error marking applications as seen:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 };

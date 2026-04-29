@@ -185,12 +185,13 @@ export const adminDashboard = async (req, res) => {
  */
 export const getDashboardStats = async (req, res) => {
   try {
-    const [studentsSnap, trainersSnap, batchesSnap, coursesSnap, enrollmentsSnap] = await Promise.all([
+    const [studentsSnap, trainersSnap, batchesSnap, coursesSnap, enrollmentsSnap, counsellingSnap] = await Promise.all([
       studentsRef.once("value"),
       trainersRef.once("value"),
       batchesRef.once("value"),
       coursesRef.once("value"),
-      enrollmentsRef.once("value")
+      enrollmentsRef.once("value"),
+      db.ref("counsellingBookings").once("value")
     ]);
 
     const studentsRaw = studentsSnap.val() || {};
@@ -198,6 +199,7 @@ export const getDashboardStats = async (req, res) => {
     const batchesRaw = batchesSnap.val() || {};
     const coursesRaw = coursesSnap.val() || {};
     const enrollmentsRaw = enrollmentsSnap.val() || {};
+    const counsellingRaw = counsellingSnap.val() || {};
 
     const students = Object.entries(studentsRaw).map(([id, data]) => {
       const rawEmail = (data.email || "").trim().toLowerCase();
@@ -233,12 +235,17 @@ export const getDashboardStats = async (req, res) => {
       status: data.status || "Planned"
     }));
 
+    const counsellingRequests = Object.values(counsellingRaw);
+
     const stats = {
       totalStudents: students.length,
       activeTrainers: trainers.filter(t => !t.status || matchesStatus(t.status, ["Active", "Onboarded"])).length,
       activeBatches: batches.filter(b => matchesStatus(b.status, ["Active"])).length, 
       pendingVerifications: students.filter(s => matchesStatus(s.status, ["Pending"])).length,
-      coursesCount: Object.keys(coursesRaw).length
+      coursesCount: Object.keys(coursesRaw).length,
+      pendingTrainers: trainers.filter(t => t.status === 'Applied').length,
+      pendingCounsellingRequests: counsellingRequests.filter(c => c.status === "pending").length,
+      pendingStudentResults: students.filter(s => s.testResults && s.testResults.isSeen === false).length
     };
 
     res.status(200).json({
