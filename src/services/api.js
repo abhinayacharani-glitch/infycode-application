@@ -311,6 +311,31 @@ export const updateTrainerProfileAPI = (profileData) => {
     body: JSON.stringify(profileData),
   });
 };
+ 
+// ─────────────────────────────────────────────
+// TRAINER APPLICATION WORKFLOW
+// ─────────────────────────────────────────────
+ 
+/**
+ * POST /api/trainer/apply (public)
+ */
+export const applyToBecomeTrainer = (formData) =>
+  request('/api/trainer/apply', {
+    method: 'POST',
+    body: JSON.stringify(formData),
+  });
+ 
+/**
+ * PUT /api/admin/trainers/:id/status (protected)
+ */
+export const updateTrainerApplicationStatusAPI = (id, action) => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return request(`/api/admin/trainers/${id}/status`, {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${user.token || ''}` },
+    body: JSON.stringify({ action }),
+  });
+};
 
 // ─────────────────────────────────────────────
 // PASSWORD RESET FLOW  (shared — admin & trainer)

@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Loader2, CheckCircle } from 'lucide-react';
+import { applyToBecomeTrainer } from '../../services/api';
 import './BecomeTrainerPage.css';
 
 import gayathriImg from '../../assets/trainers/gayathri_v2.jpg';
@@ -12,10 +13,88 @@ import rohanImg from '../../assets/trainers/rohan.jpg';
 
 const BecomeTrainerPage = () => {
   const navigate = useNavigate();
-  
+  const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    expertise: '',
+    experience: '',
+    location: '',
+    linkedin: '',
+    portfolio: '',
+    bio: '',
+    resume: null,
+    resumeName: ''
+  });
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.type !== 'application/pdf') {
+        alert('Please upload a PDF file only.');
+        e.target.value = '';
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({ 
+          ...prev, 
+          resume: reader.result,
+          resumeName: file.name
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.resume) {
+      alert('Please upload your resume (PDF).');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await applyToBecomeTrainer(formData);
+      setSubmitted(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (error) {
+      console.error('Error submitting application:', error);
+      alert(error.message || 'Failed to submit application. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (submitted) {
+    return (
+      <div className="internal-page">
+        <div className="trainer-success-container" style={{ textAlign: 'center', padding: '100px 20px' }}>
+          <CheckCircle size={80} color="#10b981" style={{ marginBottom: '24px' }} />
+          <h1>Application Submitted!</h1>
+          <p style={{ maxWidth: '600px', margin: '16px auto', fontSize: '18px', color: '#64748b' }}>
+            Thank you for applying. We have sent a confirmation email to <strong>{formData.email}</strong>. 
+            Our onboarding team will review your application and contact you for the next steps.
+          </p>
+          <button onClick={() => navigate('/')} className="cta-btn" style={{ marginTop: '32px' }}>Return to Home</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="internal-page">
@@ -106,17 +185,55 @@ const BecomeTrainerPage = () => {
           <h2 className="trainer-form-title">Trainer Application Form</h2>
           <p className="trainer-form-sub">Submit your details and link your portfolio. Our onboarding team will contact you for an interview sequence.</p>
           
-          <form className="trainer-form">
+          <form className="trainer-form" onSubmit={handleSubmit}>
             <div className="trainer-form-row">
-              <input type="text" placeholder="First Name *" required className="trainer-input" />
-              <input type="text" placeholder="Last Name *" required className="trainer-input" />
+              <input 
+                type="text" 
+                name="firstName"
+                placeholder="First Name *" 
+                required 
+                className="trainer-input" 
+                value={formData.firstName}
+                onChange={handleInputChange}
+              />
+              <input 
+                type="text" 
+                name="lastName"
+                placeholder="Last Name *" 
+                required 
+                className="trainer-input" 
+                value={formData.lastName}
+                onChange={handleInputChange}
+              />
             </div>
             <div className="trainer-form-row">
-              <input type="email" placeholder="Email Address *" required className="trainer-input" />
-              <input type="tel" placeholder="Phone Number *" required className="trainer-input" />
+              <input 
+                type="email" 
+                name="email"
+                placeholder="Email Address *" 
+                required 
+                className="trainer-input" 
+                value={formData.email}
+                onChange={handleInputChange}
+              />
+              <input 
+                type="tel" 
+                name="phone"
+                placeholder="Phone Number *" 
+                required 
+                className="trainer-input" 
+                value={formData.phone}
+                onChange={handleInputChange}
+              />
             </div>
             <div className="trainer-form-row">
-              <select className="trainer-input" required defaultValue="">
+              <select 
+                className="trainer-input" 
+                required 
+                name="expertise"
+                value={formData.expertise}
+                onChange={handleInputChange}
+              >
                 <option value="" disabled>Primary Expertise *</option>
                 <option value="Full Stack Development">Full Stack Development</option>
                 <option value="Data Science & AI">Data Science & AI</option>
@@ -124,14 +241,91 @@ const BecomeTrainerPage = () => {
                 <option value="Cyber Security">Cyber Security</option>
                 <option value="UI/UX Design">UI/UX Design</option>
               </select>
-              <input type="text" placeholder="Years of Experience *" required className="trainer-input" />
+              <input 
+                type="text" 
+                name="experience"
+                placeholder="Years of Experience *" 
+                required 
+                className="trainer-input" 
+                value={formData.experience}
+                onChange={handleInputChange}
+              />
             </div>
-            <input type="url" placeholder="LinkedIn Profile URL *" required className="trainer-input" />
-            <input type="url" placeholder="Portfolio / GitHub URL (Optional)" className="trainer-input" />
+            <div className="trainer-form-row">
+              <input 
+                type="text" 
+                name="location"
+                placeholder="Current Location *" 
+                required 
+                className="trainer-input" 
+                value={formData.location}
+                onChange={handleInputChange}
+              />
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                <input 
+                  type="file" 
+                  name="resume"
+                  accept="application/pdf"
+                  required 
+                  className="trainer-input" 
+                  onChange={handleFileChange}
+                  id="resume-upload"
+                  style={{ display: 'none' }}
+                />
+                <label 
+                  htmlFor="resume-upload" 
+                  className="trainer-input" 
+                  style={{ 
+                    cursor: 'pointer', 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center',
+                    background: '#fff'
+                  }}
+                >
+                  <span style={{ color: formData.resumeName ? '#000' : '#9ca3af' }}>
+                    {formData.resumeName || 'Upload Resume (PDF) *'}
+                  </span>
+                  <span style={{ fontSize: '12px', background: '#f1f5f9', padding: '2px 8px', borderRadius: '4px', color: '#64748b' }}>Browse</span>
+                </label>
+              </div>
+            </div>
+            <input 
+              type="url" 
+              name="linkedin"
+              placeholder="LinkedIn Profile URL *" 
+              required 
+              className="trainer-input" 
+              value={formData.linkedin}
+              onChange={handleInputChange}
+            />
+            <input 
+              type="url" 
+              name="portfolio"
+              placeholder="Portfolio / GitHub URL (Optional)" 
+              className="trainer-input" 
+              value={formData.portfolio}
+              onChange={handleInputChange}
+            />
             
-            <textarea placeholder="Briefly describe your industrial experience and why you want to teach... *" required rows="5" className="trainer-input textarea"></textarea>
+            <textarea 
+              name="bio"
+              placeholder="Briefly describe your industrial experience and why you want to teach... *" 
+              required 
+              rows="5" 
+              className="trainer-input textarea"
+              value={formData.bio}
+              onChange={handleInputChange}
+            ></textarea>
             
-            <button className="cta-btn trainer-submit-btn">Submit Application</button>
+            <button 
+              type="submit" 
+              className="cta-btn trainer-submit-btn"
+              disabled={loading}
+              style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
+            >
+              {loading ? <><Loader2 className="animate-spin" size={20} /> Submitting...</> : 'Submit Application'}
+            </button>
           </form>
         </div>
       </div>
