@@ -295,6 +295,9 @@ export const createBatch = async (req, res) => {
 // ✅ Get Admin Profile
 export const getAdminProfile = async (req, res) => {
   try {
+    if (!req.user || !req.user.id) {
+      return res.status(400).json({ success: false, message: "User ID not found in token" });
+    }
     const adminSnap = await adminsRef.child(req.user.id).once("value");
     if (!adminSnap.exists()) return res.status(404).json({ success: false, message: "Admin not found" });
     
@@ -312,6 +315,9 @@ export const getAdminProfile = async (req, res) => {
 export const updateAdminProfile = async (req, res) => {
   try {
     const updateData = req.body;
+    if (!req.user || !req.user.id) {
+      return res.status(400).json({ success: false, message: "User ID not found in token" });
+    }
     const allowedFields = ["fullName", "profileImage", "phone"];
     const filteredData = {};
     allowedFields.forEach(field => { if (updateData[field] !== undefined) filteredData[field] = updateData[field]; });

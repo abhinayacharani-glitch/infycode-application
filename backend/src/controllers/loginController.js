@@ -64,6 +64,7 @@ export const unifiedLogin = async (req, res) => {
 
       // Build a lightweight user object for token generation
       const adminUser = {
+        id: "admin", // Hardcoded ID for the root admin account
         email: ADMIN_EMAIL,
         role: "admin",
         fullName: "Admin",
