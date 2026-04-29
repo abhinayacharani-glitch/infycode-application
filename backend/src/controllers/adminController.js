@@ -8,8 +8,7 @@ const tempRegistrationsRef = db.ref("tempRegistrations");
 const batchesRef = db.ref("batch");
 const studentsRef = db.ref("students");
 const trainersRef = db.ref("trainers");
-const coursesRef  = db.ref("courses");
-const enrollmentsRef = db.ref("enrollments");
+const coursesRef = db.ref("courses");
 
 // Helper: Normalized status matching
 const matchesStatus = (val, targetStatuses) => {
@@ -228,6 +227,8 @@ export const getDashboardStats = async (req, res) => {
       trainer: data.trainer || data.trainerName || "Unassigned",
       capacity: parseInt(data.capacity) || 30,
       enrolled: parseInt(data.enrolled) || 0,
+      studentIdFrom: data.studentIdFrom || "N/A",
+      studentIdTo: data.studentIdTo || "N/A",
       status: data.status || "Planned"
     }));
 
@@ -257,7 +258,7 @@ export const getDashboardStats = async (req, res) => {
  **/
 export const createBatch = async (req, res) => {
   try {
-    const { name, course, trainer, capacity, status } = req.body;
+    const { name, course, trainer, capacity, status, studentIdFrom, studentIdTo } = req.body;
 
     if (!name || !course || !trainer) {
       return res.status(400).json({ message: "Name, course, and trainer are required." });
@@ -272,6 +273,8 @@ export const createBatch = async (req, res) => {
       trainerName: trainer,
       capacity: parseInt(capacity) || 30,
       enrolled: 0,
+      studentIdFrom: studentIdFrom || "N/A",
+      studentIdTo: studentIdTo || "N/A",
       status: status || 'Draft',
       createdAt: new Date().toISOString()
     };
