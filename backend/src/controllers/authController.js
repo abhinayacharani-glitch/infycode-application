@@ -8,6 +8,16 @@ const adminsRef = db.ref("admins");
 const trainersRef = db.ref("trainers");
 const tempRegistrationsRef = db.ref("tempRegistrations");
 
+const coursesRef = db.ref("courses");
+
+// Helper: Generate next Student ID (INFY-110, INFY-111)
+const generateNextStudentID = async () => {
+  const snapshot = await studentsRef.once("value");
+  const count = snapshot.numChildren();
+  const nextNumber = 110 + count;
+  return `INFY-${nextNumber}`;
+};
+
 // ✅ STUDENT REGISTER
 export const studentRegister = async (req, res) => {
   try {
@@ -157,7 +167,7 @@ export const verifyRegistrationOTP = async (req, res) => {
   try {
     const { email, otp, role } = req.body;
 
-    const isTrainerEmail = email?.trim().toLowerCase().endsWith("@trainer.in");
+    const isTrainerEmail = email?.trim().toLowerCase().endsWith("@outlook.com");
 
     if (!email || (!isTrainerEmail && !otp) || !role) {
       return res.status(400).json({ message: "Email, OTP, and role are required" });
@@ -236,11 +246,15 @@ export const verifyRegistrationOTP = async (req, res) => {
     // OTP is valid and email is unique! Create the real user.
     const { otp: _, expiresAt: __, sessionExpiresAt: ___, createdAt: ____, ...userData } = registrationData;
 
-    const finalUserData = {
+    let finalUserData = {
       ...userData,
-      role: isTrainerEmail ? "trainer" : (userData.role || role),
+      role: isTrainerEmail ? "trainer" : (role.toLowerCase() === "admin" ? "admin" : "student"),
       createdAt: new Date().toISOString(),
     };
+
+    if (finalUserData.role === "student") {
+      finalUserData.studentId = await generateNextStudentID();
+    }
 
     const newRef = targetRef.push();
     await newRef.set(finalUserData);

@@ -53,7 +53,7 @@ const request = async (endpoint, options = {}) => {
  * POST /api/login
  * Single endpoint that resolves role by email:
  *   admin@charani.in           → role: "admin"
- *   *@trainer.in               → role: "trainer"
+ *   *@outlook.com               → role: "trainer"
  *   anything else              → role: "student"
  * @returns {{ success, role, token, email, fullName, message }}
  */
@@ -109,6 +109,23 @@ export const createBatch = (batchData) => {
     method: 'POST',
     headers: { Authorization: `Bearer ${user.token || ''}` },
     body: JSON.stringify(batchData),
+  });
+};
+
+export const getAdminProfileAPI = () => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return request('/api/admin/profile', {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${user.token || ''}` },
+  });
+};
+
+export const updateAdminProfileAPI = (profileData) => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return request('/api/admin/profile', {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${user.token || ''}` },
+    body: JSON.stringify(profileData),
   });
 };
 
@@ -212,13 +229,43 @@ export const getStudentMyResults = () => {
   });
 };
 
+/**
+ * GET /api/student/profile
+ * Retrieves the current student's full profile.
+ */
+export const getStudentProfile = () => {
+  const user = JSON.parse(localStorage.getItem('user') || localStorage.getItem('loggedUser') || '{}');
+  return request('/api/student/profile', {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${user.token || ''}` },
+  });
+};
+
+/**
+ * PUT /api/student/profile
+ * Updates student profile fields.
+ */
+export const updateStudentProfile = (profileData) => {
+  const user = JSON.parse(localStorage.getItem('user') || localStorage.getItem('loggedUser') || '{}');
+  return request('/api/student/profile', {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${user.token || ''}` },
+    body: JSON.stringify(profileData),
+  });
+};
+
+/**
+ * Alias for Profile.jsx compatibility
+ */
+export const getMyResults = getStudentMyResults;
+
 
 // ─────────────────────────────────────────────
 // TRAINER AUTH
 // ─────────────────────────────────────────────
 
 /**
- * POST /api/login  (trainer credentials — email must end with @trainer.in)
+ * POST /api/login  (trainer credentials — email must end with @outlook.com)
  * Alias kept so trainer Login.jsx import continues to work without changes.
  * @returns {{ success, role, token, fullName, email }}
  */
@@ -245,6 +292,27 @@ export const trainerVerifyOtp = (email, otp) =>
     method: 'POST',
     body: JSON.stringify({ email, otp }),
   });
+
+// ─────────────────────────────────────────────
+// TRAINER PROFILE
+// ─────────────────────────────────────────────
+
+export const getTrainerProfileAPI = () => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return request('/api/trainer/profile', {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${user.token || ''}` },
+  });
+};
+
+export const updateTrainerProfileAPI = (profileData) => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return request('/api/trainer/profile', {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${user.token || ''}` },
+    body: JSON.stringify(profileData),
+  });
+};
 
 // ─────────────────────────────────────────────
 // PASSWORD RESET FLOW  (shared — admin & trainer)

@@ -1,77 +1,57 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, Mail, Bell, ChevronDown, LogOut, User, Edit, MessageSquare, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import icLogo from '../../../assets/infycode-final-logo4-1.png';
 import "./Navbar.css";
 
 const Navbar = ({ onToggleSidebar }) => {
   const navigate = useNavigate();
-  const [activeDropdown, setActiveDropdown] = useState(null); // 'profile', 'notifications', 'messages', or null
+  const [activeDropdown, setActiveDropdown] = useState(null); 
   const dropdownRef = useRef(null);
   const notificationsRef = useRef(null);
   const messagesRef = useRef(null);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-  const userString = localStorage.getItem('user');
-  const user = userString ? JSON.parse(userString) : { fullname: "Anjali Syamala", role: "student" };
-  const userName = user.fullname || user.fullName || "Anjali Syamala";
-  const userRole = user.role || "student";
+  const getInitialUser = () => {
+    const userString = localStorage.getItem('loggedUser') || localStorage.getItem('user');
+    const user = userString ? JSON.parse(userString) : { fullName: "Student", role: "Student" };
+    return {
+      fullname: user.fullName || user.fullname || user.username || "Student",
+      role: user.role || "Student",
+      profileImage: user.profileImage || null
+    };
+  };
+
+  const [user, setUser] = useState(getInitialUser());
+
+  useEffect(() => {
+    const handleProfileSync = () => {
+      setUser(getInitialUser());
+    };
+    window.addEventListener('profileUpdate', handleProfileSync);
+    window.addEventListener('storage', handleProfileSync);
+    return () => {
+      window.removeEventListener('profileUpdate', handleProfileSync);
+      window.removeEventListener('storage', handleProfileSync);
+    };
+  }, []);
 
   const notifications = [
-    {
-      id: 1,
-      title: "Assessment Due",
-      message: "Your React Fundamentals assessment is due in 2 hours.",
-      time: "2h ago",
-      type: "warning"
-    },
-    {
-      id: 2,
-      title: "Grade Updated",
-      message: "Your project 'E-commerce API' has been graded.",
-      time: "5h ago",
-      type: "info"
-    },
-    {
-      id: 3,
-      title: "New Course Available",
-      message: "Advanced Node.js is now open for enrollment.",
-      time: "1d ago",
-      type: "success"
-    }
+    { id: 1, title: "Assessment Due", message: "Your React Fundamentals assessment is due in 2 hours.", time: "2h ago", type: "warning" },
+    { id: 2, title: "Grade Updated", message: "Your project 'E-commerce API' has been graded.", time: "5h ago", type: "info" },
+    { id: 3, title: "New Course Available", message: "Advanced Node.js is now open for enrollment.", time: "1d ago", type: "success" }
   ];
 
   const messages = [
-    {
-      id: 1,
-      sender: "Charani (Mentor)",
-      text: "Don't forget to push your code for the latest assignment.",
-      time: "10m ago",
-      unread: true
-    },
-    {
-      id: 2,
-      sender: "Admin",
-      text: "System maintenance scheduled for tonight at 2 AM.",
-      time: "3h ago",
-      unread: false
-    },
-    {
-      id: 3,
-      sender: "Placement Cell",
-      text: "New internship opportunity at TechCorp for React Developers.",
-      time: "1d ago",
-      unread: false
-    }
+    { id: 1, sender: "Charani (Mentor)", text: "Don't forget to push your code for the latest assignment.", time: "10m ago", unread: true },
+    { id: 2, sender: "Admin", text: "System maintenance scheduled for tonight at 2 AM.", time: "3h ago", unread: false },
+    { id: 3, sender: "Placement Cell", text: "New internship opportunity at TechCorp for React Developers.", time: "1d ago", unread: false }
   ];
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      const isOutsideDropdown = !dropdownRef.current || !dropdownRef.current.contains(event.target);
-      const isOutsideNotifications = !notificationsRef.current || !notificationsRef.current.contains(event.target);
-      const isOutsideMessages = !messagesRef.current || !messagesRef.current.contains(event.target);
-
-      if (isOutsideDropdown && isOutsideNotifications && isOutsideMessages) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target) &&
+          notificationsRef.current && !notificationsRef.current.contains(event.target) &&
+          messagesRef.current && !messagesRef.current.contains(event.target)) {
         setActiveDropdown(null);
       }
     };
@@ -90,13 +70,11 @@ const Navbar = ({ onToggleSidebar }) => {
 
   return (
     <nav className="student-topbar">
-      <div className="topbar-left">
-        {/* Search removed */}
-      </div>
+      <div className="topbar-left"></div>
 
-      <div className="topbar-right" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+      <div className="topbar-right">
 
-        {/* NOTIFICATIONS DROPDOWN */}
+        {/* NOTIFICATIONS */}
         <div className="dropdown-wrapper" ref={notificationsRef} onClick={() => toggleDropdown('notifications')}>
           <div className="action-with-badge">
             <Bell size={24} />
@@ -112,16 +90,11 @@ const Navbar = ({ onToggleSidebar }) => {
               <div className="dropdown-body">
                 {notifications.map(notif => (
                   <div key={notif.id} className={`dropdown-item ${notif.type === 'warning' ? 'unread' : ''}`}>
-                    <div className={`item-icon ${notif.type}`}>
-                      <Bell size={20} />
-                    </div>
+                    <div className={`item-icon ${notif.type}`}><Bell size={20} /></div>
                     <div className="item-content">
                       <div className="item-title">{notif.title}</div>
                       <div className="item-snippet">{notif.message}</div>
-                      <div className="item-time">
-                        <Clock size={12} />
-                        {notif.time}
-                      </div>
+                      <div className="item-time"><Clock size={12} /> {notif.time}</div>
                     </div>
                   </div>
                 ))}
@@ -130,13 +103,13 @@ const Navbar = ({ onToggleSidebar }) => {
           )}
         </div>
 
-        {/* PROFILE DROPDOWN */}
+        {/* PROFILE */}
         <div className="nav-user-profile" ref={dropdownRef} onClick={() => toggleDropdown('profile')}>
-          <img
-            src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200&h=200"
-            alt="Profile"
-            className="navbar-avatar"
-          />
+          {user.profileImage ? (
+            <img src={user.profileImage} alt="Profile" className="navbar-avatar" />
+          ) : (
+            <div className="navbar-avatar-placeholder">{user.fullname.charAt(0).toUpperCase()}</div>
+          )}
           <ChevronDown 
             size={18} 
             className="chevron-icon" 
@@ -149,32 +122,26 @@ const Navbar = ({ onToggleSidebar }) => {
           {activeDropdown === 'profile' && (
             <div className="profile-dropdown-menu">
               <div className="profile-dropdown-header">
-                <img
-                  src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200&h=200"
-                  alt="Profile"
-                  className="dropdown-avatar"
-                />
+                {user.profileImage ? (
+                  <img src={user.profileImage} alt="Profile" className="dropdown-avatar" />
+                ) : (
+                  <div className="dropdown-avatar-placeholder">{user.fullname.charAt(0).toUpperCase()}</div>
+                )}
                 <div className="dropdown-user-info">
-                  <div className="dropdown-name">{userName}</div>
-                  <div className="dropdown-role">{userRole}</div>
+                  <div className="dropdown-name">{user.fullname}</div>
+                  <div className="dropdown-role">{user.role}</div>
                 </div>
               </div>
               <div className="dropdown-divider"></div>
 
-              <button
-                className="dropdown-item"
-                onClick={(e) => { e.stopPropagation(); setActiveDropdown(null); navigate('/student-dashboard/profile?edit=true'); }}
-              >
+              <button className="dropdown-item" onClick={(e) => { e.stopPropagation(); setActiveDropdown(null); navigate('/student-dashboard/profile?edit=true'); }}>
                 <Edit size={16} />
                 <span>Edit Profile</span>
               </button>
 
               <div className="dropdown-divider"></div>
 
-              <button
-                className="dropdown-item logout-item"
-                onClick={(e) => { e.stopPropagation(); setActiveDropdown(null); setShowLogoutModal(true); }}
-              >
+              <button className="dropdown-item logout-item" onClick={(e) => { e.stopPropagation(); setActiveDropdown(null); setShowLogoutModal(true); }}>
                 <LogOut size={16} />
                 <span>Logout</span>
               </button>
@@ -183,31 +150,23 @@ const Navbar = ({ onToggleSidebar }) => {
         </div>
       </div>
 
-      {/* ── LOGOUT CONFIRMATION MODAL ── */}
+      {/* LOGOUT MODAL */}
       {showLogoutModal && (
         <div className="sd-modal-overlay" onClick={() => setShowLogoutModal(false)}>
           <div className="sd-modal-card" onClick={e => e.stopPropagation()}>
-
-            <div className="sd-modal-user-header">
-              <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200&h=200" alt="Profile" className="sd-modal-avatar" />
-              <div className="sd-modal-user-info">
-                <span className="sd-modal-name">{userName}</span>
-                <span className="sd-modal-role">{userRole}</span>
+            <div className="sd-modal-logout-icon">
+              <div className="logout-icon-circle-red">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
               </div>
             </div>
-
-            <h2 className="sd-modal-title">Log out to Sign in Page?</h2>
-            <p className="sd-modal-subtitle">Are you sure you want to end your current dashboard session?</p>
-
+            <h2 className="sd-modal-title">Logout?</h2>
+            <p className="sd-modal-subtitle">Are you sure you want to end your current session?</p>
             <div className="sd-modal-actions">
-              <button className="sd-modal-cancel" onClick={() => setShowLogoutModal(false)}>
-                Cancel
-              </button>
-              <button className="sd-modal-logout" onClick={handleLogout}>
-                Yes, log out
-              </button>
+              <button className="sd-modal-cancel" onClick={() => setShowLogoutModal(false)}>Cancel</button>
+              <button className="sd-modal-logout-red" onClick={handleLogout}>OK, Logout</button>
             </div>
-
           </div>
         </div>
       )}

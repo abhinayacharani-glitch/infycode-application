@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Search, Filter, Star, Clock, Users, ArrowRight, Eye } from "lucide-react";
+import { Search, Filter, Star, Clock, Users, ArrowRight, Eye, Calendar, User as UserIcon } from "lucide-react";
 import "./Courses.css";
 import bgImage from "../../assets/course/bg.jpg";
 // Course images from assets/course
@@ -48,6 +48,8 @@ export const ALL_COURSES = [
     rating: 4.8,
     students: "15k",
     duration: "6 months",
+    startDate: "May 15, 2026",
+    trainer: "Rohan",
     level: "Intermediate",
     price: "4 months",
     courseId: "java-fs-01"
@@ -61,6 +63,8 @@ export const ALL_COURSES = [
     rating: 4.9,
     students: "9k",
     duration: "5 months",
+    startDate: "May 20, 2026",
+    trainer: "Gayathri",
     level: "Advanced",
     price: "6 months",
     courseId: "data-sci-01"
@@ -74,6 +78,8 @@ export const ALL_COURSES = [
     rating: 4.7,
     students: "7k",
     duration: "4 months",
+    startDate: "June 01, 2026",
+    trainer: "Abhinaya",
     level: "Advanced",
     price: "4 months",
     courseId: "ml-deep-01"
@@ -87,6 +93,8 @@ export const ALL_COURSES = [
     rating: 4.8,
     students: "12k",
     duration: "4 months",
+    startDate: "May 10, 2026",
+    trainer: "Karthisha",
     level: "Intermediate",
     price: "4 months",
     courseId: "cyber-sec-01"
@@ -100,6 +108,8 @@ export const ALL_COURSES = [
     rating: 4.9,
     students: "20k",
     duration: "3 months",
+    startDate: "May 25, 2026",
+    trainer: "Mohan",
     level: "Intermediate",
     price: "4 months",
     courseId: "react-fs-01"
@@ -113,6 +123,8 @@ export const ALL_COURSES = [
     rating: 4.9,
     students: "25k",
     duration: "2 months",
+    startDate: "June 05, 2026",
+    trainer: "Nagaharsha",
     level: "Beginner",
     price: "2 months",
     courseId: "python-master-01"
@@ -126,6 +138,8 @@ export const ALL_COURSES = [
     rating: 4.8,
     students: "10k",
     duration: "3 months",
+    startDate: "June 10, 2026",
+    trainer: "Rohan",
     level: "Beginner",
     price: "3 months",
     courseId: "aws-cloud-01"
@@ -139,6 +153,8 @@ export const ALL_COURSES = [
     rating: 4.8,
     students: "5k",
     duration: "2 months",
+    startDate: "June 15, 2026",
+    trainer: "Gayathri",
     level: "Advanced",
     price: "2 months",
     courseId: "nextjs-14-01"
@@ -152,6 +168,8 @@ export const ALL_COURSES = [
     rating: 4.9,
     students: "18k",
     duration: "5 months",
+    startDate: "May 30, 2026",
+    trainer: "Abhinaya",
     level: "Intermediate",
     price: "5 months",
     courseId: "mern-stack-01"
@@ -165,6 +183,8 @@ export const ALL_COURSES = [
     rating: 4.7,
     students: "8k",
     duration: "4 months",
+    startDate: "June 20, 2026",
+    trainer: "Karthisha",
     level: "Advanced",
     price: "4 months",
     courseId: "angular-ent-01"
@@ -178,6 +198,8 @@ export const ALL_COURSES = [
     rating: 4.8,
     students: "11k",
     duration: "5 months",
+    startDate: "June 25, 2026",
+    trainer: "Mohan",
     level: "Beginner",
     price: "6 months",
     courseId: "flutter-mob-01"
@@ -191,6 +213,8 @@ export const ALL_COURSES = [
     rating: 4.9,
     students: "16k",
     duration: "6 months",
+    startDate: "July 01, 2026",
+    trainer: "Nagaharsha",
     level: "Beginner",
     price: "2 months",
     courseId: "python-fullstack-01"
@@ -364,41 +388,33 @@ const Courses = () => {
                   <div className="card-content-modern">
                     <h3 className="card-title-modern">{course.title}</h3>
 
-                    {/* Stats Row */}
-                    <div className="card-stats-modern">
-                      <div className="stat students-text">
-                        {course.students} students
-                      </div>
-                      <div className="stat stars-container">
-                        {[...Array(5)].map((_, idx) => (
-                          <Star 
-                            key={idx} 
-                            size={14} 
-                            fill={idx < Math.floor(course.rating) ? "#f59e0b" : "#e2e8f0"} 
-                            color={idx < Math.floor(course.rating) ? "#f59e0b" : "#e2e8f0"} 
-                            strokeWidth={0}
-                          />
-                        ))}
-                      </div>
-                    </div>
-
                     {/* Footer */}
                     <div className="card-footer-modern">
-                      <div className="footer-actions-left">
-                        <div className="details-action-wrapper">
-                          <button 
-                            className="btn-view-details" 
-                            onClick={() => navigate(`/course-details/${course.courseId}`)}
-                            title="View Course Details"
-                          >
-                            <Eye size={20} />
-                          </button>
-                          <span className="action-label">Overview</span>
+                      <div className="footer-info-left">
+                        <div className="info-item">
+                          <UserIcon size={14} />
+                          <span>{course.trainer}</span>
+                        </div>
+                        <div className="info-item">
+                          <Calendar size={14} />
+                          <span>{course.startDate}</span>
+                        </div>
+                        <div className="info-item duration-highlight">
+                          <Clock size={14} />
+                          <span>{course.duration}</span>
                         </div>
                       </div>
-                      <button className="btn-join-now" onClick={handleEnroll}>
-                        Enroll Now
-                      </button>
+
+                      <div className="details-action-wrapper">
+                        <button 
+                          className="btn-view-details" 
+                          onClick={() => navigate(`/course-details/${course.courseId}`)}
+                          title="View Course Details"
+                        >
+                          <Eye size={20} />
+                        </button>
+                        <span className="action-label">View Course</span>
+                      </div>
                     </div>
                   </div>
                 </motion.div>

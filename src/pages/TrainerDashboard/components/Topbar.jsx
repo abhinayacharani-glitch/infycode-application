@@ -62,7 +62,7 @@ const Topbar = () => {
   const location = useLocation();
   const { trainerData, profileImage } = useTrainer();
 
-  const userName = trainerData.fullname || trainerData.name || 'Trainer';
+  const userName = trainerData.fullName || trainerData.fullname || trainerData.name || 'Trainer';
   const role = trainerData.role || 'Trainer';
   const userInitial = userName.charAt(0).toUpperCase();
 

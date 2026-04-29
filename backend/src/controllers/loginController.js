@@ -5,7 +5,7 @@
  *
  * Routing logic:
  *   1. admin@charani.in   → hardcoded admin credentials → store lastLogin in Firebase
- *   2. *@trainer.in       → look up in `trainers` node, bcrypt compare
+ *   2. *@outlook.com       → look up in `trainers` node, bcrypt compare
  *   3. everything else    → look up in `students` node, bcrypt compare
  */
 
@@ -28,6 +28,7 @@ const ADMIN_PASSWORD = "Admin@520";
 // POST /api/login
 // ---------------------------------------------------------------------------
 export const unifiedLogin = async (req, res) => {
+  let userData; // Declare here so it's available in all branches
   try {
     const { email, password } = req.body;
 
@@ -87,9 +88,9 @@ export const unifiedLogin = async (req, res) => {
     }
 
     // ════════════════════════════════════════════════════════════════════════
-    // 2. TRAINER – email ends with @trainer.in
+    // 2. TRAINER – email ends with @outlook.com
     // ════════════════════════════════════════════════════════════════════════
-    if (normalizedEmail.endsWith("@trainer.in")) {
+    if (normalizedEmail.endsWith("@outlook.com")) {
       const snapshot = await trainersRef
         .orderByChild("email")
         .equalTo(normalizedEmail)
@@ -117,12 +118,17 @@ export const unifiedLogin = async (req, res) => {
         });
       }
 
+      userData.role = "trainer"; // Ensure role is present for token generation
       const token = generateToken(userData);
+      
+      // Clean up sensitive data before sending
+      const { password: _, ...safeUserData } = userData;
 
       return res.status(200).json({
         success: true,
         role: "trainer",
         token,
+        ...safeUserData,
         fullName: userData.fullName || userData.fullname || userData.name,
         email: userData.email,
       });
@@ -143,7 +149,6 @@ export const unifiedLogin = async (req, res) => {
       });
     }
 
-    let userData;
     snapshot.forEach((child) => {
       userData = child.val();
       userData.id = child.key;

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { 
+import {
   createBatch, getAdminStats, getAllCourses,
   createCourse as apiCreateCourse,
   updateCourse as apiUpdateCourse,
@@ -8,7 +8,9 @@ import {
   getPendingFAQs as apiGetPendingFAQs,
   updateFAQStatus as apiUpdateFAQStatus,
   deleteFAQ as apiDeleteFAQ,
-  publishNewFAQ
+  publishNewFAQ,
+  getAdminProfileAPI,
+  updateAdminProfileAPI
 } from '../services/api';
 
 const AdminContext = createContext();
@@ -28,6 +30,10 @@ export const AdminProvider = ({ children }) => {
   const [courses, setCourses] = useState([]);
   const [batches, setBatches] = useState([]);
   const [pendingFAQs, setPendingFAQs] = useState([]);
+  const [adminData, setAdminData] = useState(() => {
+    const savedUser = localStorage.getItem('user');
+    return JSON.parse(savedUser || '{}');
+  });
 
   const [notifications, setNotifications] = useState([
     { id: 1, message: 'New student registration: Harvey Specter', type: 'info', read: false, time: '2 mins ago' },
@@ -67,8 +73,8 @@ export const AdminProvider = ({ children }) => {
         }
         const baseStatus = t.status === 'Hold' ? (t.prevStatus || 'Applied') : t.status;
         const currentIndex = stages.indexOf(baseStatus);
-        const nextIndex = action === 'next' 
-          ? Math.min(currentIndex + 1, stages.length - 1) 
+        const nextIndex = action === 'next'
+          ? Math.min(currentIndex + 1, stages.length - 1)
           : Math.max(currentIndex - 1, 0);
         return { ...t, status: stages[nextIndex], progress: (nextIndex / (stages.length - 1)) * 100, prevStatus: stages[nextIndex] };
       }
@@ -132,7 +138,7 @@ export const AdminProvider = ({ children }) => {
   const toggleCourseLike = async (id) => {
     try {
       const data = await apiToggleCourseLike(id);
-      setCourses(prev => prev.map(c => 
+      setCourses(prev => prev.map(c =>
         c.id === id ? { ...c, isLiked: data.isLiked, likes: data.likes } : c
       ));
     } catch (error) {
@@ -146,7 +152,7 @@ export const AdminProvider = ({ children }) => {
     try {
       const data = await apiGetPendingFAQs();
       const currentPending = data.faqs || [];
-      
+
       // Check for new questions to add to notifications
       if (currentPending.length > pendingFAQs.length) {
         const newOnes = currentPending.filter(q => !pendingFAQs.find(p => p.id === q.id));
@@ -163,7 +169,7 @@ export const AdminProvider = ({ children }) => {
           ]);
         });
       }
-      
+
       setPendingFAQs(currentPending);
     } catch (error) {
       console.error("Error loading pending FAQs:", error.message);
@@ -190,7 +196,7 @@ export const AdminProvider = ({ children }) => {
         console.warn("FAQ published, but failed to update status in original node:", updateError);
         // We continue anyway because the primary goal (publishing) succeeded
       }
-      
+
       // Step 3: Remove from the UI list
       setPendingFAQs(prev => prev.filter(f => f.id !== id));
       return true;
@@ -211,11 +217,42 @@ export const AdminProvider = ({ children }) => {
     }
   };
 
+  const fetchAdminProfile = async () => {
+    try {
+      const response = await getAdminProfileAPI();
+      if (response.success && response.profile) {
+        setAdminData(prev => ({ ...prev, ...response.profile }));
+        const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+        localStorage.setItem('user', JSON.stringify({ ...currentUser, ...response.profile }));
+      }
+    } catch (error) {
+      console.error("Error fetching admin profile:", error);
+    }
+  };
+
+  const updateAdminProfile = async (newData, newImage) => {
+    try {
+      const payload = { ...(newData || {}) };
+      if (newImage) payload.profileImage = newImage;
+      
+      const response = await updateAdminProfileAPI(payload);
+      if (response.success && response.profile) {
+        setAdminData(prev => ({ ...prev, ...response.profile }));
+        const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+        localStorage.setItem('user', JSON.stringify({ ...currentUser, ...response.profile }));
+        return response;
+      }
+    } catch (error) {
+      console.error("Error updating admin profile:", error);
+      throw error;
+    }
+  };
+
   const fetchDashboardStats = async () => {
     try {
       const data = await getAdminStats();
       const { stats: apiStats, students: apiStudents, trainers: apiTrainers, batches: apiBatches } = data;
-      
+
       setStats({
         totalStudents: {
           pending: apiStats?.pendingVerifications || 0,
@@ -252,8 +289,9 @@ export const AdminProvider = ({ children }) => {
 
   useEffect(() => {
     fetchDashboardStats();
-    loadCourses(); // Load courses separately
+    loadCourses(); 
     loadPendingFAQs();
+    fetchAdminProfile();
 
     const interval = setInterval(() => {
       fetchDashboardStats();
@@ -285,6 +323,9 @@ export const AdminProvider = ({ children }) => {
     approveFAQ,
     deleteFAQ,
     loadPendingFAQs,
+    adminData,
+    updateAdminProfile,
+    fetchAdminProfile
   };
 
   return <AdminContext.Provider value={value}>{children}</AdminContext.Provider>;

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ALL_COURSES } from "../../components/Courses/Courses";
-import { ArrowLeft, Clock, Users, Star, BookOpen, ChevronDown, ChevronUp, CheckCircle, Eye } from "lucide-react";
+import { ArrowLeft, Clock, Users, Star, BookOpen, ChevronDown, ChevronUp, CheckCircle, Eye, Calendar, User as UserIcon, Download } from "lucide-react";
+import jsPDF from 'jspdf';
 import "../../components/Courses/Courses.css";
 import "./CourseDetailsPage.css";
 
@@ -156,6 +157,67 @@ const CourseDetailsPage = () => {
     }
   };
 
+  const handleDownloadCurriculum = () => {
+    const doc = new jsPDF();
+    let yPos = 20;
+
+    // Header
+    doc.setFontSize(22);
+    doc.setTextColor(14, 165, 233); // #0ea5e9
+    doc.text(course.title, 20, yPos);
+    yPos += 10;
+
+    doc.setFontSize(14);
+    doc.setTextColor(100);
+    doc.text(`Instructor: ${course.trainer}`, 20, yPos);
+    yPos += 10;
+    doc.text(`Duration: ${course.duration}`, 20, yPos);
+    yPos += 20;
+
+    // Curriculum Header
+    doc.setFontSize(18);
+    doc.setTextColor(15, 23, 42); // #0f172a
+    doc.text("Course Curriculum", 20, yPos);
+    yPos += 15;
+
+    // Syllabus
+    courseSyllabus.forEach((mod) => {
+      if (yPos > 270) {
+        doc.addPage();
+        yPos = 20;
+      }
+
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text(mod.title, 20, yPos);
+      yPos += 8;
+
+      mod.topics.forEach((topic) => {
+        doc.setFontSize(12);
+        doc.setFont("helvetica", "normal");
+        doc.text(`• ${topic.main}`, 25, yPos);
+        yPos += 6;
+
+        if (topic.subtopics) {
+          topic.subtopics.forEach((sub) => {
+            doc.setFontSize(10);
+            doc.text(`  - ${sub}`, 30, yPos);
+            yPos += 5;
+            
+            if (yPos > 280) {
+              doc.addPage();
+              yPos = 20;
+            }
+          });
+        }
+        yPos += 4;
+      });
+      yPos += 10;
+    });
+
+    doc.save(`${course.title}_Curriculum.pdf`);
+  };
+
   // Only two tabs allowed
   const tabs = ["Overview", "Curriculum"];
 
@@ -188,8 +250,14 @@ const CourseDetailsPage = () => {
             <div className="cd-stats">
               <span className="cd-stat"><Star size={16} className="text-yellow" /> {course.rating} Rating</span>
               <span className="cd-stat"><Clock size={16} /> {course.duration}</span>
-              <span className="cd-stat"><Users size={16} /> {course.students} Enrolled</span>
-              <span className="cd-stat"><BookOpen size={16} /> Comprehensive</span>
+              <span className="cd-stat trainer-stat">
+                <UserIcon size={16} /> 
+                {course.trainer}
+                <button className="cd-mini-download" onClick={handleDownloadCurriculum} title="Download Curriculum">
+                  <Download size={14} />
+                  <span>Download Curriculum</span>
+                </button>
+              </span>
             </div>
 
             <div className="cd-hero-actions">
@@ -242,10 +310,6 @@ const CourseDetailsPage = () => {
                     <li><CheckCircle size={16} /> Best practices and modern workflows used by top companies.</li>
                   </ul>
 
-                  <h4>Key Benefits</h4>
-                  <p>
-                    By completing this program, you will not only receive a recognized certificate of completion, but you will also walk away with a portfolio of real-world projects that you can showcase to employers. Our expert-led approach ensures that every hour you spend learning directly translates into applied practical ability.
-                  </p>
                 </div>
               </section>
 
@@ -426,56 +490,36 @@ const RelatedCourses = ({ currentCourse, navigate }) => {
                         {c.title}
                       </h3>
 
-                      <div className="card-stats-modern">
-                        <div className="stat students-text">
-                          {c.students} students
-                        </div>
-                        <div className="stat stars-container">
-                          {[...Array(5)].map((_, idx) => (
-                            <Star 
-                              key={idx} 
-                              size={14} 
-                              fill={idx < Math.floor(c.rating) ? "#f59e0b" : "#e2e8f0"} 
-                              color={idx < Math.floor(c.rating) ? "#f59e0b" : "#e2e8f0"} 
-                              strokeWidth={0}
-                            />
-                          ))}
-                        </div>
-                      </div>
-
                       <div className="card-footer-modern">
-                        <div className="footer-actions-left">
-                          <div className="details-action-wrapper">
-                            <button 
-                              className="btn-view-details" 
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(`/course-details/${c.courseId}`);
-                                window.scrollTo(0, 0);
-                              }}
-                              title="View Course Details"
-                            >
-                              <Eye size={20} />
-                            </button>
-                            <span className="action-label">Overview</span>
+                        <div className="footer-info-left">
+                          <div className="info-item">
+                            <UserIcon size={14} />
+                            <span>{c.trainer}</span>
+                          </div>
+                          <div className="info-item">
+                            <Calendar size={14} />
+                            <span>{c.startDate}</span>
+                          </div>
+                          <div className="info-item duration-highlight">
+                            <Clock size={14} />
+                            <span>{c.duration}</span>
                           </div>
                         </div>
-                        <button 
-                          className="btn-join-now" 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const userStr = localStorage.getItem("loggedUser");
-                            let userObj = null;
-                            try { userObj = userStr ? JSON.parse(userStr) : null; } catch {}
-                            if (userObj && userObj.role === "Student") {
-                              navigate("/student-dashboard/courses");
-                            } else {
-                              navigate("/login", { state: { redirect: "/student-dashboard/courses" } });
-                            }
-                          }}
-                        >
-                          Enroll Now
-                        </button>
+
+                        <div className="details-action-wrapper">
+                          <button 
+                            className="btn-view-details" 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/course-details/${c.courseId}`);
+                              window.scrollTo(0, 0);
+                            }}
+                            title="View Course Details"
+                          >
+                            <Eye size={20} />
+                          </button>
+                          <span className="action-label">View Course</span>
+                        </div>
                       </div>
                     </div>
                   </div>
