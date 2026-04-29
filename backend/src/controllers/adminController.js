@@ -9,6 +9,7 @@ const batchesRef = db.ref("batch");
 const studentsRef = db.ref("students");
 const trainersRef = db.ref("trainers");
 const coursesRef = db.ref("courses");
+const enrollmentsRef = db.ref("enrollments");
 
 // Helper: Normalized status matching
 const matchesStatus = (val, targetStatuses) => {
