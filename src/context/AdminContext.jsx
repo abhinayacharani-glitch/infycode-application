@@ -10,7 +10,8 @@ import {
   deleteFAQ as apiDeleteFAQ,
   publishNewFAQ,
   getAdminProfileAPI,
-  updateAdminProfileAPI
+  updateAdminProfileAPI,
+  updateTrainerApplicationStatusAPI
 } from '../services/api';
 
 const AdminContext = createContext();
@@ -58,28 +59,14 @@ export const AdminProvider = ({ children }) => {
     setStudents(prev => prev.filter(s => s.id !== id));
   };
 
-  const updateTrainerStatus = (id, action) => {
-    const stages = ['Applied', 'Screening', 'Interview', 'Selected', 'Onboarded'];
-    setTrainers(prev => prev.map(t => {
-      if (t.id === id) {
-        if (action === 'hold') {
-          if (t.status === 'Hold') {
-            const restoredStatus = t.prevStatus || 'Applied';
-            const restoredIndex = stages.indexOf(restoredStatus);
-            return { ...t, status: restoredStatus, progress: (restoredIndex / (stages.length - 1)) * 100 };
-          } else {
-            return { ...t, prevStatus: t.status, status: 'Hold' };
-          }
-        }
-        const baseStatus = t.status === 'Hold' ? (t.prevStatus || 'Applied') : t.status;
-        const currentIndex = stages.indexOf(baseStatus);
-        const nextIndex = action === 'next'
-          ? Math.min(currentIndex + 1, stages.length - 1)
-          : Math.max(currentIndex - 1, 0);
-        return { ...t, status: stages[nextIndex], progress: (nextIndex / (stages.length - 1)) * 100, prevStatus: stages[nextIndex] };
-      }
-      return t;
-    }));
+  const updateTrainerStatus = async (id, action) => {
+    try {
+      await updateTrainerApplicationStatusAPI(id, action);
+      await fetchDashboardStats();
+    } catch (error) {
+      console.error('Error updating trainer status:', error);
+      alert(error.message || 'Failed to update trainer status');
+    }
   };
 
   const toggleCourseStatus = (id) => {
