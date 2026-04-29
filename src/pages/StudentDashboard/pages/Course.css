@@ -102,8 +102,8 @@
 /* ── CATALOG GRID ── */
 .dc-catalog-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
   max-width: 1200px;
   margin: 0 auto;
 }
@@ -130,13 +130,12 @@
 .course-card-modern {
   background: #ffffff;
   border: none;
-  border-radius: 16px;
+  border-radius: 12px;
   padding: 10px;
   display: flex;
   flex-direction: column;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  border: 1px solid #f1f5f9;
 }
 
 .course-card-modern:hover {
@@ -146,8 +145,8 @@
 
 .card-img-banner {
   position: relative;
-  height: 130px;
-  border-radius: 12px;
+  height: 140px;
+  border-radius: 10px;
   overflow: hidden;
 }
 
@@ -167,20 +166,15 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .card-title-modern {
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 800;
   line-height: 1.3;
   color: #1e293b;
   margin: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  min-height: 2.6rem;
 }
 
 .card-stats-modern {
@@ -202,39 +196,10 @@
 }
 
 .card-footer-modern {
-  margin-top: 6px;
+  margin-top: 10px;
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
-  padding-top: 10px;
-  border-top: 1px solid #f1f5f9;
-}
-
-.footer-info-left {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1;
-}
-
-.info-item {
-  display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.8rem;
-  color: #64748b;
-  font-weight: 500;
-}
-
-.info-item svg {
-  color: #94a3b8;
-  width: 13px;
-  height: 13px;
-}
-
-.duration-highlight {
-  color: #475569 !important;
-  font-weight: 700;
 }
 
 .footer-actions-left {
@@ -247,52 +212,82 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
 }
 
 .btn-view-details {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 9px;
-  border: none;
-  background: #0ea5e9;
-  color: #ffffff;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1.5px solid #e2e8f0;
+  background: #ffffff;
+  color: #475569;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 10px rgba(14, 165, 233, 0.2);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
 
 .btn-view-details:hover {
-  background: #0284c7;
+  background: #f1f5f9;
+  color: #2563eb;
+  border-color: #2563eb;
   transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(2, 132, 199, 0.3);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
 }
 
 .action-label {
-  font-size: 0.6rem;
+  font-size: 0.65rem;
   font-weight: 700;
-  color: #0ea5e9;
+  color: #64748b;
   text-transform: uppercase;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.5px;
 }
 
 .btn-join-now {
-  background: #3b82f6;
+  background: #0ea5e9;
   color: white;
   font-weight: 600;
-  padding: 8px 18px;
-  border-radius: 8px;
+  padding: 8px 20px;
+  border-radius: 10px;
   border: none;
   cursor: pointer;
   font-size: 0.95rem;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.25);
 }
 
 .btn-join-now:hover {
-  background: #2563eb;
+  background: #0284c7;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 15px rgba(2, 132, 199, 0.35);
+}
+
+.btn-enrolled {
+  background: #10b981;
+  color: white;
+  font-weight: 600;
+  padding: 8px 20px;
+  border-radius: 10px;
+  border: none;
+  cursor: default;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+}
+
+.btn-join-now.disabled {
+  background: #cbd5e1;
+  color: #94a3b8;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.btn-join-now.disabled:hover {
+  background: #cbd5e1;
 }
 
 .no-results {

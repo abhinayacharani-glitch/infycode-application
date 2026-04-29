@@ -79,9 +79,27 @@ const UsersIcon = () => (
 );
 
 const CoursesPage = () => {
+  const navigate = useNavigate();
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const handleEnroll = () => {
+    const userStr = localStorage.getItem("loggedUser");
+    let userObj = null;
+    try {
+      userObj = userStr ? JSON.parse(userStr) : null;
+    } catch {
+      console.error("Session data corrupted.");
+    }
+
+    if (userObj && userObj.role === "Student") {
+      navigate("/student-dashboard/courses");
+    } else {
+      navigate("/student/signup");
+    }
+  };
 
   return (
     <div className="courses-page">
@@ -120,7 +138,7 @@ const CoursesPage = () => {
                     <UsersIcon /> {course.students}
                   </span>
 
-                  <button className="courses-enroll-btn">Enroll Now</button>
+                  <button className="courses-enroll-btn" onClick={handleEnroll}>Enroll Now</button>
                 </div>
 
               </div>

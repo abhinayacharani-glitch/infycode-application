@@ -72,8 +72,7 @@ const PopularCoursesPage = () => {
     if (userObj && userObj.role === "Student") {
       navigate("/student-dashboard/courses");
     } else {
-      console.log("Not logged in or corrupted session, navigating to login.");
-      navigate("/login", { state: { redirect: "/student-dashboard/courses" } });
+      navigate("/student/signup");
     }
   };
 

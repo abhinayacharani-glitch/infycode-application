@@ -153,7 +153,8 @@ const CourseDetailsPage = () => {
     if (userObj && userObj.role === "Student") {
       navigate("/student-dashboard/courses");
     } else {
-      navigate("/login", { state: { redirect: "/student-dashboard/courses" } });
+      // Redirect to the signup page as requested
+      navigate("/student/signup");
     }
   };
 

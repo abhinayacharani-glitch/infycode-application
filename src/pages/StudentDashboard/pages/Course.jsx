@@ -33,37 +33,7 @@ if (PythonIdx !== -1) {
 
 const CATEGORIES = ["All", "Web Dev", "Python", "Java", "AI & Data", "Cybersecurity", "Cloud"];
 
-const DISABLED_COURSES = [
-  "Data Science & AI",
-  "Machine Learning Deep Dive",
-  "Ethical Hacking & Cyber Security",
-  "React JS Full Stack Development",
-  "Next.js 14 Masterclass",
-  "MERN Stack Development",
-  "Angular Enterprise Development",
-  "Flutter Mobile Apps",
-  "Full Stack Python Pro"
-];
-
-const CourseCardModern = ({ course, index, onNavigate, enrolledIds }) => {
-  const isEnrolled = enrolledIds.includes(course.courseId);
-  const [loading, setLoading] = useState(false);
-
-  const handleEnroll = async () => {
-    setLoading(true);
-    try {
-      await enrollInCourse(course.courseId);
-      alert(`Successfully enrolled in ${course.title}!`);
-      window.location.reload(); // Refresh to update enrollment status globally
-    } catch (error) {
-      alert(error.message || "Enrollment failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const isDisabledCard = DISABLED_COURSES.includes(course.title);
-
+const CourseCardModern = ({ course, index, onNavigate, enrolledIds, onEnroll }) => {
   return (
     <motion.div
       className="course-card-modern"
@@ -80,39 +50,54 @@ const CourseCardModern = ({ course, index, onNavigate, enrolledIds }) => {
       <div className="card-content-modern">
         <h3 className="card-title-modern">{course.title}</h3>
 
-        <div className="card-footer-modern">
-          <div className="footer-info-left">
-            <div className="info-item">
-              <UserIcon size={14} />
-              <span>{course.trainer}</span>
-            </div>
-            <div className="info-item">
-              <Calendar size={14} />
-              <span>{course.startDate}</span>
-            </div>
-            <div className="info-item duration-highlight">
-              <Clock size={14} />
-              <span>{course.duration}</span>
-            </div>
+        <div className="card-stats-modern">
+          <span className="stat students-text">{course.students} students</span>
+          <div className="stat stars-container">
+            {[...Array(5)].map((_, i) => (
+              <Star
+                key={i}
+                size={14}
+                fill={i < 4 ? "#f59e0b" : "transparent"}
+                color={i < 4 ? "#f59e0b" : "#e2e8f0"}
+              />
+            ))}
           </div>
+        </div>
 
+        <div className="card-footer-modern">
           <div className="details-action-wrapper">
             <button 
               className="btn-view-details" 
               onClick={() => onNavigate(`/course-details/${course.courseId}`)}
-              title="View Course Details"
             >
-              <Eye size={18} />
+              <Eye size={20} />
             </button>
-            <span className="action-label">View Course</span>
+            <span className="action-label">Overview</span>
           </div>
+          
+          {enrolledIds.includes(course.courseId) ? (
+            <button className="btn-enrolled" disabled>
+              Enrolled
+            </button>
+          ) : (
+            <button 
+              className={`btn-join-now ${index !== 0 ? "disabled" : ""}`}
+              disabled={index !== 0}
+              onClick={(e) => {
+                e.stopPropagation();
+                onEnroll(course.courseId);
+              }}
+            >
+              Enroll Now
+            </button>
+          )}
         </div>
       </div>
     </motion.div>
   );
 };
 
-const CourseSection = ({ title, courses, onNavigate, enrolledIds }) => {
+const CourseSection = ({ title, courses, onNavigate, enrolledIds, onEnroll }) => {
   if (courses.length === 0) return null;
   return (
     <div className="dc-section">
@@ -127,6 +112,7 @@ const CourseSection = ({ title, courses, onNavigate, enrolledIds }) => {
             index={index} 
             onNavigate={onNavigate} 
             enrolledIds={enrolledIds}
+            onEnroll={onEnroll}
           />
         ))}
       </div>
@@ -140,19 +126,33 @@ const CourseDiscovery = () => {
   const [activeCategory, setActiveCategory] = useState("All");
   const [enrolledIds, setEnrolledIds] = useState([]);
 
+  // Initialize from localStorage on load
   useEffect(() => {
-    const fetchEnrolled = async () => {
+    const savedEnrolled = localStorage.getItem("student_clicked_enrollments");
+    if (savedEnrolled) {
       try {
-        const data = await getEnrolledCourses();
-        // Assuming data is an array of IDs or an object with an enrolledCourses array
-        const ids = Array.isArray(data) ? data : (data.enrolledCourses || []);
-        setEnrolledIds(ids);
+        setEnrolledIds(JSON.parse(savedEnrolled));
       } catch (err) {
-        console.error("Failed to fetch enrolled courses:", err);
+        console.error("Failed to parse local enrollment state:", err);
       }
-    };
-    fetchEnrolled();
+    }
   }, []);
+
+  const handleEnroll = async (courseId) => {
+    try {
+      // 1. Call backend to save enrollment
+      await enrollInCourse(courseId);
+      
+      // 2. Update local state and persist to localStorage
+      setEnrolledIds(prev => {
+        const newIds = [...new Set([...prev, courseId])];
+        localStorage.setItem("student_clicked_enrollments", JSON.stringify(newIds));
+        return newIds;
+      });
+    } catch (err) {
+      console.error("Enrollment failed:", err);
+    }
+  };
 
   const handleNavigate = (path, state) => {
     navigate(path, { state });
@@ -164,7 +164,6 @@ const CourseDiscovery = () => {
     return matchesSearch && matchesCategory;
   });
 
-  // Categorize courses (if not searching)
   const isFiltering = searchTerm !== "" || activeCategory !== "All";
   
   const sections = [
@@ -206,6 +205,7 @@ const CourseDiscovery = () => {
             courses={filtered} 
             onNavigate={handleNavigate} 
             enrolledIds={enrolledIds}
+            onEnroll={handleEnroll}
           />
         ) : (
           sections.map((sec, idx) => (
@@ -215,6 +215,7 @@ const CourseDiscovery = () => {
               courses={sec.courses} 
               onNavigate={handleNavigate} 
               enrolledIds={enrolledIds}
+              onEnroll={handleEnroll}
             />
           ))
         )}
