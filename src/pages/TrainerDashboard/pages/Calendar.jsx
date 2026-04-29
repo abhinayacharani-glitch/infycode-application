@@ -6,16 +6,11 @@ import {
   Search,
   Calendar as CalendarIcon,
   Clock,
-  MapPin,
-  MoreVertical,
   X,
   Edit2,
   Trash2,
-  Filter,
   Check,
   Settings,
-  MoreHorizontal,
-  ExternalLink,
   Link as LinkIcon
 } from 'lucide-react';
 import './Calendar.css';
