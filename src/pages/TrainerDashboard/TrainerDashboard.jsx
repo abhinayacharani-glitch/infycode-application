@@ -18,6 +18,7 @@ import Feedback from "./pages/Feedback";
 import TrainerCounselling from "./pages/TrainerCounselling";
 import Messages from "./pages/Messages";
 import LiveSession from "./pages/LiveSession";
+import Calendar from "./pages/Calendar";
 import Logout from "./pages/Logout";
 
 const TrainerDashboard = () => {
@@ -68,6 +69,7 @@ const TrainerDashboard = () => {
               <Route path="feedback" element={<Feedback />} />
               <Route path="messages" element={<Messages />} />
               <Route path="live-session" element={<LiveSession />} />
+              <Route path="calendar" element={<Calendar />} />
               <Route path="logout" element={<Logout />} />
             </Routes>
           </main>
