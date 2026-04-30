@@ -274,7 +274,8 @@
   width: 100%;
 }
 
-.btn-save-saas, .btn-cancel-saas {
+.btn-save-saas,
+.btn-cancel-saas {
   display: flex;
   align-items: center;
   justify-content: center;

@@ -112,7 +112,6 @@ const Dashboard = () => {
     { label: 'Active Batches', value: parseInt(trainerData.activeBatches || 4), trend: '+5%', icon: <Layers size={22} />, color: 'blue' },
     { label: 'Total Students', value: parseInt(trainerData.totalStudents || 128), trend: '+12%', icon: <Users size={22} />, color: 'green' },
     { label: 'Sessions Today', value: 3, trend: 'On track', icon: <Calendar size={22} />, color: 'amber' },
-    { label: 'Avg Attendance', value: parseInt(trainerData.avgAttendance || 92), trend: '+3%', icon: <CheckCircle size={22} />, color: 'purple', suffix: '%' }
   ];
 
   const [schedule, setSchedule] = useState([
@@ -181,31 +180,6 @@ const Dashboard = () => {
               </>
             ) : dashData ? (
               <>
-                {/* 1. Attendance Card */}
-                <div className="modern-card attendance-card-v2 clickable" onClick={() => navigate('/trainer-dashboard/attendance')}>
-                  <div className="card-main-content">
-                    <span className="batch-tag">{dashData.attendance.batch}</span>
-                    <div className="card-icon-wrapper">
-                      <UserCheck size={26} />
-                    </div>
-                    <div className="card-details">
-                      <h4>Mark Attendance</h4>
-                      <div className="attendance-stats">
-                        <span className="stats-main">{dashData.attendance.present}/{dashData.attendance.total}</span>
-                        <span className="stats-label">Present</span>
-                      </div>
-                      <div className="modern-progress-container">
-                        <div className="modern-progress-bar" style={{ width: `${dashData.attendance.percentage}%` }}></div>
-                      </div>
-                      <div className="card-footer-info">
-                        <Clock size={14} /> Last marked: {dashData.attendance.lastMarked}
-                      </div>
-                    </div>
-                    <button className="modern-card-cta primary">
-                      Complete Now <ArrowRight size={16} />
-                    </button>
-                  </div>
-                </div>
 
                 {/* 2. Materials Card */}
                 <div className="modern-card materials-card-v2 clickable" onClick={() => navigate('/trainer-dashboard/materials')}>
@@ -277,9 +251,6 @@ const Dashboard = () => {
             </button>
             <button className="qa-pill" onClick={() => navigate('/trainer-dashboard/batches')}>
               <TrendingUp size={18} /> Batch Progress
-            </button>
-            <button className="qa-pill" onClick={() => navigate('/trainer-dashboard/attendance')}>
-              <FileText size={18} /> Attendance Report
             </button>
           </div>
         </section>
