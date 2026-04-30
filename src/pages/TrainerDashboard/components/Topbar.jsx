@@ -1,120 +1,193 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTrainer } from '../../../context/TrainerContext';
 import { LogOut } from 'lucide-react';
 import './Topbar.css';
 
 import icLogo from '../../../assets/infycode-final-logo4-1.png';
+import {
+  getTrainerNotificationsAPI,
+  markTrainerNotificationsReadAPI,
+  deleteTrainerNotificationAPI,
+  seedTrainerNotificationsAPI,
+} from '../../../services/api';
 
-const EnvelopeIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="#606d80">
-    <path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0l-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z" />
-  </svg>
-);
-
-const BellSolidIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="#606d80">
-    <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
-  </svg>
-);
-
+/* ─── SVG Icon Components ─────────────────────────────────────────────── */
 const ChevronDownIcon = () => (
   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#606d80" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
     <polyline points="6 9 12 15 18 9" />
   </svg>
 );
 
-const SearchIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#606d80" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="11" cy="11" r="8" />
-    <line x1="21" y1="21" x2="16.65" y2="16.65" />
-  </svg>
-);
-
 const CheckCircleIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="12" r="10" /><polyline points="9 12 11 14 15 10" />
   </svg>
 );
 
 const AlertIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
     <line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" />
   </svg>
 );
 
 const InfoIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
   </svg>
 );
 
-/* ── Notification icon resolver ── */
-const NotifIcon = ({ type }) => {
-  if (type === 'success') return <CheckCircleIcon />;
-  if (type === 'warning') return <AlertIcon />;
-  return <InfoIcon />;
+const StudentIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M22 10v6M2 10l10-5 10 5-10 5z" /><path d="M6 12v5c3 3 9 3 12 0v-5" />
+  </svg>
+);
+
+const BellIcon = ({ hasUnread }) => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill={hasUnread ? '#2563eb' : 'none'} stroke={hasUnread ? '#2563eb' : '#64748b'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+  </svg>
+);
+
+const TrashIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M9 6V4h6v2" />
+  </svg>
+);
+
+/* ─── Notification type → icon + colour map ──────────────────────────── */
+const notifConfig = {
+  success: { Icon: CheckCircleIcon, bg: '#dcfce7', color: '#16a34a', label: 'Admin' },
+  warning: { Icon: AlertIcon,       bg: '#fef3c7', color: '#d97706', label: 'Admin' },
+  student: { Icon: StudentIcon,     bg: '#ede9fe', color: '#7c3aed', label: 'Student' },
+  info:    { Icon: InfoIcon,        bg: '#dbeafe', color: '#2563eb', label: 'Admin' },
 };
 
+const getConfig = (type) => notifConfig[type] || notifConfig.info;
+
+/* ─── Time formatter ─────────────────────────────────────────────────── */
+const formatTime = (createdAt) => {
+  if (!createdAt) return '';
+  const diff = Date.now() - createdAt;
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1)  return 'Just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24)  return `${hrs}h ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
+};
+
+/* ══════════════════════════════════════════════════════════════════════ */
 const Topbar = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
+  const navigate  = useNavigate();
+  const location  = useLocation();
   const { trainerData, profileImage } = useTrainer();
 
-  const userName = trainerData.fullName || trainerData.fullname || trainerData.name || 'Trainer';
-  const role = trainerData.role || 'Trainer';
+  const userName    = trainerData.fullName || trainerData.fullname || trainerData.name || 'Trainer';
+  const role        = trainerData.role || 'Trainer';
   const userInitial = userName.charAt(0).toUpperCase();
 
-  // State
-  const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [modalType, setModalType] = useState('user-menu'); // 'user-menu' or 'brand-logo'
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [showMessages, setShowMessages] = useState(false);
-  const [showUserMenu, setShowUserMenu] = useState(false);
-  const [searchFocused, setSearchFocused] = useState(false);
-  const [searchValue, setSearchValue] = useState('');
+  /* ── UI state ── */
+  const [showLogoutModal,    setShowLogoutModal]    = useState(false);
+  const [modalType,          setModalType]          = useState('user-menu');
+  const [showNotifications,  setShowNotifications]  = useState(false);
+  const [showUserMenu,       setShowUserMenu]        = useState(false);
 
-  // Dummy Data for Trainer
-  const [notifications, setNotifications] = useState([
-    { id: 1, type: 'info', title: 'Session Reminder', text: 'React Basics starts in 15 mins', time: '10m ago', read: false },
-    { id: 2, type: 'success', title: 'Attendance Marked', text: 'Batch B2 attendance updated.', time: '2h ago', read: false }
-  ]);
-  const [messages] = useState([
-    { id: 1, sender: "Admin", text: "Please submit last week's reports.", time: "1h ago", unread: true },
-    { id: 2, sender: "Student Council", text: "Doubt clearing session requested.", time: "4h ago", unread: false }
-  ]);
+  /* ── Notification state ── */
+  const [notifications, setNotifications] = useState([]);
+  const [notifLoading,  setNotifLoading]  = useState(false);
+  const [notifError,    setNotifError]    = useState(null);
 
-  const msgRef = useRef(null);
-  const notifRef = useRef(null);
+  /* ── Refs for click-outside ── */
+  const notifRef   = useRef(null);
   const userMenuRef = useRef(null);
 
-  /* Click-outside handler */
+  /* ── Fetch notifications ─────────────────────────────────────────── */
+  const fetchNotifications = useCallback(async () => {
+    setNotifLoading(true);
+    setNotifError(null);
+    try {
+      const data = await getTrainerNotificationsAPI();
+      if (data.success) {
+        setNotifications(data.notifications || []);
+      }
+    } catch (err) {
+      setNotifError('Could not load notifications');
+      console.error('[Topbar] fetchNotifications error:', err.message);
+    } finally {
+      setNotifLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchNotifications(); // load on mount
+    const interval = setInterval(() => fetchNotifications(), 60000); // poll every 60s
+    return () => clearInterval(interval);
+  }, [fetchNotifications]);
+
+  /* ── Click-outside handler ───────────────────────────────────────── */
   useEffect(() => {
     const handler = (e) => {
-      if (notifRef.current && !notifRef.current.contains(e.target)) setShowNotifications(false);
-      if (msgRef.current && !msgRef.current.contains(e.target)) setShowMessages(false);
+      if (notifRef.current   && !notifRef.current.contains(e.target))   setShowNotifications(false);
       if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setShowUserMenu(false);
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
+  /* ── Derived counts ─────────────────────────────────────────────── */
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  /* ── Handlers ───────────────────────────────────────────────────── */
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    localStorage.removeItem("loggedUser");
-    localStorage.removeItem("trainerProfileImage");
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('loggedUser');
+    localStorage.removeItem('trainerProfileImage');
     setShowLogoutModal(false);
-    navigate('/'); // Redirect to landing page
+    navigate('/');
   };
 
-  const markAllRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+  const handleMarkAllRead = async () => {
+    try {
+      await markTrainerNotificationsReadAPI(null); // null = mark all
+      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    } catch (err) {
+      console.error('[Topbar] markAllRead error:', err.message);
+    }
   };
 
+  const handleMarkOneRead = async (notif) => {
+    if (notif.read) return;
+    try {
+      await markTrainerNotificationsReadAPI(notif.id);
+      setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, read: true } : n));
+    } catch (err) {
+      console.error('[Topbar] markOneRead error:', err.message);
+    }
+  };
+
+  const handleDelete = async (e, id) => {
+    e.stopPropagation();
+    try {
+      await deleteTrainerNotificationAPI(id);
+      setNotifications(prev => prev.filter(n => n.id !== id));
+    } catch (err) {
+      console.error('[Topbar] delete error:', err.message);
+    }
+  };
+
+  const handleBellClick = () => {
+    setShowNotifications(prev => !prev);
+    setShowUserMenu(false);
+  };
+
+  /* ════════════════════════════════════════════════════════════════ */
   return (
     <header className="tb-root">
+
       {/* ── Brand / Logo ── */}
       <div className="adm-brand-section-tb">
         <div
@@ -131,22 +204,150 @@ const Topbar = () => {
         </div>
       </div>
 
-      {/* ── Search Bar (Center) ── */}
-      <div className="tb-left-aligned">
-        {/* Search removed as per request */}
-      </div>
+      {/* ── Centre spacer ── */}
+      <div className="tb-left-aligned" />
+      <div className="tb-spacer" style={{ flex: 1 }} />
 
-      <div className="tb-spacer" style={{ flex: 1 }}></div>
+      {/* ── Right: Bell + Profile ── */}
+      <div className="tb-right-aligned" style={{ gap: '10px' }}>
 
-      {/* ── Right Items (User Profile + Icons) ── */}
-      <div className="tb-right-aligned">
+        {/* ════ BELL NOTIFICATION BUTTON ════ */}
+        <div className="tb-notif-wrapper" ref={notifRef}>
+          <button
+            id="trainer-notif-bell"
+            className={`tb-bell-btn ${showNotifications ? 'active' : ''}`}
+            onClick={handleBellClick}
+            aria-label={`Notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ''}`}
+          >
+            <BellIcon hasUnread={unreadCount > 0} />
+            {unreadCount > 0 && (
+              <span className="tb-bell-badge">{unreadCount > 9 ? '9+' : unreadCount}</span>
+            )}
+          </button>
 
+          {/* ── Notification Dropdown Panel ── */}
+          {showNotifications && (
+            <div className="tb-notif-panel" role="dialog" aria-label="Notifications">
+
+              {/* Panel Header */}
+              <div className="tb-notif-panel-header">
+                <div className="tb-notif-panel-title">
+                  <span>Notifications</span>
+                  {unreadCount > 0 && (
+                    <span className="tb-notif-count-pill">{unreadCount} new</span>
+                  )}
+                </div>
+                {unreadCount > 0 && (
+                  <button className="tb-notif-mark-all" onClick={handleMarkAllRead}>
+                    Mark all read
+                  </button>
+                )}
+              </div>
+              {/* Filter tabs (visual only) */}
+              <div className="tb-notif-tabs">
+                <span className="tb-notif-tab active">All</span>
+              </div>
+
+
+              {/* Notification list */}
+              <div className="tb-notif-list">
+                {notifLoading && (
+                  <div className="tb-notif-empty">
+                    <div className="tb-notif-spinner" />
+                    <span>Loading notifications…</span>
+                  </div>
+                )}
+
+                {!notifLoading && notifError && (
+                  <div className="tb-notif-empty tb-notif-error">
+                    <span>⚠ {notifError}</span>
+                    <button onClick={() => fetchNotifications(false)} className="tb-notif-retry">Retry</button>
+                  </div>
+                )}
+
+                {!notifLoading && !notifError && notifications.length === 0 && (
+                  <div className="tb-notif-empty">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="1.5">
+                      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                      <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                    </svg>
+                    <span>No notifications yet</span>
+                  </div>
+                )}
+
+                {!notifLoading && !notifError && notifications.map((notif) => {
+                  const cfg = getConfig(notif.type);
+                  return (
+                    <div
+                      key={notif.id}
+                      className={`tb-notif-item ${notif.read ? '' : 'unread'}`}
+                      onClick={() => handleMarkOneRead(notif)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={e => e.key === 'Enter' && handleMarkOneRead(notif)}
+                    >
+                      {/* Unread dot */}
+                      {!notif.read && <span className="tb-notif-unread-dot" />}
+
+                      {/* Icon avatar */}
+                      <div className="tb-notif-icon-wrap" style={{ background: cfg.bg }}>
+                        <cfg.Icon />
+                      </div>
+
+                      {/* Content */}
+                      <div className="tb-notif-content">
+                        <div className="tb-notif-sender-row">
+                          <span
+                            className="tb-notif-sender-badge"
+                            style={{ background: cfg.bg, color: cfg.color }}
+                          >
+                            {notif.senderRole === 'student' ? '🎓 Student' : '🛡 Admin'}
+                          </span>
+                          <span className="tb-notif-time">{formatTime(notif.createdAt)}</span>
+                        </div>
+                        <div className="tb-notif-title">{notif.title}</div>
+                        <div className="tb-notif-text">{notif.text}</div>
+                        {notif.senderName && notif.senderName !== 'System' && (
+                          <div className="tb-notif-from">— {notif.senderName}</div>
+                        )}
+                      </div>
+
+                      {/* Delete button */}
+                      <button
+                        className="tb-notif-delete-btn"
+                        onClick={(e) => handleDelete(e, notif.id)}
+                        aria-label="Delete notification"
+                        title="Delete"
+                      >
+                        <TrashIcon />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Panel Footer */}
+              {notifications.length > 0 && (
+                <div className="tb-notif-panel-footer">
+                  <button
+                    className="tb-notif-refresh-btn"
+                    onClick={() => fetchNotifications(false)}
+                  >
+                    ↻ Refresh
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* ════ USER PROFILE ════ */}
         <div className="tb-user-profile-new" ref={userMenuRef} onClick={() => setShowUserMenu(!showUserMenu)}>
-          <img src={profileImage || "https://i.pravatar.cc/150?img=5"} alt={userName} className="tb-user-avatar-new" />
+          <img src={profileImage || 'https://i.pravatar.cc/150?img=5'} alt={userName} className="tb-user-avatar-new" />
           {showUserMenu && (
             <div className="tb-user-dropdown">
               <div className="tb-user-dropdown-header">
-                <img src={profileImage || "https://i.pravatar.cc/150?img=5"} alt={userName} className="tb-udrop-avatar" />
+                <img src={profileImage || 'https://i.pravatar.cc/150?img=5'} alt={userName} className="tb-udrop-avatar" />
                 <div>
                   <div className="tb-udrop-name">{userName}</div>
                   <div className="tb-udrop-role">{role}</div>
@@ -167,11 +368,10 @@ const Topbar = () => {
         </div>
       </div>
 
-      {/* CONFIRMATION MODAL SC-UI (Conditional based on Trigger Source) */}
+      {/* ── Logout Modal ── */}
       {showLogoutModal && (
         <div className="logout-modal-overlay" onClick={() => setShowLogoutModal(false)}>
           {modalType === 'brand-logo' ? (
-            /* BRAND-SPECIFIC LOGOUT MODAL (Matching LogoutModal.jsx code) */
             <div className="logout-modal-container" onClick={(e) => e.stopPropagation()}>
               <div className="logout-icon-circle">
                 <LogOut size={28} strokeWidth={2.5} />
@@ -179,40 +379,27 @@ const Topbar = () => {
               <h2 className="logout-modal-title">Logout</h2>
               <p className="logout-modal-subtitle">Are you sure you want to log out?</p>
               <div className="logout-modal-button-group">
-                <button className="logout-modal-cancel-btn" onClick={() => setShowLogoutModal(false)}>
-                  Cancel
-                </button>
-                <button className="logout-modal-confirm-btn" onClick={handleLogout}>
-                  OK, Logout
-                </button>
+                <button className="logout-modal-cancel-btn" onClick={() => setShowLogoutModal(false)}>Cancel</button>
+                <button className="logout-modal-confirm-btn" onClick={handleLogout}>OK, Logout</button>
               </div>
             </div>
           ) : (
-            /* USER-SPECIFIC LOGOUT MODAL (Matching Sidebar style) */
             <div className="logout-modal-card" onClick={(e) => e.stopPropagation()}>
               <div className="logout-modal-profile-section">
                 <div className="logout-modal-avatar">
                   {profileImage ? (
                     <img src={profileImage} alt="Profile" className="tb-user-avatar-new" style={{ width: '100%', height: '100%', borderRadius: '50%' }} />
-                  ) : (
-                    userInitial
-                  )}
+                  ) : userInitial}
                 </div>
                 <h3>{userName}</h3>
               </div>
-
               <div className="logout-modal-message-section">
                 <h2>Are you sure you want to logout?</h2>
                 <p>You will be redirected to the trainer login page.</p>
               </div>
-
               <div className="logout-modal-button-group">
-                <button className="logout-modal-cancel-btn" onClick={() => setShowLogoutModal(false)}>
-                  Cancel
-                </button>
-                <button className="logout-modal-ok-btn" onClick={handleLogout}>
-                  OK
-                </button>
+                <button className="logout-modal-cancel-btn" onClick={() => setShowLogoutModal(false)}>Cancel</button>
+                <button className="logout-modal-ok-btn" onClick={handleLogout}>OK</button>
               </div>
             </div>
           )}
@@ -223,5 +410,3 @@ const Topbar = () => {
 };
 
 export default Topbar;
-
-

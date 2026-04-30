@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Edit2, Mail, Phone, MapPin, Award, BookOpen, CheckCircle, GraduationCap, Camera, User } from 'lucide-react';
+import { Edit2, Mail, Phone, MapPin, Award, BookOpen, CheckCircle, GraduationCap, Camera, User, Upload, Trash2, X } from 'lucide-react';
 import { useLocation } from "react-router-dom";
 import "./Profile.css";
 import { getStudentProfile, updateStudentProfile, getEnrolledCourses, getMyResults } from "../../../services/api";
@@ -7,6 +7,10 @@ import { getStudentProfile, updateStudentProfile, getEnrolledCourses, getMyResul
 const Profile = () => {
   const location = useLocation();
   const fileInputRef = useRef(null);
+  const photoMenuRef = useRef(null);
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
+  
   const [loading, setLoading] = useState(true);
   const [profileData, setProfileData] = useState(null);
   const [open, setOpen] = useState("personal");
@@ -15,6 +19,9 @@ const Profile = () => {
   const [enrolledCourses, setEnrolledCourses] = useState([]);
   const [testResults, setTestResults] = useState({});
   const [saveStatus, setSaveStatus] = useState('');
+  
+  const [showPhotoMenu, setShowPhotoMenu] = useState(false);
+  const [showCameraModal, setShowCameraModal] = useState(false);
 
   const [personal, setPersonal] = useState({
     fullName: "", phone: "", email: "", dob: "", gender: "", location: "", profileImage: null
@@ -29,6 +36,16 @@ const Profile = () => {
     fetchAll();
     const params = new URLSearchParams(location.search);
     if (params.get('edit') === 'true') { setIsEditing(true); setOpen("personal"); }
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (photoMenuRef.current && !photoMenuRef.current.contains(event.target)) {
+        setShowPhotoMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const fetchAll = async () => {
@@ -93,12 +110,13 @@ const Profile = () => {
     finally { setLoading(false); }
   };
 
-  const dispatchSync = () => {
-    window.dispatchEvent(new Event('profileUpdate'));
+  const dispatchSync = (overrides = {}) => {
+    const updatedPersonal = { ...personal, ...overrides };
     const stored = JSON.parse(localStorage.getItem('loggedUser') || localStorage.getItem('user') || '{}');
-    const updated = { ...stored, ...personal, fullName: personal.fullName, username: personal.fullName };
+    const updated = { ...stored, ...updatedPersonal, fullName: updatedPersonal.fullName, username: updatedPersonal.fullName };
     localStorage.setItem('loggedUser', JSON.stringify(updated));
     localStorage.setItem('user', JSON.stringify(updated));
+    window.dispatchEvent(new Event('profileUpdate'));
   };
 
   const handlePhotoChange = async (e) => {
@@ -107,10 +125,64 @@ const Profile = () => {
     const reader = new FileReader();
     reader.onloadend = async () => {
       const b64 = reader.result;
+      setShowPhotoMenu(false);
       setPersonal(prev => ({ ...prev, profileImage: b64 }));
-      try { await updateStudentProfile({ profileImage: b64 }); dispatchSync(); } catch (err) { console.error(err); }
+      try { 
+        await updateStudentProfile({ profileImage: b64 }); 
+        dispatchSync({ profileImage: b64 }); 
+      } catch (err) { console.error(err); }
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleRemovePhoto = async () => {
+    setShowPhotoMenu(false);
+    setPersonal(prev => ({ ...prev, profileImage: null }));
+    try { 
+      await updateStudentProfile({ profileImage: null }); 
+      dispatchSync({ profileImage: null }); 
+    } catch (err) { console.error(err); }
+  };
+
+  const openCamera = async () => {
+    setShowPhotoMenu(false);
+    setShowCameraModal(true);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+    } catch (err) {
+      console.error("Camera access denied:", err);
+      alert("Unable to access camera. Please check permissions.");
+      setShowCameraModal(false);
+    }
+  };
+
+  const closeCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+    }
+    setShowCameraModal(false);
+  };
+
+  const capturePhoto = () => {
+    if (videoRef.current) {
+      const canvas = document.createElement("canvas");
+      canvas.width = videoRef.current.videoWidth;
+      canvas.height = videoRef.current.videoHeight;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+      const b64 = canvas.toDataURL("image/jpeg");
+      
+      closeCamera();
+      
+      setPersonal(prev => ({ ...prev, profileImage: b64 }));
+      updateStudentProfile({ profileImage: b64 })
+        .then(() => dispatchSync({ profileImage: b64 }))
+        .catch(console.error);
+    }
   };
 
   const validatePersonal = () => {
@@ -202,6 +274,28 @@ const Profile = () => {
 
   return (
     <div className="profile-page">
+      {/* ── CAMERA MODAL ── */}
+      {showCameraModal && (
+        <div className="camera-modal-overlay">
+          <div className="camera-modal">
+            <div className="camera-modal-header">
+              <h3>Take Photo</h3>
+              <button className="camera-close-btn" onClick={closeCamera}>
+                <X size={20} />
+              </button>
+            </div>
+            <div className="camera-view-container">
+              <video ref={videoRef} autoPlay playsInline className="camera-video"></video>
+            </div>
+            <div className="camera-modal-footer">
+              <button className="camera-capture-btn" onClick={capturePhoto}>
+                <Camera size={18} /> Capture Photo
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── SUCCESS TOAST ── */}
       {saveStatus === 'saved' && (
         <div className="profile-toast success">
@@ -219,15 +313,32 @@ const Profile = () => {
       <div className="profile-hero-banner">
         <div className="hero-left">
           {/* Avatar */}
-          <div className="hero-avatar-wrap">
+          <div className="hero-avatar-wrap" ref={photoMenuRef}>
             {personal.profileImage ? (
               <img src={personal.profileImage} alt="avatar" className="hero-avatar-img" />
             ) : (
               <div className="hero-avatar-initials">{personal.fullName.charAt(0) || 'S'}</div>
             )}
-            <button className="hero-camera-btn" onClick={() => fileInputRef.current.click()} title="Change photo">
+            <button className="hero-camera-btn" onClick={() => setShowPhotoMenu(!showPhotoMenu)} title="Change photo">
               <Camera size={14} />
             </button>
+            
+            {showPhotoMenu && (
+              <div className="photo-options-menu">
+                <button className="photo-menu-item" onClick={openCamera}>
+                  <Camera size={16} /> Take photo
+                </button>
+                <button className="photo-menu-item" onClick={() => fileInputRef.current.click()}>
+                  <Upload size={16} /> Upload photo
+                </button>
+                {personal.profileImage && (
+                  <button className="photo-menu-item danger" onClick={handleRemovePhoto}>
+                    <Trash2 size={16} /> Remove photo
+                  </button>
+                )}
+              </div>
+            )}
+            
             <input type="file" ref={fileInputRef} accept="image/*" style={{ display: 'none' }} onChange={handlePhotoChange} />
           </div>
 

@@ -15,46 +15,84 @@ import {
   User,
   Star,
   Users,
-  Calendar
+  Calendar,
+  Upload,
+  Trash2
 } from 'lucide-react';
 import './Profile.css';
+
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error, errorInfo) {
+    console.error("ErrorBoundary caught an error", error, errorInfo);
+  }
+  render() {
+    if (this.state.hasError) {
+      return <div style={{color: 'red', padding: '20px'}}><h2>Something went wrong.</h2><pre>{this.state.error.toString()}</pre></div>;
+    }
+    return this.props.children;
+  }
+}
 
 const Profile = () => {
   const { trainerData, profileImage, updateTrainerProfile } = useTrainer();
   const [isEditing, setIsEditing] = useState(false);
   const fileInputRef = useRef(null);
+  
+  const [showPhotoMenu, setShowPhotoMenu] = useState(false);
+  const [showCameraModal, setShowCameraModal] = useState(false);
+  const photoMenuRef = useRef(null);
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
 
+  const safeData = trainerData || {};
   const [tempData, setTempData] = useState({
-    name: trainerData.fullName || trainerData.fullname || trainerData.name || "",
-    role: trainerData.role ? trainerData.role.toUpperCase() : "",
-    email: trainerData.email || "",
-    phone: trainerData.phone || "",
-    location: trainerData.location || "",
-    experience: trainerData.experience || "",
-    expertise: trainerData.expertise || "",
-    courses: trainerData.courses || "",
-    mode: trainerData.mode || "",
-    about: trainerData.about || ""
+    name: safeData.fullName || safeData.fullname || safeData.name || "",
+    role: safeData.role ? safeData.role.toUpperCase() : "",
+    email: safeData.email || "",
+    phone: safeData.phone || "",
+    location: safeData.location || "",
+    experience: safeData.experience || "",
+    expertise: safeData.expertise || "",
+    courses: safeData.courses || "",
+    mode: safeData.mode || "",
+    about: safeData.about || ""
   });
 
   const [localImage, setLocalImage] = useState(profileImage);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (photoMenuRef.current && !photoMenuRef.current.contains(event.target)) {
+        setShowPhotoMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   // Sync with context if it changes elsewhere (like after backend fetch)
   useEffect(() => {
-    console.log("[Profile] trainerData updated:", trainerData);
-    if (!isEditing && trainerData && (trainerData.email || trainerData.fullName || trainerData.name)) {
+    console.log("[Profile] trainerData updated:", safeData);
+    if (!isEditing && safeData && (safeData.email || safeData.fullName || safeData.name)) {
       setTempData({
-        name: trainerData.fullName || trainerData.fullname || trainerData.name || "",
-        role: trainerData.role ? trainerData.role.toUpperCase() : "TRAINER",
-        email: trainerData.email || "",
-        phone: trainerData.phone || trainerData.phno || "",
-        location: trainerData.location || "",
-        experience: trainerData.experience || "",
-        expertise: trainerData.expertise || "",
-        courses: trainerData.courses || "",
-        mode: trainerData.mode || "",
-        about: trainerData.about || ""
+        name: safeData.fullName || safeData.fullname || safeData.name || "",
+        role: safeData.role ? String(safeData.role).toUpperCase() : "TRAINER",
+        email: safeData.email || "",
+        phone: safeData.phone || safeData.phno || "",
+        location: safeData.location || "",
+        experience: safeData.experience || "",
+        expertise: safeData.expertise || "",
+        courses: safeData.courses || "",
+        mode: safeData.mode || "",
+        about: safeData.about || ""
       });
       setIsDataLoaded(true);
     }
@@ -64,16 +102,16 @@ const Profile = () => {
   const handleEditToggle = () => {
     if (isEditing) {
       setTempData({
-        name: trainerData.fullName || trainerData.fullname || trainerData.name || "",
-        role: trainerData.role ? trainerData.role.toUpperCase() : "",
-        email: trainerData.email || "",
-        phone: trainerData.phone || "",
-        location: trainerData.location || "",
-        experience: trainerData.experience || "",
-        expertise: trainerData.expertise || "",
-        courses: trainerData.courses || "",
-        mode: trainerData.mode || "",
-        about: trainerData.about || ""
+        name: safeData.fullName || safeData.fullname || safeData.name || "",
+        role: safeData.role ? String(safeData.role).toUpperCase() : "",
+        email: safeData.email || "",
+        phone: safeData.phone || "",
+        location: safeData.location || "",
+        experience: safeData.experience || "",
+        expertise: safeData.expertise || "",
+        courses: safeData.courses || "",
+        mode: safeData.mode || "",
+        about: safeData.about || ""
       });
     }
     setIsEditing(!isEditing);
@@ -95,39 +133,103 @@ const Profile = () => {
     setTempData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleImageClick = () => {
-    fileInputRef.current.click();
-  };
-
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Basic size check (2MB)
       if (file.size > 2 * 1024 * 1024) {
         alert("Image size should be less than 2MB");
         return;
       }
-
       const reader = new FileReader();
       reader.onloadend = () => {
         setLocalImage(reader.result);
-        // Instant update as requested
+        setShowPhotoMenu(false);
         updateTrainerProfile(null, reader.result);
       };
       reader.readAsDataURL(file);
     }
   };
 
+  const handleRemovePhoto = async () => {
+    setShowPhotoMenu(false);
+    setLocalImage(null);
+    try {
+      await updateTrainerProfile(null, null);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const openCamera = async () => {
+    setShowPhotoMenu(false);
+    setShowCameraModal(true);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+    } catch (err) {
+      console.error("Camera access denied:", err);
+      alert("Unable to access camera. Please check permissions.");
+      setShowCameraModal(false);
+    }
+  };
+
+  const closeCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+    }
+    setShowCameraModal(false);
+  };
+
+  const capturePhoto = () => {
+    if (videoRef.current) {
+      const canvas = document.createElement("canvas");
+      canvas.width = videoRef.current.videoWidth;
+      canvas.height = videoRef.current.videoHeight;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+      const b64 = canvas.toDataURL("image/jpeg");
+      
+      closeCamera();
+      setLocalImage(b64);
+      updateTrainerProfile(null, b64).catch(console.error);
+    }
+  };
+
   const stats = [
-    { label: 'Active Batches', value: trainerData.activeBatches || '4', icon: <Layers size={18} />, color: 'blue' },
-    { label: 'Total Students', value: trainerData.totalStudents || '128', icon: <Users size={18} />, color: 'green' },
-    { label: 'Avg Attendance', value: (trainerData.avgAttendance || '92') + '%', icon: <Star size={18} />, color: 'purple' }
+    { label: 'Active Batches', value: safeData.activeBatches || '4', icon: <Layers size={18} />, color: 'blue' },
+    { label: 'Total Students', value: safeData.totalStudents || '128', icon: <Users size={18} />, color: 'green' },
+    { label: 'Avg Attendance', value: (safeData.avgAttendance || '92') + '%', icon: <Star size={18} />, color: 'purple' }
   ];
 
-  const displayName = trainerData.fullName || trainerData.fullname || trainerData.name || "";
+  const displayName = safeData.fullName || safeData.fullname || safeData.name || "";
 
   return (
     <div className="profile-saas-container">
+      {/* ── CAMERA MODAL ── */}
+      {showCameraModal && (
+        <div className="camera-modal-overlay">
+          <div className="camera-modal">
+            <div className="camera-modal-header">
+              <h3>Take Photo</h3>
+              <button className="camera-close-btn" onClick={closeCamera}>
+                <X size={20} />
+              </button>
+            </div>
+            <div className="camera-view-container">
+              <video ref={videoRef} autoPlay playsInline className="camera-video"></video>
+            </div>
+            <div className="camera-modal-footer">
+              <button className="camera-capture-btn" onClick={capturePhoto}>
+                <Camera size={18} /> Capture Photo
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 0. HEADER */}
       <div className="profile-header">
         <h1 className="profile-title">My Profile</h1>
@@ -138,7 +240,7 @@ const Profile = () => {
       <div className="profile-layout">
         <div className="profile-card-container">
           <div className="profile-header-card shadow-sm minimal">
-            <div className="profile-image-container-minimal" onClick={handleImageClick}>
+            <div className="profile-image-container-minimal" ref={photoMenuRef}>
               {localImage ? (
                 <img src={localImage} alt="Profile" className="profile-img-centered" />
               ) : (
@@ -146,9 +248,26 @@ const Profile = () => {
                   <User size={40} className="text-muted" />
                 </div>
               )}
-              <div className="camera-overlay-minimal">
+              <div className="camera-overlay-minimal" onClick={() => setShowPhotoMenu(!showPhotoMenu)}>
                 <Camera size={14} color="white" />
               </div>
+              
+              {showPhotoMenu && (
+                <div className="photo-options-menu">
+                  <button className="photo-menu-item" onClick={openCamera}>
+                    <Camera size={16} /> Take photo
+                  </button>
+                  <button className="photo-menu-item" onClick={() => fileInputRef.current.click()}>
+                    <Upload size={16} /> Upload photo
+                  </button>
+                  {localImage && (
+                    <button className="photo-menu-item danger" onClick={handleRemovePhoto}>
+                      <Trash2 size={16} /> Remove photo
+                    </button>
+                  )}
+                </div>
+              )}
+
               <input
                 type="file"
                 ref={fileInputRef}
@@ -160,8 +279,8 @@ const Profile = () => {
 
             <div className="profile-identity-centered">
               <h1 className="trainer-name-centered">{displayName}</h1>
-              <p className="trainer-role-minimal">{trainerData.role ? trainerData.role.toUpperCase() : ""}</p>
-              <p className="trainer-email-centered">{trainerData.email || ""}</p>
+              <p className="trainer-role-minimal">{safeData.role ? String(safeData.role).toUpperCase() : ""}</p>
+              <p className="trainer-email-centered">{safeData.email || ""}</p>
               <div className="trainer-id-status-row">
                 <span className="trainer-id-centered">TRN-1024</span>
                 <span className="trainer-status-pill">
@@ -227,7 +346,7 @@ const Profile = () => {
               {isEditing ? (
                 <input name="email" value={tempData.email} onChange={handleChange} className="edit-input-saas" />
               ) : (
-                <div className="value-box-saas text-blue">{trainerData.email || ""}</div>
+                <div className="value-box-saas text-blue">{safeData.email || ""}</div>
               )}
             </div>
             <div className="info-item-saas">
@@ -235,7 +354,7 @@ const Profile = () => {
               {isEditing ? (
                 <input name="phone" value={tempData.phone} onChange={handleChange} className="edit-input-saas" />
               ) : (
-                <div className="value-box-saas">{trainerData.phone || ""}</div>
+                <div className="value-box-saas">{safeData.phone || ""}</div>
               )}
             </div>
             <div className="info-item-saas">
@@ -243,7 +362,7 @@ const Profile = () => {
               {isEditing ? (
                 <input name="location" value={tempData.location} onChange={handleChange} className="edit-input-saas" />
               ) : (
-                <div className="value-box-saas">{trainerData.location || ""}</div>
+                <div className="value-box-saas">{safeData.location || ""}</div>
               )}
             </div>
           </div>
@@ -258,7 +377,7 @@ const Profile = () => {
               {isEditing ? (
                 <input name="experience" value={tempData.experience} onChange={handleChange} className="edit-input-saas" />
               ) : (
-                <div className="value-box-saas">{trainerData.experience || ""}</div>
+                <div className="value-box-saas">{safeData.experience || ""}</div>
               )}
             </div>
             <div className="info-item-saas">
@@ -266,7 +385,7 @@ const Profile = () => {
               {isEditing ? (
                 <input name="expertise" value={tempData.expertise} onChange={handleChange} className="edit-input-saas" />
               ) : (
-                <div className="value-box-saas">{trainerData.expertise || ""}</div>
+                <div className="value-box-saas">{safeData.expertise || ""}</div>
               )}
             </div>
             <div className="info-item-saas">
@@ -274,7 +393,7 @@ const Profile = () => {
               {isEditing ? (
                 <input name="courses" value={tempData.courses} onChange={handleChange} className="edit-input-saas" />
               ) : (
-                <div className="value-box-saas">{trainerData.courses || ""}</div>
+                <div className="value-box-saas">{safeData.courses || ""}</div>
               )}
             </div>
             <div className="info-item-saas">
@@ -282,7 +401,7 @@ const Profile = () => {
               {isEditing ? (
                 <input name="mode" value={tempData.mode} onChange={handleChange} className="edit-input-saas" />
               ) : (
-                <div className="value-box-saas">{trainerData.mode || ""}</div>
+                <div className="value-box-saas">{safeData.mode || ""}</div>
               )}
             </div>
           </div>
@@ -300,7 +419,7 @@ const Profile = () => {
               rows="4"
             />
           ) : (
-            <p className="about-text-saas">{trainerData.about || ""}</p>
+            <p className="about-text-saas">{safeData.about || ""}</p>
           )}
         </div>
 
@@ -309,4 +428,10 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default function ProfileWithErrorBoundary(props) {
+  return (
+    <ErrorBoundary>
+      <Profile {...props} />
+    </ErrorBoundary>
+  );
+}

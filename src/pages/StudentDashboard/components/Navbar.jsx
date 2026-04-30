@@ -29,6 +29,23 @@ const Navbar = ({ onToggleSidebar }) => {
     };
     window.addEventListener('profileUpdate', handleProfileSync);
     window.addEventListener('storage', handleProfileSync);
+    
+    // Global sync on mount to catch profileImage if missing from login
+    import('../../../services/api').then(({ getStudentProfile }) => {
+      getStudentProfile().then(res => {
+        if (res.success && res.profile && res.profile.profileImage) {
+          const currentLocal = JSON.parse(localStorage.getItem('loggedUser') || localStorage.getItem('user') || '{}');
+          if (currentLocal.profileImage !== res.profile.profileImage) {
+            currentLocal.profileImage = res.profile.profileImage;
+            localStorage.setItem('loggedUser', JSON.stringify(currentLocal));
+            localStorage.setItem('user', JSON.stringify(currentLocal));
+            setUser(prev => ({ ...prev, profileImage: res.profile.profileImage }));
+            window.dispatchEvent(new Event('profileUpdate')); // Sync Sidebar
+          }
+        }
+      }).catch(err => console.error("Global profile sync error:", err));
+    });
+
     return () => {
       window.removeEventListener('profileUpdate', handleProfileSync);
       window.removeEventListener('storage', handleProfileSync);
