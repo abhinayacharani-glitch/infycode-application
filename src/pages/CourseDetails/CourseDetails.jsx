@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ALL_COURSES } from "../../components/Courses/Courses";
+import { useCourseContext } from "../../context/CourseContext";
 import { ArrowLeft, Clock, Users, Star, BookOpen, ChevronDown, ChevronUp, CheckCircle, Eye, Calendar, User as UserIcon, Download } from "lucide-react";
 import jsPDF from 'jspdf';
 import "../../components/Courses/Courses.css";
@@ -117,12 +118,14 @@ const CourseDetailsPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("Overview");
   const [openModules, setOpenModules] = useState([]); // All modules closed by default
+  const { publishedCourses } = useCourseContext();
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  const course = ALL_COURSES.find((c) => c.courseId === id);
+  const combinedCourses = [...publishedCourses, ...ALL_COURSES];
+  const course = combinedCourses.find((c) => c.courseId === id);
 
   if (!course) {
     return (
@@ -203,7 +206,7 @@ const CourseDetailsPage = () => {
             doc.setFontSize(10);
             doc.text(`  - ${sub}`, 30, yPos);
             yPos += 5;
-            
+
             if (yPos > 280) {
               doc.addPage();
               yPos = 20;
@@ -222,7 +225,30 @@ const CourseDetailsPage = () => {
   const tabs = ["Overview", "Curriculum"];
 
   // Calculate specific syllabus based on category
-  const courseSyllabus = SYLLABUS_DB[course.category] || DEFAULT_SYLLABUS;
+  let courseSyllabus = SYLLABUS_DB[course.category] || DEFAULT_SYLLABUS;
+
+  // Handle dynamically parsed curriculum from Firebase published courses
+  if (course.curriculum) {
+    try {
+      // The curriculum format from Firebase is e.g.:
+      // [Module Name]
+      // Topic 1
+      // Topic 2
+      const blocks = course.curriculum.split('\n\n').filter(b => b.trim());
+      if (blocks.length > 0) {
+        courseSyllabus = blocks.map((block, idx) => {
+          const lines = block.split('\n').filter(l => l.trim());
+          const titleLine = lines[0] || '';
+          const titleMatch = titleLine.match(/\[(.*?)\]/);
+          const title = titleMatch ? titleMatch[1] : `Module ${idx + 1}`;
+          const topics = lines.slice(1).map(t => ({ main: t, subtopics: [] }));
+          return { id: idx + 1, title, topics };
+        });
+      }
+    } catch (e) {
+      console.error("Failed to parse dynamic curriculum", e);
+    }
+  }
 
   return (
     <div className="cd-page-wrapper">
@@ -251,7 +277,7 @@ const CourseDetailsPage = () => {
               <span className="cd-stat"><Star size={16} className="text-yellow" /> {course.rating} Rating</span>
               <span className="cd-stat"><Clock size={16} /> {course.duration}</span>
               <span className="cd-stat trainer-stat">
-                <UserIcon size={16} /> 
+                <UserIcon size={16} />
                 {course.trainer}
                 <button className="cd-mini-download" onClick={handleDownloadCurriculum} title="Download Curriculum">
                   <Download size={14} />
@@ -270,7 +296,7 @@ const CourseDetailsPage = () => {
             </div>
           </div>
           <div className="cd-header-image">
-            <img src={course.image} alt={course.title} />
+            <img src={course.image || 'https://via.placeholder.com/600x400?text=Course'} alt={course.title} />
           </div>
         </div>
 
@@ -329,7 +355,7 @@ const CourseDetailsPage = () => {
               </section>
 
               {/* Related Courses Section */}
-              <RelatedCourses currentCourse={course} navigate={navigate} />
+              <RelatedCourses currentCourse={course} navigate={navigate} publishedCourses={publishedCourses} />
             </div>
           )}
 
@@ -396,12 +422,14 @@ const statusColors = {
   "BEGINNER": { bg: "rgba(99,102,241,0.12)", color: "#6366f1" },
 };
 
-const RelatedCourses = ({ currentCourse, navigate }) => {
+const RelatedCourses = ({ currentCourse, navigate, publishedCourses }) => {
   // Get suggestions
-  const sameCat = ALL_COURSES.filter(
+  const combinedCourses = [...publishedCourses, ...ALL_COURSES];
+
+  const sameCat = combinedCourses.filter(
     (c) => c.courseId !== currentCourse.courseId && c.category === currentCourse.category
   );
-  const others = ALL_COURSES.filter(
+  const others = combinedCourses.filter(
     (c) => c.courseId !== currentCourse.courseId && c.category !== currentCourse.category
   );
   const originalSuggestions = [...sameCat, ...others].slice(0, 8);
@@ -456,35 +484,35 @@ const RelatedCourses = ({ currentCourse, navigate }) => {
 
       <div className="cd-slider-container">
         <button className="cd-slider-nav prev" onClick={prev}>❮</button>
-        
+
         <div className="cd-slider-viewport">
-          <div 
+          <div
             className="cd-slider-track"
-            style={{ 
+            style={{
               transform: `translateX(-${index * (100 / (window.innerWidth > 1024 ? 3 : window.innerWidth > 768 ? 2 : 1))}%)`,
               transition: isTransitioning ? "transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)" : "none"
             }}
           >
             {suggestions.map((c, i) => {
               return (
-                <div 
-                  key={`${c.courseId}-${i}`} 
+                <div
+                  key={`${c.courseId}-${i}`}
                   className="cd-slider-item"
                   style={{ flex: `0 0 ${100 / (window.innerWidth > 1024 ? 3 : window.innerWidth > 768 ? 2 : 1)}%` }}
                 >
                   <div className="course-card-modern">
-                    <div 
-                      className="card-img-banner" 
-                      onClick={() => { navigate(`/course-details/${c.courseId}`); window.scrollTo(0, 0); }} 
+                    <div
+                      className="card-img-banner"
+                      onClick={() => { navigate(`/course-details/${c.courseId}`); window.scrollTo(0, 0); }}
                       style={{ cursor: "pointer" }}
                     >
-                      <img src={c.image} alt={c.title} />
+                      <img src={c.image || 'https://via.placeholder.com/400x200?text=Course'} alt={c.title} />
                     </div>
 
                     <div className="card-content-modern">
-                      <h3 
-                        className="card-title-modern" 
-                        onClick={() => { navigate(`/course-details/${c.courseId}`); window.scrollTo(0, 0); }} 
+                      <h3
+                        className="card-title-modern"
+                        onClick={() => { navigate(`/course-details/${c.courseId}`); window.scrollTo(0, 0); }}
                         style={{ cursor: "pointer" }}
                       >
                         {c.title}
@@ -507,8 +535,8 @@ const RelatedCourses = ({ currentCourse, navigate }) => {
                         </div>
 
                         <div className="details-action-wrapper">
-                          <button 
-                            className="btn-view-details" 
+                          <button
+                            className="btn-view-details"
                             onClick={(e) => {
                               e.stopPropagation();
                               navigate(`/course-details/${c.courseId}`);

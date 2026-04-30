@@ -54,15 +54,15 @@ const AdminLogin = () => {
       const data = await adminLogin(formData.email, formData.password);
       // Store auth data in standardized 'user' object
       localStorage.setItem('user', JSON.stringify({
-        token:    data.token,
-        role:     data.role,
-        email:    data.email,
+        token: data.token,
+        role: data.role,
+        email: data.email,
         fullName: data.fullName || 'Admin',
       }));
       // Role-based navigation
-      if (data.role === 'admin')        navigate("/admin-dashboard");
+      if (data.role === 'admin') navigate("/admin-dashboard");
       else if (data.role === 'trainer') navigate("/trainer-dashboard");
-      else                              navigate("/student-dashboard");
+      else navigate("/student-dashboard");
     } catch (err) {
       setApiError(err.message);
     } finally {
@@ -163,12 +163,12 @@ const AdminLogin = () => {
         {/* ── RIGHT: Blue Panel ── */}
         <div className="admin-panel-side">
           <div className="admin-panel-content">
-            <h2 className="admin-panel-heading">Secure.<br/>Powerful.</h2>
+            <h2 className="admin-panel-heading">Secure.<br />Powerful.</h2>
             <p className="admin-panel-sub">
               Manage Trainers, Courses, and System Growth from a centralized command center.
             </p>
-            <Link 
-              to="/admin/signup" 
+            <Link
+              to="/admin/signup"
               className="admin-panel-btn"
               state={{ fromLogin: true }}
               onClick={(e) => {

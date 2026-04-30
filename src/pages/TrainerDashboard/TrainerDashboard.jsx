@@ -14,7 +14,10 @@ import BatchDetails from "./pages/BatchDetails"; // New Page
 import Schedule from "./pages/Schedule";
 import Materials from "./pages/Materials";
 import Attendance from "./pages/Attendance";
-import Feedback from "./pages/Feedback";
+import StudentConnect from "./pages/StudentConnect";
+import StudentConnectBatch from "./pages/StudentConnectBatch";
+import StudentConnectQuery from "./pages/StudentConnectQuery";
+import StudentConnectSolution from "./pages/StudentConnectSolution";
 import TrainerCounselling from "./pages/TrainerCounselling";
 import Messages from "./pages/Messages";
 import LiveSession from "./pages/LiveSession";
@@ -66,7 +69,11 @@ const TrainerDashboard = () => {
               <Route path="materials" element={<Materials />} />
               <Route path="attendance" element={<Attendance />} />
               <Route path="counselling" element={<TrainerCounselling />} />
-              <Route path="feedback" element={<Feedback />} />
+              <Route path="student-connect" element={<StudentConnect />} />
+              <Route path="student-connect/:batchId" element={<StudentConnectBatch />} />
+              <Route path="student-connect/:batchId/:studentId" element={<StudentConnectQuery />} />
+              <Route path="student-connect/:batchId/:studentId/solution" element={<StudentConnectSolution />} />
+              <Route path="chat/:studentId" element={<Messages />} />
               <Route path="messages" element={<Messages />} />
               <Route path="live-session" element={<LiveSession />} />
               <Route path="calendar" element={<Calendar />} />

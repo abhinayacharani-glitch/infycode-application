@@ -245,12 +245,7 @@ const CourseFeed = ({ courses, onToggleLike, onUpdateCourse, onDeleteCourse, isE
                       <span className="cf-meta-item"><Clock size={13} /> {course.duration}</span>
                       <span className="cf-level-badge" style={{ background: lvl.bg, color: lvl.color }}>{course.level}</span>
                     </div>
-                    {course.curriculum && (
-                      <div className="cf-curriculum-container" style={{ marginTop: '0.75rem', padding: '0.75rem', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                        <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b', marginBottom: '0.5rem' }}>SYLLABUS</div>
-                        <div className="cf-curriculum-content">{renderCurriculum(course.curriculum)}</div>
-                      </div>
-                    )}
+
                     <div className="cf-social">
                       <button className="cf-action-btn cf-ml-auto" onClick={() => startEdit(course)}><Edit2 size={15} /></button>
                       <button className="cf-action-btn cf-delete-btn" onClick={() => handleDelete(course.id)}><Trash2 size={15} /></button>

@@ -107,7 +107,7 @@ const EMPTY_FORM = {
 
 const AdminPage = ({ onCoursePublished, isEmbedded = false }) => {
   const navigate = useNavigate();
-  const { addCourse } = useAdmin();
+  const { addCourse, syllabuses } = useAdmin();
 
   const [formData, setFormData] = useState({ ...EMPTY_FORM });
   const [submitted, setSubmitted] = useState(false);
@@ -309,6 +309,14 @@ const AdminPage = ({ onCoursePublished, isEmbedded = false }) => {
                 if (val === 'java') setFormData(prev => ({ ...prev, curriculum: JAVA_SYLLABUS }));
                 if (val === 'python') setFormData(prev => ({ ...prev, curriculum: PYTHON_SYLLABUS }));
                 if (val === 'cloud') setFormData(prev => ({ ...prev, curriculum: CLOUD_SYLLABUS }));
+                
+                const selectedSyllabus = syllabuses.find(s => s.id === val);
+                if (selectedSyllabus) {
+                  const formatted = selectedSyllabus.modules.map(m => 
+                    `[${m.name}]\n${m.topics.join('\n')}`
+                  ).join('\n\n');
+                  setFormData(prev => ({ ...prev, curriculum: formatted }));
+                }
               }}
               style={{
                 marginLeft: 'auto',
@@ -327,6 +335,9 @@ const AdminPage = ({ onCoursePublished, isEmbedded = false }) => {
               <option value="java">Java Syllabus</option>
               <option value="python">Python Syllabus</option>
               <option value="cloud">Cloud Computing Syllabus</option>
+              {syllabuses && syllabuses.map(s => (
+                <option key={s.id} value={s.id}>{s.title}</option>
+              ))}
             </select>
           </div>
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useCourseContext } from "../../context/CourseContext";
 import { motion } from "framer-motion";
 import { Search, Filter, Star, Clock, Users, ArrowRight, Eye, Calendar, User as UserIcon } from "lucide-react";
 import "./Courses.css";
@@ -225,6 +226,7 @@ const Courses = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
+  const { publishedCourses } = useCourseContext();
 
   const handleEnroll = () => {
     const userStr = localStorage.getItem("loggedUser");
@@ -243,7 +245,9 @@ const Courses = () => {
     }
   };
 
-  const filtered = ALL_COURSES.filter(course => {
+  const combinedCourses = [...publishedCourses, ...ALL_COURSES];
+
+  const filtered = combinedCourses.filter(course => {
     const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = activeCategory === "All" || course.category === activeCategory;
     return matchesSearch && matchesCategory;
@@ -252,15 +256,15 @@ const Courses = () => {
   return (
     <div className="courses-page-modern" id="courses">
       {/* Header with Search */}
-     <div 
-  className="courses-hero"
-  style={{
-    backgroundImage: `url(${bgImage})`,
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    backgroundRepeat: "no-repeat"
-  }}
->
+      <div
+        className="courses-hero"
+        style={{
+          backgroundImage: `url(${bgImage})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat"
+        }}
+      >
         <div className="container-custom">
           <motion.div
             className="courses-hero-content"
@@ -382,7 +386,7 @@ const Courses = () => {
                 >
                   {/* Image Banner */}
                   <div className="card-img-banner">
-                    <img src={course.image} alt={course.title} />
+                    <img src={course.image || imgWebDev} alt={course.title} />
                   </div>
 
                   <div className="card-content-modern">
@@ -406,8 +410,8 @@ const Courses = () => {
                       </div>
 
                       <div className="details-action-wrapper">
-                        <button 
-                          className="btn-view-details" 
+                        <button
+                          className="btn-view-details"
                           onClick={() => navigate(`/course-details/${course.courseId}`)}
                           title="View Course Details"
                         >

@@ -49,9 +49,9 @@ const SkillTest = () => {
 
       <div className="special-note-box">
         <p>
-          ⚠️Mandatory Step:Students must first complete 
-           Aptitude, Reasoning, and Communication tests before attempting the 
-           Core Technical Test.
+          ⚠️Mandatory Step:Students must first complete
+          Aptitude, Reasoning, and Communication tests before attempting the
+          Core Technical Test.
         </p>
       </div>
 
@@ -72,7 +72,7 @@ const SkillTest = () => {
           <FaArrowRight className="flow-arrow" />
         </div>
 
-        <div className="skill-card modern">
+        <div className={`skill-card modern ${!isUnlocked ? "locked-card" : ""}`}>
           <div className="card-badge secondary">Step 02</div>
           <div className="skill-image-box">
             <img src="https://images.unsplash.com/photo-1516116216624-53e697fedbea?auto=format&fit=crop&q=80&w=800" alt="Technical Test" />
@@ -80,12 +80,12 @@ const SkillTest = () => {
           <div className="skill-info">
             <h3>Core Technical Test</h3>
             <p>Deep dive into DSA, System Design, and niche technologies to prove your technical expertise.</p>
-            <button 
-              className={`start-btn-modern ${!isUnlocked || loading ? "locked" : ""}`} 
+            <button
+              className={`start-btn-modern ${!isUnlocked || loading ? "locked" : ""}`}
               onClick={() => !loading && isUnlocked && navigate("/student/core-test")}
               disabled={loading || !isUnlocked}
             >
-              {loading ? "Checking Status..." : isUnlocked ? "Start Core Test" : "Join Waiting List"}
+              {loading ? "Checking..." : isUnlocked ? "Start Core Test" : "Complete Step 1 to Unlock"}
             </button>
           </div>
         </div>
