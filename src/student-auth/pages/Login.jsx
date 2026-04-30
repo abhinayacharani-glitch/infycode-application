@@ -80,14 +80,14 @@ function Login() {
     try {
       const data = await studentLogin(signInForm.email.trim(), signInForm.password);
       localStorage.setItem("user", JSON.stringify({
-        token:    data.token,
+        token: data.token,
         fullName: data.fullName || data.fullname,
-        email:    data.email,
-        role:     data.role
+        email: data.email,
+        role: data.role
       }));
-      if (data.role === 'admin')        navigate("/admin-dashboard");
+      if (data.role === 'admin') navigate("/admin-dashboard");
       else if (data.role === 'trainer') navigate("/trainer-dashboard");
-      else                              navigate("/student-dashboard");
+      else navigate("/student-dashboard");
     } catch (err) { setSignInApiError(err.message); }
     finally { setIsSignInLoading(false); }
   };
@@ -186,7 +186,7 @@ function Login() {
         <div className="lp-right">
           <div className={`lp-flip-container ${isActive ? "is-flipped" : ""}`}>
             <div className="lp-flip-inner">
-              
+
               {/* FRONT SIDE — SIGN IN */}
               <div className="lp-card lp-card-front">
                 <div className="lp-card-header">

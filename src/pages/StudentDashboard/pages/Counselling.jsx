@@ -29,12 +29,14 @@ const Counselling = () => {
       title: 'Upcoming Counselling',
       description: 'Stay updated with upcoming sessions and expert talks.',
       imageUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=800',
+      isUpcoming: true,
     },
     {
       id: 3,
       title: 'Career Guidance',
       description: 'Structured roadmap to achieve your career goals efficiently.',
       imageUrl: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&q=80&w=800',
+      isUpcoming: true,
     },
   ];
 
@@ -56,8 +58,10 @@ const Counselling = () => {
               <p>{card.description}</p>
               <div className="card-actions">
                 <button 
-                  className="card-action-btn" 
-                  onClick={() => navigate(`/student-dashboard/counselling/${card.id}`)}
+                  className={`card-action-btn ${card.isUpcoming ? 'disabled-upcoming' : ''}`}
+                  onClick={() => !card.isUpcoming && navigate(`/student-dashboard/counselling/${card.id}`)}
+                  disabled={card.isUpcoming}
+                  title={card.isUpcoming ? 'Upcoming' : ''}
                 >
                   Learn More
                 </button>

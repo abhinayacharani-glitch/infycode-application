@@ -59,7 +59,7 @@ const Profile = () => {
       try {
         const { COURSE_MAP } = await import('./data/extraCourses');
         const { ALL_COURSES } = await import('../../../components/Courses/Courses');
-        
+
         const enrolled = [];
         const seenTitles = new Set();
 
@@ -116,7 +116,7 @@ const Profile = () => {
   const validatePersonal = () => {
     const newErrors = {};
     if (!personal.fullName.trim()) newErrors.fullName = "Name is required";
-    if (personal.phone && !/^\d{10}$/.test(personal.phone.replace(/[\s-]/g, ''))) 
+    if (personal.phone && !/^\d{10}$/.test(personal.phone.replace(/[\s-]/g, '')))
       newErrors.phone = "Enter a valid 10-digit phone number";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -180,7 +180,7 @@ const Profile = () => {
       const completedSet = new Set(JSON.parse(saved));
       // Estimate 100% if the set is populated (more logic can be added if needed)
       // For now, if the course object itself says 100 or localStorage progress is full
-      return c.progress === 100 || completedSet.size > 10; 
+      return c.progress === 100 || completedSet.size > 10;
     }
     return c.progress === 100;
   }).length;
@@ -323,16 +323,9 @@ const Profile = () => {
               </div>
 
               <div className="pc-fields-grid">
-                <div className="pc-field">
+                <div className="pc-field pc-read-only">
                   <label>FULL NAME</label>
-                  {isEditing
-                    ? (
-                      <>
-                        <input className={`pc-input ${errors.fullName ? 'input-error' : ''}`} value={personal.fullName} onChange={e => setPersonal({ ...personal, fullName: e.target.value })} />
-                        {errors.fullName && <span className="pc-error-text">{errors.fullName}</span>}
-                      </>
-                    )
-                    : <p>{personal.fullName || '—'}</p>}
+                  <p>{personal.fullName || '—'}</p>
                 </div>
                 <div className="pc-field pc-read-only">
                   <label>EMAIL (PRIMARY)</label>

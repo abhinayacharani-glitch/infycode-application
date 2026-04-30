@@ -125,13 +125,31 @@ const Assessment = () => {
               <div style={{ fontSize: '36px', fontWeight: 'bold' }}>{scores.aptitude + scores.reasoning + scores.communication}</div>
             </div>
 
-            <button 
-              className="btn-primary" 
-              style={{ width: '100%', padding: '14px', fontSize: '16px' }}
-              onClick={() => window.location.href = '/student-dashboard'}
-            >
-              Back to Dashboard
-            </button>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <button 
+                className="btn-primary" 
+                style={{ width: '100%', padding: '14px', fontSize: '16px', fontWeight: 'bold' }}
+                onClick={() => window.location.href = '/student/core-test'}
+              >
+                Take Next Round
+              </button>
+              
+              <button 
+                style={{ 
+                  width: '100%', 
+                  padding: '12px', 
+                  fontSize: '15px', 
+                  background: 'transparent', 
+                  border: '1px solid #e2e8f0', 
+                  color: '#64748b',
+                  borderRadius: '8px',
+                  cursor: 'pointer'
+                }}
+                onClick={() => window.location.href = '/student-dashboard'}
+              >
+                Back to Dashboard
+              </button>
+            </div>
           </div>
         </div>
       </>
