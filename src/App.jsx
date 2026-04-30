@@ -70,6 +70,7 @@ const MentorshipPage = lazy(() => import("./pages/Features/MentorshipPage"));
 const PracticalLearningPage = lazy(() => import("./pages/Features/PracticalLearningPage"));
 const SkillEvaluationPage = lazy(() => import("./pages/Features/SkillEvaluationPage"));
 const CareerPreparationPage = lazy(() => import("./pages/Features/CareerPreparationPage"));
+const LaunchEvent = lazy(() => import("./pages/LaunchEvent/LaunchEvent"));
 
 // ─── Lazy-loaded — Other ─────────────────────────────────────────────────────
 const BatchCreation = lazy(() => import("./pages/AdminDashboard/pages/BatchCreation"));
@@ -298,8 +299,28 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [showPopup, setShowPopup] = useState(false);
   const [courses, setCourses] = useState([]);
+  const [showLaunchEvent, setShowLaunchEvent] = useState(true);
+
+  const handleEnterSite = (targetId) => {
+    setShowLaunchEvent(false);
+    if (targetId) {
+      setTimeout(() => {
+        if (targetId === '/') {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          const element = document.getElementById(targetId.replace('#', ''));
+          if (element) {
+            element.scrollIntoView({ behavior: "smooth" });
+          }
+        }
+      }, 500);
+    }
+  };
 
   useEffect(() => {
+    // Show launch event on every load for now as requested
+    setShowLaunchEvent(true);
+
     getAllCourses()
       .then((data) => setCourses(data.courses || []))
       .catch((err) => console.error("Failed to load courses:", err));
@@ -350,7 +371,12 @@ function App() {
 
   return (
     <BrowserRouter>
-      {showPopup && <Popup onClose={() => setShowPopup(false)} />}
+      {showLaunchEvent && (
+        <Suspense fallback={<PageLoader />}>
+          <LaunchEvent onEnterSite={handleEnterSite} />
+        </Suspense>
+      )}
+      {showPopup && !showLaunchEvent && <Popup onClose={() => setShowPopup(false)} />}
       <Layout
         courses={courses}
         setCourses={setCourses}
