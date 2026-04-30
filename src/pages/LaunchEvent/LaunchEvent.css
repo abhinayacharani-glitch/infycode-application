@@ -301,10 +301,12 @@
 
 .rsvp-container h2 {
     font-family: 'Outfit', sans-serif;
-    font-size: 36px;
+    font-size: 38px;
     font-weight: 800;
     margin-bottom: 32px;
     text-align: center;
+    color: #ffffff;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
 }
 
 .rsvp-form {
@@ -324,19 +326,27 @@
 
 .form-control {
     width: 100%;
-    background: rgba(15, 23, 42, 0.6);
-    border: 1px solid var(--launch-glass-border);
-    padding: 14px 18px;
-    border-radius: 10px;
-    color: #fff;
-    font-size: 15px;
+    background: rgba(255, 255, 255, 0.05); /* Glassy background */
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 16px 20px;
+    border-radius: 12px;
+    color: #ffffff;
+    font-size: 16px;
     outline: none;
-    transition: all 0.2s;
+    transition: all 0.3s;
+    font-family: inherit;
+}
+
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5); /* Brighter placeholder */
+    font-weight: 500;
 }
 
 .form-control:focus {
     border-color: var(--launch-primary);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
 }
 
 .rsvp-submit {
