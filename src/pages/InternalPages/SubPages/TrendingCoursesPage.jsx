@@ -1,35 +1,4 @@
-import React, { useEffect } from 'react';
-import './TrendingCoursesPage.css';
-
-const courses = [
-  {
-    id: 1,
-    title: "Generative AI Foundations",
-    desc: "Learn the fundamentals of LLMs, prompt engineering, and building AI-powered apps with LangChain.",
-    img: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=800",
-    tag: "Trending #1",
-    hours: "40 Hours",
-    students: "5.8k+"
-  },
-  {
-    id: 2,
-    title: "Blockchain & Web3 Engineering",
-    desc: "Master smart contract development with Solidity, Hardhat, and decentralized app architectures.",
-    img: "https://images.unsplash.com/photo-1639322537228-f710d846310a?auto=format&fit=crop&q=80&w=800",
-    tag: "Trending #2",
-    hours: "65 Hours",
-    students: "2.4k+"
-  },
-  {
-    id: 3,
-    title: "Advanced Cyber Security",
-    desc: "Defend against modern threats. Learn penetration testing, cryptography, and network defense.",
-    img: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800",
-    tag: "Trending #3",
-    hours: "85 Hours",
-    students: "1.9k+"
-  }
-];
+import { useCourseContext } from '../../../context/CourseContext';
 
 // ✅ SVG Icons
 const ClockIcon = () => (
@@ -55,6 +24,7 @@ import { useNavigate } from 'react-router-dom';
 
 const TrendingCoursesPage = () => {
   const navigate = useNavigate();
+  const { publishedCourses } = useCourseContext();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -91,18 +61,18 @@ const TrendingCoursesPage = () => {
 
       <div className="trending-section">
         <div className="trending-course-grid">
-          {courses.map((course) => (
+          {publishedCourses.map((course) => (
             <div className="trending-course-card" key={course.id}>
-              <img src={course.img} alt={course.title} className="trending-course-img" />
+              <img src={course.image || course.img} alt={course.title} className="trending-course-img" />
               <div className="trending-course-info">
-                <span className="trending-course-tag">{course.tag}</span>
+                <span className="trending-course-tag">{course.badge || course.tag}</span>
                 <h3>{course.title}</h3>
-                <p>{course.desc}</p>
+                <p>{course.description || course.desc}</p>
 
                 <div className="trending-course-meta">
 
                   <span className="meta-item">
-                    <ClockIcon /> {course.hours}
+                    <ClockIcon /> {course.duration || course.hours}
                   </span>
 
                   <span className="meta-item">

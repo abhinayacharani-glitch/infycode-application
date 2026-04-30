@@ -204,11 +204,11 @@ export const getDashboardStats = async (req, res) => {
     const students = Object.entries(studentsRaw).map(([id, data]) => {
       const rawEmail = (data.email || "").trim().toLowerCase();
       const sanitizedEmail = rawEmail.replace(/\./g, ",");
-      
+
       // Get student enrollments
       const studentEnrollments = enrollmentsRaw[sanitizedEmail] || {};
       const courseIds = Object.keys(studentEnrollments);
-      
+
       // Map course IDs to names/titles
       let courseNames = courseIds.map(cid => {
         const courseData = coursesRaw[cid];
@@ -219,10 +219,10 @@ export const getDashboardStats = async (req, res) => {
       if (courseNames.length === 0 && data.course) {
         courseNames = [data.course];
       }
-      
+
       const courseDisplay = courseNames.length > 0 ? courseNames.join(", ") : "N/A";
       const hasEnrollments = courseIds.length > 0 || !!data.course;
-      
+
       return {
         id,
         ...data,
@@ -256,7 +256,7 @@ export const getDashboardStats = async (req, res) => {
     const stats = {
       totalStudents: students.length,
       activeTrainers: trainers.filter(t => !t.status || matchesStatus(t.status, ["Active", "Onboarded"])).length,
-      activeBatches: batches.filter(b => matchesStatus(b.status, ["Active"])).length, 
+      activeBatches: batches.filter(b => matchesStatus(b.status, ["Active"])).length,
       pendingVerifications: students.filter(s => matchesStatus(s.status, ["Pending"])).length,
       coursesCount: Object.keys(coursesRaw).length,
       pendingTrainers: trainers.filter(t => t.status === 'Applied').length,
@@ -321,11 +321,11 @@ export const getAdminProfile = async (req, res) => {
     }
     const adminSnap = await adminsRef.child(req.user.id).once("value");
     if (!adminSnap.exists()) return res.status(404).json({ success: false, message: "Admin not found" });
-    
+
     const adminData = adminSnap.val();
     delete adminData.password;
     adminData.id = req.user.id;
-    
+
     res.status(200).json({ success: true, profile: adminData });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -373,7 +373,7 @@ export const moveStudentsToBatch = async (req, res) => {
     // 2. Get Student Data for all selected students
     const studentPromises = studentIds.map(id => studentsRef.child(id).once("value"));
     const studentSnaps = await Promise.all(studentPromises);
-    
+
     const studentsToMove = studentSnaps
       .filter(snap => snap.exists())
       .map(snap => ({
@@ -389,10 +389,15 @@ export const moveStudentsToBatch = async (req, res) => {
     // 3. Update Batch: Increment enrolled count and add students
     const currentEnrolled = parseInt(batchData.enrolled || 0);
     const newEnrolled = currentEnrolled + studentsToMove.length;
-    
+
     const batchUpdates = {
       enrolled: newEnrolled
     };
+
+    // If capacity reached, set status to Ready
+    if (newEnrolled >= parseInt(batchData.capacity || 30)) {
+      batchUpdates.status = 'Ready';
+    }
 
     // Add students to batch node
     studentsToMove.forEach(student => {
@@ -414,8 +419,8 @@ export const moveStudentsToBatch = async (req, res) => {
     });
     await studentsRef.update(studentUpdates);
 
-    res.status(200).json({ 
-      success: true, 
+    res.status(200).json({
+      success: true,
       message: `Successfully moved ${studentsToMove.length} students to batch ${batchData.name || batchData.courseName || batchData.course}`,
       enrolledCount: newEnrolled
     });

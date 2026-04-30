@@ -191,7 +191,11 @@ function BatchCreation() {
                         <div className="detail">
                           <span className="label">Starts</span>
                           <span className="value">
-                            {batch.startDateTime ? new Date(batch.startDateTime).toLocaleDateString() : "TBD"}
+                            {batch.startDateTime ?
+                              new Date(batch.startDateTime).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }) + ' at ' +
+                              new Date(batch.startDateTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+                              : "TBD"
+                            }
                           </span>
                         </div>
                         <div className="detail">

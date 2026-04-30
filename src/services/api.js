@@ -392,6 +392,14 @@ export const seedTrainerNotificationsAPI = () => {
     headers: { Authorization: `Bearer ${user.token || ''}` },
   });
 };
+
+export const startBatchAPI = (firebaseId) => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return request(`/api/trainer/batches/${firebaseId}/start`, {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${user.token || ''}` },
+  });
+};
  
 // ─────────────────────────────────────────────
 // TRAINER APPLICATION WORKFLOW

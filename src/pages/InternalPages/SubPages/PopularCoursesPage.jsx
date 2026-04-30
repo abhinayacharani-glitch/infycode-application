@@ -1,35 +1,4 @@
-import React, { useEffect } from 'react';
-import './PopularCoursesPage.css';
-
-const courses = [
-  {
-    id: 1,
-    title: "Full Stack Web Development",
-    desc: "Master modern web development from front to back. Build responsive UIs with React and scalable backends with Node.js.",
-    img: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=800",
-    tag: "Highest Rated",
-    hours: "120 Hours",
-    students: "4.5k+"
-  },
-  {
-    id: 2,
-    title: "Data Science & Machine Learning",
-    desc: "Dive into data analysis, visualization, and ML algorithms using Python and TensorFlow.",
-    img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800",
-    tag: "Advanced",
-    hours: "90 Hours",
-    students: "3.2k+"
-  },
-  {
-    id: 3,
-    title: "AWS Cloud Architect",
-    desc: "Learn to design, deploy, and scale highly available systems on Amazon Web Services.",
-    img: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800",
-    tag: "In Demand",
-    hours: "80 Hours",
-    students: "2.1k+"
-  }
-];
+import { useCourseContext } from '../../../context/CourseContext';
 
 // ✅ SVG Icons as components
 const ClockIcon = () => (
@@ -55,6 +24,7 @@ import { useNavigate } from 'react-router-dom';
 
 const PopularCoursesPage = () => {
   const navigate = useNavigate();
+  const { publishedCourses } = useCourseContext();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -91,18 +61,18 @@ const PopularCoursesPage = () => {
 
       <div className="popular-section">
         <div className="popular-course-grid">
-          {courses.map((course) => (
+          {publishedCourses.map((course) => (
             <div className="popular-course-card" key={course.id}>
-              <img src={course.img} alt={course.title} className="popular-course-img" />
+              <img src={course.image || course.img} alt={course.title} className="popular-course-img" />
               <div className="popular-course-info">
-                <span className="popular-course-tag">{course.tag}</span>
+                <span className="popular-course-tag">{course.badge || course.tag}</span>
                 <h3>{course.title}</h3>
-                <p>{course.desc}</p>
+                <p>{course.description || course.desc}</p>
 
                 <div className="popular-course-meta">
                   
                   <span className="meta-item">
-                    <ClockIcon /> {course.hours}
+                    <ClockIcon /> {course.duration || course.hours}
                   </span>
 
                   <span className="meta-item">

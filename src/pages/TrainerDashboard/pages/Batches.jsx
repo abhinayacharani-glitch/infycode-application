@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getTrainerBatchesAPI } from '../../../services/api';
+import { getTrainerBatchesAPI, startBatchAPI } from '../../../services/api';
 import {
   Users,
   Layers,
@@ -94,6 +94,24 @@ const Batches = () => {
     fetchBatches();
   }, []);
 
+  const handleStartBatch = async (e, firebaseId) => {
+    e.stopPropagation();
+    if (!window.confirm("Are you sure you want to start this batch? All enrolled students will be notified.")) return;
+
+    try {
+      const response = await startBatchAPI(firebaseId);
+      if (response.success) {
+        alert("Batch started successfully!");
+        // Refresh list
+        const res = await getTrainerBatchesAPI();
+        if (res.success) setBatches(res.batches || []);
+      }
+    } catch (error) {
+      console.error("Error starting batch:", error);
+      alert(error.message || "Failed to start batch");
+    }
+  };
+
   const handleAddBatch = (e) => {
     e.preventDefault();
     // This local add is kept for UI if needed, but admin is the primary source
@@ -173,49 +191,73 @@ const Batches = () => {
             <div className="loading-state-saas">Loading batches...</div>
           ) : filteredBatches.length > 0 ? (
             filteredBatches.map((batch) => (
-            <div
-              key={batch.id}
-              className="batch-card-saas-v3"
-              onClick={() => navigate(`/trainer-dashboard/batches/${batch.id}`)}
-            >
-              <div className="batch-card-accent-border"></div>
+              <div
+                key={batch.id}
+                className="batch-card-saas-v3"
+                onClick={() => navigate(`/trainer-dashboard/batches/${batch.id}`)}
+              >
+                <div className="batch-card-accent-border"></div>
 
-              <div className="batch-card-body-saas">
-                <div className="batch-card-header-v3">
-                  <span className="batch-id-pill-v3">{batch.id}</span>
-                  <span className="last-updated-saas">{formatTimeAgo(batch.lastUpdated)}</span>
-                </div>
-
-                <h2 className="batch-card-title-v3">{batch.course}</h2>
-
-                <div className="batch-card-dates-v3">
-                  <Calendar size={14} />
-                  <span>{batch.startDate} — {batch.endDate}</span>
-                </div>
-
-                <div className="batch-card-meta-v3">
-                  <div className="meta-item-saas">
-                    <Clock size={14} />
-                    <span>{calculateDuration(batch.startDate, batch.endDate)}</span>
+                <div className="batch-card-body-saas">
+                  <div className="batch-card-header-v3">
+                    <span className="batch-id-pill-v3">{batch.id}</span>
+                    <span className="last-updated-saas">{formatTimeAgo(batch.lastUpdated)}</span>
                   </div>
-                  <div className="meta-item-saas">
-                    <Monitor size={14} />
-                    <span>{batch.mode}</span>
-                  </div>
-                  <div className="meta-item-saas">
-                    <Users size={14} />
-                    <span>{batch.students} Students</span>
-                  </div>
-                </div>
 
-                <div className="card-divider-saas"></div>
+                  <h2 className="batch-card-title-v3">{batch.course}</h2>
 
-                <div className="batch-card-footer-v3">
-                  <span className="view-details-v3">View Overview</span>
-                  <ArrowRight size={16} />
+                  <div className="batch-card-dates-v3">
+                    <Calendar size={14} />
+                    <span>{batch.startDate} — {batch.endDate}</span>
+                  </div>
+
+                  <div className="batch-card-meta-v3">
+                    <div className="meta-item-saas">
+                      <Clock size={14} />
+                      <span>{calculateDuration(batch.startDate, batch.endDate)}</span>
+                    </div>
+                    <div className="meta-item-saas">
+                      <Monitor size={14} />
+                      <span>{batch.mode}</span>
+                    </div>
+                    <div className="meta-item-saas">
+                      <Users size={14} />
+                      <span>{batch.students} Students</span>
+                    </div>
+                  </div>
+
+                  <div className="card-divider-saas"></div>
+
+                  <div className="batch-card-footer-v3">
+                    <div className="footer-left-saas">
+                      <span className="view-details-v3">View Overview</span>
+                      <ArrowRight size={16} />
+                    </div>
+
+                    <div className="footer-actions-saas">
+                      {batch.status === 'Ready' && (
+                        <button
+                          className="btn-start-batch-action"
+                          onClick={(e) => handleStartBatch(e, batch.firebaseId)}
+                        >
+                          Start Batch
+                        </button>
+                      )}
+                      {batch.status === 'Active' && (
+                        <button
+                          className="btn-connect-students-action"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/trainer-dashboard/student-connect/${batch.id}`);
+                          }}
+                        >
+                          Connect Students
+                        </button>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
             ))
           ) : (
             <div className="empty-state-saas">No batches found for you.</div>

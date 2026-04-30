@@ -1,7 +1,7 @@
 import express from "express";
 const router = express.Router();
 
-import { trainerRegister, trainerVerifyOtp, trainerDashboard, getTrainerProfile, updateTrainerProfile, getTrainerBatches } from "../controllers/trainerRegController.js";
+import { trainerRegister, trainerVerifyOtp, trainerDashboard, getTrainerProfile, updateTrainerProfile, getTrainerBatches, startBatch } from "../controllers/trainerRegController.js";
 import { submitApplication } from "../controllers/trainerApplicationController.js";
 import { verifyToken, isTrainer } from "../middleware/authMiddleware.js";
 import { checkRole } from "../middleware/roleMiddleware.js";
@@ -33,6 +33,7 @@ router.put("/profile", verifyToken, isTrainer, updateTrainerProfile);
 
 // ✅ Trainer Batches — GET /api/trainer/batches (protected)
 router.get("/batches", verifyToken, isTrainer, getTrainerBatches);
+router.put("/batches/:id/start", verifyToken, isTrainer, startBatch);
 
 // ✅ Trainer Notifications (protected — trainer only)
 router.get("/notifications",            verifyToken, isTrainer, getTrainerNotifications);
