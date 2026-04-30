@@ -372,7 +372,13 @@ function App() {
 
   return (
     <CourseProvider>
-      <BrowserRouter>
+  <BrowserRouter>
+    {showLaunchEvent ? (
+      <Suspense fallback={<PageLoader />}>
+        <LaunchEvent onEnterSite={handleEnterSite} />
+      </Suspense>
+    ) : (
+      <>
         {showPopup && <Popup onClose={() => setShowPopup(false)} />}
         <Layout
           courses={courses}
@@ -381,8 +387,10 @@ function App() {
           onUpdateCourse={handleUpdateCourse}
           onDeleteCourse={handleDeleteCourse}
         />
-      </BrowserRouter>
-    </CourseProvider>
+      </>
+    )}
+  </BrowserRouter>
+</CourseProvider>
   );
 }
 
