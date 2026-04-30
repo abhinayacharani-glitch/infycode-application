@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getTrainerBatchesAPI, startBatchAPI } from '../../../services/api';
 import {
   Users,
   Layers,
@@ -61,27 +62,10 @@ const Batches = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // Dynamic State for Batches
-  const [batches, setBatches] = useState(() => {
-    try {
-      const saved = localStorage.getItem('trainer_batches_v2');
-      if (saved) {
-        const data = JSON.parse(saved);
-        return Array.isArray(data) ? data : [];
-      }
-    } catch (e) { console.error("Data Load Error", e); }
-
-    return [
-      { id: 'B1', course: 'Full Stack Web Development (MERN)', students: 32, startDate: '2026-01-10', endDate: '2026-04-10', mode: 'Online', lastUpdated: new Date().toISOString() },
-      { id: 'B2', course: 'Python & Data Science Bootcamp', students: 28, startDate: '2026-02-15', endDate: '2026-06-15', mode: 'Offline', lastUpdated: new Date(Date.now() - 3600000 * 2).toISOString() },
-      { id: 'B3', course: 'UI/UX Advanced Design Basics', students: 24, startDate: '2026-03-01', endDate: '2026-05-01', mode: 'Online', lastUpdated: new Date(Date.now() - 86400000).toISOString() },
-      { id: 'B4', course: 'AWS & Cloud Architecture Pro', students: 18, startDate: '2026-03-10', endDate: '2026-05-10', mode: 'Online', lastUpdated: new Date(Date.now() - 3600000 * 5).toISOString() },
-      { id: 'B5', course: 'Java Full Stack', students: 20, startDate: '2026-04-01', endDate: '2026-07-01', mode: 'Online', lastUpdated: new Date().toISOString() },
-      { id: 'B6', course: 'Python Fullstack Bootcamp', students: 25, startDate: '2026-04-15', endDate: '2026-08-15', mode: 'Offline', lastUpdated: new Date().toISOString() },
-      { id: 'B7', course: 'Cloud Computing Mastery', students: 15, startDate: '2026-05-01', endDate: '2026-08-01', mode: 'Online', lastUpdated: new Date().toISOString() },
-    ];
-  });
+  const [batches, setBatches] = useState([]);
 
   const [newBatch, setNewBatch] = useState({
     id: '',
@@ -93,22 +77,44 @@ const Batches = () => {
   });
 
   useEffect(() => {
-    localStorage.setItem('trainer_batches_v2', JSON.stringify(batches));
-
-    // Pre-populate some initial history if not exists
-    batches.forEach(b => {
-      const key = `batch_history_v2_${b.id}`;
-      if (!localStorage.getItem(key)) {
-        const initial = [
-          { id: Date.now() - 1000, type: 'System', title: `Batch ${b.id} initialized`, timestamp: b.lastUpdated }
-        ];
-        localStorage.setItem(key, JSON.stringify(initial));
+    const fetchBatches = async () => {
+      try {
+        setLoading(true);
+        const response = await getTrainerBatchesAPI();
+        if (response.success) {
+          setBatches(response.batches || []);
+        }
+      } catch (error) {
+        console.error("Error fetching trainer batches:", error);
+      } finally {
+        setLoading(false);
       }
-    });
-  }, [batches]);
+    };
+
+    fetchBatches();
+  }, []);
+
+  const handleStartBatch = async (e, firebaseId) => {
+    e.stopPropagation();
+    if (!window.confirm("Are you sure you want to start this batch? All enrolled students will be notified.")) return;
+
+    try {
+      const response = await startBatchAPI(firebaseId);
+      if (response.success) {
+        alert("Batch started successfully!");
+        // Refresh list
+        const res = await getTrainerBatchesAPI();
+        if (res.success) setBatches(res.batches || []);
+      }
+    } catch (error) {
+      console.error("Error starting batch:", error);
+      alert(error.message || "Failed to start batch");
+    }
+  };
 
   const handleAddBatch = (e) => {
     e.preventDefault();
+    // This local add is kept for UI if needed, but admin is the primary source
     const batchToAdd = {
       ...newBatch,
       students: parseInt(newBatch.students) || 0,
@@ -123,8 +129,8 @@ const Batches = () => {
   };
 
   const filteredBatches = batches.filter(b =>
-    b.course.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    b.id.toLowerCase().includes(searchTerm.toLowerCase())
+    (b.course || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (b.id || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const totalStudents = batches.reduce((acc, b) => acc + (parseInt(b.students) || 0), 0);
@@ -181,51 +187,81 @@ const Batches = () => {
 
         {/* 3. BATCH CARDS GRID */}
         <div className="batches-grid-saas">
-          {filteredBatches.map((batch) => (
-            <div
-              key={batch.id}
-              className="batch-card-saas-v3"
-              onClick={() => navigate(`/trainer-dashboard/batches/${batch.id}`)}
-            >
-              <div className="batch-card-accent-border"></div>
+          {loading ? (
+            <div className="loading-state-saas">Loading batches...</div>
+          ) : filteredBatches.length > 0 ? (
+            filteredBatches.map((batch) => (
+              <div
+                key={batch.id}
+                className="batch-card-saas-v3"
+                onClick={() => navigate(`/trainer-dashboard/batches/${batch.id}`)}
+              >
+                <div className="batch-card-accent-border"></div>
 
-              <div className="batch-card-body-saas">
-                <div className="batch-card-header-v3">
-                  <span className="batch-id-pill-v3">{batch.id}</span>
-                  <span className="last-updated-saas">{formatTimeAgo(batch.lastUpdated)}</span>
-                </div>
-
-                <h2 className="batch-card-title-v3">{batch.course}</h2>
-
-                <div className="batch-card-dates-v3">
-                  <Calendar size={14} />
-                  <span>{batch.startDate} — {batch.endDate}</span>
-                </div>
-
-                <div className="batch-card-meta-v3">
-                  <div className="meta-item-saas">
-                    <Clock size={14} />
-                    <span>{calculateDuration(batch.startDate, batch.endDate)}</span>
+                <div className="batch-card-body-saas">
+                  <div className="batch-card-header-v3">
+                    <span className="batch-id-pill-v3">{batch.id}</span>
+                    <span className="last-updated-saas">{formatTimeAgo(batch.lastUpdated)}</span>
                   </div>
-                  <div className="meta-item-saas">
-                    <Monitor size={14} />
-                    <span>{batch.mode}</span>
-                  </div>
-                  <div className="meta-item-saas">
-                    <Users size={14} />
-                    <span>{batch.students} Students</span>
-                  </div>
-                </div>
 
-                <div className="card-divider-saas"></div>
+                  <h2 className="batch-card-title-v3">{batch.course}</h2>
 
-                <div className="batch-card-footer-v3">
-                  <span className="view-details-v3">View Overview</span>
-                  <ArrowRight size={16} />
+                  <div className="batch-card-dates-v3">
+                    <Calendar size={14} />
+                    <span>{batch.startDate} — {batch.endDate}</span>
+                  </div>
+
+                  <div className="batch-card-meta-v3">
+                    <div className="meta-item-saas">
+                      <Clock size={14} />
+                      <span>{calculateDuration(batch.startDate, batch.endDate)}</span>
+                    </div>
+                    <div className="meta-item-saas">
+                      <Monitor size={14} />
+                      <span>{batch.mode}</span>
+                    </div>
+                    <div className="meta-item-saas">
+                      <Users size={14} />
+                      <span>{batch.students} Students</span>
+                    </div>
+                  </div>
+
+                  <div className="card-divider-saas"></div>
+
+                  <div className="batch-card-footer-v3">
+                    <div className="footer-left-saas">
+                      <span className="view-details-v3">View Overview</span>
+                      <ArrowRight size={16} />
+                    </div>
+
+                    <div className="footer-actions-saas">
+                      {batch.status === 'Ready' && (
+                        <button
+                          className="btn-start-batch-action"
+                          onClick={(e) => handleStartBatch(e, batch.firebaseId)}
+                        >
+                          Start Batch
+                        </button>
+                      )}
+                      {batch.status === 'Active' && (
+                        <button
+                          className="btn-connect-students-action"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/trainer-dashboard/student-connect/${batch.id}`);
+                          }}
+                        >
+                          Connect Students
+                        </button>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <div className="empty-state-saas">No batches found for you.</div>
+          )}
         </div>
 
         {/* 4. NEW BATCH MODAL */}

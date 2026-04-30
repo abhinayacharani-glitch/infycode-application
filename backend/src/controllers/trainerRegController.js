@@ -16,7 +16,7 @@ import bcrypt from "bcryptjs";
 import generateToken from "../utils/generateToken.js";
 
 const trainersRef = db.ref("trainers");
-const usersRef    = db.ref("users");
+const usersRef = db.ref("users");
 
 // ─── Helper: generate a short unique ID ─────────────────────────────────────
 const shortId = () => Math.random().toString(36).slice(2, 9);
@@ -30,7 +30,7 @@ export const trainerRegister = async (req, res) => {
     const { email, password, fullName, fullname, name, phone, phno, confirmPassword } = req.body;
 
     // ── Resolve optional fields ─────────────────────────────────────────────
-    const resolvedName  = fullName || fullname || name || "";
+    const resolvedName = fullName || fullname || name || "";
     const resolvedPhone = phone || phno || "";
 
     if (!email || !password) {
@@ -90,26 +90,26 @@ export const trainerRegister = async (req, res) => {
 
     // ── Hash password ───────────────────────────────────────────────────────
     const hashedPassword = await bcrypt.hash(password, 10);
-    const trainerId      = shortId();
-    const createdAt      = Date.now();
+    const trainerId = shortId();
+    const createdAt = Date.now();
 
     // ── Save to  trainers/<push-id>/  ───────────────────────────────────────
     const newRef = trainersRef.push();
     await newRef.set({
-      email:     normalizedEmail,
-      fullName:  resolvedName.trim() || normalizedEmail.split("@")[0],
-      phone:     resolvedPhone.trim(),
-      password:  hashedPassword,
-      role:      "trainer",
+      email: normalizedEmail,
+      fullName: resolvedName.trim() || normalizedEmail.split("@")[0],
+      phone: resolvedPhone.trim(),
+      password: hashedPassword,
+      role: "trainer",
       trainerId,
       createdAt,
     });
 
     // ── Mirror to  users/trainer_<id>/  (as specified in the requirements) ──
     await usersRef.child(`trainer_${trainerId}`).set({
-      email:     normalizedEmail,
-      password:  hashedPassword,
-      role:      "trainer",
+      email: normalizedEmail,
+      password: hashedPassword,
+      role: "trainer",
       isVerified: true,
       createdAt,
     });
@@ -184,9 +184,9 @@ export const getTrainerProfile = async (req, res) => {
   try {
     const { email, id } = req.user;
     let trainerKey = id;
-    
+
     let snapshot = await trainersRef.child(trainerKey).once("value");
-    
+
     if (!snapshot.exists()) {
       console.log(`[getTrainerProfile] Trainer not found by ID (${trainerKey}), falling back to email lookup...`);
       const emailSnapshot = await trainersRef.orderByChild("email").equalTo(email).once("value");
@@ -198,13 +198,13 @@ export const getTrainerProfile = async (req, res) => {
         snapshot = child; // Re-assign for child.val()
       });
     }
-    
+
     let profileData = snapshot.val ? snapshot.val() : snapshot;
     profileData.id = trainerKey;
     profileData.role = "trainer"; // Hardcode for safety
-    
+
     delete profileData.password;
-    
+
     return res.status(200).json({ success: true, profile: profileData });
   } catch (error) {
     console.error("[getTrainerProfile] Error:", error.message);
@@ -222,7 +222,7 @@ export const updateTrainerProfile = async (req, res) => {
 
     // 1. Verify trainer exists (try ID first, then fallback to Email lookup)
     let snapshot = await trainersRef.child(trainerKey).once("value");
-    
+
     if (!snapshot.exists()) {
       console.log(`[updateTrainerProfile] Trainer not found by ID (${trainerKey}), falling back to email lookup...`);
       const emailSnapshot = await trainersRef.orderByChild("email").equalTo(email).once("value");
@@ -234,30 +234,30 @@ export const updateTrainerProfile = async (req, res) => {
         trainerKey = child.key;
       });
     }
-    
+
     const fields = ['fullName', 'phone', 'location', 'experience', 'expertise', 'courses', 'mode', 'about', 'profileImage', 'role'];
     const updateData = {};
-    
+
     fields.forEach(field => {
       if (req.body[field] !== undefined) {
         updateData[field] = req.body[field];
       }
     });
-    
+
     if (Object.keys(updateData).length > 0) {
       await trainersRef.child(trainerKey).update(updateData);
     }
-    
+
     // Fetch the absolute latest data from DB to ensure sync
     const updatedSnapshot = await trainersRef.child(trainerKey).once("value");
     const fullProfile = updatedSnapshot.val();
     fullProfile.id = trainerKey;
     fullProfile.role = "trainer"; // Hardcode for safety
     delete fullProfile.password;
-    
-    return res.status(200).json({ 
-      success: true, 
-      message: "Profile updated successfully", 
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
       profile: fullProfile,
       data: updateData
     });
@@ -266,3 +266,99 @@ export const updateTrainerProfile = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error: " + error.message });
   }
 };
+
+// ═══════════════════════════════════════════════════════════════════════════
+// GET /api/trainer/batches
+// ═══════════════════════════════════════════════════════════════════════════
+export const getTrainerBatches = async (req, res) => {
+  try {
+    const { email } = req.user;
+
+    // 1. Get Trainer's full name from profile
+    const trainerSnapshot = await trainersRef.orderByChild("email").equalTo(email).once("value");
+    if (!trainerSnapshot.exists()) {
+      return res.status(404).json({ success: false, message: "Trainer not found" });
+    }
+
+    let trainerFullName = "";
+    trainerSnapshot.forEach(child => {
+      trainerFullName = child.val().fullName || child.val().fullname || child.val().name;
+    });
+
+    // 2. Fetch all batches
+    const batchesRef = db.ref("batch");
+    const snapshot = await batchesRef.once("value");
+    const batchesRaw = snapshot.val() || {};
+
+    // 3. Filter and normalize
+    const batches = Object.entries(batchesRaw)
+      .map(([id, data]) => ({
+        id: data.batchId || id,
+        firebaseId: id,
+        course: data.courseName || data.course,
+        trainer: data.trainerName || data.trainer,
+        students: parseInt(data.enrolled) || 0,
+        capacity: parseInt(data.capacity) || 30,
+        startDate: data.startDateTime ? data.startDateTime.split('T')[0] : "",
+        endDate: "", // Logic to calculate endDate based on duration could go here
+        duration: data.duration || "N/A",
+        mode: "Online", // Defaulting to Online as per previous requirements
+        status: data.status || "Active",
+        lastUpdated: data.createdAt || new Date().toISOString()
+      }))
+      .filter(b => b.trainer === trainerFullName);
+
+    return res.status(200).json({ success: true, batches });
+  } catch (error) {
+    console.error("[getTrainerBatches] Error:", error.message);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PUT /api/trainer/batches/:id/start
+// ═══════════════════════════════════════════════════════════════════════════
+export const startBatch = async (req, res) => {
+  try {
+    const { id } = req.params; // firebase key
+    const { email } = req.user;
+
+    // 1. Get Trainer Profile
+    const trainerSnapshot = await trainersRef.orderByChild("email").equalTo(email).once("value");
+    if (!trainerSnapshot.exists()) {
+      return res.status(404).json({ success: false, message: "Trainer not found" });
+    }
+
+    let trainerFullName = "";
+    trainerSnapshot.forEach(child => {
+      trainerFullName = child.val().fullName || child.val().fullname || child.val().name;
+    });
+
+    // 2. Get Batch
+    const batchRef = db.ref("batch").child(id);
+    const batchSnap = await batchRef.once("value");
+    if (!batchSnap.exists()) {
+      return res.status(404).json({ success: false, message: "Batch not found" });
+    }
+
+    const batchData = batchSnap.val();
+
+    // 3. Authorization check
+    if ((batchData.trainerName || batchData.trainer) !== trainerFullName) {
+      return res.status(403).json({ success: false, message: "You are not assigned to this batch" });
+    }
+
+    // 4. Update status
+    await batchRef.update({
+      status: "Active",
+      startedAt: new Date().toISOString(),
+      lastUpdated: new Date().toISOString()
+    });
+
+    res.status(200).json({ success: true, message: "Batch started successfully!" });
+  } catch (error) {
+    console.error("[startBatch] Error:", error.message);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+

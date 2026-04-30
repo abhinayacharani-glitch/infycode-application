@@ -6,12 +6,16 @@ const FileIcon = () => (
 );
 
 const StudentVerification = () => {
-  const { students, approveStudent, rejectStudent } = useAdmin();
+  const { students, approveStudent, rejectStudent, batches, moveStudentsToBatch } = useAdmin();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
   const [selectedStudents, setSelectedStudents] = useState([]);
   const [viewingStudent, setViewingStudent] = useState(null);
   const [exportState, setExportState] = useState('idle'); // idle | downloading | success
+  
+  const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
+  const [selectedBatchId, setSelectedBatchId] = useState("");
+  const [isMoving, setIsMoving] = useState(false);
 
   const formatDate = (dateStr) => {
     if (!dateStr) return "N/A";
@@ -104,6 +108,23 @@ const StudentVerification = () => {
     }
   };
 
+  const handleMoveConfirm = async () => {
+    if (!selectedBatchId || selectedStudents.length === 0) return;
+    
+    setIsMoving(true);
+    try {
+      await moveStudentsToBatch(selectedBatchId, selectedStudents);
+      alert(`Successfully moved ${selectedStudents.length} students.`);
+      setSelectedStudents([]);
+      setIsMoveModalOpen(false);
+      setSelectedBatchId("");
+    } catch (error) {
+      alert("Failed to move students: " + error.message);
+    } finally {
+      setIsMoving(false);
+    }
+  };
+
   return (
     <div className="page active">
       <div className="card">
@@ -114,6 +135,21 @@ const StudentVerification = () => {
                 <p className="card-sub">Review and verify student identities and registration sources.</p>
               </div>
               <div style={{ display: 'flex', gap: '8px' }}>
+                <button 
+                  className="btn-secondary"
+                  onClick={() => {
+                    if (selectedStudents.length === 0) return;
+                    setIsMoveModalOpen(true);
+                  }}
+                  disabled={selectedStudents.length === 0}
+                  style={{ 
+                    minWidth: '100px', 
+                    opacity: selectedStudents.length === 0 ? 0.6 : 1,
+                    cursor: selectedStudents.length === 0 ? 'not-allowed' : 'pointer'
+                  }}
+                >
+                  Move {selectedStudents.length > 0 ? `(${selectedStudents.length})` : ''}
+                </button>
                 <button 
                   className={`btn-primary ${exportState === 'success' ? 'btn-export-success' : ''}`}
                   onClick={handleExportCSV}
@@ -154,9 +190,10 @@ const StudentVerification = () => {
                <thead>
                  <tr>
                    <th style={{ width: '40px' }}><input type="checkbox" checked={selectedStudents.length === filteredStudents.length && filteredStudents.length > 0} onChange={selectAll} /></th>
-                   <th style={{ width: '45%' }}>Name</th>
-                   <th style={{ textAlign: 'center', width: '25%' }}>Date</th>
-                   <th style={{ textAlign: 'center', width: '25%' }}>Status</th>
+                   <th style={{ width: '35%' }}>Name</th>
+                   <th style={{ textAlign: 'center', width: '20%' }}>Date</th>
+                   <th style={{ textAlign: 'center', width: '25%' }}>Course</th>
+                   <th style={{ textAlign: 'center', width: '15%' }}>Status</th>
                  </tr>
                </thead>
                <tbody>
@@ -171,12 +208,13 @@ const StudentVerification = () => {
                         </div>
                       </td>
                       <td style={{ textAlign: 'center' }}>{formatDate(student.createdAt || student.date)}</td>
+                      <td style={{ textAlign: 'center' }}>{student.course || "N/A"}</td>
                       <td style={{ textAlign: 'center' }}>{getStatusBadge(student.status)}</td>
                     </tr>
                    ))
                  ) : (
                    <tr>
-                     <td colSpan="4" style={{ textAlign: 'center', padding: '40px', color: '#666' }}>No students found matching your criteria.</td>
+                     <td colSpan="5" style={{ textAlign: 'center', padding: '40px', color: '#666' }}>No students found matching your criteria.</td>
                    </tr>
                  )}
                </tbody>
@@ -221,6 +259,56 @@ const StudentVerification = () => {
                 className="btn-secondary" 
                 onClick={() => setViewingStudent(null)}
               >Close</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Move Students Modal */}
+      {isMoveModalOpen && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+          background: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center',
+          zIndex: 1000
+        }} onClick={() => setIsMoveModalOpen(false)}>
+          <div style={{
+            background: 'white', padding: '32px', borderRadius: '12px', maxWidth: '500px', width: '90%',
+            boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)'
+          }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px' }}>
+              <h3 style={{ margin: 0 }}>Move Students to Batch</h3>
+              <button onClick={() => setIsMoveModalOpen(false)} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer' }}>×</button>
+            </div>
+            
+            <p style={{ marginBottom: '16px', color: '#666' }}>
+              Select a target batch for the {selectedStudents.length} selected students.
+            </p>
+
+            <div style={{ marginBottom: '24px' }}>
+              <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Select Batch</label>
+              <select 
+                value={selectedBatchId} 
+                onChange={(e) => setSelectedBatchId(e.target.value)}
+                style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #ddd' }}
+              >
+                <option value="">— Select a batch —</option>
+                {batches.map(batch => (
+                  <option key={batch.id} value={batch.id}>
+                    {batch.name || batch.courseName} ({batch.enrolled || 0} / {batch.capacity} Students)
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <button className="btn-secondary" onClick={() => setIsMoveModalOpen(false)}>Cancel</button>
+              <button 
+                className="btn-primary" 
+                onClick={handleMoveConfirm}
+                disabled={!selectedBatchId || isMoving}
+              >
+                {isMoving ? "Moving..." : "Confirm Move"}
+              </button>
             </div>
           </div>
         </div>

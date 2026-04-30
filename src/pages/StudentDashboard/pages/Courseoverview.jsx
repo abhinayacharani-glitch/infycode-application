@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { COURSE_MAP } from './data/extraCourses';
+import { useCourseContext } from '../../../context/CourseContext';
 import { 
   ArrowLeft, 
   User, 
@@ -84,8 +85,44 @@ const getOverallStatus = (config, now) => {
 const CourseOverview = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const courseId = location.state || 'java-fs-01';
-  const course = COURSE_MAP[courseId];
+  const { publishedCourses } = useCourseContext();
+  
+  const courseIdFromState = location.state;
+  const courseId = (typeof courseIdFromState === 'object' && courseIdFromState !== null) 
+    ? courseIdFromState.courseId || courseIdFromState.id 
+    : courseIdFromState || 'java-fs-01';
+
+  let course = COURSE_MAP[courseId];
+
+  // If not in hardcoded map, try to find it in published courses
+  if (!course) {
+    const published = publishedCourses.find(c => c.courseId === courseId || c.id === courseId);
+    if (published) {
+      course = {
+        ...published,
+        id: published.courseId || published.id,
+        trainer: published.trainer || { name: 'Expert Instructor', role: 'Senior Mentor', experience: '10+ Years', specialization: published.category || 'Tech' },
+        batch: published.batch || { 
+          name: 'Regular Batch', 
+          id: `BID-${(published.title || 'CRSE').substring(0,4).toUpperCase()}-${new Date().getFullYear()}`, 
+          startDate: published.startDate || 'Next Week', 
+          timing: 'Flexible', 
+          duration: published.duration || '3 Months' 
+        },
+        level: published.level || 'Beginner',
+        modules: published.modules || [
+          {
+            id: 'mod1',
+            label: 'Module 1',
+            subtitle: 'Introduction',
+            duration: '1 Week',
+            color: '#10b981',
+            topics: [{ id: 't1', title: `Getting Started with ${published.title}`, content: `<p>Welcome to the ${published.title} course!</p>` }]
+          }
+        ]
+      };
+    }
+  }
 
   const [sessionStatus, setSessionStatus] = useState('no-link');
   const [sessionConfig, setSessionConfig] = useState(null);

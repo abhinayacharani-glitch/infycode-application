@@ -34,6 +34,8 @@ export const CourseProvider = ({ children }) => {
         students: c.students || '0',
         badge: c.badge || 'NEW',
         color: '#2563eb',
+        duration: c.duration || '3 Months',
+        startDate: c.startDate || 'Upcoming',
       }));
       setPublishedCourses(normalised);
     } catch (err) {

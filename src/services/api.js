@@ -112,6 +112,19 @@ export const createBatch = (batchData) => {
   });
 };
 
+/**
+ * POST /api/admin/move-students
+ * Moves selected students to a batch.
+ */
+export const moveStudentsToBatchAPI = (batchId, studentIds) => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return request('/api/admin/move-students', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${user.token || ''}` },
+    body: JSON.stringify({ batchId, studentIds }),
+  });
+};
+
 export const getAdminProfileAPI = () => {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   return request('/api/admin/profile', {
@@ -322,6 +335,14 @@ export const updateTrainerProfileAPI = (profileData) => {
   });
 };
 
+export const getTrainerBatchesAPI = () => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return request('/api/trainer/batches', {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${user.token || ''}` },
+  });
+};
+
 // ─────────────────────────────────────────────
 // TRAINER NOTIFICATIONS
 // ─────────────────────────────────────────────
@@ -334,7 +355,6 @@ export const getTrainerNotificationsAPI = () => {
     headers: { Authorization: `Bearer ${user.token || ''}` },
   });
 };
-
 /** PUT /api/trainer/notifications/mark-read — mark one (id) or all as read */
 export const markTrainerNotificationsReadAPI = (id = null) => {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -369,6 +389,14 @@ export const seedTrainerNotificationsAPI = () => {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   return request('/api/trainer/notifications/seed', {
     method: 'POST',
+    headers: { Authorization: `Bearer ${user.token || ''}` },
+  });
+};
+
+export const startBatchAPI = (firebaseId) => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return request(`/api/trainer/batches/${firebaseId}/start`, {
+    method: 'PUT',
     headers: { Authorization: `Bearer ${user.token || ''}` },
   });
 };

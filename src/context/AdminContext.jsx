@@ -13,6 +13,7 @@ import {
   updateAdminProfileAPI,
   updateTrainerApplicationStatusAPI,
   markAllStudentResultsAsSeenAPI,
+  moveStudentsToBatchAPI,
   createSyllabus as apiCreateSyllabus,
   getAllSyllabuses as apiGetAllSyllabuses
 } from '../services/api';
@@ -352,6 +353,19 @@ export const AdminProvider = ({ children }) => {
     }
   };
 
+  const moveStudentsToBatch = async (batchId, studentIds) => {
+    try {
+      const response = await moveStudentsToBatchAPI(batchId, studentIds);
+      if (response.success) {
+        fetchDashboardStats();
+        return response;
+      }
+    } catch (error) {
+      console.error("Error moving students:", error);
+      throw error;
+    }
+  };
+
   const loadCourses = async () => {
     try {
       const data = await getAllCourses();
@@ -403,6 +417,7 @@ export const AdminProvider = ({ children }) => {
     updateAdminProfile,
     fetchAdminProfile,
     markAllStudentResultsAsSeen,
+    moveStudentsToBatch,
     syllabuses,
     addSyllabus,
     loadSyllabuses
