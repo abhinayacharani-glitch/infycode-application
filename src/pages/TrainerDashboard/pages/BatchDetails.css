@@ -536,7 +536,8 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
-    max-width: 500px; /* Further reduced width */
+    max-width: 500px;
+    /* Further reduced width */
     margin-top: 20px;
 }
 
@@ -581,7 +582,8 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 0; /* Compact */
+    margin-bottom: 0;
+    /* Compact */
 }
 
 .st-avatar-v5 {
@@ -637,6 +639,7 @@
         opacity: 0;
         transform: translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -708,8 +711,13 @@
     font-weight: 800;
 }
 
-.section-header-v5.upcoming .section-title-v5 { color: var(--prod-blue); }
-.section-header-v5.upcoming { border-color: rgba(59, 130, 246, 0.2); }
+.section-header-v5.upcoming .section-title-v5 {
+    color: var(--prod-blue);
+}
+
+.section-header-v5.upcoming {
+    border-color: rgba(59, 130, 246, 0.2);
+}
 
 .schedule-list-v5 {
     display: flex;
@@ -985,6 +993,7 @@
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
@@ -1006,6 +1015,7 @@
         opacity: 0;
         transform: scale(0.95);
     }
+
     to {
         opacity: 1;
         transform: scale(1);
@@ -1190,6 +1200,7 @@
         opacity: 0;
         transform: scale(0.9);
     }
+
     to {
         opacity: 1;
         transform: scale(1);
@@ -1267,6 +1278,7 @@
     background: #1e40af;
     box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
 }
+
 .save-tick-v5 {
     font-size: 12px;
     font-weight: 600;
@@ -1468,6 +1480,7 @@
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
@@ -1501,6 +1514,7 @@
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
@@ -1527,6 +1541,7 @@
         transform: translateX(100%);
         opacity: 0;
     }
+
     to {
         transform: translateX(0);
         opacity: 1;
@@ -1548,7 +1563,7 @@
     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
 }
 
-.drawer-header > div {
+.drawer-header>div {
     flex: 1;
 }
 
@@ -1932,6 +1947,7 @@
         max-height: 0;
         margin-top: 0;
     }
+
     to {
         opacity: 1;
         max-height: 2000px;
@@ -2239,26 +2255,26 @@
 
 /* Join Session Now Button */
 .join-session-button-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
 }
 
 .join-session-button {
-  background: linear-gradient(90deg, #2563eb, #3b82f6);
-  color: white;
-  border: none;
-  border-radius: 10px;
-  padding: 10px 20px;
-  font-family: "Open Sans", sans-serif;
-  font-size: 16px;
-  cursor: pointer;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: background 0.3s ease, transform 0.2s ease;
+    background: linear-gradient(90deg, #2563eb, #3b82f6);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-family: "Open Sans", sans-serif;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s ease, transform 0.2s ease;
 }
 
 .join-session-button:hover {
-  background: linear-gradient(90deg, #1e40af, #2563eb);
-  transform: scale(1.05);
+    background: linear-gradient(90deg, #1e40af, #2563eb);
+    transform: scale(1.05);
 }

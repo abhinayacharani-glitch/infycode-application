@@ -150,11 +150,6 @@ const Sidebar = ({ isCollapsed, externalShowLogoutModal, setExternalShowLogoutMo
             {!isCollapsed && <span className="adm-nav-label">Batch management</span>}
           </NavLink>
 
-          <NavLink to="/admin-dashboard/enrollment" className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`} title="Enrolment mapping" data-tooltip="Enrolment mapping">
-            <span className="adm-nav-icon"><LinkIcon /></span>
-            {!isCollapsed && <span className="adm-nav-label">Enrolment mapping</span>}
-          </NavLink>
-
           <NavLink to="/admin-dashboard/student-results" className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`} title="Student results" data-tooltip="Student results">
             <span className="adm-nav-icon"><FileIcon /></span>
             {!isCollapsed && <span className="adm-nav-label">Student results</span>}

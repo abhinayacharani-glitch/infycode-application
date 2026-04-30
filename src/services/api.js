@@ -342,6 +342,56 @@ export const getTrainerBatchesAPI = () => {
     headers: { Authorization: `Bearer ${user.token || ''}` },
   });
 };
+
+// ─────────────────────────────────────────────
+// TRAINER NOTIFICATIONS
+// ─────────────────────────────────────────────
+
+/** GET /api/trainer/notifications — fetch all notifications for the logged-in trainer */
+export const getTrainerNotificationsAPI = () => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return request('/api/trainer/notifications', {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${user.token || ''}` },
+  });
+};
+/** PUT /api/trainer/notifications/mark-read — mark one (id) or all as read */
+export const markTrainerNotificationsReadAPI = (id = null) => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return request('/api/trainer/notifications/mark-read', {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${user.token || ''}` },
+    body: JSON.stringify(id ? { id } : {}),
+  });
+};
+
+/** DELETE /api/trainer/notifications/:id — remove a single notification */
+export const deleteTrainerNotificationAPI = (id) => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return request(`/api/trainer/notifications/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${user.token || ''}` },
+  });
+};
+
+/** POST /api/trainer/notifications — send a notification to a trainer */
+export const sendTrainerNotificationAPI = (payload) => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return request('/api/trainer/notifications', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${user.token || ''}` },
+    body: JSON.stringify(payload),
+  });
+};
+
+/** POST /api/trainer/notifications/seed — seed sample notifications (dev helper) */
+export const seedTrainerNotificationsAPI = () => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return request('/api/trainer/notifications/seed', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${user.token || ''}` },
+  });
+};
  
 // ─────────────────────────────────────────────
 // TRAINER APPLICATION WORKFLOW

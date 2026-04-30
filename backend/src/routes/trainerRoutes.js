@@ -5,6 +5,13 @@ import { trainerRegister, trainerVerifyOtp, trainerDashboard, getTrainerProfile,
 import { submitApplication } from "../controllers/trainerApplicationController.js";
 import { verifyToken, isTrainer } from "../middleware/authMiddleware.js";
 import { checkRole } from "../middleware/roleMiddleware.js";
+import {
+  getTrainerNotifications,
+  markNotificationsRead,
+  sendTrainerNotification,
+  deleteTrainerNotification,
+  seedTrainerNotifications,
+} from "../controllers/trainerNotificationController.js";
 
 // ✅ Trainer Application Form — POST /api/trainer/apply (public)
 router.post("/apply", submitApplication);
@@ -26,5 +33,15 @@ router.put("/profile", verifyToken, isTrainer, updateTrainerProfile);
 
 // ✅ Trainer Batches — GET /api/trainer/batches (protected)
 router.get("/batches", verifyToken, isTrainer, getTrainerBatches);
+
+// ✅ Trainer Notifications (protected — trainer only)
+router.get("/notifications",            verifyToken, isTrainer, getTrainerNotifications);
+router.put("/notifications/mark-read",  verifyToken, isTrainer, markNotificationsRead);
+router.delete("/notifications/:id",     verifyToken, isTrainer, deleteTrainerNotification);
+router.post("/notifications/seed",      verifyToken, isTrainer, seedTrainerNotifications);
+
+// ✅ Send notification TO a trainer (admin or student can call this)
+// Protected: caller must be logged in (admin/student/trainer)
+router.post("/notifications", verifyToken, sendTrainerNotification);
 
 export default router;

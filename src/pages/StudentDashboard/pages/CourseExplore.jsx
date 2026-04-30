@@ -264,6 +264,25 @@ const CourseExplore = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
+    if (state?.topicId) {
+      const targetModule = course.modules.find(m => 
+        m.topics.some(t => t.id === state.topicId)
+      );
+      if (targetModule) {
+        setOpenModules(prev => ({ ...prev, [targetModule.id]: true }));
+        // Delay scroll to allow accordion to open
+        setTimeout(() => {
+          const element = document.getElementById(`topic-${state.topicId}`);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            element.classList.add('highlight-topic');
+          }
+        }, 500);
+      }
+    }
+  }, [state, course]);
+
+  useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 400) {
         setShowScrollTop(true);
@@ -377,7 +396,11 @@ const CourseExplore = () => {
                       </div>
                       <div className="curr-topics-list">
                         {m.topics.map((t) => (
-                          <div key={t.id} className="curr-topic-item">
+                          <div 
+                            key={t.id} 
+                            id={`topic-${t.id}`}
+                            className={`curr-topic-item ${state?.topicId === t.id ? 'highlight-topic' : ''}`}
+                          >
                             <div className="curr-topic-header">
                               <div className="curr-topic-bullet"></div>
                               <h3 className="curr-topic-title">{t.title}</h3>
