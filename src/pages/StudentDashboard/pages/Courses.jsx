@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { getEnrolledCourses } from '../../../services/api';
 import { COURSE_MAP } from './data/extraCourses';
 import { ALL_COURSES } from '../../../components/Courses/Courses';
+import { useCourseContext } from '../../../context/CourseContext';
 import DashboardHero from '../components/DashboardHero';
 import './Courses.css';
 
@@ -48,8 +49,8 @@ const EnrolledCourseCard = ({ course, onNavigate }) => {
     onNavigate('/student-dashboard/course-overview', course.id);
   };
 
-  const courseMeta = ALL_COURSES.find(c => c.title === course.title) || {};
-  const courseImage = courseMeta.image || course.image;
+  const courseMeta = ALL_COURSES.find(c => c.title === course.title) || course;
+  const courseImage = courseMeta.image || course.image || 'https://via.placeholder.com/400x200?text=Course';
 
   return (
     <motion.div
@@ -131,6 +132,7 @@ const EnrolledCourseCard = ({ course, onNavigate }) => {
 const EnrollCourses = ({ onNavigate }) => {
   const [enrolledCourses, setEnrolledCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { publishedCourses } = useCourseContext();
 
   useEffect(() => {
     const fetchEnrolled = async () => {
@@ -149,6 +151,14 @@ const EnrollCourses = ({ onNavigate }) => {
               const matchedMapCourse = Object.values(COURSE_MAP).find(c => c.title === matchedAllCourse.title);
               if (matchedMapCourse) {
                 enrolled.push(matchedMapCourse);
+              } else {
+                // If not in map, just add the course itself
+                enrolled.push({ ...matchedAllCourse, id: matchedAllCourse.courseId, modules: [] });
+              }
+            } else {
+              const matchedPublishedCourse = publishedCourses.find(c => c.courseId === id);
+              if (matchedPublishedCourse) {
+                 enrolled.push({ ...matchedPublishedCourse, id: matchedPublishedCourse.courseId, modules: [] });
               }
             }
           }
@@ -161,8 +171,8 @@ const EnrollCourses = ({ onNavigate }) => {
         setLoading(false);
       }
     };
-    fetchEnrolled();
-  }, []);
+    if (publishedCourses) fetchEnrolled();
+  }, [publishedCourses]);
 
   if (loading) {
     return (

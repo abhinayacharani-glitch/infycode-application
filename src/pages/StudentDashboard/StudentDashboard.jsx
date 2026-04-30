@@ -19,6 +19,8 @@ import MockTestDetail from "./pages/MockTestDetail";
 import MockTestList from "./pages/MockTestList";
 import ProjectTopics from "./pages/ProjectTopics";
 import PreparationResources from "./pages/PreparationResources";
+import MyQueries from "./pages/MyQueries";
+import QuerySolution from "./pages/QuerySolution";
 import Logout from "./pages/Logout";
 import "./StudentDashboard.css"; // We'll create this to store the layout styles
 
@@ -73,6 +75,8 @@ function StudentDashboard() {
             <Route path="profile" element={<Profile />} />
             <Route path="course-explore" element={<CourseExplore />} />
             <Route path="trainer-connect" element={<MentorConnection />} />
+            <Route path="my-queries" element={<MyQueries />} />
+            <Route path="my-queries/:ticketId/solution" element={<QuerySolution />} />
             <Route path="logout" element={<Logout />} />
           </Routes>
         </main>

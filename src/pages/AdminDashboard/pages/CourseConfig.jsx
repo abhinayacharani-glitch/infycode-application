@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAdmin } from '../../../context/AdminContext';
 import AdminPage from '../components/CourseManagement/AdminPage';
 import CourseFeed from '../components/CourseManagement/CourseFeed';
+import CreateSyllabus from '../components/CourseManagement/CreateSyllabus';
 const CheckCircleIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
 );
@@ -19,14 +20,21 @@ const CourseConfig = () => {
     toggleCourseLike
   } = useAdmin();
 
-  const [activeTab, setActiveTab] = useState('feed'); // 'feed' or 'create'
+  const [activeTab, setActiveTab] = useState('feed'); // 'feed', 'create', or 'syllabus'
   const [publishedTitle, setPublishedTitle] = useState('');
+  const [syllabusSuccess, setSyllabusSuccess] = useState(false);
 
   const handleCoursePublished = (newCourse) => {
     setPublishedTitle(newCourse?.title || 'Your course');
     setActiveTab('feed');
     // Auto-clear success banner after 4 seconds
     setTimeout(() => setPublishedTitle(''), 4000);
+  };
+
+  const handleSyllabusPublished = () => {
+    setSyllabusSuccess(true);
+    setActiveTab('create'); // Go back to create course to see new syllabus
+    setTimeout(() => setSyllabusSuccess(false), 4000);
   };
 
   return (
@@ -83,6 +91,23 @@ const CourseConfig = () => {
         >
           Create New Course
         </button>
+        <button
+          onClick={() => setActiveTab('syllabus')}
+          className={`adm-tab-btn ${activeTab === 'syllabus' ? 'active' : ''}`}
+          style={{
+            padding: '10px 20px',
+            fontSize: '14px',
+            fontWeight: '600',
+            border: 'none',
+            background: 'none',
+            cursor: 'pointer',
+            color: activeTab === 'syllabus' ? '#2563eb' : '#64748b',
+            borderBottom: activeTab === 'syllabus' ? '3px solid #2563eb' : '3px solid transparent',
+            transition: 'all 0.3s ease'
+          }}
+        >
+          Create New Syllabus
+        </button>
       </div>
 
       {/* ── Success Banner (shows in feed tab after publish) ── */}
@@ -100,6 +125,20 @@ const CourseConfig = () => {
         </div>
       )}
 
+      {activeTab === 'create' && syllabusSuccess && (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: '10px',
+          background: '#eff6ff', border: '1.5px solid #93c5fd',
+          color: '#1e40af', padding: '14px 18px', borderRadius: '12px',
+          fontWeight: '600', fontSize: '0.95rem', marginBottom: '20px',
+          boxShadow: '0 2px 8px rgba(37,99,235,0.10)',
+          animation: 'slideInBanner 0.3s ease-out'
+        }}>
+          <CheckCircleIcon />
+          <span>New syllabus published! You can now load it from the dropdown below.</span>
+        </div>
+      )}
+
       {/* ── Content Area ── */}
       <div className="adm-course-content-area">
         {activeTab === 'create' ? (
@@ -108,6 +147,10 @@ const CourseConfig = () => {
               onCoursePublished={handleCoursePublished}
               isEmbedded={true}
             />
+          </div>
+        ) : activeTab === 'syllabus' ? (
+          <div className="animate-fadeIn">
+            <CreateSyllabus onSyllabusPublished={handleSyllabusPublished} />
           </div>
         ) : (
           <div className="animate-fadeIn">

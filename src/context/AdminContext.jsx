@@ -12,7 +12,9 @@ import {
   getAdminProfileAPI,
   updateAdminProfileAPI,
   updateTrainerApplicationStatusAPI,
-  markAllStudentResultsAsSeenAPI
+  markAllStudentResultsAsSeenAPI,
+  createSyllabus as apiCreateSyllabus,
+  getAllSyllabuses as apiGetAllSyllabuses
 } from '../services/api';
 
 const AdminContext = createContext();
@@ -31,6 +33,7 @@ export const AdminProvider = ({ children }) => {
   const [trainers, setTrainers] = useState([]);
   const [courses, setCourses] = useState([]);
   const [batches, setBatches] = useState([]);
+  const [syllabuses, setSyllabuses] = useState([]);
   const [pendingFAQs, setPendingFAQs] = useState([]);
   const [adminData, setAdminData] = useState(() => {
     const savedUser = localStorage.getItem('user');
@@ -175,6 +178,27 @@ export const AdminProvider = ({ children }) => {
       ));
     } catch (error) {
       console.error("Error toggling like:", error);
+      throw error;
+    }
+  };
+
+  /* --- Syllabus Actions --- */
+  const loadSyllabuses = async () => {
+    try {
+      const data = await apiGetAllSyllabuses();
+      setSyllabuses(data.syllabuses || []);
+    } catch (error) {
+      console.error("Error loading syllabuses:", error);
+    }
+  };
+
+  const addSyllabus = async (syllabusData) => {
+    try {
+      const data = await apiCreateSyllabus(syllabusData);
+      setSyllabuses(prev => [...prev, data.syllabus]);
+      return data.syllabus;
+    } catch (error) {
+      console.error("Error adding syllabus:", error);
       throw error;
     }
   };
@@ -340,12 +364,14 @@ export const AdminProvider = ({ children }) => {
   useEffect(() => {
     fetchDashboardStats();
     loadCourses(); 
+    loadSyllabuses();
     loadPendingFAQs();
     fetchAdminProfile();
 
     const interval = setInterval(() => {
       fetchDashboardStats();
       loadCourses();
+      loadSyllabuses();
       loadPendingFAQs();
     }, 30000);
     return () => clearInterval(interval);
@@ -376,7 +402,10 @@ export const AdminProvider = ({ children }) => {
     adminData,
     updateAdminProfile,
     fetchAdminProfile,
-    markAllStudentResultsAsSeen
+    markAllStudentResultsAsSeen,
+    syllabuses,
+    addSyllabus,
+    loadSyllabuses
   };
 
   return <AdminContext.Provider value={value}>{children}</AdminContext.Provider>;

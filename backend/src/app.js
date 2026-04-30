@@ -9,6 +9,7 @@ import courseRoutes from "./routes/courseRoutes.js";
 import faqRoutes from "./routes/faqRoutes.js";
 import studentRoutes from "./routes/studentRoutes.js";
 import counsellingRoutes from "./routes/counsellingRoutes.js";
+import syllabusRoutes from "./routes/syllabusRoutes.js";
 import { publishFAQ, getNewPublishedFAQs } from "./controllers/faqController.js";
 
 const app = express();
@@ -71,6 +72,7 @@ app.use("/api/admin", adminRoutes);       // /api/admin/dashboard, /api/admin/st
 app.use("/api/trainer", trainerRoutes);   // /api/trainer/register, /api/trainer/verify-otp, /api/trainer/dashboard
 app.use("/api/password", passwordRoutes); // /api/password/forgot-password, /api/password/reset-password
 app.use("/api/courses", courseRoutes);    // /api/courses CRUD
+app.use("/api/syllabuses", syllabusRoutes); // /api/syllabuses CRUD
 app.use("/api/faqs", faqRoutes);          // /api/faqs FAQ operations
 app.use("/api/student", studentRoutes);   // /api/student operations
 app.use("/api/counselling", counsellingRoutes); // /api/counselling operations
