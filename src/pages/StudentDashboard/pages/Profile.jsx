@@ -1,11 +1,28 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Edit2, Mail, Phone, MapPin, Award, BookOpen, CheckCircle, GraduationCap, Camera, User, Upload, Trash2, X } from 'lucide-react';
-import { useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./Profile.css";
 import { getStudentProfile, updateStudentProfile, getEnrolledCourses, getMyResults } from "../../../services/api";
 
+const getCurrentTopic = (course) => {
+  const allTopics = course.modules.flatMap(m => m.topics);
+  if (allTopics.length === 0) return null;
+  const idx = Math.min(Math.floor((course.progress / 100) * allTopics.length), allTopics.length - 1);
+  return allTopics[idx];
+};
+
 const Profile = () => {
+  const navigate = useNavigate();
   const location = useLocation();
+  
+  const handleCourseClick = (course) => {
+    const currentTopic = getCurrentTopic(course);
+    if (currentTopic && (course.progress || 0) < 100) {
+      navigate('/student-dashboard/course-explore', { state: { courseId: course.id, topicId: currentTopic.id } });
+    } else {
+      navigate('/student-dashboard/course-overview', { state: course.id });
+    }
+  };
   const fileInputRef = useRef(null);
   const photoMenuRef = useRef(null);
   const videoRef = useRef(null);
@@ -530,17 +547,24 @@ const Profile = () => {
               </div>
               {enrolledCourses.length > 0 ? (
                 <div className="pc-course-list">
-                  {enrolledCourses.map(c => (
-                    <div key={c.id} className="pc-course-row">
-                      <div>
-                        <p className="pc-course-title">{c.title}</p>
-                        <span className="pc-course-sub">{c.level || 'Professional Level'}</span>
+                  {enrolledCourses.map(c => {
+                    const isDone = c.progress === 100;
+                    return (
+                      <div 
+                        key={c.id} 
+                        className={`pc-course-row-professional ${isDone ? 'completed' : 'ongoing'}`}
+                        onClick={() => handleCourseClick(c)}
+                      >
+                        <div className="pc-course-info-group">
+                          <p className="pc-course-title-main">{c.title}</p>
+                          <span className="pc-course-level-tag">{c.level || 'Intermediate'}</span>
+                        </div>
+                        <div className={`pc-course-status-badge ${isDone ? 'done' : 'ongoing'}`}>
+                          {isDone ? 'COMPLETED' : 'IN PROGRESS'}
+                        </div>
                       </div>
-                      <span className={`pc-status ${c.progress === 100 ? 'done' : 'ongoing'}`}>
-                        {c.progress === 100 ? 'Completed' : 'In Progress'}
-                      </span>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="pc-empty">
