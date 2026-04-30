@@ -60,7 +60,8 @@
     margin: 0 auto 2rem;
     border: 1px solid var(--border, #e2e8f0);
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
-    max-width: 520px; /* was 600px */
+    max-width: 520px;
+    /* was 600px */
     transition: all 0.3s ease;
 }
 
@@ -175,7 +176,8 @@
 
 .course-card-modern:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.08); /* slight shadow popup */
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.08);
+    /* slight shadow popup */
 }
 
 .card-img-banner {
@@ -193,7 +195,8 @@
 }
 
 .course-card-modern:hover .card-img-banner img {
-    transform: scale(1.05); /* very slight zoom */
+    transform: scale(1.05);
+    /* very slight zoom */
 }
 
 .card-content-modern {
@@ -216,7 +219,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: auto; /* Push the footer down */
+    margin-bottom: auto;
+    /* Push the footer down */
 }
 
 .stat.students-text {
@@ -242,7 +246,8 @@
 .price-tag {
     font-size: 1rem;
     font-weight: 700;
-    color: #3b82f6; /* blue matching original mock */
+    color: #3b82f6;
+    /* blue matching original mock */
 }
 
 .btn-join-now {
@@ -383,50 +388,57 @@
         background: var(--bg, #f4f6f9);
     }
 }
+
 .courses-hero {
-  position: relative;
-  min-height: 500px;
+    position: relative;
+    min-height: 500px;
 }
 
 /* optional overlay for readability */
 .courses-hero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
 }
 
 .courses-hero-content {
-  position: relative;
-  z-index: 1;
+    position: relative;
+    z-index: 1;
 }
+
 .categories-bar-wrap {
-  margin-top: 60px;
+    margin-top: 60px;
 }
+
 /* 🔥 ENROLL BUTTON - CLEAN (NO BG, NO BORDER) */
 .btn-primary.mini {
-  background: transparent !important; 
-   /* remove white bg */
-  border: none !important;             /* remove border */
-  box-shadow: none !important;
+    background: transparent !important;
+    /* remove white bg */
+    border: none !important;
+    /* remove border */
+    box-shadow: none !important;
 
-  color: #2563eb !important; /* 🔥 FORCED BLUE */
-  font-weight: bolder;
+    color: #2563eb !important;
+    /* 🔥 FORCED BLUE */
+    font-weight: bolder;
 
-  display: flex;
-  align-items: center;
-  gap: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 
-  cursor: pointer;
-  padding: 6px 0;
+    cursor: pointer;
+    padding: 6px 0;
 
-  transition: all 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 /* 🔥 HOVER EFFECT (subtle, modern) */
 .course-card-modern .btn-primary.mini:hover {
-  background: transparent !important;
-  box-shadow: none !important;
-  color: #1d4ed8 !important; /* darker blue on hover */
-  transform: translateX(4px); /* small slide effect */
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #1d4ed8 !important;
+    /* darker blue on hover */
+    transform: translateX(4px);
+    /* small slide effect */
 }

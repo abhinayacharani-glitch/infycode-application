@@ -12,10 +12,10 @@ const Login = () => {
   // Remove back button interception that might interfere with navigation
 
   const [formData, setFormData] = useState({ email: '', password: '' });
-  const [errors, setErrors]     = useState({});
+  const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading]       = useState(false);
-  const [apiError, setApiError]         = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [apiError, setApiError] = useState('');
 
   const [successMsg, setSuccessMsg] = useState(location.state?.message || '');
 
@@ -36,9 +36,9 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const errs = {};
-    if (!formData.email)                       errs.email    = 'Email is required';
-    else if (!validateEmail(formData.email))   errs.email    = 'Invalid email address';
-    if (!formData.password)                    errs.password = 'Password is required';
+    if (!formData.email) errs.email = 'Email is required';
+    else if (!validateEmail(formData.email)) errs.email = 'Invalid email address';
+    if (!formData.password) errs.password = 'Password is required';
     if (Object.keys(errs).length) { setErrors(errs); return; }
 
     setIsLoading(true);
@@ -47,15 +47,15 @@ const Login = () => {
     try {
       const data = await trainerLogin(formData.email, formData.password);
       localStorage.setItem('user', JSON.stringify({
-        token:    data.token,
-        role:     data.role,
+        token: data.token,
+        role: data.role,
         fullName: data.fullName || data.fullname,
-        email:    data.email
+        email: data.email
       }));
       // Role-based navigation
-      if (data.role === 'admin')        navigate("/admin-dashboard");
+      if (data.role === 'admin') navigate("/admin-dashboard");
       else if (data.role === 'trainer') navigate("/trainer-dashboard");
-      else                              navigate("/student-dashboard");
+      else navigate("/student-dashboard");
     } catch (err) {
       setApiError(err.message);
     } finally {
@@ -186,8 +186,8 @@ const Login = () => {
 
           <div className="auth-footer">
             Don't have an account?
-            <Link 
-              to="/trainer/signup" 
+            <Link
+              to="/trainer/signup"
               state={{ fromLogin: true }}
               onClick={(e) => {
                 if (location.state?.fromSignup) {

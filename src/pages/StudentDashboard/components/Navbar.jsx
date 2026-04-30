@@ -5,7 +5,7 @@ import "./Navbar.css";
 
 const Navbar = ({ onToggleSidebar }) => {
   const navigate = useNavigate();
-  const [activeDropdown, setActiveDropdown] = useState(null); 
+  const [activeDropdown, setActiveDropdown] = useState(null);
   const dropdownRef = useRef(null);
   const notificationsRef = useRef(null);
   const messagesRef = useRef(null);
@@ -65,19 +65,33 @@ const Navbar = ({ onToggleSidebar }) => {
   ];
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target) &&
-          notificationsRef.current && !notificationsRef.current.contains(event.target) &&
-          messagesRef.current && !messagesRef.current.contains(event.target)) {
+    if (!activeDropdown) return;
+
+    const handleGlobalClick = (event) => {
+      // Check if the click was on a dropdown trigger
+      const isNotificationTrigger = notificationsRef.current && notificationsRef.current.contains(event.target);
+      const isProfileTrigger = dropdownRef.current && dropdownRef.current.contains(event.target);
+
+      // If we clicked something else, close the dropdown
+      if (!isNotificationTrigger && !isProfileTrigger) {
         setActiveDropdown(null);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+
+    // Use a small timeout to ensure the opening click doesn't immediately trigger this
+    const timer = setTimeout(() => {
+      window.addEventListener('click', handleGlobalClick);
+    }, 0);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('click', handleGlobalClick);
+    };
+  }, [activeDropdown]);
 
   const toggleDropdown = (dropdownType) => {
-    setActiveDropdown(activeDropdown === dropdownType ? null : dropdownType);
+    // Always set to the type to ensure it opens/stays open
+    setActiveDropdown(dropdownType);
   };
 
   const handleLogout = () => {
@@ -99,7 +113,7 @@ const Navbar = ({ onToggleSidebar }) => {
           </div>
 
           {activeDropdown === 'notifications' && (
-            <div className="content-dropdown" onClick={(e) => e.stopPropagation()}>
+            <div className="content-dropdown">
               <div className="dropdown-header">
                 <h3>Notifications</h3>
                 <button className="view-all">Mark all read</button>
@@ -127,13 +141,13 @@ const Navbar = ({ onToggleSidebar }) => {
           ) : (
             <div className="navbar-avatar-placeholder">{user.fullname.charAt(0).toUpperCase()}</div>
           )}
-          <ChevronDown 
-            size={18} 
-            className="chevron-icon" 
-            style={{ 
-              transform: activeDropdown === 'profile' ? 'rotate(180deg)' : 'rotate(0)', 
-              transition: 'transform 0.2s' 
-            }} 
+          <ChevronDown
+            size={18}
+            className="chevron-icon"
+            style={{
+              transform: activeDropdown === 'profile' ? 'rotate(180deg)' : 'rotate(0)',
+              transition: 'transform 0.2s'
+            }}
           />
 
           {activeDropdown === 'profile' && (

@@ -335,14 +335,11 @@ const Profile = () => {
           <div className="info-list-items">
             <div className="info-item-saas">
               <div className="item-label-saas"><User size={14} /> Full Name</div>
-              {isEditing ? (
-                <input name="name" value={tempData.name} onChange={handleChange} className="edit-input-saas" />
-              ) : (
-                <div className="value-box-saas">{displayName}</div>
-              )}
+              <div className="value-box-saas read-only-info">{displayName}</div>
             </div>
             <div className="info-item-saas">
               <div className="item-label-saas"><Mail size={14} /> Email</div>
+<<<<<<< HEAD
               {isEditing ? (
                 <input name="email" value={tempData.email} onChange={handleChange} className="edit-input-saas" />
               ) : (
@@ -356,6 +353,13 @@ const Profile = () => {
               ) : (
                 <div className="value-box-saas">{safeData.phone || ""}</div>
               )}
+=======
+              <div className="value-box-saas text-blue read-only-info">{trainerData.email || ""}</div>
+            </div>
+            <div className="info-item-saas">
+              <div className="item-label-saas"><Phone size={14} /> Phone</div>
+              <div className="value-box-saas read-only-info">{trainerData.phone || trainerData.phno || ""}</div>
+>>>>>>> ba3d1cf8b1b3fb048223d1e788fc020a5bbb16a1
             </div>
             <div className="info-item-saas">
               <div className="item-label-saas"><MapPin size={14} /> Location</div>

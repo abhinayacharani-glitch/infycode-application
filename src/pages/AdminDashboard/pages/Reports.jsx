@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { getAdminStudentResults } from "../../../services/api";
+import { useAdmin } from "../../../context/AdminContext";
 
 const StudentResults = () => {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { markAllStudentResultsAsSeen } = useAdmin();
 
   useEffect(() => {
     fetchResults();
+    markAllStudentResultsAsSeen();
   }, []);
 
   const fetchResults = async () => {
