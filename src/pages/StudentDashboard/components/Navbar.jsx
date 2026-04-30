@@ -84,7 +84,8 @@ const Navbar = ({ onToggleSidebar }) => {
 
   return (
     <nav className="student-topbar">
-      <div className="topbar-left"></div>
+      <div className="topbar-left">
+      </div>
 
       <div className="topbar-right">
 
