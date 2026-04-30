@@ -252,15 +252,15 @@ const Courses = () => {
   return (
     <div className="courses-page-modern" id="courses">
       {/* Header with Search */}
-     <div 
-  className="courses-hero"
-  style={{
-    backgroundImage: `url(${bgImage})`,
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    backgroundRepeat: "no-repeat"
-  }}
->
+      <div
+        className="courses-hero"
+        style={{
+          backgroundImage: `url(${bgImage})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat"
+        }}
+      >
         <div className="container-custom">
           <motion.div
             className="courses-hero-content"
@@ -406,8 +406,8 @@ const Courses = () => {
                       </div>
 
                       <div className="details-action-wrapper">
-                        <button 
-                          className="btn-view-details" 
+                        <button
+                          className="btn-view-details"
                           onClick={() => navigate(`/course-details/${course.courseId}`)}
                           title="View Course Details"
                         >

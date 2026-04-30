@@ -328,6 +328,18 @@
   color: #0f172a;
 }
 
+.fp-cta-btn-blue {
+  background: #2563eb !important;
+  color: white !important;
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4) !important;
+}
+
+.fp-cta-btn-blue:hover {
+  background: #1d4ed8 !important;
+  transform: translateY(-3px) !important;
+  box-shadow: 0 15px 35px rgba(37, 99, 235, 0.5) !important;
+}
+
 /* ─── RESPONSIVE ─── */
 @media (max-width: 900px) {
   .fp-hero-inner {

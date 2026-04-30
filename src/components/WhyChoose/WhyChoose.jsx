@@ -38,6 +38,9 @@ function WhyChoose() {
             className={`why-option ${activePath === "confused" ? "active" : ""}`}
             onClick={() => setActivePath(activePath === "confused" ? null : "confused")}
           >
+            <button className="why-know-more-btn" onClick={(e) => { e.stopPropagation(); setActivePath(activePath === "confused" ? null : "confused"); }}>
+              Know More
+            </button>
             <img src={confusedImg} alt="Confused Student" />
             <div className="overlay">
               <h3>I’m Not Sure</h3>
@@ -83,6 +86,9 @@ function WhyChoose() {
             className={`why-option ${activePath === "clear" ? "active" : ""}`}
             onClick={() => setActivePath(activePath === "clear" ? null : "clear")}
           >
+            <button className="why-know-more-btn" onClick={(e) => { e.stopPropagation(); setActivePath(activePath === "clear" ? null : "clear"); }}>
+              Know More
+            </button>
             <img src={focusedImg} alt="Focused Student" />
             <div className="overlay">
               <h3>I Know My Path</h3>
