@@ -436,6 +436,22 @@ export const toggleCourseLike = (id) =>
     headers: getAuthHeader(),
   });
 
+// ─────────────────────────────────────────────
+// SYLLABUSES
+// ─────────────────────────────────────────────
+
+export const createSyllabus = (syllabusData) =>
+  request('/api/syllabuses', {
+    method: 'POST',
+    headers: getAuthHeader(),
+    body: JSON.stringify(syllabusData),
+  });
+
+export const getAllSyllabuses = () =>
+  request('/api/syllabuses', {
+    headers: getAuthHeader(),
+  });
+
 export const enrollInCourse = (courseId) =>
   request(`/api/student/enroll/${courseId}`, {
     method: 'POST',

@@ -7,6 +7,7 @@ import Navbar from "./components/Navbar/Navbar";
 import AIChatbot from "./components/AIChatbot/AIChatbot";
 import { motion, AnimatePresence } from "framer-motion";
 import { AdminProvider } from "./context/AdminContext";
+import { CourseProvider } from "./context/CourseContext";
 
 import {
   getAllCourses,
@@ -370,21 +371,18 @@ function App() {
   if (isLoading) return <Loader />;
 
   return (
-    <BrowserRouter>
-      {showLaunchEvent && (
-        <Suspense fallback={<PageLoader />}>
-          <LaunchEvent onEnterSite={handleEnterSite} />
-        </Suspense>
-      )}
-      {showPopup && !showLaunchEvent && <Popup onClose={() => setShowPopup(false)} />}
-      <Layout
-        courses={courses}
-        setCourses={setCourses}
-        onToggleLike={handleToggleLike}
-        onUpdateCourse={handleUpdateCourse}
-        onDeleteCourse={handleDeleteCourse}
-      />
-    </BrowserRouter>
+    <CourseProvider>
+      <BrowserRouter>
+        {showPopup && <Popup onClose={() => setShowPopup(false)} />}
+        <Layout
+          courses={courses}
+          setCourses={setCourses}
+          onToggleLike={handleToggleLike}
+          onUpdateCourse={handleUpdateCourse}
+          onDeleteCourse={handleDeleteCourse}
+        />
+      </BrowserRouter>
+    </CourseProvider>
   );
 }
 
