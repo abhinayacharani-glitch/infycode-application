@@ -5,6 +5,7 @@ import { validateEmail } from '../utils/validation';
 import { studentForgotPassword } from '../../services/api';
 import logoIcon from "../../assets/infycode-final-logo4-1.png";
 import logoText from "../../assets/color-logo-3.jpeg";
+import LoginBackground from "../components/LoginBackground";
 import "../styles/Login.css";
 
 const ForgotPassword = () => {
@@ -38,28 +39,7 @@ const ForgotPassword = () => {
   return (
     <div className="lp-root">
       {/* Animated BG */}
-      <div className="lp-bg">
-        <div className="lp-grad" />
-        {/* Particles */}
-        {[...Array(40)].map((_, i) => (
-          <div 
-            key={i} 
-            className={`lp-particle lp-particle-${['sm','md','lg'][i % 3]}`} 
-            style={{ 
-              left: `${Math.random() * 100}%`, 
-              top: `${Math.random() * 100}%`,
-              '--del': `${Math.random() * 10}s`,
-              '--dur': `${10 + Math.random() * 10}s`
-            }} 
-          />
-        ))}
-        {[...Array(18)].map((_, i) => (
-          <div key={i} className={`lp-shape lp-shape-${(i % 4) + 1}`} style={{ '--i': i }} />
-        ))}
-        <div className="lp-orb lp-orb-a" />
-        <div className="lp-orb lp-orb-b" />
-        <div className="lp-orb lp-orb-c" />
-      </div>
+      <LoginBackground />
 
       <div className="lp-layout">
         {/* LEFT — Logo only */}

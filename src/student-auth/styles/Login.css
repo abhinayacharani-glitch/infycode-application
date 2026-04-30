@@ -325,48 +325,61 @@
   perspective: 1500px; /* Added for 3D effect */
 }
 
-/* ── FLIP SYSTEM ── */
-.lp-flip-container {
+/* ── INTERNAL CAROUSEL SYSTEM ── */
+.lp-static-card {
   width: 100%;
   max-width: 460px;
-  height: auto;
-  min-height: 550px;
+  min-height: 620px; /* Balanced minimum height */
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 28px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+  overflow: hidden; /* Clip the sliding content */
   position: relative;
-}
-
-.lp-flip-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-  transform-style: preserve-3d;
-}
-
-.lp-flip-container.is-flipped .lp-flip-inner {
-  transform: rotateY(180deg);
+  display: flex;
+  flex-direction: column;
 }
 
 .lp-card {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  background: #ffffff; /* Changed to white */
+  background: #ffffff;
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 28px;
   padding: 52px 48px;
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
 }
 
-.lp-card-back {
-  transform: rotateY(180deg);
+.lp-right > .lp-card {
+  position: relative;
+  max-width: 460px;
 }
 
-/* Ensure the container stays sized for the active card */
-.lp-flip-container:not(.is-flipped) .lp-card-back { pointer-events: none; opacity: 0; }
-.lp-flip-container.is-flipped .lp-card-front { pointer-events: none; opacity: 0; }
+.lp-carousel-track {
+  display: flex;
+  width: 200%; /* Two slides */
+  height: 100%;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  align-items: stretch;
+}
+
+.lp-carousel-track.is-signup {
+  transform: translateX(-50%);
+}
+
+.lp-carousel-slide {
+  width: 50%;
+  padding: 52px 48px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Vertically center content */
+  transition: opacity 0.4s ease;
+  opacity: 0.3; /* Dim inactive content */
+}
+
+.lp-carousel-track.is-signup .lp-signup-slide,
+.lp-carousel-track:not(.is-signup) .lp-login-slide {
+  opacity: 1;
+}
 
 .lp-card-header {
   margin-bottom: 32px;

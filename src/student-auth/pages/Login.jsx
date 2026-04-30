@@ -182,129 +182,129 @@ function Login() {
           </div>
         </div>
 
-        {/* RIGHT — Form with Flip Effect */}
+        {/* RIGHT — Form with Internal Carousel Effect */}
         <div className="lp-right">
-          <div className={`lp-flip-container ${isActive ? "is-flipped" : ""}`}>
-            <div className="lp-flip-inner">
+          <div className="lp-static-card">
+            <div className={`lp-carousel-track ${isActive ? "is-signup" : ""}`}>
 
-              {/* FRONT SIDE — SIGN IN */}
-              <div className="lp-card lp-card-front">
-                <div className="lp-card-header">
-                  <h1>Welcome Back</h1>
-                  <p>Sign in to continue your journey</p>
-                </div>
-                {successMessage && <div className="lp-alert lp-alert-success"><CheckCircle size={15} />{successMessage}</div>}
-                {signInApiError && <div className="lp-alert lp-alert-error">⚠ {signInApiError}</div>}
-                <form onSubmit={handleSignInSubmit} noValidate className="lp-form">
-                  <div className="lp-field">
-                    <label>Email Address</label>
-                    <div className="lp-input-wrap">
-                      <Mail size={15} className="lp-icon" />
-                      <input type="email" name="email" placeholder="you@example.com"
-                        value={signInForm.email} onChange={handleSignInChange}
-                        className={`lp-input${signInErrors.email ? " err" : ""}`} autoComplete="email" />
+                {/* LOGIN SLIDE */}
+                <div className="lp-carousel-slide lp-login-slide">
+                  <div className="lp-card-header">
+                    <h1>Welcome Back</h1>
+                    <p>Sign in to continue your journey</p>
+                  </div>
+                  {successMessage && <div className="lp-alert lp-alert-success"><CheckCircle size={15} />{successMessage}</div>}
+                  {signInApiError && <div className="lp-alert lp-alert-error">⚠ {signInApiError}</div>}
+                  <form onSubmit={handleSignInSubmit} noValidate className="lp-form">
+                    <div className="lp-field">
+                      <label>Email Address</label>
+                      <div className="lp-input-wrap">
+                        <Mail size={15} className="lp-icon" />
+                        <input type="email" name="email" placeholder="you@example.com"
+                          value={signInForm.email} onChange={handleSignInChange}
+                          className={`lp-input${signInErrors.email ? " err" : ""}`} autoComplete="email" />
+                      </div>
+                      {signInErrors.email && <span className="lp-err">{signInErrors.email}</span>}
                     </div>
-                    {signInErrors.email && <span className="lp-err">{signInErrors.email}</span>}
-                  </div>
-                  <div className="lp-field">
-                    <label>Password</label>
-                    <div className="lp-input-wrap">
-                      <Lock size={15} className="lp-icon" />
-                      <input type={showSignInPassword ? "text" : "password"} name="password" placeholder="••••••••"
-                        value={signInForm.password} onChange={handleSignInChange}
-                        className={`lp-input${signInErrors.password ? " err" : ""}`} autoComplete="current-password" />
-                      <button type="button" className="lp-eye" onClick={() => setShowSignInPassword(p => !p)}>
-                        {showSignInPassword ? <EyeOff size={15} /> : <Eye size={15} />}
-                      </button>
-                    </div>
-                    {signInErrors.password && <span className="lp-err">{signInErrors.password}</span>}
-                  </div>
-                  <div className="lp-forgot-row">
-                    <Link to="/student/forgot-password" className="lp-forgot">Forgot Password?</Link>
-                  </div>
-                  <button type="submit" className="lp-btn" disabled={isSignInLoading}>
-                    {isSignInLoading ? <><span className="lp-spinner" />Signing in...</> : "Sign In →"}
-                  </button>
-                </form>
-                <div className="lp-card-footer">
-                  <Link to="/" className="lp-back"><ArrowLeft size={14} /> Back to Home</Link>
-                </div>
-              </div>
-
-              {/* BACK SIDE — SIGN UP */}
-              <div className="lp-card lp-card-back">
-                <div className="lp-card-header">
-                  <h1>Create Account</h1>
-                  <p>Join 10,000+ students transforming their careers</p>
-                </div>
-                {signUpApiError && <div className="lp-alert lp-alert-error">⚠ {signUpApiError}</div>}
-                <form onSubmit={handleSignUpSubmit} noValidate className="lp-form">
-                  <div className="lp-field">
-                    <label>Full Name</label>
-                    <div className="lp-input-wrap">
-                      <User size={15} className="lp-icon" />
-                      <input type="text" name="fullName" placeholder="Your full name"
-                        value={signUpForm.fullName} onChange={handleSignUpChange}
-                        className={`lp-input${signUpErrors.fullName ? " err" : ""}`} />
-                    </div>
-                    {signUpErrors.fullName && <span className="lp-err">{signUpErrors.fullName}</span>}
-                  </div>
-                  <div className="lp-field">
-                    <label>Email Address</label>
-                    <div className="lp-input-wrap">
-                      <Mail size={15} className="lp-icon" />
-                      <input type="email" name="email" placeholder="you@example.com"
-                        value={signUpForm.email} onChange={handleSignUpChange}
-                        className={`lp-input${signUpErrors.email ? " err" : ""}`} autoComplete="email" />
-                    </div>
-                    {signUpErrors.email && <span className="lp-err">{signUpErrors.email}</span>}
-                  </div>
-                  <div className="lp-field">
-                    <label>Phone Number</label>
-                    <div className="lp-input-wrap">
-                      <Phone size={15} className="lp-icon" />
-                      <input type="tel" name="phone" placeholder="10-digit mobile number"
-                        value={signUpForm.phone} onChange={handleSignUpChange} maxLength={10}
-                        className={`lp-input${signUpErrors.phone ? " err" : ""}`} />
-                    </div>
-                    {signUpErrors.phone && <span className="lp-err">{signUpErrors.phone}</span>}
-                  </div>
-                  <div className="lp-row">
                     <div className="lp-field">
                       <label>Password</label>
                       <div className="lp-input-wrap">
                         <Lock size={15} className="lp-icon" />
-                        <input type={showSignUpPassword ? "text" : "password"} name="password" placeholder="Min 8 chars"
-                          value={signUpForm.password} onChange={handleSignUpChange}
-                          className={`lp-input${signUpErrors.password ? " err" : ""}`} />
-                        <button type="button" className="lp-eye" onClick={() => setShowSignUpPassword(p => !p)}>
-                          {showSignUpPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                        <input type={showSignInPassword ? "text" : "password"} name="password" placeholder="••••••••"
+                          value={signInForm.password} onChange={handleSignInChange}
+                          className={`lp-input${signInErrors.password ? " err" : ""}`} autoComplete="current-password" />
+                        <button type="button" className="lp-eye" onClick={() => setShowSignInPassword(p => !p)}>
+                          {showSignInPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                         </button>
                       </div>
-                      {signUpErrors.password && <span className="lp-err">{signUpErrors.password}</span>}
+                      {signInErrors.password && <span className="lp-err">{signInErrors.password}</span>}
+                    </div>
+                    <div className="lp-forgot-row">
+                      <Link to="/student/forgot-password" className="lp-forgot">Forgot Password?</Link>
+                    </div>
+                    <button type="submit" className="lp-btn" disabled={isSignInLoading}>
+                      {isSignInLoading ? <><span className="lp-spinner" />Signing in...</> : "Sign In →"}
+                    </button>
+                  </form>
+                  <div className="lp-card-footer">
+                    <Link to="/" className="lp-back"><ArrowLeft size={14} /> Back to Home</Link>
+                  </div>
+                </div>
+
+                {/* SIGNUP SLIDE */}
+                <div className="lp-carousel-slide lp-signup-slide">
+                  <div className="lp-card-header">
+                    <h1>Create Account</h1>
+                    <p>Join 10,000+ students transforming their careers</p>
+                  </div>
+                  {signUpApiError && <div className="lp-alert lp-alert-error">⚠ {signUpApiError}</div>}
+                  <form onSubmit={handleSignUpSubmit} noValidate className="lp-form">
+                    <div className="lp-field">
+                      <label>Full Name</label>
+                      <div className="lp-input-wrap">
+                        <User size={15} className="lp-icon" />
+                        <input type="text" name="fullName" placeholder="Your full name"
+                          value={signUpForm.fullName} onChange={handleSignUpChange}
+                          className={`lp-input${signUpErrors.fullName ? " err" : ""}`} />
+                      </div>
+                      {signUpErrors.fullName && <span className="lp-err">{signUpErrors.fullName}</span>}
                     </div>
                     <div className="lp-field">
-                      <label>Confirm Password</label>
+                      <label>Email Address</label>
                       <div className="lp-input-wrap">
-                        <Lock size={15} className="lp-icon" />
-                        <input type={showConfirmPassword ? "text" : "password"} name="confirmPassword" placeholder="Re-enter"
-                          value={signUpForm.confirmPassword} onChange={handleSignUpChange}
-                          className={`lp-input${signUpErrors.confirmPassword ? " err" : ""}`} />
-                        <button type="button" className="lp-eye" onClick={() => setShowConfirmPassword(p => !p)}>
-                          {showConfirmPassword ? <EyeOff size={15} /> : <Eye size={15} />}
-                        </button>
-                      </div>
-                      {signUpErrors.confirmPassword && <span className="lp-err">{signUpErrors.confirmPassword}</span>}
+                        <Mail size={15} className="lp-icon" />
+                        <input type="email" name="email" placeholder="you@example.com"
+                          value={signUpForm.email} onChange={handleSignUpChange}
+                          className={`lp-input${signUpErrors.email ? " err" : ""}`} autoComplete="email" />
                     </div>
+                      {signUpErrors.email && <span className="lp-err">{signUpErrors.email}</span>}
+                    </div>
+                    <div className="lp-field">
+                      <label>Phone Number</label>
+                      <div className="lp-input-wrap">
+                        <Phone size={15} className="lp-icon" />
+                        <input type="tel" name="phone" placeholder="10-digit mobile number"
+                          value={signUpForm.phone} onChange={handleSignUpChange} maxLength={10}
+                          className={`lp-input${signUpErrors.phone ? " err" : ""}`} />
+                      </div>
+                      {signUpErrors.phone && <span className="lp-err">{signUpErrors.phone}</span>}
+                    </div>
+                    <div className="lp-row">
+                      <div className="lp-field">
+                        <label>Password</label>
+                        <div className="lp-input-wrap">
+                          <Lock size={15} className="lp-icon" />
+                          <input type={showSignUpPassword ? "text" : "password"} name="password" placeholder="Min 8 chars"
+                            value={signUpForm.password} onChange={handleSignUpChange}
+                            className={`lp-input${signUpErrors.password ? " err" : ""}`} />
+                          <button type="button" className="lp-eye" onClick={() => setShowSignUpPassword(p => !p)}>
+                            {showSignUpPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                          </button>
+                        </div>
+                        {signUpErrors.password && <span className="lp-err">{signUpErrors.password}</span>}
+                      </div>
+                      <div className="lp-field">
+                        <label>Confirm Password</label>
+                        <div className="lp-input-wrap">
+                          <Lock size={15} className="lp-icon" />
+                          <input type={showConfirmPassword ? "text" : "password"} name="confirmPassword" placeholder="Re-enter"
+                            value={signUpForm.confirmPassword} onChange={handleSignUpChange}
+                            className={`lp-input${signUpErrors.confirmPassword ? " err" : ""}`} />
+                          <button type="button" className="lp-eye" onClick={() => setShowConfirmPassword(p => !p)}>
+                            {showConfirmPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                          </button>
+                        </div>
+                        {signUpErrors.confirmPassword && <span className="lp-err">{signUpErrors.confirmPassword}</span>}
+                      </div>
+                    </div>
+                    <button type="submit" className="lp-btn" disabled={isSignUpLoading}>
+                      {isSignUpLoading ? <><span className="lp-spinner" />Creating Account...</> : "Create Account →"}
+                    </button>
+                  </form>
+                  <div className="lp-card-footer">
+                    <Link to="/" className="lp-back"><ArrowLeft size={14} /> Back to Home</Link>
                   </div>
-                  <button type="submit" className="lp-btn" disabled={isSignUpLoading}>
-                    {isSignUpLoading ? <><span className="lp-spinner" />Creating Account...</> : "Create Account →"}
-                  </button>
-                </form>
-                <div className="lp-card-footer">
-                  <Link to="/" className="lp-back"><ArrowLeft size={14} /> Back to Home</Link>
                 </div>
-              </div>
 
             </div>
           </div>

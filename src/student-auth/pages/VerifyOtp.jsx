@@ -7,7 +7,9 @@ import AuthFormCard from '../components/AuthFormCard';
 import PageWrapper  from '../components/PageWrapper';
 import "../styles/Login.css";
 import { studentVerifyRegistrationOTP, studentVerifyResetOTP, studentForgotPassword } from '../../services/api';
-
+import logoIcon from "../../assets/infycode-final-logo4-1.png";
+import logoText from "../../assets/color-logo-3.jpeg";
+import LoginBackground from "../components/LoginBackground";
 
 const OTP_DIGITS    = 6;
 const TIMER_SECONDS = 60;
@@ -131,103 +133,75 @@ const VerifyOtp = () => {
   }, [email, resending, loading]);
 
   return (
-    <PageWrapper>
-      <div className="studentLogin-wrapper">
-        <div className="studentLogin-container studentLogin-active">
-          <div className="studentLogin-form-container studentLogin-sign-up">
-            <form className="sa-form" onSubmit={(e) => e.preventDefault()}>
-              <h1 className="sa-form-heading">Verify OTP</h1>
-              <p  className="sa-form-sub">
-                {email
-                  ? <>6-digit code sent to <strong>{email}</strong></>
-                  : 'Enter the 6-digit OTP sent to your email'}
-              </p>
+    <div className="lp-root">
+      {/* Animated BG */}
+      <LoginBackground />
 
-              {/* Success banner */}
-              {successMsg && !error && (
-                <div className="sa-banner sa-banner--success" style={{ marginBottom: 12 }}>
-                  <ShieldCheck size={14} /><span>{successMsg}</span>
-                </div>
-              )}
-              {/* Expired banner */}
-              {expired && (
-                <div className="sa-banner sa-banner--error" style={{ marginBottom: 12 }}>
-                  <span>OTP has expired. Please request a new one.</span>
-                </div>
-              )}
+      <div className="lp-layout">
+        {/* LEFT — Logo only */}
+        <div className="lp-left">
+          <div className="lp-logo-block">
+            <img src={logoIcon} alt="InfyCode" className="lp-logo-icon" />
+            <img src={logoText} alt="InfyCode" className="lp-logo-text" />
+            <p className="lp-logo-sub">Your Career Starts Here</p>
+          </div>
+          <div className="lp-left-switch">
+            <p>Back to login?</p>
+            <button onClick={() => navigate('/student/login')} className="lp-switch-btn">
+              Back to Sign In →
+            </button>
+          </div>
+        </div>
 
-              {/* OTP digit inputs */}
-              <div className="sa-otp-wrap">
+        {/* RIGHT — Form */}
+        <div className="lp-right">
+          <div className="lp-card">
+            <div className="lp-card-header">
+              <div style={{ width: 60, height: 60, background: 'linear-gradient(135deg,rgba(124,58,237,0.25),rgba(139,92,246,0.15))', border: '1px solid rgba(167,139,250,0.3)', borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20, color: '#a78bfa' }}>
+                <ShieldCheck size={28} />
+              </div>
+              <h1>Verify OTP</h1>
+              <p>{email ? `6-digit code sent to ${email}` : 'Enter the 6-digit OTP sent to your email'}</p>
+            </div>
+
+            {successMsg && !error && <div className="lp-alert lp-alert-success">✓ {successMsg}</div>}
+            {expired && <div className="lp-alert lp-alert-error">⚠ OTP has expired. Please request a new one.</div>}
+            {error && <div className="lp-alert lp-alert-error">⚠ {error}</div>}
+
+            <form onSubmit={(e) => e.preventDefault()} className="lp-form">
+              <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginBottom: '20px' }}>
                 {otp.map((digit, i) => (
                   <input
-                    key={i}
-                    ref={(el) => (inputRefs.current[i] = el)}
-                    type="text" inputMode="numeric" maxLength={1}
-                    value={digit}
+                    key={i} ref={(el) => (inputRefs.current[i] = el)}
+                    type="text" inputMode="numeric" maxLength={1} value={digit}
                     onChange={(e) => handleOtpChange(i, e.target.value)}
                     onKeyDown={(e)  => handleKeyDown(i, e)}
                     onPaste={i === 0 ? handlePaste : undefined}
-                    className={`sa-otp-digit${error ? ' sa-otp-digit--error':''}${digit ? ' sa-otp-digit--filled':''}`}
+                    style={{ width: '45px', height: '55px', fontSize: '24px', textAlign: 'center', borderRadius: '12px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#1e293b', transition: 'all 0.3s' }}
+                    className={digit ? 'filled' : ''}
                     disabled={loading || expired}
                     autoFocus={i === 0}
-                    aria-label={`OTP digit ${i + 1}`}
                   />
                 ))}
               </div>
 
-              {error && (
-                <span className="sa-error-text" style={{ textAlign:'center', display:'block', width: '100%' }}>
-                  {error}
-                </span>
-              )}
-
-              {/* Timer */}
-              <div className="sa-otp-timer">
-                {expired
-                  ? 'OTP has expired'
-                  : <>Expires in <span className="sa-otp-timer__count" style={{ color: getTimerColor(timeLeft) }}>{formatTime(timeLeft)}</span></>}
+              <div style={{ textAlign: 'center', color: '#94a3b8', fontSize: '14px', marginBottom: '24px' }}>
+                {expired ? 'OTP has expired' : <>Expires in <span style={{ color: getTimerColor(timeLeft), fontWeight: 'bold' }}>{formatTime(timeLeft)}</span></>}
               </div>
 
-              {/* Verify + Resend buttons */}
-              <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', width: '100%', marginTop: '16px' }}>
-                <button
-                  type="button"
-                  className="sa-submit-btn"
-                  style={{ width: '160px', flex: '0 0 auto', margin: 0, height: '44px', whiteSpace: 'nowrap', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  onClick={handleVerify}
-                  disabled={loading || expired}
-                >
-                  {loading
-                    ? <span className="sa-btn-inner"><span className="sa-spinner" />VERIFYING...</span>
-                    : 'Verify OTP'}
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button type="button" onClick={handleVerify} disabled={loading || expired} className="lp-btn" style={{ flex: 1 }}>
+                  {loading ? <><span className="lp-spinner" /> VERIFYING...</> : 'Verify OTP'}
                 </button>
-                <button
-                  type="button"
-                  className="sa-submit-btn"
-                  style={{ width: '160px', flex: '0 0 auto', margin: 0, height: '44px', whiteSpace: 'nowrap', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  onClick={handleResend}
-                  disabled={resending || loading}
-                >
-                  {resending
-                    ? <span className="sa-btn-inner"><RefreshCw size={14} style={{ animation: 'saSpin 0.7s linear infinite' }} /></span>
-                    : <span className="sa-btn-inner"><RefreshCw size={14} style={{ marginRight: 6 }} />Resend OTP</span>}
+                <button type="button" onClick={handleResend} disabled={!expired || resending || loading} className="lp-btn" style={{ flex: 1, background: expired ? '#f1f5f9' : '#f8fafc', color: expired ? '#3b82f6' : '#94a3b8', border: expired ? '1px solid #bfdbfe' : '1px solid #e2e8f0', boxShadow: 'none' }}>
+                  {resending ? <><span className="lp-spinner" style={{ borderColor: '#3b82f6', borderTopColor: 'transparent' }} /> RESENDING...</> : <><RefreshCw size={15} style={{ marginRight: 6 }} /> Resend OTP</>}
                 </button>
               </div>
             </form>
           </div>
-
-          <div className="studentLogin-toggle-container">
-            <div className="studentLogin-toggle">
-              <div className="studentLogin-toggle-panel studentLogin-toggle-left">
-                <h1>Verify OTP</h1>
-                <p>Enter the OTP sent to your email to continue</p>
-                <button className="studentLogin-hidden" onClick={() => navigate('/student/login')} type="button">Back to Login</button>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
-    </PageWrapper>
+    </div>
   );
 };
 
