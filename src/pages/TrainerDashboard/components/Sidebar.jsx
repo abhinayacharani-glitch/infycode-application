@@ -172,7 +172,7 @@ const Sidebar = ({ isOpen, onClose, externalShowLogoutModal, setExternalShowLogo
             </div>
           </NavLink>
 
-          <NavLink to="/trainer-dashboard/feedback"
+          <NavLink to="/trainer-dashboard/student-connect"
             onClick={onClose}
             className={({ isActive }) => `sd-item ${isActive ? 'active' : ''}`}>
             <div className="sd-box">
