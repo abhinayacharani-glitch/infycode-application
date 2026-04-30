@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getTrainerBatchesAPI } from '../../../services/api';
 import {
   Users,
   Layers,
@@ -61,27 +62,10 @@ const Batches = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // Dynamic State for Batches
-  const [batches, setBatches] = useState(() => {
-    try {
-      const saved = localStorage.getItem('trainer_batches_v2');
-      if (saved) {
-        const data = JSON.parse(saved);
-        return Array.isArray(data) ? data : [];
-      }
-    } catch (e) { console.error("Data Load Error", e); }
-
-    return [
-      { id: 'B1', course: 'Full Stack Web Development (MERN)', students: 32, startDate: '2026-01-10', endDate: '2026-04-10', mode: 'Online', lastUpdated: new Date().toISOString() },
-      { id: 'B2', course: 'Python & Data Science Bootcamp', students: 28, startDate: '2026-02-15', endDate: '2026-06-15', mode: 'Offline', lastUpdated: new Date(Date.now() - 3600000 * 2).toISOString() },
-      { id: 'B3', course: 'UI/UX Advanced Design Basics', students: 24, startDate: '2026-03-01', endDate: '2026-05-01', mode: 'Online', lastUpdated: new Date(Date.now() - 86400000).toISOString() },
-      { id: 'B4', course: 'AWS & Cloud Architecture Pro', students: 18, startDate: '2026-03-10', endDate: '2026-05-10', mode: 'Online', lastUpdated: new Date(Date.now() - 3600000 * 5).toISOString() },
-      { id: 'B5', course: 'Java Full Stack', students: 20, startDate: '2026-04-01', endDate: '2026-07-01', mode: 'Online', lastUpdated: new Date().toISOString() },
-      { id: 'B6', course: 'Python Fullstack Bootcamp', students: 25, startDate: '2026-04-15', endDate: '2026-08-15', mode: 'Offline', lastUpdated: new Date().toISOString() },
-      { id: 'B7', course: 'Cloud Computing Mastery', students: 15, startDate: '2026-05-01', endDate: '2026-08-01', mode: 'Online', lastUpdated: new Date().toISOString() },
-    ];
-  });
+  const [batches, setBatches] = useState([]);
 
   const [newBatch, setNewBatch] = useState({
     id: '',
@@ -93,22 +77,26 @@ const Batches = () => {
   });
 
   useEffect(() => {
-    localStorage.setItem('trainer_batches_v2', JSON.stringify(batches));
-
-    // Pre-populate some initial history if not exists
-    batches.forEach(b => {
-      const key = `batch_history_v2_${b.id}`;
-      if (!localStorage.getItem(key)) {
-        const initial = [
-          { id: Date.now() - 1000, type: 'System', title: `Batch ${b.id} initialized`, timestamp: b.lastUpdated }
-        ];
-        localStorage.setItem(key, JSON.stringify(initial));
+    const fetchBatches = async () => {
+      try {
+        setLoading(true);
+        const response = await getTrainerBatchesAPI();
+        if (response.success) {
+          setBatches(response.batches || []);
+        }
+      } catch (error) {
+        console.error("Error fetching trainer batches:", error);
+      } finally {
+        setLoading(false);
       }
-    });
-  }, [batches]);
+    };
+
+    fetchBatches();
+  }, []);
 
   const handleAddBatch = (e) => {
     e.preventDefault();
+    // This local add is kept for UI if needed, but admin is the primary source
     const batchToAdd = {
       ...newBatch,
       students: parseInt(newBatch.students) || 0,
@@ -123,8 +111,8 @@ const Batches = () => {
   };
 
   const filteredBatches = batches.filter(b =>
-    b.course.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    b.id.toLowerCase().includes(searchTerm.toLowerCase())
+    (b.course || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (b.id || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const totalStudents = batches.reduce((acc, b) => acc + (parseInt(b.students) || 0), 0);
@@ -181,7 +169,10 @@ const Batches = () => {
 
         {/* 3. BATCH CARDS GRID */}
         <div className="batches-grid-saas">
-          {filteredBatches.map((batch) => (
+          {loading ? (
+            <div className="loading-state-saas">Loading batches...</div>
+          ) : filteredBatches.length > 0 ? (
+            filteredBatches.map((batch) => (
             <div
               key={batch.id}
               className="batch-card-saas-v3"
@@ -225,7 +216,10 @@ const Batches = () => {
                 </div>
               </div>
             </div>
-          ))}
+            ))
+          ) : (
+            <div className="empty-state-saas">No batches found for you.</div>
+          )}
         </div>
 
         {/* 4. NEW BATCH MODAL */}

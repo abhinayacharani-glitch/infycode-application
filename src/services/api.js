@@ -112,6 +112,19 @@ export const createBatch = (batchData) => {
   });
 };
 
+/**
+ * POST /api/admin/move-students
+ * Moves selected students to a batch.
+ */
+export const moveStudentsToBatchAPI = (batchId, studentIds) => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return request('/api/admin/move-students', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${user.token || ''}` },
+    body: JSON.stringify({ batchId, studentIds }),
+  });
+};
+
 export const getAdminProfileAPI = () => {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   return request('/api/admin/profile', {
@@ -319,6 +332,14 @@ export const updateTrainerProfileAPI = (profileData) => {
     method: 'PUT',
     headers: { Authorization: `Bearer ${user.token || ''}` },
     body: JSON.stringify(profileData),
+  });
+};
+
+export const getTrainerBatchesAPI = () => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return request('/api/trainer/batches', {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${user.token || ''}` },
   });
 };
  

@@ -62,85 +62,90 @@
     padding: 24px 32px;
     background: white;
     border-radius: 18px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
     border: 1px solid var(--prod-border);
     margin-bottom: 28px;
-
-    /* 🔥 NEW */
-    position: sticky;
-    top: 20px;
-    z-index: 50;
-    backdrop-filter: blur(8px);
 }
 
 .title-bold {
-    font-size: 30px;
+    font-size: 32px;
     font-weight: 800;
-    color: var(--prod-slate);
+    color: #1e293b;
     margin: 0;
 }
 
 .subtitle-gray {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
-    color: var(--prod-slate-light);
-    margin-top: 4px;
+    color: #64748b;
+    margin-top: 6px;
 }
 
 .header-info-structured {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
     align-items: flex-end;
 }
 
 .info-top-row {
     display: flex;
-    gap: 16px;
+    gap: 12px;
 }
 
 .info-item-prod {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 12.5px;
-    font-weight: 700;
+    font-size: 13px;
+    font-weight: 600;
     color: #475569;
-    background: #F1F5F9;
-    padding: 7px 14px;
-    border-radius: 10px;
+    background: #f1f5f9;
+    padding: 8px 16px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.info-item-prod.students-badge {
+    background: #dcfce7;
+    color: #16a34a;
+    border-color: #bbf7d0;
 }
 
 .info-bottom-row {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 20px;
 }
 
-.prod-btn-primary-v5 {
-    background: var(--prod-blue);
+.status-badge-prod.updated {
+    font-size: 13px;
+    color: #64748b;
+}
+
+.status-badge-prod.updated b {
+    color: #1e293b;
+    margin-left: 4px;
+}
+
+.add-student-btn-prod {
+    background: #2563eb;
     color: white;
     border: none;
-    padding: 12px 24px;
-    border-radius: 12px;
-    font-weight: 800;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 700;
     font-size: 14px;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 10px;
-    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.25);
-    transition: var(--prod-transition);
+    gap: 8px;
+    transition: all 0.2s ease;
 }
 
-.prod-btn-primary-v5:hover {
-    transform: translateY(-2px);
-    background: var(--prod-blue-dark);
-}
-
-.prod-btn-primary-v5.full-width {
-    width: 100%;
-    justify-content: center;
+.add-student-btn-prod:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
 }
 
 /* ================= TAB NAVIGATION ================= */
@@ -280,6 +285,24 @@
     font-size: 20px;
     font-weight: 800;
     color: var(--prod-slate);
+}
+
+.progress-expand-hint {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #f1f5f9;
+    text-align: center;
+}
+
+.progress-expand-hint span {
+    color: #2563eb;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.progress-expand-hint span:hover {
+    text-decoration: underline;
 }
 
 .tracker-card-v5 {

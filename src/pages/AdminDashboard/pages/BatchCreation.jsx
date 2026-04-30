@@ -18,8 +18,6 @@ const initialFormState = {
   trainerName: "",
   courseName: "",
   numberOfStudents: "",
-  studentIdFrom: "",
-  studentIdTo: "",
   startDateTime: "",
   duration: "",
   batchImage: null,
@@ -71,8 +69,6 @@ function BatchCreation() {
         capacity: Number(form.numberOfStudents),
         status: 'Active',
         duration: form.duration,
-        studentIdFrom: form.studentIdFrom,
-        studentIdTo: form.studentIdTo,
         startDateTime: form.startDateTime,
         batchImage: form.batchImage
       };
@@ -157,16 +153,6 @@ function BatchCreation() {
                   <label>Duration</label>
                   <input type="text" name="duration" placeholder="e.g. 12 Weeks" value={form.duration} onChange={handleChange} />
                 </div>
-
-                <div className="form-group">
-                  <label>Student ID From</label>
-                  <input type="text" name="studentIdFrom" placeholder="e.g. INF-001" value={form.studentIdFrom} onChange={handleChange} />
-                </div>
-
-                <div className="form-group">
-                  <label>Student ID To</label>
-                  <input type="text" name="studentIdTo" placeholder="e.g. INF-030" value={form.studentIdTo} onChange={handleChange} />
-                </div>
               </div>
 
               <div className="form-footer">
@@ -210,15 +196,7 @@ function BatchCreation() {
                         </div>
                         <div className="detail">
                           <span className="label">Students</span>
-                          <span className="value">{batch.capacity} Seats</span>
-                        </div>
-                        <div className="detail">
-                          <span className="label">ID From</span>
-                          <span className="value">{batch.studentIdFrom || "Not Set"}</span>
-                        </div>
-                        <div className="detail">
-                          <span className="label">ID To</span>
-                          <span className="value">{batch.studentIdTo || "Not Set"}</span>
+                          <span className="value">{batch.enrolled || 0} / {batch.capacity} Seats</span>
                         </div>
                       </div>
                     </div>

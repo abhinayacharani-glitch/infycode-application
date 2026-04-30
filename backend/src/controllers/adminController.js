@@ -204,12 +204,30 @@ export const getDashboardStats = async (req, res) => {
     const students = Object.entries(studentsRaw).map(([id, data]) => {
       const rawEmail = (data.email || "").trim().toLowerCase();
       const sanitizedEmail = rawEmail.replace(/\./g, ",");
-      const hasEnrollments = enrollmentsRaw[sanitizedEmail] && Object.keys(enrollmentsRaw[sanitizedEmail]).length > 0;
+      
+      // Get student enrollments
+      const studentEnrollments = enrollmentsRaw[sanitizedEmail] || {};
+      const courseIds = Object.keys(studentEnrollments);
+      
+      // Map course IDs to names/titles
+      let courseNames = courseIds.map(cid => {
+        const courseData = coursesRaw[cid];
+        return courseData ? (courseData.title || courseData.name || cid) : cid;
+      });
+
+      // Fallback to data.course if no enrollments found but course field exists
+      if (courseNames.length === 0 && data.course) {
+        courseNames = [data.course];
+      }
+      
+      const courseDisplay = courseNames.length > 0 ? courseNames.join(", ") : "N/A";
+      const hasEnrollments = courseIds.length > 0 || !!data.course;
       
       return {
         id,
         ...data,
         name: data.fullname || data.fullName || data.username || data.name || "N/A",
+        course: courseDisplay,
         status: hasEnrollments ? "Enrolled" : "Pending",
         createdAt: data.createdAt || new Date().toISOString()
       };
@@ -230,8 +248,6 @@ export const getDashboardStats = async (req, res) => {
       trainer: data.trainer || data.trainerName || "Unassigned",
       capacity: parseInt(data.capacity) || 30,
       enrolled: parseInt(data.enrolled) || 0,
-      studentIdFrom: data.studentIdFrom || "N/A",
-      studentIdTo: data.studentIdTo || "N/A",
       status: data.status || "Planned"
     }));
 
@@ -266,7 +282,7 @@ export const getDashboardStats = async (req, res) => {
  **/
 export const createBatch = async (req, res) => {
   try {
-    const { name, course, trainer, capacity, status, studentIdFrom, studentIdTo } = req.body;
+    const { name, course, trainer, capacity, status } = req.body;
 
     if (!name || !course || !trainer) {
       return res.status(400).json({ message: "Name, course, and trainer are required." });
@@ -281,8 +297,6 @@ export const createBatch = async (req, res) => {
       trainerName: trainer,
       capacity: parseInt(capacity) || 30,
       enrolled: 0,
-      studentIdFrom: studentIdFrom || "N/A",
-      studentIdTo: studentIdTo || "N/A",
       status: status || 'Draft',
       createdAt: new Date().toISOString()
     };
@@ -339,3 +353,75 @@ export const updateAdminProfile = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// ✅ Move Students to Batch
+export const moveStudentsToBatch = async (req, res) => {
+  try {
+    const { batchId, studentIds } = req.body;
+
+    if (!batchId || !studentIds || !Array.isArray(studentIds)) {
+      return res.status(400).json({ success: false, message: "batchId and studentIds (array) are required" });
+    }
+
+    // 1. Get Batch Data
+    const batchSnap = await batchesRef.child(batchId).once("value");
+    if (!batchSnap.exists()) {
+      return res.status(404).json({ success: false, message: "Batch not found" });
+    }
+    const batchData = batchSnap.val();
+
+    // 2. Get Student Data for all selected students
+    const studentPromises = studentIds.map(id => studentsRef.child(id).once("value"));
+    const studentSnaps = await Promise.all(studentPromises);
+    
+    const studentsToMove = studentSnaps
+      .filter(snap => snap.exists())
+      .map(snap => ({
+        id: snap.key,
+        ...snap.val(),
+        name: snap.val().fullname || snap.val().fullName || snap.val().username || snap.val().name || "N/A"
+      }));
+
+    if (studentsToMove.length === 0) {
+      return res.status(400).json({ success: false, message: "No valid students found to move" });
+    }
+
+    // 3. Update Batch: Increment enrolled count and add students
+    const currentEnrolled = parseInt(batchData.enrolled || 0);
+    const newEnrolled = currentEnrolled + studentsToMove.length;
+    
+    const batchUpdates = {
+      enrolled: newEnrolled
+    };
+
+    // Add students to batch node
+    studentsToMove.forEach(student => {
+      const studentKey = student.id;
+      batchUpdates[`students/${studentKey}`] = {
+        name: student.name,
+        email: student.email,
+        movedAt: new Date().toISOString()
+      };
+    });
+
+    await batchesRef.child(batchId).update(batchUpdates);
+
+    // 4. Update Student records to link to batch
+    const studentUpdates = {};
+    studentsToMove.forEach(student => {
+      studentUpdates[`${student.id}/batchId`] = batchId;
+      studentUpdates[`${student.id}/batchName`] = batchData.name || batchData.courseName || batchData.course;
+    });
+    await studentsRef.update(studentUpdates);
+
+    res.status(200).json({ 
+      success: true, 
+      message: `Successfully moved ${studentsToMove.length} students to batch ${batchData.name || batchData.courseName || batchData.course}`,
+      enrolledCount: newEnrolled
+    });
+  } catch (error) {
+    console.error("Backend Error moving students to batch:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+

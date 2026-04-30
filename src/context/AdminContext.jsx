@@ -12,7 +12,8 @@ import {
   getAdminProfileAPI,
   updateAdminProfileAPI,
   updateTrainerApplicationStatusAPI,
-  markAllStudentResultsAsSeenAPI
+  markAllStudentResultsAsSeenAPI,
+  moveStudentsToBatchAPI
 } from '../services/api';
 
 const AdminContext = createContext();
@@ -328,6 +329,19 @@ export const AdminProvider = ({ children }) => {
     }
   };
 
+  const moveStudentsToBatch = async (batchId, studentIds) => {
+    try {
+      const response = await moveStudentsToBatchAPI(batchId, studentIds);
+      if (response.success) {
+        fetchDashboardStats();
+        return response;
+      }
+    } catch (error) {
+      console.error("Error moving students:", error);
+      throw error;
+    }
+  };
+
   const loadCourses = async () => {
     try {
       const data = await getAllCourses();
@@ -376,7 +390,8 @@ export const AdminProvider = ({ children }) => {
     adminData,
     updateAdminProfile,
     fetchAdminProfile,
-    markAllStudentResultsAsSeen
+    markAllStudentResultsAsSeen,
+    moveStudentsToBatch
   };
 
   return <AdminContext.Provider value={value}>{children}</AdminContext.Provider>;

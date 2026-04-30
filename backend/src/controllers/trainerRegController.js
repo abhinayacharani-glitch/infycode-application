@@ -266,3 +266,52 @@ export const updateTrainerProfile = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error: " + error.message });
   }
 };
+
+// ═══════════════════════════════════════════════════════════════════════════
+// GET /api/trainer/batches
+// ═══════════════════════════════════════════════════════════════════════════
+export const getTrainerBatches = async (req, res) => {
+  try {
+    const { email } = req.user;
+    
+    // 1. Get Trainer's full name from profile
+    const trainerSnapshot = await trainersRef.orderByChild("email").equalTo(email).once("value");
+    if (!trainerSnapshot.exists()) {
+      return res.status(404).json({ success: false, message: "Trainer not found" });
+    }
+    
+    let trainerFullName = "";
+    trainerSnapshot.forEach(child => {
+      trainerFullName = child.val().fullName || child.val().fullname || child.val().name;
+    });
+
+    // 2. Fetch all batches
+    const batchesRef = db.ref("batch");
+    const snapshot = await batchesRef.once("value");
+    const batchesRaw = snapshot.val() || {};
+
+    // 3. Filter and normalize
+    const batches = Object.entries(batchesRaw)
+      .map(([id, data]) => ({
+        id: data.batchId || id,
+        firebaseId: id,
+        course: data.courseName || data.course,
+        trainer: data.trainerName || data.trainer,
+        students: parseInt(data.enrolled) || 0,
+        capacity: parseInt(data.capacity) || 30,
+        startDate: data.startDateTime ? data.startDateTime.split('T')[0] : "",
+        endDate: "", // Logic to calculate endDate based on duration could go here
+        duration: data.duration || "N/A",
+        mode: "Online", // Defaulting to Online as per previous requirements
+        status: data.status || "Active",
+        lastUpdated: data.createdAt || new Date().toISOString()
+      }))
+      .filter(b => b.trainer === trainerFullName);
+
+    return res.status(200).json({ success: true, batches });
+  } catch (error) {
+    console.error("[getTrainerBatches] Error:", error.message);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+

@@ -507,26 +507,28 @@ const BatchDetails = () => {
         <div className="header-container-grid">
           <div className="header-left">
             <h1 className="title-bold">{baseBatch?.title || 'Batch'}</h1>
-            <p className="subtitle-gray">{baseBatch?.batchName || 'Unknown'} • Trainer Overview</p>
+            <div className="subtitle-gray">
+              {baseBatch?.batchName || 'Unknown'} • Trainer Overview
+            </div>
           </div>
 
           <div className="header-info-structured">
             <div className="info-top-row">
-              <div className="info-item-prod header-badge-hover">
+              <div className="info-item-prod">
                 <Calendar size={14} />
-                {baseBatch?.startDate || 'N/A'} — {baseBatch?.endDate || 'N/A'}
+                <span>{baseBatch?.startDate} — {baseBatch?.endDate}</span>
               </div>
-              <div className="info-item-prod header-badge-hover">
+              <div className="info-item-prod">
                 <Clock size={14} />
-                {duration}
+                <span>{duration}</span>
               </div>
-              <div className="info-item-prod header-badge-hover">
+              <div className="info-item-prod">
                 <Monitor size={14} />
-                {baseBatch?.mode || 'N/A'}
+                <span>{baseBatch?.mode}</span>
               </div>
-              <div className="info-item-prod header-badge-hover students-badge">
+              <div className="info-item-prod students-badge">
                 <Users size={14} />
-                {displayStudentCount} Students
+                <span>{displayStudentCount} Students</span>
               </div>
             </div>
 
@@ -631,17 +633,14 @@ const BatchDetails = () => {
                   ) : (
                     <div className="empty-state-v5">
                       <p className="no-sess-msg">No sessions scheduled for today</p>
-                      {pendingTopics.length > 0 && (
-                        <div className="tentative-topics-v5">
-                          <p className="tentative-lbl">UPCOMING TOPICS:</p>
-                          <ul className="tentative-list">
-                            {pendingTopics.slice(0, 2).map(t => (
-                              <li key={t.id}>• {t.name}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                      <button className="join-session-btn-v5 secondary-btn-prod" onClick={handleJoinSession} style={{ marginTop: '16px' }}>
+                      <div className="tentative-topics-v5">
+                        <p className="tentative-lbl">UPCOMING TOPICS:</p>
+                        <ul className="tentative-list">
+                          <li>• JavaScript Basics</li>
+                          <li>• ES6 Features</li>
+                        </ul>
+                      </div>
+                      <button className="join-session-btn-v5" onClick={handleJoinSession} style={{ marginTop: '20px' }}>
                         Join Now
                       </button>
                     </div>
