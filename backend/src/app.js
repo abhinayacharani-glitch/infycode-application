@@ -34,7 +34,7 @@ app.use(
     origin: (origin, callback) => {
       // Allow requests with no origin (Postman, curl, same-origin)
       const isLocal = origin && (
-        origin.includes("localhost") || 
+        origin.includes("localhost") ||
         origin.includes("127.0.0.1")
       );
 
