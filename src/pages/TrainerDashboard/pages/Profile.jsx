@@ -339,27 +339,11 @@ const Profile = () => {
             </div>
             <div className="info-item-saas">
               <div className="item-label-saas"><Mail size={14} /> Email</div>
-<<<<<<< HEAD
-              {isEditing ? (
-                <input name="email" value={tempData.email} onChange={handleChange} className="edit-input-saas" />
-              ) : (
-                <div className="value-box-saas text-blue">{safeData.email || ""}</div>
-              )}
+              <div className="value-box-saas text-blue read-only-info">{safeData.email || ""}</div>
             </div>
             <div className="info-item-saas">
               <div className="item-label-saas"><Phone size={14} /> Phone</div>
-              {isEditing ? (
-                <input name="phone" value={tempData.phone} onChange={handleChange} className="edit-input-saas" />
-              ) : (
-                <div className="value-box-saas">{safeData.phone || ""}</div>
-              )}
-=======
-              <div className="value-box-saas text-blue read-only-info">{trainerData.email || ""}</div>
-            </div>
-            <div className="info-item-saas">
-              <div className="item-label-saas"><Phone size={14} /> Phone</div>
-              <div className="value-box-saas read-only-info">{trainerData.phone || trainerData.phno || ""}</div>
->>>>>>> ba3d1cf8b1b3fb048223d1e788fc020a5bbb16a1
+              <div className="value-box-saas read-only-info">{safeData.phone || safeData.phno || ""}</div>
             </div>
             <div className="info-item-saas">
               <div className="item-label-saas"><MapPin size={14} /> Location</div>
