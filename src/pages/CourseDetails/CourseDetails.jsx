@@ -206,7 +206,7 @@ const CourseDetailsPage = () => {
             doc.setFontSize(10);
             doc.text(`  - ${sub}`, 30, yPos);
             yPos += 5;
-            
+
             if (yPos > 280) {
               doc.addPage();
               yPos = 20;
@@ -277,7 +277,7 @@ const CourseDetailsPage = () => {
               <span className="cd-stat"><Star size={16} className="text-yellow" /> {course.rating} Rating</span>
               <span className="cd-stat"><Clock size={16} /> {course.duration}</span>
               <span className="cd-stat trainer-stat">
-                <UserIcon size={16} /> 
+                <UserIcon size={16} />
                 {course.trainer}
                 <button className="cd-mini-download" onClick={handleDownloadCurriculum} title="Download Curriculum">
                   <Download size={14} />
@@ -484,35 +484,35 @@ const RelatedCourses = ({ currentCourse, navigate, publishedCourses }) => {
 
       <div className="cd-slider-container">
         <button className="cd-slider-nav prev" onClick={prev}>❮</button>
-        
+
         <div className="cd-slider-viewport">
-          <div 
+          <div
             className="cd-slider-track"
-            style={{ 
+            style={{
               transform: `translateX(-${index * (100 / (window.innerWidth > 1024 ? 3 : window.innerWidth > 768 ? 2 : 1))}%)`,
               transition: isTransitioning ? "transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)" : "none"
             }}
           >
             {suggestions.map((c, i) => {
               return (
-                <div 
-                  key={`${c.courseId}-${i}`} 
+                <div
+                  key={`${c.courseId}-${i}`}
                   className="cd-slider-item"
                   style={{ flex: `0 0 ${100 / (window.innerWidth > 1024 ? 3 : window.innerWidth > 768 ? 2 : 1)}%` }}
                 >
                   <div className="course-card-modern">
-                    <div 
-                      className="card-img-banner" 
-                      onClick={() => { navigate(`/course-details/${c.courseId}`); window.scrollTo(0, 0); }} 
+                    <div
+                      className="card-img-banner"
+                      onClick={() => { navigate(`/course-details/${c.courseId}`); window.scrollTo(0, 0); }}
                       style={{ cursor: "pointer" }}
                     >
                       <img src={c.image || 'https://via.placeholder.com/400x200?text=Course'} alt={c.title} />
                     </div>
 
                     <div className="card-content-modern">
-                      <h3 
-                        className="card-title-modern" 
-                        onClick={() => { navigate(`/course-details/${c.courseId}`); window.scrollTo(0, 0); }} 
+                      <h3
+                        className="card-title-modern"
+                        onClick={() => { navigate(`/course-details/${c.courseId}`); window.scrollTo(0, 0); }}
                         style={{ cursor: "pointer" }}
                       >
                         {c.title}
@@ -535,8 +535,8 @@ const RelatedCourses = ({ currentCourse, navigate, publishedCourses }) => {
                         </div>
 
                         <div className="details-action-wrapper">
-                          <button 
-                            className="btn-view-details" 
+                          <button
+                            className="btn-view-details"
                             onClick={(e) => {
                               e.stopPropagation();
                               navigate(`/course-details/${c.courseId}`);

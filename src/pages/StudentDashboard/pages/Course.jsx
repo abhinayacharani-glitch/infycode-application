@@ -34,17 +34,7 @@ if (PythonIdx !== -1) {
 
 const CATEGORIES = ["All", "Web Dev", "Python", "Java", "AI & Data", "Cybersecurity", "Cloud"];
 
-const DISABLED_COURSES = [
-  "Data Science & AI",
-  "Machine Learning Deep Dive",
-  "Ethical Hacking & Cyber Security",
-  "React JS Full Stack Development",
-  "Next.js 14 Masterclass",
-  "MERN Stack Development",
-  "Angular Enterprise Development",
-  "Flutter Mobile Apps",
-  "Full Stack Python Pro"
-];
+const DISABLED_COURSES = [];
 
 const CourseCardModern = ({ course, index, onNavigate, enrolledIds }) => {
   const isEnrolled = enrolledIds.includes(course.courseId);

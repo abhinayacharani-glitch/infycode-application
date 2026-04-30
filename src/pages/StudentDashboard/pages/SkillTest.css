@@ -168,6 +168,17 @@
   border: 1px solid #e2e8f0;
 }
 
+.locked-card {
+  opacity: 0.7;
+  filter: grayscale(0.5);
+  pointer-events: none;
+}
+
+.locked-card .start-btn-modern {
+  pointer-events: auto;
+  /* allow hover on button even if card is locked to show not-allowed cursor */
+}
+
 /* 🔷 FLOW ARROW */
 .flow-indicator {
   display: flex;

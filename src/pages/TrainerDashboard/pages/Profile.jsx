@@ -216,27 +216,15 @@ const Profile = () => {
           <div className="info-list-items">
             <div className="info-item-saas">
               <div className="item-label-saas"><User size={14} /> Full Name</div>
-              {isEditing ? (
-                <input name="name" value={tempData.name} onChange={handleChange} className="edit-input-saas" />
-              ) : (
-                <div className="value-box-saas">{displayName}</div>
-              )}
+              <div className="value-box-saas read-only-info">{displayName}</div>
             </div>
             <div className="info-item-saas">
               <div className="item-label-saas"><Mail size={14} /> Email</div>
-              {isEditing ? (
-                <input name="email" value={tempData.email} onChange={handleChange} className="edit-input-saas" />
-              ) : (
-                <div className="value-box-saas text-blue">{trainerData.email || ""}</div>
-              )}
+              <div className="value-box-saas text-blue read-only-info">{trainerData.email || ""}</div>
             </div>
             <div className="info-item-saas">
               <div className="item-label-saas"><Phone size={14} /> Phone</div>
-              {isEditing ? (
-                <input name="phone" value={tempData.phone} onChange={handleChange} className="edit-input-saas" />
-              ) : (
-                <div className="value-box-saas">{trainerData.phone || ""}</div>
-              )}
+              <div className="value-box-saas read-only-info">{trainerData.phone || trainerData.phno || ""}</div>
             </div>
             <div className="info-item-saas">
               <div className="item-label-saas"><MapPin size={14} /> Location</div>
