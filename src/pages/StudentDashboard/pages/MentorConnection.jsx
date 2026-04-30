@@ -1,130 +1,169 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Send, Phone, Video, Calendar, ArrowLeft, ExternalLink, MessageCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { 
+  ArrowLeft, 
+  MessageSquare, 
+  Code, 
+  Video, 
+  ExternalLink, 
+  Send, 
+  MessageCircle, 
+  Clock, 
+  Calendar, 
+  CheckCircle, 
+  Eye 
+} from 'lucide-react';
+import Editor from '@monaco-editor/react';
 import './MentorConnection.css';
 
 const MentorConnection = () => {
-  const [selected, setSelected] = useState(null);
-  const [message, setMessage] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const messagesEndRef = useRef(null);
+  const [selected, setSelected] = useState(null); // Selected Trainer Index
+  const [solutionType, setSolutionType] = useState('chat'); // 'chat', 'editor', 'meet'
+  
+  // Form States
+  const [description, setDescription] = useState('');
+  const [code, setCode] = useState('');
+  const [language, setLanguage] = useState('javascript');
+  const fileInputRef = React.useRef(null);
+  
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [querySuccess, setQuerySuccess] = useState(false);
+  const [activeTicket, setActiveTicket] = useState(null);
+  const [myQueries, setMyQueries] = useState([]);
+  const [attachedFile, setAttachedFile] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [toastVisible, setToastVisible] = useState(false);
+  
+  const navigate = useNavigate();
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setAttachedFile(file);
+      alert(`File attached: ${file.name}`);
+    }
+  };
+
+  const triggerFileUpload = () => {
+    fileInputRef.current?.click();
+  };
 
   const mentors = [
-    { n: 'Charani', preview: 'Sure, I will share the resources with the batch.', time: '10:20 AM', unread: false, color: '#2563eb', role: 'Senior Java Architect', spec: ['Java', 'Spring Boot', 'Microservices'], availability: 'Mon-Fri, 6PM-8PM' },
-    { n: 'Charani', preview: 'When are you available for a 1:1?', time: 'Yesterday', unread: true, color: '#10b981', role: 'Lead Python Developer', spec: ['Python', 'Django', 'AI'], availability: 'Tue, Thu, 4PM-7PM' },
-    { n: 'Charani', preview: 'Let me look at your AWS architecture diagram.', time: 'Mar 12', unread: false, color: '#f59e0b', role: 'Cloud Solutions Architect', spec: ['AWS', 'Terraform', 'Kubernetes'], availability: 'Weekends, 10AM-12PM' }
+    { id: 't1', n: 'Abhinaya', role: 'Senior Java Architect', spec: ['Java', 'Spring Boot', 'Microservices'], color: '#2563eb' },
+    { id: 't2', n: 'Charani', role: 'Lead Python Developer', spec: ['Python', 'Django', 'AI'], color: '#10b981' },
+    { id: 't3', n: 'Suresh Kumar', role: 'Cloud Solutions Architect', spec: ['AWS', 'Terraform', 'Kubernetes'], color: '#f59e0b' }
   ];
 
-  const [activeThreads, setActiveThreads] = useState([
-    [
-      { from: 'You', text: 'Hello sir, I have a doubt regarding the React useEffect hook. Can you help me?', time: '10:15 AM', self: true },
-      { from: 'Charani', text: 'Sure! useEffect runs after every render by default. Adding an empty dependency array [] makes it run only once on mount. I\'ll share resources with the batch.', time: '10:20 AM', self: false },
-    ],
-    [
-      { from: 'You', text: 'Hi Charani, I am struggling with the Django ORM queries for the assignment.', time: 'Yesterday', self: true },
-      { from: 'Charani', text: 'Hi! That is a common hurdle. When are you available for a 1:1?', time: 'Yesterday', self: false },
-    ],
-    [
-      { from: 'You', text: 'Hi Charani, can you review my AWS architecture diagram?', time: 'Mar 12', self: true },
-      { from: 'Charani', text: 'Let me look at your AWS architecture diagram. Send over the link.', time: 'Mar 12', self: false },
-    ]
-  ]);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  // Course-based languages
+  const languageOptions = {
+    't1': ['Java', 'Spring Boot', 'SQL'],
+    't2': ['Python', 'Django', 'Flask'],
+    't3': ['AWS', 'Terraform', 'Kubernetes', 'Docker']
   };
 
   useEffect(() => {
-    scrollToBottom();
-  }, [activeThreads, isTyping, selected]);
+    const raised = JSON.parse(localStorage.getItem('student_queries') || '[]');
+    const solved = JSON.parse(localStorage.getItem('solved_queries') || '[]');
+    const merged = raised.map(q => {
+      const isSolved = solved.find(s => s.id === q.id);
+      return isSolved ? { ...q, status: 'solved', response: isSolved.response } : q;
+    });
+    setMyQueries(merged);
+  }, [querySuccess]);
 
-  const handleSend = () => {
-    if (!message.trim() || selected === null) return;
+  const handleSubmitQuery = (e) => {
+    if (e) e.preventDefault();
     
-    const newMessage = {
-      from: 'You',
-      text: message,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      self: true
-    };
+    // Validation
+    if (solutionType === 'chat' && !description.trim()) return;
+    if (solutionType === 'editor' && !code.trim()) return;
+    if (solutionType === 'meet' && !description.trim()) return;
 
-    const newThreads = [...activeThreads];
-    newThreads[selected] = [...newThreads[selected], newMessage];
-    setActiveThreads(newThreads);
-    setMessage('');
-    setIsTyping(true);
-
-    // Simulate mentor reply
+    setIsSubmitting(true);
+    
     setTimeout(() => {
-      const replyMessage = {
-        from: mentors[selected].n,
-        text: "That's a great question! Let me review that and I'll explain it during our 1:1 call.",
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        self: false
-      };
+      let updatedQuery;
+      const existing = JSON.parse(localStorage.getItem('student_queries') || '[]');
+
+      if (isEditing && activeTicket) {
+        // Update existing query
+        updatedQuery = {
+          ...activeTicket,
+          description,
+          code: solutionType === 'editor' ? code : null,
+          language: solutionType === 'editor' ? language : null,
+          attachedFileName: attachedFile ? attachedFile.name : activeTicket.attachedFileName,
+          updatedAt: new Date().toISOString()
+        };
+        const newList = existing.map(q => q.id === activeTicket.id ? updatedQuery : q);
+        localStorage.setItem('student_queries', JSON.stringify(newList));
+      } else {
+        // Create new query
+        const qId = `QRY-${Math.floor(1000 + Math.random() * 9000)}`;
+        updatedQuery = {
+          id: qId,
+          studentId: 's1',
+          trainerId: mentors[selected].id,
+          trainerName: mentors[selected].n,
+          title: solutionType === 'meet' ? 'Meeting Request' : (description.substring(0, 40) || 'Code Review'),
+          description,
+          code: solutionType === 'editor' ? code : null,
+          language: solutionType === 'editor' ? language : null,
+          solutionType,
+          status: 'pending',
+          attachedFileName: attachedFile?.name || null,
+          createdAt: new Date().toISOString()
+        };
+        localStorage.setItem('student_queries', JSON.stringify([...existing, updatedQuery]));
+      }
+
+      setIsSubmitting(false);
+      setQuerySuccess(true);
+      setActiveTicket(updatedQuery);
+      setAttachedFile(null);
+      setIsEditing(false);
       
-      setActiveThreads(prev => {
-        const updated = [...prev];
-        updated[selected] = [...updated[selected], replyMessage];
-        return updated;
-      });
-      setIsTyping(false);
-    }, 1500);
+      // Show Success Toast
+      setToastVisible(true);
+      setTimeout(() => setToastVisible(false), 3000);
+      
+    }, 1200);
   };
 
-  const openZoomMeeting = () => {
-     window.open('https://zoom.us/test', '_blank');
+  const handleEditQuery = () => {
+    if (!activeTicket) return;
+    setIsEditing(true);
+    setDescription(activeTicket.description || '');
+    setCode(activeTicket.code || '');
+    setLanguage(activeTicket.language || 'javascript');
+    setSolutionType(activeTicket.solutionType);
   };
 
   if (selected === null) {
-      // Directory View
       return (
-        <div className="mentor-viewport">
+        <div className="mentor-viewport animate-fade-in">
           <div className="mentor-top-header directory-header">
             <div className="header-text-content">
               <h1 className="mentor-top-title">Trainer Directory</h1>
-              <p className="mentor-top-subtitle">Browse professional profiles and connect directly with industry experts.</p>
+              <p className="mentor-top-subtitle">Browse profiles and connect with experts.</p>
             </div>
           </div>
-          
           <div className="mentor-directory-grid">
             {mentors.map((m, i) => (
               <div className="dir-card-premium" key={i}>
-                 <div className="dir-card-banner" style={{ background: `linear-gradient(135deg, ${m.color}e6, ${m.color})` }}>
-                 </div>
-                 
+                 <div className="dir-card-banner" style={{ background: `linear-gradient(135deg, ${m.color}e6, ${m.color})` }}></div>
                  <div className="dir-avatar-wrapper">
-                    <div className="dir-avatar-circle" style={{ color: m.color }}>
-                      {m.n.split(' ').map(x => x[0]).join('').slice(0, 2)}
-                    </div>
+                    <div className="dir-avatar-circle" style={{ color: m.color }}>{m.n[0]}</div>
                  </div>
-                 
                  <div className="dir-card-body">
                     <div className="dir-title-section">
                        <h2 className="dir-name">{m.n}</h2>
                        <p className="dir-role">{m.role}</p>
                     </div>
-
-                    <div className="dir-tags-group">
-                      {m.spec.map((tag, j) => (
-                        <span key={j} className="dir-tag-pill">{tag}</span>
-                      ))}
-                    </div>
-                    
-                    <div className="dir-separator"></div>
-                    
                     <div className="dir-footer-section">
-                       <div className="dir-availability-pill">
-                         <Calendar size={14} className="avail-icon" />
-                         <span>{m.availability}</span>
-                       </div>
-
-                       <button 
-                         className={`dir-connect-action-btn ${i !== 0 ? 'disabled' : ''}`} 
-                         onClick={() => i === 0 && setSelected(i)}
-                         disabled={i !== 0}
-                       >
+                       <button className="dir-connect-action-btn" onClick={() => setSelected(i)}>
                           <MessageCircle size={18} />
-                          <span>Connect</span>
+                          <span>Raise Query</span>
                        </button>
                     </div>
                  </div>
@@ -136,143 +175,213 @@ const MentorConnection = () => {
   }
 
   return (
-    <div className="mentor-viewport">
-      <div className="mentor-top-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <button className="back-to-dir-btn" onClick={() => setSelected(null)}>
-            <ArrowLeft size={20} />
-          </button>
-          <div>
-            <h1 className="mentor-top-title">Trainer Connect</h1>
-            <p className="mentor-top-subtitle">Chat with industry experts and get your technical doubts resolved 1:1.</p>
-          </div>
+    <div className="mentor-viewport animate-fade-in">
+      {/* Success Toast */}
+      {toastVisible && (
+        <div className="submission-toast">
+          <CheckCircle size={20} />
+          <span>Your query has been submitted successfully</span>
         </div>
+      )}
+
+      {/* Hidden File Input */}
+      <input 
+        type="file" 
+        ref={fileInputRef} 
+        style={{ display: 'none' }} 
+        onChange={handleFileUpload}
+      />
+
+      <div className="mentor-top-header clean-header">
+        <button className="circular-back-btn" onClick={() => setSelected(null)}>
+          <ArrowLeft size={20} />
+        </button>
       </div>
 
       <div className="mentor-chat-layout">
-        {/* Chat Thread */}
-        <div className="mentor-card-panel" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-          <div className="mentor-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div className="mentor-avatar-box" style={{ background: mentors[selected].color, width: '36px', height: '36px', fontSize: '0.9rem', margin: 0 }}>
-                {mentors[selected].n.split(' ').map(x => x[0]).join('').slice(0, 2)}
-              </div>
-              <div>
-                <h2 className="mentor-card-title" style={{ fontSize: '1.05rem' }}>{mentors[selected].n}</h2>
-                <div className="mentor-card-sub" style={{ fontSize: '0.8rem' }}>{mentors[selected].role}</div>
-              </div>
-            </div>
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <button 
-                className="zoom-join-btn-small" 
-                onClick={openZoomMeeting}
-                title="Join Live Meeting"
-              >
-                <Video size={16} />
-                Join Zoom
-              </button>
-            </div>
+        <div className="mentor-card-panel query-submission-panel">
+          <div className="mode-selection-row">
+            <button 
+              className={`mode-card ${solutionType === 'chat' ? 'active' : ''}`}
+              onClick={() => { setSolutionType('chat'); setDescription(''); }}
+            >
+              <MessageSquare size={20} />
+              <span>Quick Chat</span>
+            </button>
+            <button 
+              className={`mode-card ${solutionType === 'editor' ? 'active' : ''}`}
+              onClick={() => { setSolutionType('editor'); setDescription(''); }}
+            >
+              <Code size={20} />
+              <span>Code Editor</span>
+            </button>
+            <button 
+              className={`mode-card ${solutionType === 'meet' ? 'active' : ''}`}
+              onClick={() => { setSolutionType('meet'); setDescription(''); }}
+            >
+              <Video size={20} />
+              <span>Google Meet</span>
+            </button>
           </div>
-          
-          <div className="mentor-card-body chat-messages">
-            {activeThreads[selected].map((msg, i) => (
-              <div key={i} className={`msg-wrapper ${msg.self ? 'msg-right' : 'msg-left'}`}>
-                {!msg.self && <div className="msg-sender">{msg.from}</div>}
-                <div className="msg-bubble">
-                  {msg.text}
-                </div>
-                <div className="msg-meta">{msg.time}</div>
-              </div>
-            ))}
-            
-            {isTyping && (
-              <div className="msg-wrapper msg-left">
-                <div className="msg-sender">{mentors[selected].n}</div>
-                <div className="msg-bubble typing-indicator">
-                  <span></span>
-                  <span></span>
-                  <span></span>
+
+          <div className="dynamic-form-area">
+            {solutionType === 'chat' && (
+              <div className="chat-inline-interface animate-fade-in">
+                <div className="inline-input-group">
+                  <textarea 
+                    className="minimal-chat-input"
+                    placeholder={`Describe your problem to ${mentors[selected].n}...`} 
+                    value={description}
+                    onChange={e => setDescription(e.target.value)}
+                  />
+                  <div className="inline-actions">
+                     <div className="upload-section">
+                        <button className="dashed-upload-btn" onClick={triggerFileUpload}>
+                           <ExternalLink size={16} />
+                           <span>{attachedFile ? attachedFile.name : 'Upload PDF / Code'}</span>
+                        </button>
+                     </div>
+                     <button 
+                        className="gradient-submit-btn" 
+                        onClick={handleSubmitQuery} 
+                        disabled={!description.trim() || isSubmitting}
+                     >
+                        {isSubmitting ? <span className="q-loader"></span> : <span>{isEditing ? 'Update Query' : 'Submit Query'}</span>}
+                     </button>
+                  </div>
                 </div>
               </div>
             )}
-            
-            {/* Invisible div to scroll to */}
-            <div ref={messagesEndRef} />
-          </div>
-          
-          <div className="chat-input-area">
-            <input 
-              type="text" 
-              className="chat-input-box" 
-              placeholder="Type your doubt or message..." 
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-            />
-            <button className="chat-send-btn" onClick={handleSend}>
-              <Send size={18} />
-            </button>
+
+            {solutionType === 'editor' && (
+              <div className="editor-interface-upgraded animate-fade-in">
+                <div className="editor-header-actions">
+                  <span className="editor-label">Code Workspace</span>
+                  <select className="premium-select" value={language} onChange={e => setLanguage(e.target.value)}>
+                    {languageOptions[mentors[selected].id].map(l => (
+                      <option key={l} value={l.toLowerCase()}>{l}</option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div className="monaco-wrapper-premium">
+                  <Editor
+                    height="320px"
+                    language={language}
+                    theme="vs-dark"
+                    value={code}
+                    onChange={setCode}
+                    options={{ 
+                      minimap: { enabled: false }, 
+                      fontSize: 14,
+                      roundedSelection: true,
+                      scrollBeyondLastLine: false,
+                    }}
+                  />
+                </div>
+
+                <div className="editor-details">
+                  <textarea 
+                    className="description-box"
+                    placeholder="Provide context or specific errors you're facing..."
+                    value={description}
+                    onChange={e => setDescription(e.target.value)}
+                  />
+                  <div className="editor-footer-upgraded">
+                     <button className="dashed-upload-btn" onClick={triggerFileUpload}>
+                        <ExternalLink size={16} />
+                        <span>{attachedFile ? attachedFile.name : 'Upload Material / ScreenShot'}</span>
+                     </button>
+                     <button 
+                        className="gradient-submit-btn" 
+                        onClick={handleSubmitQuery} 
+                        disabled={isSubmitting || !code.trim()}
+                     >
+                        {isSubmitting ? <span className="q-loader"></span> : <span>{isEditing ? 'Update Review' : 'Submit Review'}</span>}
+                     </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {solutionType === 'meet' && (
+              <div className="meet-interface-upgraded animate-fade-in">
+                <div className="meet-card-body">
+                   <h4 className="meet-title">Request 1:1 Technical Session</h4>
+                   <textarea 
+                      className="meet-textarea-premium"
+                      placeholder="What topics would you like to discuss in this meeting?"
+                      value={description}
+                      onChange={e => setDescription(e.target.value)}
+                   />
+                   <div className="meet-footer-actions">
+                      <button className="dashed-upload-btn" onClick={triggerFileUpload}>
+                         <ExternalLink size={16} />
+                         <span>{attachedFile ? attachedFile.name : 'Upload Agenda / Materials'}</span>
+                      </button>
+                      <button 
+                         className="gradient-submit-btn" 
+                         onClick={handleSubmitQuery} 
+                         disabled={!description.trim() || isSubmitting}
+                      >
+                         {isSubmitting ? <span className="q-loader"></span> : <span>{isEditing ? 'Update Meeting' : 'Schedule Meeting'}</span>}
+                      </button>
+                   </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Contact Info / Quick Actions */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', height: '100%' }}>
-          <div className="mentor-card-panel">
-             <div className="zoom-highlight-banner" onClick={openZoomMeeting}>
-                <div className="zoom-icon-wrapper">
-                   <Video size={24} color="#fff" />
+        <div className="mentor-side-col">
+          <div className="mentor-card-panel premium-status-card">
+             <div className="premium-card-header">
+                <div className="trainer-avatar-container">
+                   <div className="trainer-avatar-circle-premium" style={{ background: `linear-gradient(135deg, ${mentors[selected].color}, #3b82f6)` }}>
+                      {mentors[selected].n[0]}
+                   </div>
+                   <div className="online-status-dot"></div>
                 </div>
-                <div className="zoom-text-wrapper">
-                   <h4>Live 1:1 Meeting</h4>
-                   <p>Join secure Zoom room</p>
-                </div>
-                <ExternalLink size={20} color="rgba(255,255,255,0.8)" />
+                <h3 className="trainer-name-main">{mentors[selected].n}</h3>
+                <p className="trainer-role-sub">{mentors[selected].role}</p>
              </div>
 
-             <div className="mentor-card-body" style={{ padding: '24px 20px' }}>
-               <div className="profile-avatar-large" style={{ background: mentors[selected].color }}>
-                 {mentors[selected].n.split(' ').map(x => x[0]).join('').slice(0, 2)}
-                 <div className="status-indicator-online"></div>
-               </div>
-               <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-                 <h3 style={{ fontSize: '1.2rem', fontWeight: '800', color: '#1e293b', margin: '0 0 4px' }}>{mentors[selected].n}</h3>
-                 <p style={{ color: '#64748b', fontSize: '0.9rem', margin: 0 }}>{mentors[selected].role}</p>
-               </div>
-               
-               <div className="mentor-info-row">
-                 <span className="mentor-info-label">Specialization</span>
-                 <span className="mentor-info-val">{mentors[selected].spec[0]}</span>
-               </div>
-               <div className="mentor-info-row">
-                 <span className="mentor-info-label">Avg. Response Time</span>
-                 <span className="mentor-info-val">~ 15 mins</span>
-               </div>
+             <div className="premium-info-list">
+                <div className="info-row-premium">
+                   <span className="info-label-premium">Trainer Name</span>
+                   <span className="info-val-premium">{mentors[selected].n}</span>
+                </div>
+                <div className="info-row-premium">
+                   <span className="info-label-premium">Query Mode</span>
+                   <span className="info-val-premium capitalize">{solutionType}</span>
+                </div>
+                <div className="info-row-premium">
+                   <span className="info-label-premium">Query Status</span>
+                   <span className={`status-badge-premium ${activeTicket?.status || 'none'}`}>
+                      {activeTicket?.status === 'pending' ? 'Pending' : (activeTicket?.status === 'solved' ? 'Solved' : 'No Active Query')}
+                   </span>
+                </div>
              </div>
-          </div>
+             
+             {activeTicket?.status === 'solved' && (
+               <button className="view-solution-premium-btn" onClick={() => navigate(`/student-dashboard/my-queries/${activeTicket.id}/solution`)}>
+                  <Eye size={18} />
+                  <span>View Solution</span>
+               </button>
+             )}
 
-          <div className="mentor-card-panel">
-            <div className="mentor-card-header">
-               <h2 className="mentor-card-title">Quick Replies</h2>
-            </div>
-            <div className="mentor-card-body" style={{ padding: '16px 20px', flex: 1, overflowY: 'auto' }}>
-              {[
-                "I have a doubt in today's topic.",
-                "Can we schedule a call?",
-                "Could you review my assignment?",
-                "Thank you for the explanation!"
-              ].map((text, i) => (
-                <button 
-                  key={i} 
-                  className="quick-reply-btn"
-                  onClick={() => {
-                    setMessage(text);
-                    setTimeout(() => document.querySelector('.chat-input-box')?.focus(), 0);
-                  }}
-                >
-                  {text}
-                </button>
-              ))}
-            </div>
+             {activeTicket && activeTicket.status === 'pending' && (
+               <div className="action-buttons-group">
+                 <button className="edit-query-btn" onClick={handleEditQuery}>
+                   <MessageSquare size={18} />
+                   <span>Edit Query</span>
+                 </button>
+                 <button className="navigate-queries-btn" onClick={() => navigate('/student-dashboard/my-queries')}>
+                   <ExternalLink size={18} />
+                   <span>Go to My Queries</span>
+                 </button>
+               </div>
+             )}
           </div>
         </div>
       </div>

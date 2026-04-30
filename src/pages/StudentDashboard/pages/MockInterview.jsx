@@ -59,7 +59,7 @@ const MockInterview = () => {
                 <li><FaCheckCircle className="text-success" /> Conduct mock peer-to-peer technical reviews.</li>
               </ul>
               <button 
-                className="secondary-action-btn mt-auto"
+                className="primary-action-btn mt-auto"
                 onClick={() => navigate('/student-dashboard/preparation-resources')}
               >
                 Access All Resources
