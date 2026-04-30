@@ -145,20 +145,22 @@
 
 .card-img-banner {
   position: relative;
-  height: 180px;
-  border-radius: 10px;
+  height: 170px; /* Optimal height for compact cards */
+  border-radius: 12px 12px 0 0; /* Rounded top only */
   overflow: hidden;
 }
 
 .card-img-banner img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 170px; /* Strictly enforced height */
+  object-fit: cover; /* Prevent distortion */
+  border-radius: 12px 12px 0 0; /* Match card radius */
+  display: block;
+  transition: transform 0.3s ease; /* Smooth hover transition */
 }
 
 .course-card-modern:hover .card-img-banner img {
-  transform: scale(1.05);
+  transform: scale(1.05); /* Premium hover zoom */
 }
 
 .card-content-modern {
