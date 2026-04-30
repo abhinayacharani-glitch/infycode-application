@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { enrollInCourse, getEnrolledCourses } from "../../../services/api";
 import { ALL_COURSES as ORIGINAL_COURSES } from "../../../components/Courses/Courses";
+import { useCourseContext } from "../../../context/CourseContext";
 import "./Course.css";
 
 // Swap "Ethical Hacking & Cyber Security" and "AWS Cloud Practitioner" for dashboard UI
@@ -64,7 +65,7 @@ const CourseCardModern = ({ course, index, onNavigate, enrolledIds }) => {
       whileHover={{ y: -10 }}
     >
       <div className="card-img-banner">
-        <img src={course.image} alt={course.title} />
+        <img src={course.image || 'https://via.placeholder.com/400x200?text=Course'} alt={course.title} />
       </div>
 
       <div className="card-content-modern">
@@ -147,6 +148,7 @@ const CourseDiscovery = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
   const [enrolledIds, setEnrolledIds] = useState([]);
+  const { publishedCourses } = useCourseContext();
 
   useEffect(() => {
     const fetchEnrolled = async () => {
@@ -166,7 +168,9 @@ const CourseDiscovery = () => {
     navigate(path, { state });
   };
 
-  const filtered = ALL_COURSES.filter(course => {
+  const combinedCourses = [...publishedCourses, ...ALL_COURSES];
+
+  const filtered = combinedCourses.filter(course => {
     const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = activeCategory === "All" || course.category === activeCategory;
     return matchesSearch && matchesCategory;
@@ -176,6 +180,7 @@ const CourseDiscovery = () => {
   const isFiltering = searchTerm !== "" || activeCategory !== "All";
   
   const sections = [
+    ...(publishedCourses.length > 0 ? [{ title: "New Published Courses", courses: publishedCourses }] : []),
     { title: "Popular Courses", courses: ALL_COURSES.slice(0, 4) },
     { title: "Trending Courses", courses: ALL_COURSES.slice(4, 8) },
     { title: "Recommended Courses", courses: ALL_COURSES.slice(8, 12) }
