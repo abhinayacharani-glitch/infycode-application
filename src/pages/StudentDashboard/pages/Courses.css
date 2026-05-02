@@ -1,51 +1,67 @@
-/* Redesigned Enrolled Courses CSS */
+/* ============================================================
+   ENROLLED COURSES — PREMIUM SAAS REDESIGN
+   ============================================================ */
+
 .enroll-page {
-  padding: 32px;
+  padding: 40px;
   background: #f8fafc; /* Minimal light background */
   min-height: 100vh;
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── PAGE HEADER ── */
+.page-header-centered {
+  text-align: center;
+  margin-bottom: 48px;
+  animation: fadeInDown 0.6s ease-out;
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.page-header-centered h2 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 12px;
+  letter-spacing: -0.02em;
+}
+
+.page-header-centered p {
+  font-size: 1.1rem;
+  color: #64748b;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
 }
 
 .enroll-course-grid {
   width: 100%;
-  max-width: 1400px;
+  max-width: 1440px;
   margin: 0 auto;
 }
 
 /* ── CARD GRID ── */
 .enroll-cards-wrapper {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 28px;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 40px 24px;
   width: 100%;
-  padding: 20px 0;
-  /* Removed blue gradient background */
+  padding: 24px 0;
 }
 
-/* Desktop: 4 per row */
-@media (min-width: 1200px) {
-  .enroll-cards-wrapper {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-/* Tablet: 2 per row */
-@media (max-width: 1199px) and (min-width: 640px) {
-  .enroll-cards-wrapper {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-/* Mobile: 1 per row */
-@media (max-width: 639px) {
-  .enroll-cards-wrapper {
-    grid-template-columns: 1fr;
-  }
-}
-
+/* ── ENROLLED COURSE CARD ── */
 .enrolled-course-card {
-  background: white;
-  border-radius: 16px;
-  border: 1px solid #f1f5f9;
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid rgba(226, 232, 240, 0.8);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -53,59 +69,67 @@
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
   height: 100%;
   position: relative;
+  background: linear-gradient(to bottom, #ffffff, #fafafa);
 }
 
 .enrolled-course-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  transform: translateY(-6px);
+  box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.08);
+  border-color: #3b82f6;
 }
 
 /* Image Section */
 .ecc-header {
-  height: 160px;
+  height: 135px;
   width: 100%;
   position: relative;
   overflow: hidden;
+  background: #f1f5f9;
 }
 
 .ecc-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.5s ease;
+  display: block;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .enrolled-course-card:hover .ecc-image {
-  transform: scale(1.05);
+  transform: scale(1.1);
 }
 
 /* Body Section */
 .ecc-body {
-  padding: 20px;
+  padding: 14px;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .ecc-title {
-  font-size: 1.1rem;
-  font-weight: 700;
+  font-size: 1.05rem;
+  font-weight: 800;
   color: #0f172a;
   margin: 0;
   line-height: 1.4;
-  /* Limit title to 2 lines */
+  letter-spacing: -0.02em;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  min-height: 2.8em;
 }
 
 /* Progress Section */
 .ecc-progress-wrap {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+  background: rgba(241, 245, 249, 0.5);
+  padding: 12px;
+  border-radius: 16px;
 }
 
 .ecc-progress-header {
@@ -113,18 +137,21 @@
   justify-content: space-between;
   align-items: center;
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: 700;
   color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .ecc-progress-percent {
   color: #2563eb;
-  font-weight: 700;
+  font-weight: 900;
+  font-size: 1rem;
 }
 
 .ecc-progress-bar {
-  height: 6px;
-  background: #f1f5f9;
+  height: 8px;
+  background: #e2e8f0;
   border-radius: 10px;
   overflow: hidden;
 }
@@ -132,74 +159,112 @@
 .ecc-progress-fill {
   height: 100%;
   border-radius: 10px;
-  background: linear-gradient(90deg, #2563eb, #3b82f6);
-  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+  box-shadow: 0 0 12px rgba(37, 99, 235, 0.3);
 }
 
 /* Footer / Buttons Section */
 .ecc-footer {
-  padding: 0 20px 20px;
+  padding: 0 24px 24px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
 
 .ecc-btn {
-  padding: 10px;
-  border-radius: 10px;
-  font-size: 0.85rem;
+  padding: 12px;
+  border-radius: 14px;
+  font-size: 0.9rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
   white-space: nowrap;
 }
 
 .ecc-resume-btn {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  background: #2563eb;
   color: white;
   border: none;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
 }
 
 .ecc-resume-btn:hover {
-  background: linear-gradient(135deg, #1d4ed8, #1e40af);
-  transform: scale(1.02);
+  background: #1d4ed8;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+}
+
+.ecc-resume-btn:active {
+  transform: translateY(0);
 }
 
 .ecc-join-btn {
-  background: white;
+  background: #ffffff;
   color: #2563eb;
-  border: 1.5px solid #e2e8f0;
+  border: 2px solid #e2e8f0;
 }
 
 .ecc-join-btn:hover {
   background: #f8fafc;
   border-color: #2563eb;
-  transform: scale(1.02);
+  transform: translateY(-2px);
 }
 
 /* No Courses Empty State */
 .no-courses-container {
   grid-column: 1 / -1;
   text-align: center;
-  padding: 80px 40px;
+  padding: 100px 40px;
   background: white;
-  border-radius: 24px;
-  border: 1px dashed #cbd5e1;
+  border-radius: 32px;
+  border: 2px dashed #e2e8f0;
   margin-top: 40px;
 }
 
 .no-courses-title {
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 2rem;
+  font-weight: 800;
   color: #1e293b;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
 }
 
 .no-courses-text {
   color: #64748b;
-  font-size: 1rem;
+  font-size: 1.1rem;
+  max-width: 500px;
+  margin: 0 auto;
 }
+
+/* Responsive Breakpoints */
+@media (max-width: 1280px) {
+  .enroll-cards-wrapper {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  .enroll-cards-wrapper {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .enroll-page {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 640px) {
+  .enroll-cards-wrapper {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .ecc-footer {
+    grid-template-columns: 1fr;
+  }
+  .no-courses-title {
+    font-size: 1.5rem;
+  }
+}

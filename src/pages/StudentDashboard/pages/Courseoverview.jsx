@@ -15,6 +15,7 @@ import {
   Video,
   ChevronRight
 } from 'lucide-react';
+import { getCourseImage } from '../../../utils/courseUtils';
 import './Courseoverview.css';
 
 const daysOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -141,6 +142,8 @@ const CourseOverview = () => {
     'no-link': { text: 'Not Configured', className: 'status-none' },
   }[sessionStatus];
 
+  const courseImage = getCourseImage(course);
+
   return (
     <div className="course-overview-page">
       <button className="co-back-btn" onClick={handleBack}>
@@ -150,6 +153,10 @@ const CourseOverview = () => {
 
       {/* Header Card */}
       <div className="co-hero">
+        <div className="co-hero-bg">
+          <img src={courseImage} alt={course.title} className="co-hero-img" />
+          <div className="co-hero-overlay"></div>
+        </div>
         <div className="co-hero-left">
           <span className="co-level-badge">{course.level}</span>
           <h1 className="co-hero-title">{course.title}</h1>

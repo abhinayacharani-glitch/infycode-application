@@ -4,6 +4,7 @@ import { ALL_COURSES } from "../../components/Courses/Courses";
 import { useCourseContext } from "../../context/CourseContext";
 import { ArrowLeft, Clock, Users, Star, BookOpen, ChevronDown, ChevronUp, CheckCircle, Eye, Calendar, User as UserIcon, Download } from "lucide-react";
 import jsPDF from 'jspdf';
+import { getCourseImage } from "../../utils/courseUtils";
 import "../../components/Courses/Courses.css";
 import "./CourseDetailsPage.css";
 
@@ -296,7 +297,7 @@ const CourseDetailsPage = () => {
             </div>
           </div>
           <div className="cd-header-image">
-            <img src={course.image || 'https://via.placeholder.com/600x400?text=Course'} alt={course.title} />
+            <img src={getCourseImage(course)} alt={course.title} />
           </div>
         </div>
 
@@ -506,7 +507,7 @@ const RelatedCourses = ({ currentCourse, navigate, publishedCourses }) => {
                       onClick={() => { navigate(`/course-details/${c.courseId}`); window.scrollTo(0, 0); }}
                       style={{ cursor: "pointer" }}
                     >
-                      <img src={c.image || 'https://via.placeholder.com/400x200?text=Course'} alt={c.title} />
+                      <img src={getCourseImage(c)} alt={c.title} />
                     </div>
 
                     <div className="card-content-modern">

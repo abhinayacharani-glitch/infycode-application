@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useCourseContext } from "../../context/CourseContext";
 import { motion } from "framer-motion";
 import { Search, Filter, Star, Clock, Users, ArrowRight, Eye, Calendar, User as UserIcon } from "lucide-react";
+import { getCourseImage } from "../../utils/courseUtils";
 import "./Courses.css";
 import bgImage from "../../assets/course/bg.jpg";
 // Course images from assets/course
@@ -374,6 +375,16 @@ const Courses = () => {
           {filtered.length > 0 ? (
             filtered.map((course, i) => {
               const sc = statusColors[course.badge] || statusColors["NEW"];
+
+              // Fallback dates for specific cards as requested
+              let displayDate = course.startDate;
+              const lowerTitle = course.title.toLowerCase();
+              if (lowerTitle.includes("aptitude")) {
+                displayDate = "May 5, 2026";
+              } else if (lowerTitle.includes("introduction to ai")) {
+                displayDate = "May 10, 2026";
+              }
+
               return (
                 <motion.div
                   key={course.title}
@@ -386,7 +397,7 @@ const Courses = () => {
                 >
                   {/* Image Banner */}
                   <div className="card-img-banner">
-                    <img src={course.image || imgWebDev} alt={course.title} />
+                    <img src={getCourseImage(course)} alt={course.title} />
                   </div>
 
                   <div className="card-content-modern">
@@ -401,7 +412,7 @@ const Courses = () => {
                         </div>
                         <div className="info-item">
                           <Calendar size={14} />
-                          <span>{course.startDate}</span>
+                          <span>{displayDate || "TBA"}</span>
                         </div>
                         <div className="info-item duration-highlight">
                           <Clock size={14} />

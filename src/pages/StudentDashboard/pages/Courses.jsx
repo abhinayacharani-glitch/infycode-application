@@ -5,6 +5,7 @@ import { COURSE_MAP } from './data/extraCourses';
 import { ALL_COURSES } from '../../../components/Courses/Courses';
 import { useCourseContext } from '../../../context/CourseContext';
 import { Play, BookOpen } from 'lucide-react';
+import { getCourseImage } from '../../../utils/courseUtils';
 import './Courses.css';
 
 const getCurrentTopic = (course) => {
@@ -36,8 +37,7 @@ const EnrolledCourseCard = ({ course, onNavigate, index }) => {
   })();
 
   const currentTopic = getCurrentTopic({ ...course, progress: dynamicProgress });
-  const courseMeta = ALL_COURSES.find(c => c.title === course.title) || course;
-  const courseImage = courseMeta.image || course.image || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80';
+  const courseImage = getCourseImage(course);
 
   return (
     <motion.div
@@ -150,6 +150,11 @@ const EnrollCourses = ({ onNavigate }) => {
 
   return (
     <div className="enroll-page">
+      <header className="page-header-centered">
+        <h2>Enrolled Courses</h2>
+        <p>Keep track of your progress and continue your learning journey where you left off.</p>
+      </header>
+      
       <div className="enroll-course-grid">
         <div className="enroll-cards-wrapper">
           {enrolledCourses.length > 0 ? (
