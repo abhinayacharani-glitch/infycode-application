@@ -25,8 +25,6 @@ function BatchCreation() {
 
   // ── Build course list: mirrors Student Dashboard EXACTLY ──────────────────
   // Replicates reordering logic from StudentDashboard/pages/Course.jsx
-  // ── Build course list: mirrors Student Dashboard EXACTLY ──────────────────
-  // Replicates reordering logic from StudentDashboard/pages/Course.jsx
   const courseList = useMemo(() => {
     // 1. Get static courses and reorder them exactly like Student Dashboard
     const staticCourses = [...ALL_COURSES];
