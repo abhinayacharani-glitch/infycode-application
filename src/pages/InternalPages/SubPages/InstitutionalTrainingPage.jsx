@@ -1,13 +1,20 @@
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import './InstitutionalTrainingPage.css';
 
 const InstitutionalTrainingPage = () => {
+  const navigate = useNavigate();
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   return (
     <div className="institutional-page">
+      <button className="modern-back-btn" onClick={() => navigate("/")}>
+        <ArrowLeft size={18} />
+        <span>Back</span>
+      </button>
       <div
         className="institutional-hero"
         style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80&w=1920)' }}

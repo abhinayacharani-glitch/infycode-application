@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, MapPin, Users, Zap, Award, Rocket, CheckCircle, Sparkles, Globe, BrainCircuit, Instagram, Linkedin, ExternalLink } from 'lucide-react';
+import { Calendar, MapPin, Users, Zap, Award, Rocket, CheckCircle, Sparkles, Globe, BrainCircuit, Instagram, Linkedin, ExternalLink, ArrowLeft } from 'lucide-react';
 import LoginBackground from '../../student-auth/components/LoginBackground';
 import './LaunchEvent.css';
 
@@ -68,6 +68,10 @@ const LaunchEvent = ({ onEnterSite }) => {
 
     return (
         <div className="launch-root fullscreen-launch">
+            <button className="modern-back-btn" onClick={() => onEnterSite('/')} style={{ top: '40px', left: '40px' }}>
+                <ArrowLeft size={18} />
+                <span>Back</span>
+            </button>
             {/* Background from Login Page */}
             <div className="launch-bg-wrapper">
                 <LoginBackground />

@@ -1,13 +1,20 @@
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import './ContactPage.css';
 
 const ContactPage = () => {
+  const navigate = useNavigate();
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   return (
     <div className="internal-page">
+      <button className="modern-back-btn" onClick={() => navigate("/")}>
+        <ArrowLeft size={18} />
+        <span>Back</span>
+      </button>
       <div className="internal-hero contact-hero">
         <div className="internal-hero-content">
           <h1>Get in Touch</h1>

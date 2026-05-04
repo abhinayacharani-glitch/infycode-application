@@ -1,4 +1,8 @@
+import React, { useEffect } from 'react';
 import { useCourseContext } from '../../../context/CourseContext';
+import { useNavigate } from 'react-router-dom';
+import { ALL_COURSES } from '../../../components/Courses/Courses';
+import { ArrowLeft } from 'lucide-react';
 
 // ✅ SVG Icons as components
 const ClockIcon = () => (
@@ -20,11 +24,15 @@ const UsersIcon = () => (
   </svg>
 );
 
-import { useNavigate } from 'react-router-dom';
-
 const PopularCoursesPage = () => {
   const navigate = useNavigate();
   const { publishedCourses } = useCourseContext();
+
+  const combinedCourses = [...publishedCourses, ...ALL_COURSES];
+  const popularCourses = combinedCourses.filter(course => {
+    const badge = course.badge?.toLowerCase();
+    return badge === "popular" || badge === "bestseller" || badge === "top rated";
+  });
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -49,6 +57,10 @@ const PopularCoursesPage = () => {
 
   return (
     <div className="popular-page">
+      <button className="modern-back-btn" onClick={() => navigate("/")}>
+        <ArrowLeft size={18} />
+        <span>Back</span>
+      </button>
       <div
         className="popular-hero"
         style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=1920)' }}
@@ -61,30 +73,34 @@ const PopularCoursesPage = () => {
 
       <div className="popular-section">
         <div className="popular-course-grid">
-          {publishedCourses.map((course) => (
-            <div className="popular-course-card" key={course.id}>
-              <img src={course.image || course.img} alt={course.title} className="popular-course-img" />
-              <div className="popular-course-info">
-                <span className="popular-course-tag">{course.badge || course.tag}</span>
-                <h3>{course.title}</h3>
-                <p>{course.description || course.desc}</p>
+          {popularCourses.length > 0 ? (
+            popularCourses.map((course, index) => (
+              <div className="popular-course-card" key={course.id || course.courseId || index}>
+                <img src={course.image || course.img} alt={course.title} className="popular-course-img" />
+                <div className="popular-course-info">
+                  <span className="popular-course-tag">{course.badge}</span>
+                  <h3>{course.title}</h3>
+                  <p>{course.description || course.desc}</p>
 
-                <div className="popular-course-meta">
-                  
-                  <span className="meta-item">
-                    <ClockIcon /> {course.duration || course.hours}
-                  </span>
+                  <div className="popular-course-meta">
+                    
+                    <span className="meta-item">
+                      <ClockIcon /> {course.duration || course.hours}
+                    </span>
 
-                  <span className="meta-item">
-                    <UsersIcon /> {course.students}
-                  </span>
+                    <span className="meta-item">
+                      <UsersIcon /> {course.students}
+                    </span>
 
-                  <button className="popular-enroll-btn" onClick={handleEnroll}>Enroll Now</button>
+                    <button className="popular-enroll-btn" onClick={handleEnroll}>Enroll Now</button>
+                  </div>
+
                 </div>
-
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <div className="no-courses-msg">No popular courses available at the moment.</div>
+          )}
         </div>
       </div>
     </div>
