@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Clock, Users, Star, PlayCircle, ArrowRight } from 'lucide-react';
+import { Clock, Users, Star, PlayCircle, ArrowRight, ArrowLeft } from 'lucide-react';
 import '../CoursesPage.css'; // Reuse existing styles
 import './VideoCourses.css';
 import heroBg from '../../../assets/video-courses-hero.png';
@@ -45,6 +45,10 @@ const VideoCoursesPage = () => {
 
   return (
     <div className="courses-page">
+      <button className="modern-back-btn" onClick={() => navigate("/")}>
+        <ArrowLeft size={18} />
+        <span>Back</span>
+      </button>
       <div
         className="courses-hero"
         style={{ backgroundImage: `url(${heroBg})` }}
@@ -62,8 +66,8 @@ const VideoCoursesPage = () => {
         <h2 className="courses-section-title">Available Recorded Sessions</h2>
         <div className="courses-grid">
           {videoCoursesData.map((course, i) => (
-            <motion.div 
-              className="courses-card" 
+            <motion.div
+              className="courses-card"
               key={course.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -82,7 +86,7 @@ const VideoCoursesPage = () => {
                   <span className="meta-item">
                     <Users size={16} /> {course.students}
                   </span>
-                  <button 
+                  <button
                     className="courses-enroll-btn"
                     onClick={() => navigate(`/video-courses/${course.id}`)}
                   >

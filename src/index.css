@@ -810,3 +810,37 @@ small, .small {
   height: 48px;
   background: rgba(255, 255, 255, 0.2);
 }
+/* --- SHARED BACK BUTTON (Glassmorphism) --- */
+.modern-back-btn {
+  position: fixed;
+  top: 110px; /* Below sticky navbar */
+  left: 40px;
+  z-index: 1100; /* Above navbar if needed, or just below */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 12px 28px;
+  border-radius: 100px;
+  color: white;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  text-decoration: none;
+}
+
+.modern-back-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+}
+
+.modern-back-btn svg {
+  stroke-width: 3px;
+}
