@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTrainer } from '../../../context/TrainerContext';
-import { LogOut } from 'lucide-react';
+import { LogOut, User } from 'lucide-react';
 import './Topbar.css';
 
 import icLogo from '../../../assets/infycode-final-logo4-1.png';
@@ -346,7 +346,7 @@ const Topbar = () => {
           {profileImage ? (
             <img src={profileImage} alt={userName} className="tb-user-avatar-new" />
           ) : (
-            <div className="tb-avatar-initial">{userInitial}</div>
+            <div className="tb-avatar-initial" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><User size={20} /></div>
           )}
           {showUserMenu && (
             <div className="tb-user-dropdown">
@@ -354,7 +354,7 @@ const Topbar = () => {
                 {profileImage ? (
                   <img src={profileImage} alt={userName} className="tb-udrop-avatar" />
                 ) : (
-                  <div className="tb-udrop-avatar tb-avatar-initial-small">{userInitial}</div>
+                  <div className="tb-udrop-avatar tb-avatar-initial-small" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><User size={16} /></div>
                 )}
                 <div>
                   <div className="tb-udrop-name">{userName}</div>
@@ -398,7 +398,7 @@ const Topbar = () => {
                   {profileImage ? (
                     <img src={profileImage} alt="Profile" className="tb-user-avatar-new" style={{ width: '100%', height: '100%', borderRadius: '50%' }} />
                   ) : (
-                    <div className="tb-avatar-initial-modal">{userInitial}</div>
+                    <div className="tb-avatar-initial-modal" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', borderRadius: '50%', backgroundColor: '#94a3b8', color: 'white' }}><User size={24} /></div>
                   )}
                 </div>
                 <h3>{userName}</h3>

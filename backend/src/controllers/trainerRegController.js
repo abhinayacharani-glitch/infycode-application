@@ -203,6 +203,34 @@ export const getTrainerProfile = async (req, res) => {
     profileData.id = trainerKey;
     profileData.role = "trainer"; // Hardcode for safety
 
+    // Calculate dynamic stats from batches
+    const trainerFullName = profileData.fullName || profileData.fullname || profileData.name;
+    try {
+      const batchesRef = db.ref("batch");
+      const batchesSnap = await batchesRef.once("value");
+      const batchesRaw = batchesSnap.val() || {};
+      
+      let activeBatchesCount = 0;
+      let totalStudentsCount = 0;
+      
+      Object.values(batchesRaw).forEach(batch => {
+        const batchTrainer = batch.trainerName || batch.trainer;
+        if (batchTrainer === trainerFullName) {
+          activeBatchesCount++; // Count all assigned batches as active
+          totalStudentsCount += parseInt(batch.enrolled) || 0;
+        }
+      });
+      
+      profileData.activeBatches = activeBatchesCount;
+      profileData.totalStudents = totalStudentsCount;
+      profileData.avgAttendance = "92"; // Placeholder for avg attendance
+    } catch (err) {
+      console.error("[getTrainerProfile] Error calculating stats:", err.message);
+      profileData.activeBatches = 0;
+      profileData.totalStudents = 0;
+      profileData.avgAttendance = "0";
+    }
+
     delete profileData.password;
 
     return res.status(200).json({ success: true, profile: profileData });
