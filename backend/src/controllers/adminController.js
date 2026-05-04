@@ -282,7 +282,7 @@ export const getDashboardStats = async (req, res) => {
  **/
 export const createBatch = async (req, res) => {
   try {
-    const { name, course, trainer, capacity, status } = req.body;
+    const { name, course, trainer, capacity, status, startDateTime, duration, batchImage } = req.body;
 
     if (!name || !course || !trainer) {
       return res.status(400).json({ message: "Name, course, and trainer are required." });
@@ -290,7 +290,7 @@ export const createBatch = async (req, res) => {
 
     const nextBID = await generateNextBatchID();
     const newBatchRef = batchesRef.push();
-    const batchData = {
+    const rawBatchData = {
       batchId: nextBID, // Assign unique sequential Batch ID
       name,
       courseName: course,
@@ -298,8 +298,14 @@ export const createBatch = async (req, res) => {
       capacity: parseInt(capacity) || 30,
       enrolled: 0,
       status: status || 'Draft',
+      startDateTime: startDateTime || "",
+      duration: duration || "",
+      batchImage: batchImage || "",
       createdAt: new Date().toISOString()
     };
+
+    // Clean undefined/null to prevent Firebase errors
+    const batchData = Object.fromEntries(Object.entries(rawBatchData).filter(([_, v]) => v != null && v !== ""));
 
     await newBatchRef.set(batchData);
 

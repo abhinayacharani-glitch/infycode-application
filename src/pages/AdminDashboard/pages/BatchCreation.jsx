@@ -25,7 +25,7 @@ const initialFormState = {
 
 function BatchCreation() {
   const navigate = useNavigate();
-  const { trainers, batches, addBatch } = useAdmin();
+  const { trainers, batches, addBatch, startBatch } = useAdmin();
   const [form, setForm] = useState(initialFormState);
   const [errors, setErrors] = useState({});
   const [showToast, setShowToast] = useState(false);
@@ -63,14 +63,14 @@ function BatchCreation() {
     setIsSubmitting(true);
     try {
       const batchData = {
-        name: `${form.courseName} - ${new Date(form.startDateTime).toLocaleDateString()}`,
+        name: `${form.courseName} - ${new Date(form.startDateTime).toLocaleString('en-US', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`,
         course: form.courseName,
         trainer: form.trainerName,
         capacity: Number(form.numberOfStudents),
-        status: 'Active',
-        duration: form.duration,
+        status: 'Scheduled',
         startDateTime: form.startDateTime,
-        batchImage: form.batchImage
+        duration: form.duration || "",
+        batchImage: form.batchImage || ""
       };
 
       await addBatch(batchData);
@@ -157,7 +157,7 @@ function BatchCreation() {
 
               <div className="form-footer">
                 <button type="submit" className="batch-submit-btn" disabled={isSubmitting}>
-                  {isSubmitting ? "Finalizing..." : "Initialize Batch"}
+                  {isSubmitting ? "Finalizing..." : form.courseName ? `Start ${form.courseName} Batch` : "Initialize Batch"}
                 </button>
               </div>
             </form>
@@ -184,7 +184,12 @@ function BatchCreation() {
                           <h4 className="batch-title">{batch.courseName || batch.course}</h4>
                           <span className="batch-trainer">{batch.trainerName || batch.trainer}</span>
                         </div>
-                        <div className="batch-status-pill">{batch.status}</div>
+                        <div className="batch-status-pill" style={{ 
+                          background: batch.status === 'Active' ? '#f0fdf4' : '#fff7ed',
+                          color: batch.status === 'Active' ? '#16a34a' : '#ea580c'
+                        }}>
+                          {batch.status}
+                        </div>
                       </div>
 
                       <div className="batch-item-details">
@@ -194,7 +199,7 @@ function BatchCreation() {
                             {batch.startDateTime ?
                               new Date(batch.startDateTime).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }) + ' at ' +
                               new Date(batch.startDateTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
-                              : "TBD"
+                              : (batch.name && batch.name.includes(' - ')) ? batch.name.split(' - ').pop() : "-"
                             }
                           </span>
                         </div>
@@ -202,6 +207,21 @@ function BatchCreation() {
                           <span className="label">Students</span>
                           <span className="value">{batch.enrolled || 0} / {batch.capacity} Seats</span>
                         </div>
+                        {batch.status !== 'Active' && (
+                          <div className="detail full-width" style={{ gridColumn: 'span 2', marginTop: '12px' }}>
+                            <button 
+                              className="start-batch-action-btn"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if(window.confirm("Start this batch now?")) {
+                                  startBatch(batch.id || batch.firebaseId);
+                                }
+                              }}
+                            >
+                              🚀 Start Batch Now
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}

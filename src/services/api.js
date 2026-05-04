@@ -5,8 +5,8 @@
  */
 
 const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-const rawApiUrl = import.meta.env.VITE_API_BASE_URL || 
-                 (isLocalhost ? 'http://localhost:5001' : 'https://infycode-application.onrender.com');
+const rawApiUrl = import.meta.env.VITE_API_BASE_URL ||
+  (isLocalhost ? 'http://localhost:5001' : 'https://infycode-application.onrender.com');
 const BASE_URL = rawApiUrl.endsWith('/') ? rawApiUrl.slice(0, -1) : rawApiUrl;
 
 console.log(`[API Service] Using BASE_URL: ${BASE_URL}`);
@@ -400,11 +400,11 @@ export const startBatchAPI = (firebaseId) => {
     headers: { Authorization: `Bearer ${user.token || ''}` },
   });
 };
- 
+
 // ─────────────────────────────────────────────
 // TRAINER APPLICATION WORKFLOW
 // ─────────────────────────────────────────────
- 
+
 /**
  * POST /api/trainer/apply (public)
  */
@@ -413,7 +413,7 @@ export const applyToBecomeTrainer = (formData) =>
     method: 'POST',
     body: JSON.stringify(formData),
   });
- 
+
 /**
  * PUT /api/admin/trainers/:id/status (protected)
  */
@@ -456,14 +456,14 @@ export const resetPassword = (token, newPassword, confirmPassword) =>
 export const verifyRegistrationOTP = (email, otp, role) =>
   request('/api/auth/verify-registration-otp', {
     method: 'POST',
-    body: JSON.stringify({ email, otp,  role }),
+    body: JSON.stringify({ email, otp, role }),
   });
 
 export const resendRegistrationOTP = (emailOrObj, role) => {
-  const payload = typeof emailOrObj === 'object' 
-    ? emailOrObj 
+  const payload = typeof emailOrObj === 'object'
+    ? emailOrObj
     : { email: emailOrObj, role };
-    
+
   return request('/api/auth/resend-registration-otp', {
     method: 'POST',
     body: JSON.stringify(payload),
@@ -541,6 +541,12 @@ export const getEnrolledCourses = () =>
   request('/api/student/enrolled-courses', {
     headers: getAuthHeader(),
   });
+
+export const getStudentBatchesAPI = () =>
+  request('/api/student/my-batches', {
+    headers: getAuthHeader(),
+  });
+
 
 
 // ─────────────────────────────────────────────

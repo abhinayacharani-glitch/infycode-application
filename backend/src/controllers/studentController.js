@@ -166,7 +166,7 @@ export const enrollInCourse = async (req, res) => {
     }
 
     const sanitizedEmail = email.trim().toLowerCase().replace(/\./g, ",");
-    
+
     // Add courseId to student's enrollment list
     await enrollmentsRef.child(sanitizedEmail).child(courseId).set({
       enrolledAt: new Date().toISOString(),
@@ -211,8 +211,123 @@ export const getEnrolledCourses = async (req, res) => {
   }
 };
 
+/**
+ * @desc  Get per-course batch + full trainer details for the logged-in student
+ * @route GET /api/student/my-batches
+ */
+export const getStudentBatches = async (req, res) => {
+  try {
+    const email = req.user?.email?.toLowerCase();
+    const idFromToken = req.user?.id;
+
+    // 1. Resolve student record
+    let studentData = null;
+    if (idFromToken) {
+      const snap = await studentsRef.child(idFromToken).once("value");
+      if (snap.exists()) studentData = { id: idFromToken, ...snap.val() };
+    }
+    if (!studentData && email) {
+      const allSnap = await studentsRef.once("value");
+      const all = allSnap.val() || {};
+      for (const key in all) {
+        if (all[key].email?.toLowerCase() === email) {
+          studentData = { id: key, ...all[key] };
+          break;
+        }
+      }
+    }
+    if (!studentData) {
+      return res.status(404).json({ success: false, message: "Student not found" });
+    }
+
+    // 2. Get batches map: { "Course Name": "batchFirebaseKey" }
+    const batchesMap = studentData.batches || {};
+    if (Object.keys(batchesMap).length === 0) {
+      return res.status(200).json({ success: true, batches: {} });
+    }
+
+    // 3. Fetch batch + trainer for each course
+    const batchesRef = db.ref("batch");
+    const trainersRef = db.ref("trainers");
+    const result = {};
+
+    for (const [courseName, batchKey] of Object.entries(batchesMap)) {
+      try {
+        // Try direct key lookup first (most reliable)
+        const directSnap = await batchesRef.child(batchKey).once("value");
+        let batchData = null;
+        if (directSnap.exists()) {
+          batchData = { firebaseKey: batchKey, ...directSnap.val() };
+        } else {
+          // Fallback: query by batchId field
+          const qSnap = await batchesRef.orderByChild("batchId").equalTo(batchKey).once("value");
+          if (qSnap.exists()) qSnap.forEach(c => { batchData = { firebaseKey: c.key, ...c.val() }; });
+        }
+        if (!batchData) continue;
+
+        // 4. Fetch full trainer profile
+        const trainerName = batchData.trainerName || batchData.trainer || "";
+        let trainerDetails = null;
+        if (trainerName) {
+          const tSnap = await trainersRef.orderByChild("fullName").equalTo(trainerName).once("value");
+          if (tSnap.exists()) {
+            tSnap.forEach(c => {
+              const t = c.val();
+              trainerDetails = {
+                name:           t.fullName || t.fullname || trainerName,
+                email:          t.email || "",
+                phone:          t.phone || t.mobile || "",
+                specialization: t.specialization || t.domain || "",
+                experience:     t.experience || "",
+                profileImage:   t.profileImage || ""
+              };
+            });
+          }
+          if (!trainerDetails) {
+            trainerDetails = { name: trainerName, email: "", phone: "", specialization: "", experience: "", profileImage: "" };
+          }
+        }
+
+        // 5. Extract start date/time
+        let startDate = "", startTime = "";
+        if (batchData.startDateTime) {
+          const d = new Date(batchData.startDateTime);
+          startDate = d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+          startTime = d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+        } else if (batchData.name && batchData.name.includes(" - ")) {
+          startDate = batchData.name.split(" - ").pop();
+        }
+
+        result[courseName] = {
+          batchId:       batchData.batchId || batchKey,
+          batchName:     batchData.name || courseName,
+          courseName:    batchData.courseName || batchData.course || courseName,
+          courseId:      batchData.courseId || "",
+          status:        batchData.status || "Scheduled",
+          startDateTime: batchData.startDateTime || "",
+          startDate,
+          startTime,
+          duration:      batchData.duration || "",
+          capacity:      batchData.capacity || 30,
+          enrolled:      batchData.enrolled || 0,
+          liveClassLink: batchData.liveClassLink || batchData.meetLink || "",
+          trainer:       trainerDetails
+        };
+      } catch (err) {
+        console.error(`[getStudentBatches] Error for "${courseName}":`, err.message);
+      }
+    }
+
+    return res.status(200).json({ success: true, batches: result });
+  } catch (error) {
+    console.error("[getStudentBatches] Error:", error.message);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
 export const getStudentProfile = async (req, res) => {
   try {
+
     const email = req.user?.email?.toLowerCase();
     const idFromToken = req.user?.id;
 
