@@ -9,7 +9,7 @@ function Achievements() {
   const sectionRef = useRef(null);
   const intervalRef = useRef(null);
 
-  const targetValues = [120, 17, 70, 50];
+  const targetValues = [7, 7, 6, 7];
 
   // ✅ AOS INIT
   useEffect(() => {
@@ -95,7 +95,7 @@ function Achievements() {
                   </svg>
                 </div>
                 <h4>
-                  <span className="cnumb">{counts[0]}</span>k+
+                  <span className="cnumb">{counts[0]}</span>
                 </h4>
                 <p>Our Happy Students</p>
               </div>
@@ -111,7 +111,7 @@ function Achievements() {
                   </svg>
                 </div>
                 <h4>
-                  <span className="cnumb">{counts[1]}</span>k+
+                  <span className="cnumb">{counts[1]}</span>
                 </h4>
                 <p>Enrolled Learners</p>
               </div>
@@ -128,7 +128,7 @@ function Achievements() {
                   </svg>
                 </div>
                 <h4>
-                  <span className="cnumb">{counts[2]}</span>k+
+                  <span className="cnumb">{counts[2]}</span>
                 </h4>
                 <p>Expert Instructor</p>
               </div>
@@ -144,7 +144,7 @@ function Achievements() {
                   </svg>
                 </div>
                 <h4>
-                  <span className="cnumb">{counts[3]}</span>k+
+                  <span className="cnumb">{counts[3]}</span>
                 </h4>
                 <p>Satisfaction Rate</p>
               </div>
