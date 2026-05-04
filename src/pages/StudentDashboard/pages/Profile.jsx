@@ -3,6 +3,7 @@ import { Edit2, Mail, Phone, MapPin, Award, BookOpen, CheckCircle, GraduationCap
 import { useNavigate, useLocation } from "react-router-dom";
 import "./Profile.css";
 import { getStudentProfile, updateStudentProfile, getEnrolledCourses, getMyResults } from "../../../services/api";
+import { useCourseContext } from "../../../context/CourseContext";
 
 const getCurrentTopic = (course) => {
   const allTopics = course.modules.flatMap(m => m.topics);
@@ -30,6 +31,7 @@ const Profile = () => {
   
   const [loading, setLoading] = useState(true);
   const [profileData, setProfileData] = useState(null);
+  const { publishedCourses } = useCourseContext();
   const [open, setOpen] = useState("personal");
   const [isEditing, setIsEditing] = useState(false);
   const [isEditingAcademic, setIsEditingAcademic] = useState(false);
@@ -53,7 +55,7 @@ const Profile = () => {
     fetchAll();
     const params = new URLSearchParams(location.search);
     if (params.get('edit') === 'true') { setIsEditing(true); setOpen("personal"); }
-  }, []);
+  }, [publishedCourses]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -95,22 +97,25 @@ const Profile = () => {
         const { ALL_COURSES } = await import('../../../components/Courses/Courses');
 
         const enrolled = [];
-        const seenTitles = new Set();
 
         enrolledIds.forEach(id => {
-          let course = null;
           if (COURSE_MAP[id]) {
-            course = COURSE_MAP[id];
+            enrolled.push(COURSE_MAP[id]);
           } else {
             const matchedAllCourse = ALL_COURSES.find(c => c.courseId === id);
             if (matchedAllCourse) {
-              course = Object.values(COURSE_MAP).find(c => c.title === matchedAllCourse.title);
+              const matchedMapCourse = Object.values(COURSE_MAP).find(c => c.title === matchedAllCourse.title);
+              if (matchedMapCourse) {
+                enrolled.push(matchedMapCourse);
+              } else {
+                enrolled.push({ ...matchedAllCourse, id: matchedAllCourse.courseId, modules: [] });
+              }
+            } else {
+              const matchedPublishedCourse = publishedCourses?.find(c => c.courseId === id);
+              if (matchedPublishedCourse) {
+                 enrolled.push({ ...matchedPublishedCourse, id: matchedPublishedCourse.courseId, modules: [] });
+              }
             }
-          }
-
-          if (course && !seenTitles.has(course.title)) {
-            enrolled.push(course);
-            seenTitles.add(course.title);
           }
         });
 
@@ -150,6 +155,7 @@ const Profile = () => {
       } catch (err) { console.error(err); }
     };
     reader.readAsDataURL(file);
+    e.target.value = null;
   };
 
   const handleRemovePhoto = async () => {
@@ -334,7 +340,7 @@ const Profile = () => {
             {personal.profileImage ? (
               <img src={personal.profileImage} alt="avatar" className="hero-avatar-img" />
             ) : (
-              <div className="hero-avatar-initials">{personal.fullName.charAt(0) || 'S'}</div>
+              <div className="hero-avatar-initials" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}><User size={40} /></div>
             )}
             <button className="hero-camera-btn" onClick={() => setShowPhotoMenu(!showPhotoMenu)} title="Change photo">
               <Camera size={14} />

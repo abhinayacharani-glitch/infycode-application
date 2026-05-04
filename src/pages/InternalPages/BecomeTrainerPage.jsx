@@ -235,11 +235,20 @@ const BecomeTrainerPage = () => {
                 onChange={handleInputChange}
               >
                 <option value="" disabled>Primary Expertise *</option>
-                <option value="Full Stack Development">Full Stack Development</option>
+                <option value="Java Full Stack">Java Full Stack</option>
+                <option value="Python Full Stack">Python Full Stack</option>
+                <option value="AWS Cloud Practitioner">AWS Cloud Practitioner</option>
+                <option value="Introduction to AI">Introduction to AI</option>
+                <option value="Aptitude">Aptitude</option>
                 <option value="Data Science & AI">Data Science & AI</option>
-                <option value="Cloud & DevOps">Cloud & DevOps</option>
-                <option value="Cyber Security">Cyber Security</option>
-                <option value="UI/UX Design">UI/UX Design</option>
+                <option value="Machine Learning Deep Dive">Machine Learning Deep Dive</option>
+                <option value="Ethical Hacking & Cyber Security">Ethical Hacking & Cyber Security</option>
+                <option value="React JS Full Stack Development">React JS Full Stack Development</option>
+                <option value="Next.js 14 Masterclass">Next.js 14 Masterclass</option>
+                <option value="MERN Stack Development">MERN Stack Development</option>
+                <option value="Angular Enterprise Development">Angular Enterprise Development</option>
+                <option value="Flutter Mobile Apps">Flutter Mobile Apps</option>
+                <option value="Full Stack Python Pro">Full Stack Python Pro</option>
               </select>
               <input 
                 type="text" 

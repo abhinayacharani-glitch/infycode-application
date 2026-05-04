@@ -424,8 +424,10 @@ export const updateStudentProfile = async (req, res) => {
     const sanitized = {};
     for (const key of ALLOWED) {
       const val = body[key];
-      // Only include truthy strings (skip null, undefined, empty string)
-      if (val !== undefined && val !== null && val !== "") {
+      // Allow clearing profileImage
+      if (key === 'profileImage' && (val === null || val === "")) {
+        sanitized[key] = null; // Firebase removes keys set to null
+      } else if (val !== undefined && val !== null && val !== "") {
         sanitized[key] = val;
       }
     }
