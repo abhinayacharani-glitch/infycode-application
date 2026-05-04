@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { enrollInCourse, getEnrolledCourses } from "../../../services/api";
 import { ALL_COURSES as ORIGINAL_COURSES } from "../../../components/Courses/Courses";
 import { useCourseContext } from "../../../context/CourseContext";
+import { getCourseImage } from "../../../utils/courseUtils";
 import "./Course.css";
 
 // Swap "Ethical Hacking & Cyber Security" and "AWS Cloud Practitioner" for dashboard UI
@@ -65,7 +66,7 @@ const CourseCardModern = ({ course, index, onNavigate, enrolledIds }) => {
       whileHover={{ y: -10 }}
     >
       <div className="card-img-banner">
-        <img src={course.image || 'https://via.placeholder.com/400x200?text=Course'} alt={course.title} />
+        <img src={getCourseImage(course)} alt={course.title} />
       </div>
 
       <div className="card-content-modern">
@@ -77,11 +78,11 @@ const CourseCardModern = ({ course, index, onNavigate, enrolledIds }) => {
           </div>
           <div className="stat stars-container">
             {[...Array(5)].map((_, idx) => (
-              <Star 
-                key={idx} 
-                size={14} 
-                fill={idx < Math.floor(course.rating) ? "#f59e0b" : "#e2e8f0"} 
-                color={idx < Math.floor(course.rating) ? "#f59e0b" : "#e2e8f0"} 
+              <Star
+                key={idx}
+                size={14}
+                fill={idx < Math.floor(course.rating) ? "#f59e0b" : "#e2e8f0"}
+                color={idx < Math.floor(course.rating) ? "#f59e0b" : "#e2e8f0"}
                 strokeWidth={0}
               />
             ))}
@@ -91,8 +92,8 @@ const CourseCardModern = ({ course, index, onNavigate, enrolledIds }) => {
         <div className="card-footer-modern">
           <div className="footer-actions-left">
             <div className="details-action-wrapper">
-              <button 
-                className="btn-view-details" 
+              <button
+                className="btn-view-details"
                 onClick={() => onNavigate(`/course-details/${course.courseId}`)}
                 title="View Course Details"
               >
@@ -101,15 +102,15 @@ const CourseCardModern = ({ course, index, onNavigate, enrolledIds }) => {
               <span className="action-label">Overview</span>
             </div>
           </div>
-          <button 
-            className={`btn-join-now ${isEnrolled ? 'enrolled' : ''}`} 
+          <button
+            className={`btn-join-now ${isEnrolled ? 'enrolled' : ''}`}
             onClick={isDisabledCard || isEnrolled || loading ? undefined : handleEnroll}
             disabled={isDisabledCard || isEnrolled || loading}
             style={
-              isDisabledCard 
-                ? { cursor: 'not-allowed', opacity: 0.7 } 
-                : isEnrolled 
-                  ? { backgroundColor: '#10b981', cursor: 'default' } 
+              isDisabledCard
+                ? { cursor: 'not-allowed', opacity: 0.7 }
+                : isEnrolled
+                  ? { backgroundColor: '#10b981', cursor: 'default' }
                   : {}
             }
           >
@@ -130,11 +131,11 @@ const CourseSection = ({ title, courses, onNavigate, enrolledIds }) => {
       </div>
       <div className="dc-catalog-grid">
         {courses.map((course, index) => (
-          <CourseCardModern 
-            key={course.courseId} 
-            course={course} 
-            index={index} 
-            onNavigate={onNavigate} 
+          <CourseCardModern
+            key={course.courseId}
+            course={course}
+            index={index}
+            onNavigate={onNavigate}
             enrolledIds={enrolledIds}
           />
         ))}
@@ -178,7 +179,7 @@ const CourseDiscovery = () => {
 
   // Categorize courses (if not searching)
   const isFiltering = searchTerm !== "" || activeCategory !== "All";
-  
+
   const sections = [
     ...(publishedCourses.length > 0 ? [{ title: "New Published Courses", courses: publishedCourses }] : []),
     { title: "Popular Courses", courses: ALL_COURSES.slice(0, 4) },
@@ -188,12 +189,17 @@ const CourseDiscovery = () => {
 
   return (
     <div className="dc-main-viewport">
-      <div className="dc-controls-wrapper" style={{ marginBottom: '40px' }}>
+      <header className="page-header-centered">
+        <h2>Course Catalog</h2>
+        <p>Explore our wide range of professional courses and start your learning journey today.</p>
+      </header>
+
+      <div className="dc-controls-wrapper">
         <div className="dc-search-bar">
           <Search size={20} color="#94a3b8" />
-          <input 
-            type="text" 
-            placeholder="Search for courses (e.g. React, Java...)" 
+          <input
+            type="text"
+            placeholder="Search for courses (e.g. React, Java...)"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -201,8 +207,8 @@ const CourseDiscovery = () => {
 
         <div className="dc-categories-bar">
           {CATEGORIES.map(cat => (
-            <button 
-              key={cat} 
+            <button
+              key={cat}
               className={`dc-cat-btn ${activeCategory === cat ? 'active' : ''}`}
               onClick={() => setActiveCategory(cat)}
             >
@@ -212,21 +218,21 @@ const CourseDiscovery = () => {
         </div>
       </div>
 
-      <div className="dc-content-sections" style={{ maxWidth: '1200px', margin: '0 auto' }}>
+      <div className="dc-content-sections">
         {isFiltering ? (
-          <CourseSection 
-            title={searchTerm ? `Search Results for "${searchTerm}"` : `Filtered Courses: ${activeCategory}`} 
-            courses={filtered} 
-            onNavigate={handleNavigate} 
+          <CourseSection
+            title={searchTerm ? `Search Results for "${searchTerm}"` : `Filtered Courses: ${activeCategory}`}
+            courses={filtered}
+            onNavigate={handleNavigate}
             enrolledIds={enrolledIds}
           />
         ) : (
           sections.map((sec, idx) => (
-            <CourseSection 
-              key={idx} 
-              title={sec.title} 
-              courses={sec.courses} 
-              onNavigate={handleNavigate} 
+            <CourseSection
+              key={idx}
+              title={sec.title}
+              courses={sec.courses}
+              onNavigate={handleNavigate}
               enrolledIds={enrolledIds}
             />
           ))

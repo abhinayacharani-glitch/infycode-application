@@ -17,7 +17,8 @@ import {
   Users,
   Calendar,
   Upload,
-  Trash2
+  Trash2,
+  Lock
 } from 'lucide-react';
 import './Profile.css';
 
@@ -334,16 +335,25 @@ const Profile = () => {
           <h2 className="details-title-saas">Personal Information</h2>
           <div className="info-list-items">
             <div className="info-item-saas">
-              <div className="item-label-saas"><User size={14} /> Full Name</div>
-              <div className="value-box-saas read-only-info">{displayName}</div>
+              <div className="item-label-saas">
+                <div className="label-with-icon"><User size={14} /> Full Name</div>
+                <span className="locked-badge"><Lock size={10} /> Verified</span>
+              </div>
+              <div className="value-box-saas locked-field">{displayName}</div>
             </div>
             <div className="info-item-saas">
-              <div className="item-label-saas"><Mail size={14} /> Email</div>
-              <div className="value-box-saas text-blue read-only-info">{safeData.email || ""}</div>
+              <div className="item-label-saas">
+                <div className="label-with-icon"><Mail size={14} /> Email</div>
+                <span className="locked-badge"><Lock size={10} /> Verified</span>
+              </div>
+              <div className="value-box-saas text-blue locked-field">{safeData.email || ""}</div>
             </div>
             <div className="info-item-saas">
-              <div className="item-label-saas"><Phone size={14} /> Phone</div>
-              <div className="value-box-saas read-only-info">{safeData.phone || safeData.phno || ""}</div>
+              <div className="item-label-saas">
+                <div className="label-with-icon"><Phone size={14} /> Phone</div>
+                <span className="locked-badge"><Lock size={10} /> Verified</span>
+              </div>
+              <div className="value-box-saas locked-field">{safeData.phone || safeData.phno || ""}</div>
             </div>
             <div className="info-item-saas">
               <div className="item-label-saas"><MapPin size={14} /> Location</div>

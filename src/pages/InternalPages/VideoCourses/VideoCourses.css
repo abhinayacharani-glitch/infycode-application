@@ -4,6 +4,35 @@
    ========================================= */
 
 /* Layout & Container */
+.courses-page {
+    position: relative;
+}
+
+.back-btn {
+    position: absolute;
+    top: 20px;
+    left: 5%;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    padding: 8px 16px;
+    border-radius: 50px;
+    color: #1e293b;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.back-btn:hover {
+    background: #f8fafc;
+    transform: translateX(-4px);
+    border-color: #cbd5e1;
+}
+
 .vc-centered-container {
     max-width: 1000px;
     margin: 0 auto;

@@ -16,14 +16,14 @@ const TrainerApproval = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'Applied': return '#64748b';
-      case 'Screening': return '#3b82f6';
-      case 'Interview': return '#f59e0b';
-      case 'Selected': return '#10b981';
-      case 'Onboarded': return '#8b5cf6';
-      case 'Hold': return '#ef4444';
-      case 'Rejected': return '#e11d48';
-      default: return '#ccc';
+      case 'Applied': return '#64748b'; // Slate
+      case 'Screening': return '#2563eb'; // Deep Blue
+      case 'Interview': return '#7c3aed'; // Deep Purple
+      case 'Selected': return '#059669'; // Emerald
+      case 'Onboarded': return '#4338ca'; // Indigo
+      case 'Hold': return '#d97706'; // Amber
+      case 'Rejected': return '#dc2626'; // Red
+      default: return '#94a3b8';
     }
   };
 
@@ -70,9 +70,9 @@ const TrainerApproval = () => {
                 >
                   {/* Left Side: Info & Pipeline */}
                   <div style={{ flex: '1', minWidth: '400px' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '16px' }}>
-                      <span style={{ fontWeight: '600', fontSize: '16px', color: '#0f172a' }}>{trainer.name}</span>
-                      <span style={{ fontSize: '13px', color: '#64748b' }}>{trainer.specialty}</span>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '16px' }}>
+                      <span style={{ fontWeight: '800', fontSize: '18px', color: '#1e293b', letterSpacing: '-0.3px' }}>{trainer.name}</span>
+                      <span style={{ fontSize: '14px', fontWeight: '600', color: '#64748b' }}>{trainer.specialty}</span>
                     </div>
                     
                     <div style={{ position: 'relative', width: '380px' }}>
@@ -113,14 +113,17 @@ const TrainerApproval = () => {
                   </div>
 
                   {/* Middle: Status Badge */}
-                  <div style={{ padding: '0 24px', display: 'flex', justifyContent: 'center', minWidth: '120px' }}>
+                  <div style={{ padding: '0 24px', display: 'flex', justifyContent: 'center', minWidth: '140px' }}>
                     <span className="badge" style={{
-                      background: getStatusColor(trainer.status) + '15',
+                      background: getStatusColor(trainer.status) + '12',
                       color: getStatusColor(trainer.status),
-                      border: `1px solid ${getStatusColor(trainer.status)}`,
-                      padding: '6px 12px',
-                      borderRadius: '16px',
-                      fontWeight: '600'
+                      border: `1.5px solid ${getStatusColor(trainer.status)}`,
+                      padding: '8px 16px',
+                      borderRadius: '12px',
+                      fontWeight: '800',
+                      fontSize: '12px',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px'
                     }}>{trainer.status}</span>
                   </div>
 
@@ -165,8 +168,8 @@ const TrainerApproval = () => {
           }} onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '32px' }}>
               <div>
-                <h3 style={{ margin: 0, color: '#0f172a', fontSize: '20px' }}>Recruitment Workflow: {viewingTrainer.name}</h3>
-                <p style={{ margin: '4px 0 0 0', color: '#64748b', fontSize: '14px' }}>Move trainer through hiring stages</p>
+                <h3 style={{ margin: 0, color: '#1e293b', fontSize: '24px', fontWeight: '800' }}>Recruitment Workflow: {viewingTrainer.name}</h3>
+                <p style={{ margin: '6px 0 0 0', color: '#64748b', fontSize: '15px', fontWeight: '600' }}>Move trainer through hiring stages professionally</p>
               </div>
               <button
                 onClick={() => setViewingTrainerId(null)}
@@ -217,13 +220,13 @@ const TrainerApproval = () => {
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
-              <div style={{ background: '#f8fafc', padding: '24px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                <h4 style={{ margin: '0 0 16px 0', color: '#0f172a', fontSize: '16px' }}>Application Summary</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr', gap: '16px', fontSize: '14px', alignItems: 'center' }}>
-                  <div style={{ color: '#64748b', fontWeight: '500' }}>Experience:</div><div style={{ color: '#0f172a' }}>{viewingTrainer.experience} Years</div>
-                  <div style={{ color: '#64748b', fontWeight: '500' }}>Skills:</div><div style={{ color: '#0f172a' }}>{viewingTrainer.specialty}</div>
-                  <div style={{ color: '#64748b', fontWeight: '500' }}>Location:</div><div style={{ color: '#0f172a' }}>{viewingTrainer.location || 'Not provided'}</div>
-                  <div style={{ color: '#64748b', fontWeight: '500' }}>Resume:</div>
+              <div style={{ background: '#f8fafc', padding: '24px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                <h4 style={{ margin: '0 0 20px 0', color: '#1e293b', fontSize: '18px', fontWeight: '800' }}>Application Summary</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '20px', fontSize: '15px', alignItems: 'center' }}>
+                  <div style={{ color: '#64748b', fontWeight: '700' }}>Experience:</div><div style={{ color: '#1e293b', fontWeight: '600' }}>{viewingTrainer.experience} Years</div>
+                  <div style={{ color: '#64748b', fontWeight: '700' }}>Skills:</div><div style={{ color: '#1e293b', fontWeight: '600' }}>{viewingTrainer.specialty}</div>
+                  <div style={{ color: '#64748b', fontWeight: '700' }}>Location:</div><div style={{ color: '#1e293b', fontWeight: '600' }}>{viewingTrainer.location || 'Not provided'}</div>
+                  <div style={{ color: '#64748b', fontWeight: '700' }}>Resume:</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     {viewingTrainer.resume ? (
                       <>

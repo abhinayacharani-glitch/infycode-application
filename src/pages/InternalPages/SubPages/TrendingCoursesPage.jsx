@@ -1,35 +1,8 @@
 import React, { useEffect } from 'react';
-import './TrendingCoursesPage.css';
-
-const courses = [
-  {
-    id: 1,
-    title: "Generative AI Foundations",
-    desc: "Learn the fundamentals of LLMs, prompt engineering, and building AI-powered apps with LangChain.",
-    img: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=800",
-    tag: "Trending #1",
-    hours: "40 Hours",
-    students: "5.8k+"
-  },
-  {
-    id: 2,
-    title: "Blockchain & Web3 Engineering",
-    desc: "Master smart contract development with Solidity, Hardhat, and decentralized app architectures.",
-    img: "https://images.unsplash.com/photo-1639322537228-f710d846310a?auto=format&fit=crop&q=80&w=800",
-    tag: "Trending #2",
-    hours: "65 Hours",
-    students: "2.4k+"
-  },
-  {
-    id: 3,
-    title: "Advanced Cyber Security",
-    desc: "Defend against modern threats. Learn penetration testing, cryptography, and network defense.",
-    img: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800",
-    tag: "Trending #3",
-    hours: "85 Hours",
-    students: "1.9k+"
-  }
-];
+import { useCourseContext } from '../../../context/CourseContext';
+import { useNavigate } from 'react-router-dom';
+import { ALL_COURSES } from '../../../components/Courses/Courses';
+import { ArrowLeft } from 'lucide-react';
 
 // ✅ SVG Icons
 const ClockIcon = () => (
@@ -51,10 +24,15 @@ const UsersIcon = () => (
   </svg>
 );
 
-import { useNavigate } from 'react-router-dom';
-
 const TrendingCoursesPage = () => {
   const navigate = useNavigate();
+  const { publishedCourses } = useCourseContext();
+
+  const combinedCourses = [...publishedCourses, ...ALL_COURSES];
+  const trendingCourses = combinedCourses.filter(course => {
+    const badge = course.badge?.toLowerCase();
+    return badge === "trending" || badge === "hot" || badge === "new";
+  });
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -79,6 +57,10 @@ const TrendingCoursesPage = () => {
 
   return (
     <div className="trending-page">
+      <button className="modern-back-btn" onClick={() => navigate("/")}>
+        <ArrowLeft size={18} />
+        <span>Back</span>
+      </button>
       <div
         className="trending-hero"
         style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&q=80&w=1920)' }}
@@ -91,30 +73,34 @@ const TrendingCoursesPage = () => {
 
       <div className="trending-section">
         <div className="trending-course-grid">
-          {courses.map((course) => (
-            <div className="trending-course-card" key={course.id}>
-              <img src={course.img} alt={course.title} className="trending-course-img" />
-              <div className="trending-course-info">
-                <span className="trending-course-tag">{course.tag}</span>
-                <h3>{course.title}</h3>
-                <p>{course.desc}</p>
+          {trendingCourses.length > 0 ? (
+            trendingCourses.map((course, index) => (
+              <div className="trending-course-card" key={course.id || course.courseId || index}>
+                <img src={course.image || course.img} alt={course.title} className="trending-course-img" />
+                <div className="trending-course-info">
+                  <span className="trending-course-tag">{course.badge}</span>
+                  <h3>{course.title}</h3>
+                  <p>{course.description || course.desc}</p>
 
-                <div className="trending-course-meta">
+                  <div className="trending-course-meta">
 
-                  <span className="meta-item">
-                    <ClockIcon /> {course.hours}
-                  </span>
+                    <span className="meta-item">
+                      <ClockIcon /> {course.duration || course.hours}
+                    </span>
 
-                  <span className="meta-item">
-                    <UsersIcon /> {course.students}
-                  </span>
+                    <span className="meta-item">
+                      <UsersIcon /> {course.students}
+                    </span>
 
-                  <button className="trending-enroll-btn" onClick={handleEnroll}>Enroll Now</button>
+                    <button className="trending-enroll-btn" onClick={handleEnroll}>Enroll Now</button>
+                  </div>
+
                 </div>
-
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <div className="no-courses-msg">No trending courses available at the moment.</div>
+          )}
         </div>
       </div>
     </div>

@@ -56,10 +56,14 @@ export const TrainerProvider = ({ children }) => {
     setTrainerData(prev => {
       const updated = { ...prev, ...(newData || {}) };
       
-      if (newImage) {
+      if (newImage !== undefined) {
         updated.profileImage = newImage;
         setProfileImage(newImage);
-        localStorage.setItem('trainerProfileImage', newImage);
+        if (newImage) {
+          localStorage.setItem('trainerProfileImage', newImage);
+        } else {
+          localStorage.removeItem('trainerProfileImage');
+        }
       }
       
       // Ensure we keep the token from the existing storage if it's not in updated
@@ -72,7 +76,7 @@ export const TrainerProvider = ({ children }) => {
 
     try {
       const payload = { ...(newData || {}) };
-      if (newImage) payload.profileImage = newImage;
+      if (newImage !== undefined) payload.profileImage = newImage;
       
       const response = await updateTrainerProfileAPI(payload);
       if (response.success && response.profile) {

@@ -1,12 +1,28 @@
-/* ===========================
-   COURSE OVERVIEW PAGE — REDESIGNED
-   =========================== */
+/* ============================================================
+   COURSE OVERVIEW PAGE — MODERN DASHBOARD REDESIGN
+   ============================================================ */
+:root {
+  --co-bg: #f8fafc;
+  --co-card-bg: #ffffff;
+  --co-primary: #2563eb;
+  --co-primary-gradient: linear-gradient(135deg, #4f46e5, #2563eb);
+  --co-secondary-bg: #f1f5f9;
+  --co-text-main: #0f172a;
+  --co-text-muted: #64748b;
+  --co-border: #e2e8f0;
+  --co-shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --co-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --co-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
 .course-overview-page {
-  padding-bottom: 60px;
-  background: #f8fafc;
-  min-height: 100%;
+  padding: 24px 32px 60px;
+  background: var(--co-bg);
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
+  gap: 24px;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 /* Back Button */
@@ -16,500 +32,441 @@
   gap: 8px;
   background: transparent;
   border: none;
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  color: #64748b;
+  color: var(--co-text-muted);
   cursor: pointer;
-  padding: 20px 36px 0;
+  padding: 0;
   width: fit-content;
-  transition: color 0.2s;
+  transition: all 0.2s ease;
 }
-.co-back-btn:hover { color: var(--primary); }
 
-/* Hero */
+.co-back-btn:hover {
+  color: var(--co-primary);
+  transform: translateX(-4px);
+}
+
+/* Header / Hero Section Card */
 .co-hero {
-  padding: 28px 36px 36px;
-  background: white;
-  border-bottom: 1px solid #e2e8f0;
+  position: relative;
+  background: var(--co-card-bg);
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: var(--co-shadow-md);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border: 1px solid var(--co-border);
+  overflow: hidden; /* For the background image */
 }
-.co-hero-left { flex: 1; }
 
+.co-hero-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.co-hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.15; /* Subtle background presence */
+}
+
+.co-hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(255,255,255,1) 30%, rgba(255,255,255,0.7) 100%);
+}
+
+.co-hero-left {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.co-level-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--co-primary);
+  background: #eff6ff;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+  letter-spacing: 0.5px;
+}
+
+.co-hero-title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: var(--co-text-main);
+  margin: 0 0 12px;
+  letter-spacing: -0.02em;
+}
+
+.co-subtitle {
+  font-size: 1rem;
+  color: var(--co-text-muted);
+  max-width: 600px;
+  line-height: 1.5;
+}
+
+/* Action Panel (Right Side of Hero) */
 .co-hero-right {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 10px;
+  gap: 12px;
+  min-width: 280px;
+  position: relative;
+  z-index: 1;
 }
 
-.co-session-notice {
-  display: flex;
+.session-status-badge {
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  max-width: 360px;
-  padding: 10px 12px;
-  border-radius: 10px;
   font-size: 0.85rem;
-  font-weight: 600;
-  animation: slide-down 0.3s ease-in-out;
-  transition: all 0.3s ease;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 12px;
+  width: 100%;
+  justify-content: center;
+  background: var(--co-secondary-bg);
+  border: 1px solid var(--co-border);
 }
 
-.co-session-notice.info {
-  background: #eaf2ff;
-  border: 1px solid #c6dbff;
-  color: #1d4ed8;
-}
-
-.co-session-notice.success {
-  background: #e8f8ef;
-  border: 1px solid #b7e7c6;
-  color: #166534;
-}
-
-.co-session-notice.cancelled {
-  background: #ffe6e6;
-  border: 1px solid #f5b7b7;
-  color: #991b1b;
-}
-
-.co-notice-icon {
-  flex-shrink: 0;
+.session-status-badge.status-live {
+  background: #f0fdf4;
+  color: #16a34a;
+  border-color: #bbf7d0;
 }
 
 .co-day-status-list {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .co-day-status-row {
-  width: 100%;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
-  border-radius: 8px;
+  padding: 8px 12px;
+  background: var(--co-secondary-bg);
+  border-radius: 10px;
   font-size: 0.8rem;
-  border: 1px solid #e2e8f0;
-  transition: all 0.3s ease;
-  animation: slide-down 0.3s ease-in-out;
+  font-weight: 600;
+  color: var(--co-text-main);
+  border: 1px solid var(--co-border);
 }
 
 .co-day-status-row.live {
   background: #f0fdf4;
-  border-color: #bbf7d0;
-  color: #166534;
-}
-
-.co-day-status-row.upcoming {
-  background: #eff6ff;
-  border-color: #bfdbfe;
-  color: #1d4ed8;
-}
-
-.co-day-status-row.completed {
-  background: #f8fafc;
-  border-color: #e2e8f0;
-  color: #475569;
-}
-
-.co-day-status-row.cancelled {
-  background: #fef2f2;
-  border-color: #fecaca;
-  color: #991b1b;
-}
-
-.co-day-name {
-  font-weight: 700;
-}
-
-.co-day-value {
-  text-align: right;
-}
-
-/* Session Status Badge */
-.session-status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.82rem;
-  font-weight: 700;
-  padding: 5px 12px;
-  border-radius: 20px;
-}
-
-.session-status-badge.status-live {
-  background: #f0fdf4;
   color: #16a34a;
-  border: 1px solid #bbf7d0;
+  border-color: #bbf7d0;
 }
 
-.session-status-badge.status-upcoming {
-  background: #fefce8;
-  color: #92400e;
-  border: 1px solid #fde68a;
-}
-
-.session-status-badge.status-ended {
-  background: #fef2f2;
-  color: #991b1b;
-  border: 1px solid #fecaca;
-}
-
-.session-status-badge.status-none {
-  background: #f8fafc;
-  color: #64748b;
-  border: 1px solid #e2e8f0;
-}
-
-/* Join Button — Active */
 .co-join-btn {
+  width: 100%;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
-  padding: 12px 24px;
-  background: #f0f9ff;
-  color: #0369a1;
-  border: 1px solid #bae6fd;
-  border-radius: 10px;
-  font-size: 0.95rem;
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s ease-in-out;
-}
-.co-join-btn:hover:not(:disabled) {
-  background: #e0f2fe;
-  transform: scale(1.03);
-  box-shadow: 0 4px 12px rgba(3,105,161,0.15);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
 }
 
-/* Join Button — Disabled */
-.co-join-btn.disabled,
-.co-join-btn:disabled {
-  background: #f1f5f9;
-  color: #94a3b8;
-  border-color: #e2e8f0;
+.co-join-btn:not(.disabled) {
+  background: var(--co-primary-gradient);
+  color: white;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.co-join-btn:not(.disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+}
+
+.co-join-btn.disabled {
+  background: var(--co-secondary-bg);
+  color: var(--co-text-muted);
   cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
+  border: 1px solid var(--co-border);
 }
 
-/* Status Dots */
-.co-join-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-}
-
-.co-join-dot.live {
-  background: #22c55e;
-  animation: pulse-green 1.5s infinite;
-}
-
-.co-join-dot.inactive {
-  background: #94a3b8;
-}
-
-@keyframes pulse-green {
-  0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
-  70% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
-}
-
-@keyframes pulse {
-  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-  70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-}
-
-@keyframes slide-down {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ─── Premium Cards Row (Trainer & Batch) ─── */
+/* ─── Information Cards Layout ─── */
 .co-info-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
-  padding: 30px 40px;
-  background: #ffffff;
 }
 
 .co-info-card {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 24px 28px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.02);
+  background: var(--co-card-bg);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: var(--co-shadow-md);
+  border: 1px solid var(--co-border);
   display: flex;
   flex-direction: column;
+  gap: 20px;
+  transition: transform 0.3s ease;
+}
+
+.co-info-card:hover {
+  transform: translateY(-4px);
 }
 
 .co-info-header {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 24px;
 }
 
 .co-info-header h2 {
-  font-size: 1.05rem;
+  font-size: 1.25rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--co-text-main);
   margin: 0;
 }
 
 .co-header-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-.co-header-icon.trainer {
   background: #eff6ff;
-  color: #3b82f6;
-}
-.co-header-icon.batch {
-  background: #ecfdf5;
-  color: #10b981;
+  color: var(--co-primary);
 }
 
+/* Trainer Specific */
 .co-trainer-main-pill {
   display: flex;
   align-items: center;
-  gap: 16px;
-  background: #f8fafc;
-  padding: 18px 20px;
-  border-radius: 10px;
-  margin-bottom: 12px;
-  border: 1px solid #f1f5f9;
+  gap: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--co-border);
 }
 
 .co-trainer-avatar-blue {
-  width: 44px;
-  height: 44px;
-  background: #3b82f6;
+  width: 64px;
+  height: 64px;
+  background: var(--co-primary-gradient);
   color: white;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 1.15rem;
-}
-
-.co-trainer-text {
-  display: flex;
-  flex-direction: column;
+  font-size: 1.5rem;
+  font-weight: 800;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
 }
 
 .co-t-name {
-  font-size: 0.95rem;
+  font-size: 1.1rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--co-text-main);
 }
 
 .co-t-role {
-  font-size: 0.8rem;
-  color: #64748b;
+  font-size: 0.9rem;
+  color: var(--co-text-muted);
   margin-top: 4px;
-  font-weight: 500;
 }
 
 .co-trainer-stats-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 16px;
 }
 
 .co-stat-pill, .co-batch-pill {
-  background: #f8fafc;
-  padding: 16px 20px;
-  border-radius: 10px;
-  border: 1px solid #f1f5f9;
+  background: var(--co-secondary-bg);
+  padding: 16px;
+  border-radius: 12px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  height: auto;
+  border: 1px solid var(--co-border);
 }
 
 .co-pill-label {
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: #64748b;
-  letter-spacing: 0.5px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--co-text-muted);
   text-transform: uppercase;
+  letter-spacing: 0.5px;
   display: flex;
   align-items: center;
-  gap: 8px;
-}
-
-.co-pill-label svg {
-  color: #94a3b8;
+  gap: 6px;
 }
 
 .co-pill-value {
-  font-size: 0.92rem;
+  font-size: 0.95rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--co-text-main);
 }
 
+/* Batch Grid */
 .co-batch-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 16px;
 }
 
-@media (max-width: 768px) {
-  .co-hero { flex-direction: column; align-items: flex-start; gap: 20px; }
-  .co-info-layout { grid-template-columns: 1fr; padding: 24px; }
-  .co-benefits-grid { grid-template-columns: 1fr; }
-}
-
-/* Course Objective */
+/* Course Objective Section */
 .co-objective-section {
-  background: white;
-  padding: 28px 36px;
-  margin-top: 20px;
-  border-top: 1px solid #e2e8f0;
-  border-bottom: 1px solid #e2e8f0;
-}
-.co-section-label {
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  color: #94a3b8;
-  margin-bottom: 10px;
-}
-.co-objective-text {
-  font-size: 0.95rem;
-  color: #475569;
-  line-height: 1.75;
-  max-width: 900px;
-  margin: 0 0 24px;
+  background: var(--co-card-bg);
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: var(--co-shadow-md);
+  border: 1px solid var(--co-border);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
-/* Benefits Grid */
+.co-section-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--co-primary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.co-objective-text {
+  font-size: 1.05rem;
+  color: #475569;
+  line-height: 1.8;
+  margin: 0;
+}
+
+/* Features Grid */
 .co-benefits-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  max-width: 700px;
-}
-.co-benefit-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 14px 16px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-}
-.co-benefit-icon {
-  font-size: 1.4rem;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-.co-benefit-label {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: #1e293b;
-  margin-bottom: 2px;
-}
-.co-benefit-desc {
-  font-size: 0.8rem;
-  color: #64748b;
-  line-height: 1.4;
+  gap: 16px;
 }
 
-/* CTA Button */
-.co-cta-section {
-  padding: 28px 36px 0;
-}
-.co-start-btn {
-  display: inline-flex;
+.co-benefit-item {
+  display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 14px 32px;
-  background: var(--primary);
-  color: white;
-  border: none;
+  gap: 16px;
+  padding: 20px;
+  background: var(--co-secondary-bg);
   border-radius: 12px;
+  border: 1px solid var(--co-border);
+  transition: all 0.2s ease;
+}
+
+.co-benefit-item:hover {
+  background: #ffffff;
+  border-color: var(--co-primary);
+  transform: scale(1.02);
+}
+
+.co-benefit-icon {
+  width: 44px;
+  height: 44px;
+  background: #ffffff;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--co-primary);
+  box-shadow: var(--co-shadow-sm);
+}
+
+.co-benefit-label {
   font-size: 1rem;
   font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+  color: var(--co-text-main);
 }
+
+.co-benefit-desc {
+  font-size: 0.85rem;
+  color: var(--co-text-muted);
+  margin-top: 2px;
+}
+
+/* Start Learning Button */
+.co-cta-section {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.co-start-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 40px;
+  background: var(--co-primary-gradient);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.3);
+}
+
 .co-start-btn:hover {
-  background: var(--primary-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 30px -10px rgba(37, 99, 235, 0.4), 0 0 15px rgba(37, 99, 235, 0.2);
+}
+
+/* Responsiveness */
+@media (max-width: 1024px) {
+  .co-info-layout {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 768px) {
-  .co-cards-row { grid-template-columns: 1fr; }
-  .co-benefits-grid { grid-template-columns: 1fr; }
+  .course-overview-page {
+    padding: 20px;
+  }
+  .co-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+  }
+  .co-hero-right {
+    width: 100%;
+    align-items: flex-start;
+  }
+  .co-benefits-grid {
+    grid-template-columns: 1fr;
+  }
+  .co-hero-title {
+    font-size: 1.75rem;
+  }
 }
 
-/* ─── Trainer Card Redesign ─── */
-.co-trainer-info { flex: 1; }
-
-.co-trainer-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 8px;
-}
-.co-trainer-tag {
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  background: #eff6ff;
-  color: #2563eb;
-  border: 1px solid #bfdbfe;
-  letter-spacing: 0.3px;
-}
-.co-trainer-tag.co-trainer-tag-green {
-  background: #f0fdf4;
-  color: #16a34a;
-  border-color: #bbf7d0;
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.co-trainer-stats {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding-top: 16px;
-  margin-top: 16px;
-  border-top: 1px solid #e2e8f0;
+.co-info-card, .co-hero, .co-objective-section {
+  animation: fadeIn 0.5s ease-out both;
 }
-.co-trainer-stat {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.85rem;
-  color: #475569;
-  font-weight: 500;
-}
-.co-trainer-stat span { line-height: 1.4; }
-
-/* ─── Benefit Icon Color ─── */
-.co-benefit-icon svg { color: var(--primary); }

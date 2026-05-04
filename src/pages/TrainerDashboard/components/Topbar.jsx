@@ -343,11 +343,19 @@ const Topbar = () => {
 
         {/* ════ USER PROFILE ════ */}
         <div className="tb-user-profile-new" ref={userMenuRef} onClick={() => setShowUserMenu(!showUserMenu)}>
-          <img src={profileImage || 'https://i.pravatar.cc/150?img=5'} alt={userName} className="tb-user-avatar-new" />
+          {profileImage ? (
+            <img src={profileImage} alt={userName} className="tb-user-avatar-new" />
+          ) : (
+            <div className="tb-avatar-initial">{userInitial}</div>
+          )}
           {showUserMenu && (
             <div className="tb-user-dropdown">
               <div className="tb-user-dropdown-header">
-                <img src={profileImage || 'https://i.pravatar.cc/150?img=5'} alt={userName} className="tb-udrop-avatar" />
+                {profileImage ? (
+                  <img src={profileImage} alt={userName} className="tb-udrop-avatar" />
+                ) : (
+                  <div className="tb-udrop-avatar tb-avatar-initial-small">{userInitial}</div>
+                )}
                 <div>
                   <div className="tb-udrop-name">{userName}</div>
                   <div className="tb-udrop-role">{role}</div>
@@ -389,7 +397,9 @@ const Topbar = () => {
                 <div className="logout-modal-avatar">
                   {profileImage ? (
                     <img src={profileImage} alt="Profile" className="tb-user-avatar-new" style={{ width: '100%', height: '100%', borderRadius: '50%' }} />
-                  ) : userInitial}
+                  ) : (
+                    <div className="tb-avatar-initial-modal">{userInitial}</div>
+                  )}
                 </div>
                 <h3>{userName}</h3>
               </div>

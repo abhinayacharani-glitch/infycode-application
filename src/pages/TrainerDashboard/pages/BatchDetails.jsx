@@ -233,25 +233,25 @@ const BatchDetails = () => {
   // Use global schedule storage filtered by batchId
   const [batchSessions, setBatchSessions] = useState(() => {
     const fallback = [
-        { id: 1, topic: "React Context API", date: "2026-04-15", time: "09:00 AM", duration: "2h", status: computeSessionStatus("2026-04-15") },
-        { id: 2, topic: "Redux State Management", date: "2026-04-16", time: "10:00 AM", duration: "2h", status: computeSessionStatus("2026-04-16") },
-        { id: 3, topic: "Node.js Express Basics", date: "2026-04-17", time: "11:00 AM", duration: "2.5h", status: computeSessionStatus("2026-04-17") }
+      { id: 1, topic: "React Context API", date: "2026-04-15", time: "09:00 AM", duration: "2h", status: computeSessionStatus("2026-04-15") },
+      { id: 2, topic: "Redux State Management", date: "2026-04-16", time: "10:00 AM", duration: "2h", status: computeSessionStatus("2026-04-16") },
+      { id: 3, topic: "Node.js Express Basics", date: "2026-04-17", time: "11:00 AM", duration: "2.5h", status: computeSessionStatus("2026-04-17") }
     ];
     try {
       const stored = localStorage.getItem('trainer_sessions');
       if (stored) {
-         const allSessions = JSON.parse(stored);
-         const mySessions = allSessions.filter(s => s.batchId === batchId);
-         if (mySessions.length > 0) {
-           return mySessions.map(s => ({
-              id: s.id,
-              topic: s.topic,
-              date: s.date,
-              time: s.startTime,
-              duration: `${s.duration}m`,
-              status: computeSessionStatus(s.date)
-           })).sort((a, b) => new Date(`${a.date} ${a.time}`) - new Date(`${b.date} ${b.time}`));
-         }
+        const allSessions = JSON.parse(stored);
+        const mySessions = allSessions.filter(s => s.batchId === batchId);
+        if (mySessions.length > 0) {
+          return mySessions.map(s => ({
+            id: s.id,
+            topic: s.topic,
+            date: s.date,
+            time: s.startTime,
+            duration: `${s.duration}m`,
+            status: computeSessionStatus(s.date)
+          })).sort((a, b) => new Date(`${a.date} ${a.time}`) - new Date(`${b.date} ${b.time}`));
+        }
       }
       return fallback;
     } catch { return fallback; }
@@ -284,8 +284,8 @@ const BatchDetails = () => {
   useEffect(() => {
     // Auto-update batch session statuses locally
     const updated = batchSessions.map(s => {
-        const newStatus = computeSessionStatus(s.date);
-        return s.status !== newStatus ? { ...s, status: newStatus } : s;
+      const newStatus = computeSessionStatus(s.date);
+      return s.status !== newStatus ? { ...s, status: newStatus } : s;
     });
     const changed = updated.some((s, i) => s.status !== batchSessions[i].status);
     if (changed) setBatchSessions(updated);
@@ -363,7 +363,7 @@ const BatchDetails = () => {
   const handleSessionSubmit = (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
-    
+
     // Convert 24hr time (14:30) to 12hr AM/PM (02:30 PM) display string
     let formattedTime = formData.get('time');
     if (formattedTime) {
@@ -402,11 +402,11 @@ const BatchDetails = () => {
         globalSessions = JSON.parse(globalSessionsStr);
       }
       if (!Array.isArray(globalSessions)) globalSessions = [];
-      
+
       let durationStr = formData.get('duration');
       let durationMins = parseInt(durationStr) || 60;
       if (durationStr.toLowerCase().includes('h')) {
-          durationMins = parseFloat(durationStr) * 60;
+        durationMins = parseFloat(durationStr) * 60;
       }
 
       const newGlobalSession = {
@@ -507,26 +507,28 @@ const BatchDetails = () => {
         <div className="header-container-grid">
           <div className="header-left">
             <h1 className="title-bold">{baseBatch?.title || 'Batch'}</h1>
-            <p className="subtitle-gray">{baseBatch?.batchName || 'Unknown'} • Trainer Overview</p>
+            <div className="subtitle-gray">
+              {baseBatch?.batchName || 'Unknown'} • Trainer Overview
+            </div>
           </div>
 
           <div className="header-info-structured">
             <div className="info-top-row">
-              <div className="info-item-prod header-badge-hover">
+              <div className="info-item-prod">
                 <Calendar size={14} />
-                {baseBatch?.startDate || 'N/A'} — {baseBatch?.endDate || 'N/A'}
+                <span>{baseBatch?.startDate} — {baseBatch?.endDate}</span>
               </div>
-              <div className="info-item-prod header-badge-hover">
+              <div className="info-item-prod">
                 <Clock size={14} />
-                {duration}
+                <span>{duration}</span>
               </div>
-              <div className="info-item-prod header-badge-hover">
+              <div className="info-item-prod">
                 <Monitor size={14} />
-                {baseBatch?.mode || 'N/A'}
+                <span>{baseBatch?.mode}</span>
               </div>
-              <div className="info-item-prod header-badge-hover students-badge">
+              <div className="info-item-prod students-badge">
                 <Users size={14} />
-                {displayStudentCount} Students
+                <span>{displayStudentCount} Students</span>
               </div>
             </div>
 
@@ -631,17 +633,14 @@ const BatchDetails = () => {
                   ) : (
                     <div className="empty-state-v5">
                       <p className="no-sess-msg">No sessions scheduled for today</p>
-                      {pendingTopics.length > 0 && (
-                        <div className="tentative-topics-v5">
-                          <p className="tentative-lbl">UPCOMING TOPICS:</p>
-                          <ul className="tentative-list">
-                            {pendingTopics.slice(0, 2).map(t => (
-                              <li key={t.id}>• {t.name}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                      <button className="join-session-btn-v5 secondary-btn-prod" onClick={handleJoinSession} style={{ marginTop: '16px' }}>
+                      <div className="tentative-topics-v5">
+                        <p className="tentative-lbl">UPCOMING TOPICS:</p>
+                        <ul className="tentative-list">
+                          <li>• JavaScript Basics</li>
+                          <li>• ES6 Features</li>
+                        </ul>
+                      </div>
+                      <button className="join-session-btn-v5" onClick={handleJoinSession} style={{ marginTop: '20px' }}>
                         Join Now
                       </button>
                     </div>
@@ -822,7 +821,7 @@ const BatchDetails = () => {
                   <Plus size={16} /> Add Session
                 </button>
               </div>
-              
+
               <div className="schedule-sections-v5">
                 {/* UPCOMING SECTION */}
                 <div className="schedule-section-v5">
@@ -831,7 +830,7 @@ const BatchDetails = () => {
                     <span className="section-count-v5">{batchSessions.filter(s => s.status !== 'completed').length}</span>
                   </div>
                   <div className="schedule-list-v5">
-                    {batchSessions.filter(s => s.status !== 'completed').length > 0 ? 
+                    {batchSessions.filter(s => s.status !== 'completed').length > 0 ?
                       batchSessions.filter(s => s.status !== 'completed').map(session => (
                         <div key={session.id} className={`schedule-card-v5 ${session.status === 'completed' ? 'completed' : ''}`}>
                           <div className="sch-timeline-point"></div>
@@ -867,7 +866,7 @@ const BatchDetails = () => {
                     <span className="section-count-v5">{batchSessions.filter(s => s.status === 'completed').length}</span>
                   </div>
                   <div className="schedule-list-v5">
-                    {batchSessions.filter(s => s.status === 'completed').length > 0 ? 
+                    {batchSessions.filter(s => s.status === 'completed').length > 0 ?
                       batchSessions.filter(s => s.status === 'completed').map(session => (
                         <div key={session.id} className={`schedule-card-v5 completed`}>
                           <div className="sch-timeline-point"></div>

@@ -274,7 +274,8 @@
   width: 100%;
 }
 
-.btn-save-saas, .btn-cancel-saas {
+.btn-save-saas,
+.btn-cancel-saas {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -623,6 +624,46 @@
   font-weight: 600;
   color: #475569;
   margin: 0;
+}
+
+.item-label-saas {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.label-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.locked-badge {
+  font-size: 9px;
+  font-weight: 800;
+  background: #f1f5f9;
+  color: #64748b;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  text-transform: uppercase;
+  border: 1px solid #e2e8f0;
+}
+
+.value-box-saas.locked-field {
+  background: #f8fafc;
+  color: #94a3b8;
+  border-style: dashed;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.value-box-saas.locked-field:hover {
+  border-color: #e2e8f0;
+  background: #f8fafc;
 }
 
 /* ── PHOTO MENU ── */

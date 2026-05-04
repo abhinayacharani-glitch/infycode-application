@@ -4,7 +4,7 @@ import './Materials.css';
 
 const initialBatches = [
   {
-    id: 'B1', 
+    id: 'B1',
     title: 'JavaScript Fundamentals',
     uploaded: [
       { id: '11', title: 'JavaScript Arrays.docx', size: '0.9 MB', date: 'Apr 3', tag: 'JS', type: 'DOC' },
@@ -16,7 +16,7 @@ const initialBatches = [
     ]
   },
   {
-    id: 'B2', 
+    id: 'B2',
     title: 'Node.js',
     uploaded: [
       { id: '21', title: 'React Basics.pdf', size: '3.1 MB', date: 'Mar 28', tag: 'React', type: 'PDF' }
@@ -27,7 +27,7 @@ const initialBatches = [
     ]
   },
   {
-    id: 'B3', 
+    id: 'B3',
     title: 'Interview Prep',
     uploaded: [],
     pending: [
@@ -36,7 +36,7 @@ const initialBatches = [
     ]
   },
   {
-    id: 'B4', 
+    id: 'B4',
     title: 'React.js',
     uploaded: [
       { id: '41', title: 'React Hooks Deep Dive.pdf', size: '2.4 MB', date: 'Apr 9', tag: 'React', type: 'PDF' }
@@ -98,10 +98,10 @@ const Materials = () => {
   };
 
   const openInlineUpload = (batchId, pendingItem) => {
-    setUploadData({ 
-      title: pendingItem.title, 
-      batchId: batchId, 
-      pendingId: pendingItem.id, 
+    setUploadData({
+      title: pendingItem.title,
+      batchId: batchId,
+      pendingId: pendingItem.id,
       tag: 'New',
       fileName: ''
     });
@@ -111,7 +111,7 @@ const Materials = () => {
   const handleUploadSubmit = (e) => {
     e.preventDefault();
     const { batchId, pendingId, title, tag } = uploadData;
-    
+
     setBatches(curr => curr.map(b => {
       if (b.id === batchId) {
         let updatedPending = [...b.pending];
@@ -130,7 +130,7 @@ const Materials = () => {
         if (['pdf'].includes(fileExt)) type = 'PDF';
         else if (['mp4', 'mov', 'avi'].includes(fileExt)) type = 'VID';
         else if (['zip', 'rar'].includes(fileExt)) type = 'ZIP';
-        
+
         const newItem = {
           id: Date.now().toString(),
           title: title,
@@ -149,10 +149,10 @@ const Materials = () => {
   const handleDownload = (item) => {
     // Create a dummy link and click it
     const element = document.createElement("a");
-    const file = new Blob(["Simulated content for " + item.title], {type: 'text/plain'});
+    const file = new Blob(["Simulated content for " + item.title], { type: 'text/plain' });
     element.href = URL.createObjectURL(file);
     element.download = item.title;
-    document.body.appendChild(element); 
+    document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
   };
@@ -160,11 +160,11 @@ const Materials = () => {
   // Advanced Filtering Logic
   const filteredBatches = useMemo(() => {
     return batches.map(batch => {
-      const filteredUploaded = batch.uploaded.filter(item => 
+      const filteredUploaded = batch.uploaded.filter(item =>
         item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         batch.title.toLowerCase().includes(searchQuery.toLowerCase())
       );
-      const filteredPending = batch.pending.filter(item => 
+      const filteredPending = batch.pending.filter(item =>
         item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         batch.title.toLowerCase().includes(searchQuery.toLowerCase())
       );
@@ -173,8 +173,8 @@ const Materials = () => {
       const showUploaded = filterStatus === 'all' || filterStatus === 'uploaded';
       const showPending = filterStatus === 'all' || filterStatus === 'pending';
 
-      const finalUploadedTyped = filterType === 'all' 
-        ? filteredUploaded 
+      const finalUploadedTyped = filterType === 'all'
+        ? filteredUploaded
         : filteredUploaded.filter(item => item.type === filterType);
 
       const finalPending = showPending ? filteredPending : [];
@@ -198,25 +198,25 @@ const Materials = () => {
 
   return (
     <div className="materials-page-wrapper">
-      
+
       {/* Header Container — 2-Line Layout */}
       <div className="mat-header-container">
-        
+
         {/* Row 1: Titles */}
         <div className="mat-title-row">
           <h1 className="mat-page-title">Course Materials</h1>
           <p className="mat-page-subtitle">Upload and manage course content</p>
         </div>
-        
+
         {/* Row 2: Controls */}
         <div className="mat-controls-row">
           <div className="mat-search-wrapper">
             <div className="mat-search-box">
               <Search size={16} />
-              <input 
-                type="text" 
-                className="mat-input-field" 
-                placeholder="Search by file or topic..." 
+              <input
+                type="text"
+                className="mat-input-field"
+                placeholder="Search by file or topic..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -227,7 +227,7 @@ const Materials = () => {
             <div className="mat-filters-group">
               <div className="mat-filter-wrapper">
                 <span className="mat-filter-label">All Status</span>
-                <select 
+                <select
                   className="mat-select-field"
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value)}
@@ -239,7 +239,7 @@ const Materials = () => {
               </div>
               <div className="mat-filter-wrapper">
                 <span className="mat-filter-label">File Type</span>
-                <select 
+                <select
                   className="mat-select-field"
                   value={filterType}
                   onChange={(e) => setFilterType(e.target.value)}
@@ -265,7 +265,7 @@ const Materials = () => {
           const progress = calculateProgress(batch);
           const showUploaded = filterStatus === 'all' || filterStatus === 'uploaded';
           const showPending = filterStatus === 'all' || filterStatus === 'pending';
-          
+
           return (
             <div key={batch.id} className="mat-batch-card" style={{ animationDelay: `${idx * 0.1}s` }}>
               <div className="mat-batch-header">
@@ -362,24 +362,24 @@ const Materials = () => {
               <div className="mat-form-grid">
                 <div className="mat-form-group">
                   <label>Batch</label>
-                  <select 
-                    className="mat-select-field width-full" 
+                  <select
+                    className="mat-select-field width-full"
                     value={uploadData.batchId}
-                    onChange={(e) => setUploadData({...uploadData, batchId: e.target.value, pendingId: ''})}
+                    onChange={(e) => setUploadData({ ...uploadData, batchId: e.target.value, pendingId: '' })}
                     disabled={!!uploadData.pendingId}
                   >
                     {batches.map(b => <option key={b.id} value={b.id}>{b.id} – {b.title}</option>)}
                   </select>
                 </div>
-                
+
                 <div className="mat-form-group">
                   <label>Topic</label>
-                  <select 
-                    className="mat-select-field width-full" 
+                  <select
+                    className="mat-select-field width-full"
                     value={uploadData.pendingId}
                     onChange={(e) => {
                       const selected = selectedBatchPendingTopics.find(p => p.id === e.target.value);
-                      setUploadData({...uploadData, pendingId: e.target.value, title: selected ? selected.title : uploadData.title});
+                      setUploadData({ ...uploadData, pendingId: e.target.value, title: selected ? selected.title : uploadData.title });
                     }}
                     disabled={!!uploadData.pendingId}
                   >
@@ -391,23 +391,23 @@ const Materials = () => {
 
               <div className="mat-form-group">
                 <label>Title</label>
-                <input 
-                  type="text" 
-                  className="mat-input-field" 
+                <input
+                  type="text"
+                  className="mat-input-field"
                   value={uploadData.title}
-                  onChange={(e) => setUploadData({...uploadData, title: e.target.value})}
+                  onChange={(e) => setUploadData({ ...uploadData, title: e.target.value })}
                   placeholder="e.g. JavaScript Arrays Deep Dive"
-                  required 
+                  required
                 />
               </div>
 
               <div className="mat-form-group">
                 <label>Tag (Optional)</label>
-                <input 
-                  type="text" 
-                  className="mat-input-field" 
+                <input
+                  type="text"
+                  className="mat-input-field"
                   value={uploadData.tag}
-                  onChange={(e) => setUploadData({...uploadData, tag: e.target.value})}
+                  onChange={(e) => setUploadData({ ...uploadData, tag: e.target.value })}
                   placeholder="e.g. JS, React, Interview"
                 />
               </div>
@@ -415,16 +415,16 @@ const Materials = () => {
               <div className="mat-form-group">
                 <label>Upload File</label>
                 <div className="mat-file-input-wrapper">
-                   <input 
-                    type="file" 
-                    className="mat-file-input" 
-                    onChange={(e) => setUploadData({...uploadData, fileName: e.target.files[0]?.name})}
-                    required 
-                   />
-                   <div className="mat-file-placeholder">
-                    <Upload size={18} /> 
+                  <input
+                    type="file"
+                    className="mat-file-input"
+                    onChange={(e) => setUploadData({ ...uploadData, fileName: e.target.files[0]?.name })}
+                    required
+                  />
+                  <div className="mat-file-placeholder">
+                    <Upload size={18} />
                     {uploadData.fileName || 'Choose file...'}
-                   </div>
+                  </div>
                 </div>
               </div>
 
@@ -453,9 +453,9 @@ const Materials = () => {
                 <h4 className="mat-preview-title">{previewItem.title}</h4>
                 <p>This is a simulated preview of the uploaded content.</p>
                 <div className="mat-preview-meta">
-                   <div className="mat-meta-badge"><span>Size:</span> {previewItem.size}</div>
-                   <div className="mat-meta-badge"><span>Type:</span> {previewItem.type}</div>
-                   <div className="mat-meta-badge"><span>Date:</span> {previewItem.date}</div>
+                  <div className="mat-meta-badge"><span>Size:</span> {previewItem.size}</div>
+                  <div className="mat-meta-badge"><span>Type:</span> {previewItem.type}</div>
+                  <div className="mat-meta-badge"><span>Date:</span> {previewItem.date}</div>
                 </div>
               </div>
               <div className="mat-modal-footer">

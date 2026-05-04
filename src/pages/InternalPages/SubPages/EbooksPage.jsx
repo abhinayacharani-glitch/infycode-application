@@ -1,4 +1,6 @@
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import './EbooksPage.css';
 
 const ebooks = [
@@ -29,12 +31,17 @@ const ebooks = [
 ];
 
 const EbooksPage = () => {
+  const navigate = useNavigate();
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   return (
     <div className="ebooks-page">
+      <button className="modern-back-btn" onClick={() => navigate("/")}>
+        <ArrowLeft size={18} />
+        <span>Back</span>
+      </button>
       <div
         className="ebooks-hero"
         style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&q=80&w=1920)' }}

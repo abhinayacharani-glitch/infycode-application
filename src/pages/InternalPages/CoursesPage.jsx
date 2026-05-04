@@ -1,62 +1,4 @@
-import React, { useEffect } from 'react';
-import './CoursesPage.css';
-
-const courses = [
-  {
-    id: 1,
-    title: "Full Stack Web Development",
-    desc: "Master modern web development from front to back. Build responsive UIs with React and scalable backends with Node.js and MongoDB.",
-    img: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=800",
-    tag: "Popular",
-    hours: "120 Hours",
-    students: "4.5k+"
-  },
-  {
-    id: 2,
-    title: "Python & Data Science",
-    desc: "Dive into data analysis, visualization, and machine learning. Learn to extract actionable insights from complex datasets.",
-    img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800",
-    tag: "Beginner",
-    hours: "90 Hours",
-    students: "3.2k+"
-  },
-  {
-    id: 3,
-    title: "UI/UX Design Masterclass",
-    desc: "Design intuitive, beautiful, and accessible user interfaces. Master Figma, wireframing, and user research methodologies.",
-    img: "https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&q=80&w=800",
-    tag: "Intermediate",
-    hours: "60 Hours",
-    students: "2.8k+"
-  },
-  {
-    id: 4,
-    title: "Cloud Computing & DevOps",
-    desc: "Deploy and scale applications seamlessly. Master Docker, Kubernetes, CI/CD pipelines, and AWS architecture.",
-    img: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800",
-    tag: "Advanced",
-    hours: "100 Hours",
-    students: "1.9k+"
-  },
-  {
-    id: 5,
-    title: "Cyber Security Fundamentals",
-    desc: "Protect systems and networks from digital attacks. Learn ethical hacking, network security, and cryptography.",
-    img: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800",
-    tag: "High Demand",
-    hours: "85 Hours",
-    students: "2.1k+"
-  },
-  {
-    id: 6,
-    title: "Mobile App Development",
-    desc: "Build cross-platform mobile applications for iOS and Android using React Native and Flutter.",
-    img: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=80&w=800",
-    tag: "Advanced",
-    hours: "95 Hours",
-    students: "1.5k+"
-  }
-];
+import { useCourseContext } from '../../context/CourseContext';
 
 // ✅ SVG Icons (Reusable Components)
 const ClockIcon = () => (
@@ -79,6 +21,8 @@ const UsersIcon = () => (
 );
 
 const CoursesPage = () => {
+  const { publishedCourses } = useCourseContext();
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -102,18 +46,18 @@ const CoursesPage = () => {
       <div className="courses-section" id="popular">
         <h2 className="courses-section-title">Explore Our Premium Courses</h2>
         <div className="courses-grid">
-          {courses.map((course) => (
+          {publishedCourses.map((course) => (
             <div className="courses-card" key={course.id}>
-              <img src={course.img} alt={course.title} className="courses-card-img" />
+              <img src={course.image || course.img} alt={course.title} className="courses-card-img" />
               <div className="courses-card-info">
-                <span className="courses-card-tag">{course.tag}</span>
+                <span className="courses-card-tag">{course.badge || course.tag}</span>
                 <h3>{course.title}</h3>
-                <p>{course.desc}</p>
+                <p>{course.description || course.desc}</p>
 
                 <div className="courses-card-meta">
 
                   <span className="meta-item">
-                    <ClockIcon /> {course.hours}
+                    <ClockIcon /> {course.duration || course.hours}
                   </span>
 
                   <span className="meta-item">

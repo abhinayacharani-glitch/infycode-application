@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   ChevronLeft,
   ChevronRight,
@@ -10,6 +11,7 @@ import {
   Edit2,
   Trash2,
   Check,
+  CheckCircle,
   Settings,
   Link as LinkIcon
 } from 'lucide-react';
@@ -31,6 +33,7 @@ const formatTo12Hr = (time24) => {
 };
 
 const Calendar = () => {
+  const navigate = useNavigate();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [activeView, setActiveView] = useState('Month');
 
@@ -61,6 +64,7 @@ const Calendar = () => {
   });
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showToast, setShowToast] = useState(false);
 
@@ -128,7 +132,6 @@ const Calendar = () => {
     setTimeout(() => setNavDirection(''), 400);
     setCurrentDate(newDate);
   };
-
   const filteredEvents = useMemo(() => {
     return events.filter(e => {
       const matchesSearch = e.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -138,16 +141,38 @@ const Calendar = () => {
     });
   }, [events, searchQuery, visibleTypes]);
 
+  const handleEditClick = (event) => {
+    setNewEvent({
+      id: event.id,
+      title: event.title,
+      date: event.date,
+      startTime: event.startTime,
+      endTime: event.endTime,
+      type: event.type,
+      meetingLink: event.meetingLink || '',
+      description: event.description || ''
+    });
+    setIsEditing(true);
+    setShowCreateModal(true);
+    setSelectedEvent(null);
+  };
+
   const handleCreateEvent = (e) => {
     e.preventDefault();
     setIsSaving(true);
 
     // Simulate API delay
     setTimeout(() => {
-      const id = Date.now().toString();
-      setEvents([...events, { ...newEvent, id }]);
+      if (isEditing) {
+        setEvents(events.map(ev => ev.id === newEvent.id ? { ...newEvent } : ev));
+      } else {
+        const id = Date.now().toString();
+        setEvents([...events, { ...newEvent, id }]);
+      }
+      
       setIsSaving(false);
       setShowCreateModal(false);
+      setIsEditing(false);
       setShowToast(true);
 
       // Auto hide toast
@@ -335,61 +360,94 @@ const Calendar = () => {
                     <div className="cell-header">
                       <span className="date-num">{d.date.getDate()}</span>
                     </div>
-                    <div className="event-pills-wrap">
-                      {dayEvents.slice(0, 4).map(event => (
-                        <div
-                          key={event.id}
-                          className={`event-pill ${event.type}`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (event.meetingLink) {
-                              window.open(event.meetingLink, '_blank');
-                            } else {
-                              setSelectedEvent(event);
-                            }
-                          }}
-                        >
-                          <span className="event-time">{formatTo12Hr(event.startTime)}</span>
-                          <span className="event-title">{event.title}</span>
-                          {event.meetingLink && <LinkIcon size={10} className="pill-link-icon" />}
-                        </div>
-                      ))}
-                      {dayEvents.length > 4 && (
-                        <div className="more-indicator">+{dayEvents.length - 4} more</div>
-                      )}
-                    </div>
+                      <div className="event-pills-wrap">
+                        {dayEvents.slice(0, 4).map(event => {
+                          const isCompleted = new Date(`${event.date}T${event.endTime}`) < new Date();
+                          
+                          return (
+                            <div
+                              key={event.id}
+                              className={`event-pill ${event.type} ${isCompleted ? 'completed' : ''}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (isCompleted) return;
+                                
+                                if (event.type === 'meeting' && event.meetingLink) {
+                                  window.open(event.meetingLink, '_blank');
+                                } else if (event.type === 'training') {
+                                  navigate('/trainer-dashboard/materials');
+                                } else if (event.type === 'counselling') {
+                                  navigate('/trainer-dashboard/counselling');
+                                }
+                              }}
+                              title={
+                                isCompleted ? "Event Completed" :
+                                event.type === 'meeting' ? "Join Teams Meeting" :
+                                event.type === 'training' ? "Go to Materials" :
+                                event.type === 'counselling' ? "Go to Counselling" :
+                                event.title
+                              }
+                            >
+                              <span 
+                                className="event-time" 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedEvent(event);
+                                }}
+                                title="View Details"
+                              >
+                                {isCompleted ? <CheckCircle size={10} className="completed-check" /> : formatTo12Hr(event.startTime)}
+                              </span>
+                              <span className="event-title">{event.title}</span>
+                              {!isCompleted && event.meetingLink && <LinkIcon size={10} className="pill-link-icon" />}
+                            </div>
+                          );
+                        })}
+                        {dayEvents.length > 4 && (
+                          <div className="more-indicator">+{dayEvents.length - 4} more</div>
+                        )}
+                      </div>
                   </div>
                 );
               })}
             </div>
 
             {/* EVENT DETAILS POPUP */}
-            {selectedEvent && (
-              <div className="v3-details-popup" style={{ top: '100px', left: '50%', transform: 'translateX(-50%)' }}>
-                <div className="popup-header">
-                  <span className={`popup-type-tag ${selectedEvent.type}`} style={{ background: EVENT_TYPES.find(t => t.id === selectedEvent.type).bg, color: EVENT_TYPES.find(t => t.id === selectedEvent.type).color }}>
-                    {selectedEvent.type}
-                  </span>
-                  <button className="close-btn" onClick={() => setSelectedEvent(null)}><X size={16} /></button>
+            {selectedEvent && (() => {
+              const isHappened = new Date(`${selectedEvent.date}T${selectedEvent.endTime}`) < new Date();
+              return (
+                <div className="v3-details-popup" style={{ top: '100px', left: '50%', transform: 'translateX(-50%)' }}>
+                  <div className="popup-header">
+                    <span className={`popup-type-tag ${selectedEvent.type}`} style={{ background: EVENT_TYPES.find(t => t.id === selectedEvent.type).bg, color: EVENT_TYPES.find(t => t.id === selectedEvent.type).color }}>
+                      {selectedEvent.type}
+                    </span>
+                    {isHappened && (
+                      <span className="happened-badge">
+                        <CheckCircle size={12} />
+                        Event Happened
+                      </span>
+                    )}
+                    <button className="close-btn" onClick={() => setSelectedEvent(null)}><X size={16} /></button>
+                  </div>
+                  <h3 className="popup-title">{selectedEvent.title}</h3>
+                  <div className="popup-info-row">
+                    <CalendarIcon size={14} />
+                    <span>{new Date(selectedEvent.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</span>
+                  </div>
+                  <div className="popup-info-row">
+                    <Clock size={14} />
+                    <span>{formatTo12Hr(selectedEvent.startTime)} - {formatTo12Hr(selectedEvent.endTime)}</span>
+                  </div>
+                  {selectedEvent.description && (
+                    <div className="popup-desc">{selectedEvent.description}</div>
+                  )}
+                  <div className="popup-actions">
+                    <button className="action-btn" onClick={() => handleEditClick(selectedEvent)} title="Edit"><Edit2 size={14} /></button>
+                    <button className="action-btn delete" onClick={() => handleDeleteEvent(selectedEvent.id)} title="Delete"><Trash2 size={14} /></button>
+                  </div>
                 </div>
-                <h3 className="popup-title">{selectedEvent.title}</h3>
-                <div className="popup-info-row">
-                  <CalendarIcon size={14} />
-                  <span>{new Date(selectedEvent.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</span>
-                </div>
-                <div className="popup-info-row">
-                  <Clock size={14} />
-                  <span>{formatTo12Hr(selectedEvent.startTime)} - {formatTo12Hr(selectedEvent.endTime)}</span>
-                </div>
-                {selectedEvent.description && (
-                  <div className="popup-desc">{selectedEvent.description}</div>
-                )}
-                <div className="popup-actions">
-                  <button className="action-btn" title="Edit"><Edit2 size={14} /></button>
-                  <button className="action-btn delete" onClick={() => handleDeleteEvent(selectedEvent.id)} title="Delete"><Trash2 size={14} /></button>
-                </div>
-              </div>
-            )}
+              );
+            })()}
           </div>
         </main>
 
@@ -398,8 +456,8 @@ const Calendar = () => {
           <div className="v3-modal-overlay">
             <div className="v3-modal-content premium">
               <div className="v3-modal-header">
-                <h2>Schedule New Event</h2>
-                <button className="v3-close-btn" onClick={() => setShowCreateModal(false)}>
+                <h2>{isEditing ? 'Edit Event' : 'Schedule New Event'}</h2>
+                <button className="v3-close-btn" onClick={() => { setShowCreateModal(false); setIsEditing(false); }}>
                   <X size={20} />
                 </button>
               </div>
@@ -495,11 +553,11 @@ const Calendar = () => {
                 </div>
 
                 <div className="v3-modal-footer">
-                  <button type="button" className="v3-cancel-btn" onClick={() => setShowCreateModal(false)}>
+                  <button type="button" className="v3-cancel-btn" onClick={() => { setShowCreateModal(false); setIsEditing(false); }}>
                     Cancel
                   </button>
                   <button type="submit" className={`v3-save-btn ${isSaving ? 'loading' : ''}`} disabled={isSaving}>
-                    {isSaving ? 'Scheduling...' : 'Save Event'}
+                    {isSaving ? (isEditing ? 'Updating...' : 'Scheduling...') : (isEditing ? 'Update Event' : 'Save Event')}
                   </button>
                 </div>
               </form>
@@ -511,7 +569,7 @@ const Calendar = () => {
         <div className={`v3-success-toast ${showToast ? 'show' : ''}`}>
           <div className="toast-content">
             <Check size={16} className="toast-icon" />
-            <span>Event scheduled successfully!</span>
+            <span>Event {isEditing ? 'updated' : 'scheduled'} successfully!</span>
           </div>
         </div>
       </div>

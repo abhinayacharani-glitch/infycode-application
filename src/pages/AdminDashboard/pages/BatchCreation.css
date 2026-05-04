@@ -293,7 +293,7 @@
   margin: 0;
   font-size: 1rem;
   font-weight: 800;
-  color: #1e293b;
+  color: #1e40af;
   line-height: 1.2;
 }
 
@@ -315,7 +315,7 @@
 
 .batch-item-details {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 12px;
   padding-top: 16px;
   border-top: 1px solid #f1f5f9;

@@ -64,7 +64,8 @@
   color: #1E293B;
   letter-spacing: -0.5px;
   margin: 0;
-  line-height: 1.2; /* Controlled line height for consistency */
+  line-height: 1.2;
+  /* Controlled line height for consistency */
   white-space: nowrap;
 }
 
@@ -105,7 +106,8 @@
 
 .mat-input-field {
   width: 100%;
-  padding: 10px 16px 10px 48px; /* Restored left padding for icon clearance */
+  padding: 10px 16px 10px 48px;
+  /* Restored left padding for icon clearance */
   height: 44px;
   border-radius: 12px;
   border: 1.5px solid #E2E8F0;
@@ -225,7 +227,8 @@
 .mat-batch-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 24px; /* Slightly larger gap for more breathing room */
+  gap: 24px;
+  /* Slightly larger gap for more breathing room */
   width: 100%;
 }
 
@@ -256,7 +259,8 @@
 }
 
 .mat-batch-title {
-  font-size: 20px; /* Refined for better fit */
+  font-size: 20px;
+  /* Refined for better fit */
   font-weight: 800;
   margin: 0 0 16px 0;
   letter-spacing: -0.5px;
@@ -449,7 +453,8 @@
 
 .mat-btn-primary {
   height: 44px;
-  padding: 0 20px; /* Refined padding */
+  padding: 0 20px;
+  /* Refined padding */
   background: var(--mat-primary-blue);
   color: var(--mat-white);
   border: none;
@@ -462,7 +467,8 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  flex-shrink: 0; /* Never shrink the primary button */
+  flex-shrink: 0;
+  /* Never shrink the primary button */
 }
 
 .mat-btn-primary:hover {
@@ -472,7 +478,8 @@
 }
 
 .header-btn {
-  height: 44px; /* Unified with Admin Dashboard */
+  height: 44px;
+  /* Unified with Admin Dashboard */
   padding: 0 24px;
   font-size: 14px;
   white-space: nowrap;
@@ -508,7 +515,8 @@
 .mat-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(2, 6, 23, 0.7); /* Deeper Backdrop for better focus */
+  background: rgba(2, 6, 23, 0.7);
+  /* Deeper Backdrop for better focus */
   backdrop-filter: blur(12px) saturate(180%);
   z-index: 2000;
   display: flex;
@@ -522,7 +530,8 @@
   border-radius: 24px;
   padding: 32px;
   width: 100%;
-  max-width: 480px; /* More compact width */
+  max-width: 480px;
+  /* More compact width */
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   position: relative;
   border: 1px solid rgba(255, 255, 255, 0.3);
@@ -759,11 +768,11 @@
     align-items: stretch;
     gap: 16px;
   }
-  
+
   .mat-search-wrapper {
     max-width: none;
   }
-  
+
   .mat-actions-right {
     justify-content: space-between;
   }
@@ -774,12 +783,12 @@
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .mat-filters-group {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .mat-filter-wrapper {
     justify-content: space-between;
   }

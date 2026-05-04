@@ -1,25 +1,14 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAdmin } from "../../../context/AdminContext";
+import { useCourseContext } from "../../../context/CourseContext";
+import { ALL_COURSES } from "../../../components/Courses/Courses";
 import "./BatchCreation.css";
-
-const COURSE_LIST = [
-  "Full Stack Development",
-  "Data Science & AI",
-  "Cloud Computing",
-  "Cyber Security",
-  "DevOps Engineering",
-  "UI/UX Design",
-  "Mobile App Development",
-  "Machine Learning",
-];
 
 const initialFormState = {
   trainerName: "",
   courseName: "",
   numberOfStudents: "",
-  studentIdFrom: "",
-  studentIdTo: "",
   startDateTime: "",
   duration: "",
   batchImage: null,
@@ -28,10 +17,55 @@ const initialFormState = {
 function BatchCreation() {
   const navigate = useNavigate();
   const { trainers, batches, addBatch } = useAdmin();
+  const { publishedCourses } = useCourseContext();
   const [form, setForm] = useState(initialFormState);
   const [errors, setErrors] = useState({});
   const [showToast, setShowToast] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // ── Build course list: mirrors Student Dashboard EXACTLY ──────────────────
+  // Replicates reordering logic from StudentDashboard/pages/Course.jsx
+  // ── Build course list: mirrors Student Dashboard EXACTLY ──────────────────
+  // Replicates reordering logic from StudentDashboard/pages/Course.jsx
+  const courseList = useMemo(() => {
+    // 1. Get static courses and reorder them exactly like Student Dashboard
+    const staticCourses = [...ALL_COURSES];
+    
+    // Java first
+    const JavaIdx = staticCourses.findIndex(c => c.title === "Java Full Stack Development");
+    if (JavaIdx !== -1) {
+      const java = staticCourses.splice(JavaIdx, 1)[0];
+      staticCourses.unshift(java);
+    }
+
+    // AWS at index 8
+    const AWSIdx = staticCourses.findIndex(c => c.title === "AWS Cloud Practitioner");
+    if (AWSIdx !== -1) {
+      const aws = staticCourses.splice(AWSIdx, 1)[0];
+      staticCourses.splice(8, 0, aws);
+    }
+
+    // Python at index 4
+    const PythonIdx = staticCourses.findIndex(c => c.title === "Python Programming Masterclass");
+    if (PythonIdx !== -1) {
+      const python = staticCourses.splice(PythonIdx, 1)[0];
+      staticCourses.splice(4, 0, python);
+    }
+
+    // 2. Combine all courses in the exact order shown on the dashboard
+    const combined = [
+      ...(publishedCourses || []).map(c => c.title),
+      ...staticCourses.map(c => c.title)
+    ];
+
+    // 3. Deduplicate while preserving order
+    const seen = new Set();
+    return combined.filter(title => {
+      if (!title || seen.has(title)) return false;
+      seen.add(title);
+      return true;
+    });
+  }, [publishedCourses]);
 
   // Sort batches to show recent first
   const sortedBatches = useMemo(() => {
@@ -71,8 +105,6 @@ function BatchCreation() {
         capacity: Number(form.numberOfStudents),
         status: 'Active',
         duration: form.duration,
-        studentIdFrom: form.studentIdFrom,
-        studentIdTo: form.studentIdTo,
         startDateTime: form.startDateTime,
         batchImage: form.batchImage
       };
@@ -114,7 +146,7 @@ function BatchCreation() {
         <div className="batch-left-panel">
           <div className="panel-card">
             <div className="panel-header">
-              <div className="panel-icon">⚙️</div>
+              {/* Icon removed as per requirement */}
               <h3>Generate New Batch</h3>
             </div>
 
@@ -122,9 +154,20 @@ function BatchCreation() {
               <div className="form-grid">
                 <div className="form-group full">
                   <label>Course Selection</label>
-                  <select name="courseName" value={form.courseName} onChange={handleChange} className={errors.courseName ? 'input-error' : ''}>
+                  <select
+                    name="courseName"
+                    value={form.courseName}
+                    onChange={handleChange}
+                    className={errors.courseName ? 'input-error' : ''}
+                  >
                     <option value="">— Select a course —</option>
-                    {COURSE_LIST.map(c => <option key={c} value={c}>{c}</option>)}
+                    {courseList.length > 0 ? (
+                      courseList.map(title => (
+                        <option key={title} value={title}>{title}</option>
+                      ))
+                    ) : (
+                      <option value="" disabled>No courses available</option>
+                    )}
                   </select>
                   {errors.courseName && <span className="error-msg">{errors.courseName}</span>}
                 </div>
@@ -148,7 +191,7 @@ function BatchCreation() {
                 </div>
 
                 <div className="form-group">
-                  <label>Start Date & Time</label>
+                  <label>Start Date &amp; Time</label>
                   <input type="datetime-local" name="startDateTime" value={form.startDateTime} onChange={handleChange} />
                   {errors.startDateTime && <span className="error-msg">{errors.startDateTime}</span>}
                 </div>
@@ -156,16 +199,6 @@ function BatchCreation() {
                 <div className="form-group">
                   <label>Duration</label>
                   <input type="text" name="duration" placeholder="e.g. 12 Weeks" value={form.duration} onChange={handleChange} />
-                </div>
-
-                <div className="form-group">
-                  <label>Student ID From</label>
-                  <input type="text" name="studentIdFrom" placeholder="e.g. INF-001" value={form.studentIdFrom} onChange={handleChange} />
-                </div>
-
-                <div className="form-group">
-                  <label>Student ID To</label>
-                  <input type="text" name="studentIdTo" placeholder="e.g. INF-030" value={form.studentIdTo} onChange={handleChange} />
                 </div>
               </div>
 
@@ -182,7 +215,7 @@ function BatchCreation() {
         <div className="batch-right-panel">
           <div className="panel-card repository-card">
             <div className="panel-header">
-              <div className="panel-icon blue">📦</div>
+              {/* Icon removed as per requirement */}
               <h3>Live Batch Repository ({batches.length})</h3>
             </div>
 
@@ -205,20 +238,16 @@ function BatchCreation() {
                         <div className="detail">
                           <span className="label">Starts</span>
                           <span className="value">
-                            {batch.startDateTime ? new Date(batch.startDateTime).toLocaleDateString() : "TBD"}
+                            {batch.startDateTime ?
+                              new Date(batch.startDateTime).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }) + ' at ' +
+                              new Date(batch.startDateTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+                              : "TBD"
+                            }
                           </span>
                         </div>
                         <div className="detail">
                           <span className="label">Students</span>
-                          <span className="value">{batch.capacity} Seats</span>
-                        </div>
-                        <div className="detail">
-                          <span className="label">ID From</span>
-                          <span className="value">{batch.studentIdFrom || "Not Set"}</span>
-                        </div>
-                        <div className="detail">
-                          <span className="label">ID To</span>
-                          <span className="value">{batch.studentIdTo || "Not Set"}</span>
+                          <span className="value">{batch.enrolled || 0} / {batch.capacity} Seats</span>
                         </div>
                       </div>
                     </div>
