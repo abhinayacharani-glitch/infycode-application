@@ -251,40 +251,44 @@ export const getStudentBatches = async (req, res) => {
     const trainersRef = db.ref("trainers");
     const result = {};
 
+    // Pre-fetch all trainers for robust in-memory matching (avoids Firebase case-sensitivity issues)
+    const allTrainersSnap = await trainersRef.once("value");
+    const allTrainersRaw = allTrainersSnap.val() || {};
+    const trainersList = Object.entries(allTrainersRaw).map(([key, data]) => ({ key, ...data }));
+
     for (const [courseName, batchKey] of Object.entries(batchesMap)) {
       try {
-        // Try direct key lookup first (most reliable)
         const directSnap = await batchesRef.child(batchKey).once("value");
         let batchData = null;
         if (directSnap.exists()) {
           batchData = { firebaseKey: batchKey, ...directSnap.val() };
         } else {
-          // Fallback: query by batchId field
           const qSnap = await batchesRef.orderByChild("batchId").equalTo(batchKey).once("value");
           if (qSnap.exists()) qSnap.forEach(c => { batchData = { firebaseKey: c.key, ...c.val() }; });
         }
         if (!batchData) continue;
 
-        // 4. Fetch full trainer profile
-        const trainerName = batchData.trainerName || batchData.trainer || "";
+        // 4. Fetch full trainer profile (Case-insensitive matching)
+        const trainerNameStr = (batchData.trainerName || batchData.trainer || "").trim().toLowerCase();
         let trainerDetails = null;
-        if (trainerName) {
-          const tSnap = await trainersRef.orderByChild("fullName").equalTo(trainerName).once("value");
-          if (tSnap.exists()) {
-            tSnap.forEach(c => {
-              const t = c.val();
-              trainerDetails = {
-                name:           t.fullName || t.fullname || trainerName,
-                email:          t.email || "",
-                phone:          t.phone || t.mobile || "",
-                specialization: t.specialization || t.domain || "",
-                experience:     t.experience || "",
-                profileImage:   t.profileImage || ""
-              };
-            });
-          }
-          if (!trainerDetails) {
-            trainerDetails = { name: trainerName, email: "", phone: "", specialization: "", experience: "", profileImage: "" };
+        
+        if (trainerNameStr) {
+          const matchedTrainer = trainersList.find(t => {
+            const tName = (t.fullName || t.fullname || t.name || "").trim().toLowerCase();
+            return tName === trainerNameStr || t.email?.toLowerCase() === trainerNameStr;
+          });
+
+          if (matchedTrainer) {
+            trainerDetails = {
+              name:           matchedTrainer.fullName || matchedTrainer.fullname || matchedTrainer.name,
+              email:          matchedTrainer.email || "",
+              phone:          matchedTrainer.phone || matchedTrainer.mobile || "",
+              specialization: matchedTrainer.specialization || matchedTrainer.domain || "",
+              experience:     matchedTrainer.experience || "",
+              profileImage:   matchedTrainer.profileImage || ""
+            };
+          } else {
+            trainerDetails = { name: batchData.trainerName || batchData.trainer, email: "", phone: "", specialization: "", experience: "", profileImage: "" };
           }
         }
 
@@ -293,7 +297,7 @@ export const getStudentBatches = async (req, res) => {
         if (batchData.startDateTime) {
           const d = new Date(batchData.startDateTime);
           startDate = d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-          startTime = d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+          startTime = d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
         } else if (batchData.name && batchData.name.includes(" - ")) {
           startDate = batchData.name.split(" - ").pop();
         }
@@ -304,6 +308,7 @@ export const getStudentBatches = async (req, res) => {
           courseName:    batchData.courseName || batchData.course || courseName,
           courseId:      batchData.courseId || "",
           status:        batchData.status || "Scheduled",
+          batchStatus:   batchData.batchStatus || batchData.status || "Scheduled",
           startDateTime: batchData.startDateTime || "",
           startDate,
           startTime,

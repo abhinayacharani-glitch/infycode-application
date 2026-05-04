@@ -366,8 +366,12 @@ export const startBatch = async (req, res) => {
 
     // 5. Activate batch in Firebase
     const startedAt = new Date().toISOString();
+    const d = new Date(startedAt);
+    const dateStr = d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    const timeStr = d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
+
     await batchRef.update({
-      status: "Active",
+      status: "started",
       batchStatus: "started",
       batchStartedAt: startedAt,
       startedAt,
@@ -384,16 +388,13 @@ export const startBatch = async (req, res) => {
           month: "long", day: "numeric", year: "numeric",
           hour: "2-digit", minute: "2-digit"
         })
-      : (batchName.includes(" - ") ? batchName.split(" - ").pop() : new Date(startedAt).toLocaleString("en-US", {
-          month: "long", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit"
-        }));
+      : `${dateStr} at ${timeStr}`;
     // ---------------------------------------------------------------------------
 
     // 6. Push in-app notification to the assigned trainer
     try {
       let targetTrainerKey = callerTrainerKey;
 
-      // If admin started it, look up trainer by their name on the batch
       if (!targetTrainerKey && trainerName) {
         const nameSnap = await trainersRef.orderByChild("fullName").equalTo(trainerName).once("value");
         if (nameSnap.exists()) nameSnap.forEach(c => { targetTrainerKey = c.key; });
@@ -401,13 +402,12 @@ export const startBatch = async (req, res) => {
 
       if (targetTrainerKey) {
         await db.ref("trainerNotifications").child(targetTrainerKey).child("items").push({
-          title: `🚀 Batch Started: ${courseName}`,
-          text:  `Your batch "${batchName}" (ID: ${batchData.batchId || id}) for ${courseName} has been officially activated. Scheduled start: ${startDisplay}. Please be ready to conduct the sessions.`,
-          type:  "success",
-          senderName: "Admin",
-          senderRole: "admin",
+          notificationId: `notif_${Date.now()}`,
+          title: `🚀 Your batch ${batchName} has started!`,
+          text: `Your batch ${batchName} for ${courseName} has been started on ${dateStr} at ${timeStr}. Please be ready to conduct the sessions.`,
           batchId: batchData.batchId || id,
           courseId: batchData.courseId || "",
+          type: "success",
           read: false,
           createdAt: Date.now()
         });
@@ -430,39 +430,31 @@ export const startBatch = async (req, res) => {
             if (!student.email) return Promise.resolve();
             return sendEmail({
               to: student.email,
-              subject: `🎉 Your Batch Has Started – ${courseName}`,
+              subject: `Your Batch Has Started - ${courseName}`,
               html: `
-                <div style="font-family:'Segoe UI',Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;background:#f9fafb;border-radius:12px;">
-                  <div style="background:linear-gradient(135deg,#3b82f6,#6366f1);border-radius:10px;padding:28px;text-align:center;margin-bottom:24px;">
-                    <h1 style="color:white;margin:0;font-size:24px;">🚀 Your Batch Has Started!</h1>
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+                  <h2 style="color: #1a73e8;">Your Batch Has Started - ${courseName}</h2>
+                  <p>Hello <strong>${student.name || "Student"}</strong>,</p>
+                  <p>We are happy to inform you that your enrolled batch for <strong>${courseName}</strong> has started.</p>
+                  <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                    <p style="margin: 5px 0;"><strong>Batch Name:</strong> ${batchName}</p>
+                    <p style="margin: 5px 0;"><strong>Trainer Name:</strong> ${trainerName}</p>
+                    <p style="margin: 5px 0;"><strong>Start Date:</strong> ${dateStr}</p>
+                    <p style="margin: 5px 0;"><strong>Start Time:</strong> ${timeStr}</p>
+                    <p style="margin: 5px 0;"><strong>Mode:</strong> Online Live</p>
                   </div>
-                  <div style="background:white;border-radius:10px;padding:24px;">
-                    <p style="color:#374151;font-size:16px;">Hello <strong>${student.name || "Student"}</strong>,</p>
-                    <p style="color:#374151;font-size:15px;">
-                      We are happy to inform you that your enrolled batch for <strong>${courseName}</strong> has officially started.
-                    </p>
-                    <div style="background:#f0f9ff;border-left:4px solid #3b82f6;border-radius:6px;padding:16px;margin:20px 0;">
-                      <p style="margin:0 0 8px;color:#1e40af;font-size:14px;"><strong>📚 Batch Name:</strong> ${batchName}</p>
-                      <p style="margin:0 0 8px;color:#1e40af;font-size:14px;"><strong>👨‍🏫 Trainer:</strong> ${trainerName}</p>
-                      <p style="margin:0 0 8px;color:#1e40af;font-size:14px;"><strong>📅 Start Date &amp; Time:</strong> ${startDisplay}</p>
-                      <p style="margin:0 0 8px;color:#1e40af;font-size:14px;"><strong>🆔 Batch ID:</strong> ${batchData.batchId || id}</p>
-                      <p style="margin:0;color:#1e40af;font-size:14px;"><strong>🖥️ Mode:</strong> Online Live</p>
-                    </div>
-                    <p style="color:#374151;font-size:15px;">Please login to your <strong>InfyCode student dashboard</strong> for complete batch details and session links.</p>
-                    <p style="color:#6b7280;font-size:13px;margin-top:24px;">Best regards,<br/><strong>The InfyCode Team</strong></p>
-                  </div>
+                  <p>Please login to your student dashboard for complete details.</p>
+                  <p>Thank you.</p>
+                  <hr style="border: none; border-top: 1px solid #eee; margin-top: 30px;" />
+                  <p style="font-size: 12px; color: #777;">InfyCode Learning Solutions</p>
                 </div>
               `
             }).catch(err => console.error(`[startBatch] Email failed → ${student.email}:`, err.message));
           });
 
           await Promise.allSettled(emailPromises);
-
-          // Mark emails as sent — prevents re-send on duplicate clicks
           await batchRef.update({ emailSentAt: new Date().toISOString() });
           console.log(`[startBatch] ✅ Emails sent to ${studentsInBatch.length} students.`);
-        } else {
-          console.log("[startBatch] ℹ️ No students in batch — skipping emails.");
         }
       } catch (emailErr) {
         console.error("[startBatch] ⚠️ Email blast error:", emailErr.message);

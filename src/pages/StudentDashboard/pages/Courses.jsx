@@ -17,6 +17,7 @@ const getCurrentTopic = (course) => {
 
 const STATUS_CONFIG = {
   Active:     { label: 'Active',     bg: '#dcfce7', color: '#16a34a' },
+  started:    { label: 'Started',    bg: '#dcfce7', color: '#16a34a' },
   Ready:      { label: 'Ready',      bg: '#dbeafe', color: '#2563eb' },
   Scheduled:  { label: 'Scheduled',  bg: '#fef3c7', color: '#d97706' },
   Upcoming:   { label: 'Upcoming',   bg: '#fef3c7', color: '#d97706' },
@@ -87,106 +88,18 @@ const EnrolledCourseCard = ({ course, batchInfo, onNavigate, index }) => {
           </div>
         </div>
 
-        {/* Trainer & Batch Details */}
-        {batchInfo && (
-          <div className="ecc-details-grid">
-            {/* ── Trainer Card ── */}
-            <div className="ecc-detail-card">
-              <div className="ecc-detail-card-header">
-                <User size={14} />
-                <span>Trainer Details</span>
-              </div>
-
-              <div className="ecc-trainer-info">
-                {trainer?.profileImage ? (
-                  <img src={trainer.profileImage} alt={trainer.name} className="ecc-trainer-photo" />
-                ) : (
-                  <div className="ecc-trainer-avatar">{trainerInitial}</div>
-                )}
-                <div>
-                  <div className="ecc-trainer-name">{trainer?.name || 'TBD'}</div>
-                  <div className="ecc-trainer-role">{trainer?.specialization || 'Trainer'}</div>
-                </div>
-              </div>
-
-              <div className="ecc-trainer-contact">
-                {trainer?.email && (
-                  <a href={`mailto:${trainer.email}`} className="ecc-contact-row" title={trainer.email}>
-                    <Mail size={11} />
-                    <span>{trainer.email}</span>
-                  </a>
-                )}
-                {trainer?.phone && (
-                  <a href={`tel:${trainer.phone}`} className="ecc-contact-row" title={trainer.phone}>
-                    <Phone size={11} />
-                    <span>{trainer.phone}</span>
-                  </a>
-                )}
-              </div>
-
-              <div className="ecc-trainer-meta">
-                {trainer?.experience && (
-                  <div className="ecc-meta-item">
-                    <span className="ecc-meta-label">EXPERIENCE</span>
-                    <span className="ecc-meta-value">{trainer.experience}</span>
-                  </div>
-                )}
-                {trainer?.specialization && (
-                  <div className="ecc-meta-item">
-                    <span className="ecc-meta-label">SPECIALIZATION</span>
-                    <span className="ecc-meta-value">{trainer.specialization}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* ── Batch Card ── */}
-            <div className="ecc-detail-card">
-              <div className="ecc-detail-card-header">
-                <CalendarDays size={14} />
-                <span>Batch Details</span>
-              </div>
-
-              <div className="ecc-batch-grid">
-                <div className="ecc-batch-item">
-                  <span className="ecc-meta-label"># BATCH ID</span>
-                  <span className="ecc-meta-value">{batchInfo.batchId || 'N/A'}</span>
-                </div>
-                <div className="ecc-batch-item">
-                  <span className="ecc-meta-label"><Monitor size={10} /> STATUS</span>
-                  <StatusBadge status={batchInfo.status} />
-                </div>
-                <div className="ecc-batch-item">
-                  <span className="ecc-meta-label"><CalendarDays size={10} /> START DATE</span>
-                  <span className="ecc-meta-value">{batchInfo.startDate || 'TBD'}</span>
-                </div>
-                <div className="ecc-batch-item">
-                  <span className="ecc-meta-label"><Clock size={10} /> START TIME</span>
-                  <span className="ecc-meta-value">{batchInfo.startTime || 'TBD'}</span>
-                </div>
-                {batchInfo.duration && (
-                  <div className="ecc-batch-item" style={{ gridColumn: '1 / -1' }}>
-                    <span className="ecc-meta-label">DURATION</span>
-                    <span className="ecc-meta-value">{batchInfo.duration} · Online Live</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Live Class Link */}
-              {batchInfo.liveClassLink && (
-                <a
-                  href={batchInfo.liveClassLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="ecc-live-btn"
-                >
-                  <Video size={13} />
-                  <span>Join Live Class</span>
-                  <ExternalLink size={11} />
-                </a>
-              )}
-            </div>
-          </div>
+        {/* Live Class Link */}
+        {batchInfo?.liveClassLink && (
+          <a
+            href={batchInfo.liveClassLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ecc-live-btn"
+          >
+            <Video size={13} />
+            <span>Join Live Class</span>
+            <ExternalLink size={11} />
+          </a>
         )}
       </div>
 
@@ -268,6 +181,10 @@ const EnrollCourses = ({ onNavigate }) => {
       }
     };
     if (publishedCourses) fetchData();
+
+    // Polling every 10 seconds to catch Admin batch-start events
+    const pollInterval = setInterval(fetchData, 10000);
+    return () => clearInterval(pollInterval);
   }, [publishedCourses]);
 
   if (loading) {

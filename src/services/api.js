@@ -401,6 +401,14 @@ export const startBatchAPI = (firebaseId) => {
   });
 };
 
+export const adminStartBatchAPI = (firebaseId) => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return request(`/api/admin/start-batch/${firebaseId}`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${user.token || ''}` },
+  });
+};
+
 // ─────────────────────────────────────────────
 // TRAINER APPLICATION WORKFLOW
 // ─────────────────────────────────────────────

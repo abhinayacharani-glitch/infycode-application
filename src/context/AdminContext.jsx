@@ -14,7 +14,7 @@ import {
   updateTrainerApplicationStatusAPI,
   markAllStudentResultsAsSeenAPI,
   moveStudentsToBatchAPI,
-  startBatchAPI,
+  adminStartBatchAPI,
   createSyllabus as apiCreateSyllabus,
   getAllSyllabuses as apiGetAllSyllabuses
 } from '../services/api';
@@ -369,7 +369,7 @@ export const AdminProvider = ({ children }) => {
 
   const startBatch = async (firebaseId) => {
     try {
-      const response = await startBatchAPI(firebaseId);
+      const response = await adminStartBatchAPI(firebaseId);
       if (response.success) {
         fetchDashboardStats();
         return response;

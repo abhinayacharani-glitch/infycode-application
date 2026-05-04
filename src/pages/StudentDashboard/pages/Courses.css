@@ -110,8 +110,88 @@
   transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.enrolled-course-card:hover .ecc-image {
+.ecc-header:hover .ecc-image {
   transform: scale(1.1);
+}
+
+/* Restored Body Details */
+.ecc-details-grid-restored {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.ecc-trainer-row-restored {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed #e2e8f0;
+}
+
+.ecc-trainer-photo-small {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.ecc-trainer-avatar-small {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #2563eb;
+  color: white;
+  font-size: 12px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ecc-trainer-info-restored {
+  display: flex;
+  flex-direction: column;
+}
+
+.ecc-t-name-small {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.ecc-t-role-small {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.ecc-batch-info-restored {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ecc-batch-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ecc-lbl {
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+.ecc-val {
+  font-size: 12px;
+  font-weight: 700;
+  color: #334155;
 }
 
 /* Body Section */

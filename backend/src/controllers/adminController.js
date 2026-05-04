@@ -420,8 +420,13 @@ export const moveStudentsToBatch = async (req, res) => {
     // 4. Update Student records to link to batch
     const studentUpdates = {};
     studentsToMove.forEach(student => {
+      // Basic root fields
       studentUpdates[`${student.id}/batchId`] = batchId;
       studentUpdates[`${student.id}/batchName`] = batchData.name || batchData.courseName || batchData.course;
+      
+      // Multi-course support: Map the specific course to this batch key
+      const courseKey = (batchData.courseName || batchData.course || "General").replace(/\./g, ",");
+      studentUpdates[`${student.id}/batches/${courseKey}`] = batchId;
     });
     await studentsRef.update(studentUpdates);
 

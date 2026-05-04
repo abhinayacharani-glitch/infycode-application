@@ -230,8 +230,8 @@ function BatchCreation() {
                           <span className="batch-trainer">{batch.trainerName || batch.trainer}</span>
                         </div>
                         <div className="batch-status-pill" style={{ 
-                          background: batch.status === 'Active' ? '#f0fdf4' : '#fff7ed',
-                          color: batch.status === 'Active' ? '#16a34a' : '#ea580c'
+                          background: (batch.status === 'Active' || batch.status === 'started') ? '#f0fdf4' : '#fff7ed',
+                          color: (batch.status === 'Active' || batch.status === 'started') ? '#16a34a' : '#ea580c'
                         }}>
                           {batch.status}
                         </div>
@@ -252,7 +252,7 @@ function BatchCreation() {
                           <span className="label">Students</span>
                           <span className="value">{batch.enrolled || 0} / {batch.capacity} Seats</span>
                         </div>
-                        {batch.status !== 'Active' && (
+                        {(batch.status !== 'Active' && batch.status !== 'started') && (
                           <div className="detail full-width" style={{ gridColumn: 'span 2', marginTop: '12px' }}>
                             <button 
                               className="start-batch-action-btn"
