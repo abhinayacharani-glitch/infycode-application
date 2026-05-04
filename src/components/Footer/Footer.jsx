@@ -10,16 +10,12 @@ function Footer() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
-  // ── Handler: ↑ Arrow → native browser hash scroll to #hero ───────────────
-  // Uses window.location.href for 100% reliability — no React timing issues
-  const handleScrollToHero = () => {
-    window.location.href = "/#hero";
-  };
-
-  // ── Handler: Logo → scroll to Hero ─────────────────────────────────────────
+  // ── Handler: Logo → navigate to Home ──────────────────────────────────────
   const handleLogoClick = (e) => {
-    e.preventDefault();
-    handleScrollToHero();
+    if (pathname === "/") {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   };
 
   // ── Handler: Courses link → scroll to #courses section ─────────────────────
@@ -29,7 +25,7 @@ function Footer() {
       const section = document.getElementById("courses");
       if (section) section.scrollIntoView({ behavior: "smooth" });
     } else {
-      navigate("/#courses");
+      navigate("/");
     }
   };
 
@@ -41,7 +37,7 @@ function Footer() {
 
   // ── Handler: WhatsApp → opens WhatsApp Web in new tab ──────────────────────
   const handleWhatsApp = () => {
-    window.open("https://web.whatsapp.com/", "_blank", "noopener,noreferrer");
+    window.open("https://wa.me/911234567890", "_blank", "noopener,noreferrer");
   };
 
   // ── Handler: X (Twitter) → opens Twitter in new tab ────────────────────────
@@ -163,16 +159,7 @@ function Footer() {
               <i className="fa-brands fa-whatsapp"></i>
             </button>
 
-            {/* ↑ Arrow → scroll to Hero section */}
-            <button
-              type="button"
-              className="scroll-top-btn"
-              onClick={handleScrollToHero}
-              aria-label="Scroll to hero section"
-              title="Back to top"
-            >
-              <FaArrowUp />
-            </button>
+
 
           </div>
 

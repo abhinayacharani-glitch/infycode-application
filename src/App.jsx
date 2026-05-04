@@ -1,6 +1,6 @@
 import React, { useState, useEffect, lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, useLocation, Navigate, useNavigate } from "react-router-dom";
-import { FaWhatsapp } from "react-icons/fa";
+import { FaWhatsapp, FaArrowUp } from "react-icons/fa";
 import Loader from "./components/Loader/Loader";
 import Popup from "./components/popup/popup";
 import Navbar from "./components/Navbar/Navbar";
