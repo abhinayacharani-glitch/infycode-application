@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { enrollInCourse, getEnrolledCourses } from "../../../services/api";
 import { ALL_COURSES as ORIGINAL_COURSES } from "../../../components/Courses/Courses";
 import { useCourseContext } from "../../../context/CourseContext";
+import { getCourseImage } from "../../../utils/courseUtils";
 import "./Course.css";
 
 // Swap "Ethical Hacking & Cyber Security" and "AWS Cloud Practitioner" for dashboard UI
@@ -54,36 +55,6 @@ const CourseCardModern = ({ course, index, onNavigate, enrolledIds }) => {
   };
 
   const isDisabledCard = DISABLED_COURSES.includes(course.title);
-
-  const getCourseImage = (course) => {
-    const title = course.title.toLowerCase();
-
-    // 1. Strict Unique Mapping for ALL Courses
-    if (title.includes('aptitude')) return 'https://images.unsplash.com/photo-1509228468518-180dd4864904?q=80&w=800';
-    if (title.includes('introduction to ai')) return 'https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=800';
-    if (title.includes('java full stack')) return 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=800';
-    if (title.includes('data science')) return 'https://www.lbsim.ac.in/Uploads/blogs/23bs_FutureProofYourCareerWithDataScienceAi.jpg';
-    if (title.includes('machine learning')) return 'https://miro.medium.com/1*xsir-fypCq_LrbK5jjyN9w.jpeg';
-    if (title.includes('ethical hacking') || title.includes('cyber')) return 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=800';
-    if (title.includes('react js')) return 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=800';
-    if (title.includes('python programming')) return 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZpwQb-ukHPtKOgCZYjmA3uL38YkGHvThgqQ&s';
-    if (title.includes('aws cloud')) return 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=800';
-    if (title.includes('next.js 14')) return 'https://images.unsplash.com/photo-1618477388954-7852f32655ec?q=80&w=800';
-    if (title.includes('mern stack')) return 'https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?q=80&w=800';
-    if (title.includes('angular enterprise')) return 'https://images.unsplash.com/photo-1593720213428-28a5b9e94613?q=80&w=800';
-    if (title.includes('flutter mobile')) return 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?q=80&w=800';
-    if (title.includes('full stack python pro')) return 'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?q=80&w=800';
-
-    // 2. Category Fallbacks (Unique within category if title doesn't match)
-    const category = course.category?.toLowerCase() || '';
-    if (category.includes('web')) return 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?q=80&w=800';
-    if (category.includes('python')) return 'https://images.unsplash.com/photo-1526374886134-22d46e1aba6d?q=80&w=800';
-    if (category.includes('java')) return 'https://images.unsplash.com/photo-1587620962725-abab7fe55159?q=80&w=800';
-    if (category.includes('cloud')) return 'https://images.unsplash.com/photo-1483058712412-4245e9b90334?q=80&w=800';
-    if (category.includes('ai')) return 'https://images.unsplash.com/photo-1620712943543-bcc4628c6bb5?q=80&w=800';
-
-    return course.image || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800';
-  };
 
   return (
     <motion.div
@@ -218,7 +189,12 @@ const CourseDiscovery = () => {
 
   return (
     <div className="dc-main-viewport">
-      <div className="dc-controls-wrapper" style={{ marginBottom: '40px' }}>
+      <header className="page-header-centered">
+        <h2>Course Catalog</h2>
+        <p>Explore our wide range of professional courses and start your learning journey today.</p>
+      </header>
+
+      <div className="dc-controls-wrapper">
         <div className="dc-search-bar">
           <Search size={20} color="#94a3b8" />
           <input
@@ -242,7 +218,7 @@ const CourseDiscovery = () => {
         </div>
       </div>
 
-      <div className="dc-content-sections" style={{ maxWidth: '1200px', margin: '0 auto' }}>
+      <div className="dc-content-sections">
         {isFiltering ? (
           <CourseSection
             title={searchTerm ? `Search Results for "${searchTerm}"` : `Filtered Courses: ${activeCategory}`}
