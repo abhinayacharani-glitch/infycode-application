@@ -1,45 +1,68 @@
-import React, { useEffect } from "react";
+import React from "react";
 import "./Footer.css";
 import logoimage from "../../assets/infycode-final-logo4-1.png";
 import logoimage1 from "../../assets/color-logo-3.png";
-import { FaPhoneAlt, FaEnvelope } from "react-icons/fa";
-import { Link, useLocation } from "react-router-dom";
+import { FaPhoneAlt, FaEnvelope, FaArrowUp } from "react-icons/fa";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 function Footer() {
 
-  // keeps your existing logic (no removal)
-  const { pathname, hash } = useLocation();
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
+  // ── Handler: ↑ Arrow → native browser hash scroll to #hero ───────────────
+  // Uses window.location.href for 100% reliability — no React timing issues
+  const handleScrollToHero = () => {
+    window.location.href = "/#hero";
+  };
 
-  // Extend logic for hash scrolling
-  useEffect(() => {
-    if (hash) {
-      const element = document.getElementById(hash.substring(1));
-      if (element) {
-        setTimeout(() => {
-          element.scrollIntoView({ behavior: "smooth" });
-        }, 100); // small delay to ensure page is loaded/scrolled to top first
-      }
+  // ── Handler: Logo → scroll to Hero ─────────────────────────────────────────
+  const handleLogoClick = (e) => {
+    e.preventDefault();
+    handleScrollToHero();
+  };
+
+  // ── Handler: Courses link → scroll to #courses section ─────────────────────
+  const handleCoursesClick = (e) => {
+    e.preventDefault();
+    if (pathname === "/") {
+      const section = document.getElementById("courses");
+      if (section) section.scrollIntoView({ behavior: "smooth" });
+    } else {
+      navigate("/#courses");
     }
-  }, [hash, pathname]);
+  };
+
+  // ── Handler: Instagram → internal /instagram page ──────────────────────────
+  const handleInstagram = () => {
+    navigate("/instagram");
+    window.scrollTo(0, 0);
+  };
+
+  // ── Handler: WhatsApp → opens WhatsApp Web in new tab ──────────────────────
+  const handleWhatsApp = () => {
+    window.open("https://web.whatsapp.com/", "_blank", "noopener,noreferrer");
+  };
+
+  // ── Handler: X (Twitter) → opens Twitter in new tab ────────────────────────
+  const handleTwitter = () => {
+    window.open("https://twitter.com/", "_blank", "noopener,noreferrer");
+  };
 
   return (
     <footer className="footer">
 
       <div className="footer-container">
 
-        {/* LEFT SECTION */}
+        {/* LEFT — Brand */}
         <div className="footer-col brand">
 
-          <Link to="/" className="footer-logo">
-            <img src={logoimage} alt="Infycode logo"/>
+          <a href="/" className="footer-logo" onClick={handleLogoClick}>
+            <img src={logoimage} alt="Infycode logo" />
             <div className="logo-text">
-              <img src={logoimage1} alt="Infycode logo"/>
+              <img src={logoimage1} alt="Infycode" />
             </div>
-          </Link>
+          </a>
 
           <p>
             There are course and event custom post types so you can easily
@@ -53,22 +76,19 @@ function Footer() {
 
         </div>
 
-
-        {/* ABOUT */}
+        {/* ABOUT US */}
         <div className="footer-col">
           <h3>About Us</h3>
 
-          <Link to="/#why-choose" className="footer-link" onClick={() => window.scrollTo(0, 0)}>About</Link>
-          <Link to="/courses" className="footer-link" onClick={() => window.scrollTo(0, 0)}>Courses</Link>
+          <Link to="/about" className="footer-link" onClick={() => window.scrollTo(0, 0)}>About</Link>
+          <a href="/#courses" className="footer-link" onClick={handleCoursesClick}>Courses</a>
           <Link to="/trainings" className="footer-link" onClick={() => window.scrollTo(0, 0)}>Trainings</Link>
           <Link to="/trainings/corporate" className="footer-link" onClick={() => window.scrollTo(0, 0)}>Corporate</Link>
           <Link to="/become-trainer" className="footer-link" onClick={() => window.scrollTo(0, 0)}>Become a Trainer</Link>
           <Link to="/contact" className="footer-link" onClick={() => window.scrollTo(0, 0)}>Contact</Link>
-
         </div>
 
-
-        {/* LINKS */}
+        {/* USEFUL LINKS */}
         <div className="footer-col">
           <h3>Useful Links</h3>
 
@@ -78,9 +98,7 @@ function Footer() {
           <Link to="/trainings/institutional" className="footer-link" onClick={() => window.scrollTo(0, 0)}>Institutional</Link>
           <Link to="/#faq" className="footer-link" onClick={() => window.scrollTo(0, 0)}>FAQ</Link>
           <Link to="/#testimonials" className="footer-link" onClick={() => window.scrollTo(0, 0)}>Testimonials</Link>
-
         </div>
-
 
         {/* NEWSLETTER */}
         <div className="footer-col">
@@ -94,7 +112,6 @@ function Footer() {
             <input type="email" placeholder="Enter your email" />
             <button>→</button>
           </div>
-
         </div>
 
       </div>
@@ -104,7 +121,7 @@ function Footer() {
       <div className="footer-bottom">
 
         <p>
-          © 2026 <span>InfyCode</span>. Product By Charani Infotech Pvt Ltd. All Rights Reserved 
+          © 2026 <span>InfyCode</span>. Product By Charani Infotech Pvt Ltd. All Rights Reserved
         </p>
 
         <div className="socials">
@@ -113,17 +130,49 @@ function Footer() {
 
           <div className="icons">
 
-            <Link to="/instagram" className="social-circle" onClick={() => window.scrollTo(0, 0)}>
+            {/* Instagram → /instagram internal page */}
+            <button
+              type="button"
+              className="social-circle"
+              onClick={handleInstagram}
+              aria-label="Instagram"
+              title="Instagram"
+            >
               <i className="fa-brands fa-instagram"></i>
-            </Link>
+            </button>
 
-            <div className="social-circle">
+            {/* X (Twitter) → opens twitter.com in new tab */}
+            <button
+              type="button"
+              className="social-circle"
+              onClick={handleTwitter}
+              aria-label="X Twitter"
+              title="X (Twitter)"
+            >
               <i className="fa-brands fa-x-twitter"></i>
-            </div>
+            </button>
 
-            <div className="social-circle">
+            {/* WhatsApp → opens WhatsApp Web in new tab */}
+            <button
+              type="button"
+              className="social-circle"
+              onClick={handleWhatsApp}
+              aria-label="WhatsApp"
+              title="WhatsApp"
+            >
               <i className="fa-brands fa-whatsapp"></i>
-            </div>
+            </button>
+
+            {/* ↑ Arrow → scroll to Hero section */}
+            <button
+              type="button"
+              className="scroll-top-btn"
+              onClick={handleScrollToHero}
+              aria-label="Scroll to hero section"
+              title="Back to top"
+            >
+              <FaArrowUp />
+            </button>
 
           </div>
 

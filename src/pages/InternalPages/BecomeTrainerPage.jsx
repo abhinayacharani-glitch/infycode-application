@@ -99,7 +99,7 @@ const BecomeTrainerPage = () => {
   return (
     <div className="internal-page">
       {/* Back Button */}
-      <button onClick={() => navigate(-1)} className="internal-back-btn">
+      <button onClick={() => navigate("/")} className="modern-back-btn">
         <ArrowLeft size={18} />
         <span>Back</span>
       </button>

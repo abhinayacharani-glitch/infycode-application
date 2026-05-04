@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, MapPin, Users, Zap, Award, Rocket, CheckCircle, Sparkles, Globe, BrainCircuit, Instagram, Linkedin, ExternalLink } from 'lucide-react';
+import { Calendar, MapPin, Users, Zap, Award, Rocket, CheckCircle, Sparkles, Globe, BrainCircuit, Instagram, Linkedin, ExternalLink, ArrowLeft } from 'lucide-react';
 import LoginBackground from '../../student-auth/components/LoginBackground';
 import './LaunchEvent.css';
 
