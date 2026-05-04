@@ -63,7 +63,7 @@ function Hero() {
   }, [index]);
 
   return (
-    <section className="hero">
+    <section className="hero" id="hero">
 
       <div
         className="slide-wrapper"

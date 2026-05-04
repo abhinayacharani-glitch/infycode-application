@@ -21,7 +21,7 @@
   margin-bottom: 20px;
   font-size: var(--fs-h3);
   color: #000; 
-  font-weight: 600;/* Black headlines */
+  font-weight: 700;
 }
 
 .footer-col p {
@@ -38,12 +38,17 @@
   gap: 10px;
   margin-bottom: 20px;
   text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.footer-logo:hover {
+  opacity: 0.85;
 }
 
 .footer-logo img {
   height: 44px;
   display: block;
-  /* Darken slightly for white backgrounds if needed, but here we just ensure clarity */
 }
 
 .footer-logo .logo-text img {
@@ -130,6 +135,7 @@
 .icons {
   display: flex;
   gap: 10px;
+  align-items: center;
 }
 
 /* CIRCLE ICONS */
@@ -146,24 +152,99 @@
   font-size: var(--fs-h3);
   cursor: pointer;
   transition: all 0.3s ease;
+  text-decoration: none;
 }
 
 .social-circle:hover {
-  background: #3b6ff5;
+  background: #2563eb;
   color: white;
   transform: translateY(-3px);
 }
 
+/* FOOTER LINKS */
+
 .footer-link {
   display: block;
-  color: #1e293b;
+  color: #475569;
   text-decoration: none;
   cursor: pointer;
-  margin: 5px 0;
-  transition: all 0.3s ease;
+  margin: 7px 0;
+  font-weight: 500;
+  transition: color 0.3s ease, padding-left 0.3s ease, font-weight 0.2s ease;
 }
 
-.footer-link:hover {
-  color: #3b6ff5;
-  padding-left: 5px;
+.footer-link:hover,
+.footer-link:focus {
+  color: #2563eb !important;
+  padding-left: 6px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* SCROLL TO TOP BUTTON */
+
+.scroll-top-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #2563eb;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+  transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+  flex-shrink: 0;
+}
+
+.scroll-top-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-3px) scale(1.08);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.5);
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 768px) {
+  .footer {
+    padding: 40px 24px 16px;
+  }
+
+  .footer-container {
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .footer-col {
+    min-width: 100%;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .socials {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer {
+    padding: 32px 16px 16px;
+  }
+
+  .footer-bottom {
+    font-size: 0.85rem;
+  }
+
+  .icons {
+    gap: 8px;
+  }
 }
