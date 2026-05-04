@@ -140,7 +140,7 @@ const Navbar = ({ onToggleSidebar }) => {
           {user.profileImage ? (
             <img src={user.profileImage} alt="Profile" className="navbar-avatar" />
           ) : (
-            <div className="navbar-avatar-placeholder">{user.fullname.charAt(0).toUpperCase()}</div>
+            <div className="navbar-avatar-placeholder" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><User size={20} /></div>
           )}
           <ChevronDown
             size={18}
@@ -157,7 +157,7 @@ const Navbar = ({ onToggleSidebar }) => {
                 {user.profileImage ? (
                   <img src={user.profileImage} alt="Profile" className="dropdown-avatar" />
                 ) : (
-                  <div className="dropdown-avatar-placeholder">{user.fullname.charAt(0).toUpperCase()}</div>
+                  <div className="dropdown-avatar-placeholder" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><User size={20} /></div>
                 )}
                 <div className="dropdown-user-info">
                   <div className="dropdown-name">{user.fullname}</div>

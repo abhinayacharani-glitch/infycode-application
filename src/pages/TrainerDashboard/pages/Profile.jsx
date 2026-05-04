@@ -200,9 +200,9 @@ const Profile = () => {
   };
 
   const stats = [
-    { label: 'Active Batches', value: safeData.activeBatches || '4', icon: <Layers size={18} />, color: 'blue' },
-    { label: 'Total Students', value: safeData.totalStudents || '128', icon: <Users size={18} />, color: 'green' },
-    { label: 'Avg Attendance', value: (safeData.avgAttendance || '92') + '%', icon: <Star size={18} />, color: 'purple' }
+    { label: 'Active Batches', value: safeData.activeBatches ?? '0', icon: <Layers size={18} />, color: 'blue' },
+    { label: 'Total Students', value: safeData.totalStudents ?? '0', icon: <Users size={18} />, color: 'green' },
+    { label: 'Avg Attendance', value: (safeData.avgAttendance ?? '92') + '%', icon: <Star size={18} />, color: 'purple' }
   ];
 
   const displayName = safeData.fullName || safeData.fullname || safeData.name || "";
@@ -245,8 +245,8 @@ const Profile = () => {
               {localImage ? (
                 <img src={localImage} alt="Profile" className="profile-img-centered" />
               ) : (
-                <div className="profile-img-centered placeholder">
-                  <User size={40} className="text-muted" />
+                <div className="profile-img-centered placeholder" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#94a3b8', color: 'white' }}>
+                  <User size={40} />
                 </div>
               )}
               <div className="camera-overlay-minimal" onClick={() => setShowPhotoMenu(!showPhotoMenu)}>

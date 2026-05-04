@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { User } from 'lucide-react';
 import "./Sidebar.css";
 import icLogo from '../../../assets/infycode-final-logo4-1.png';
 
@@ -80,8 +81,8 @@ const Sidebar = ({ externalShowLogoutModal, setExternalShowLogoutModal }) => {
             {user.profileImage ? (
               <img src={user.profileImage} alt="Profile" className="student-sd-mini-avatar" />
             ) : (
-              <div className="student-sd-mini-avatar-placeholder">
-                {user.fullname.charAt(0).toUpperCase()}
+              <div className="student-sd-mini-avatar-placeholder" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <User size={18} />
               </div>
             )}
             <span className="student-sd-status-dot-mini"></span>
