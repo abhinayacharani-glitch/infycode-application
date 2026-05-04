@@ -30,7 +30,10 @@
 .articles-hero::before {
   content: '';
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: linear-gradient(rgba(10, 25, 47, 0.85), rgba(37, 99, 235, 0.4));
   z-index: 1;
 }
@@ -74,7 +77,7 @@
   background: white;
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
   transition: transform 0.3s, box-shadow 0.3s;
   display: flex;
   flex-direction: column;
@@ -82,7 +85,7 @@
 
 .articles-card:hover {
   transform: translateY(-10px);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
 }
 
 .articles-card-img {
@@ -160,6 +163,7 @@
   .articles-hero h1 {
     font-size: 2.2rem;
   }
+
   .articles-section {
     padding: 50px 5%;
   }

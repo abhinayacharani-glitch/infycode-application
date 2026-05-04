@@ -68,10 +68,6 @@ const LaunchEvent = ({ onEnterSite }) => {
 
     return (
         <div className="launch-root fullscreen-launch">
-            <button className="modern-back-btn" onClick={() => onEnterSite('/')} style={{ top: '40px', left: '40px' }}>
-                <ArrowLeft size={18} />
-                <span>Back</span>
-            </button>
             {/* Background from Login Page */}
             <div className="launch-bg-wrapper">
                 <LoginBackground />
