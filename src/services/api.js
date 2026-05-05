@@ -621,6 +621,42 @@ export const getNewPublishedFAQs = () =>
 // COUNSELLING
 // ─────────────────────────────────────────────
 
+export const updateCounsellingStatusAPI = (bookingId, status) =>
+  request('/api/counselling/update-status', {
+    method: 'PUT',
+    headers: getAuthHeader(),
+    body: JSON.stringify({ bookingId, status }),
+  });
+
+// ─────────────────────────────────────────────
+// CALENDAR
+// ─────────────────────────────────────────────
+
+export const getCalendarEventsAPI = () =>
+  request('/api/calendar/events', {
+    headers: getAuthHeader(),
+  });
+
+export const createCalendarEventAPI = (eventData) =>
+  request('/api/calendar/events', {
+    method: 'POST',
+    headers: getAuthHeader(),
+    body: JSON.stringify(eventData),
+  });
+
+export const updateCalendarEventAPI = (id, eventData) =>
+  request(`/api/calendar/events/${id}`, {
+    method: 'PUT',
+    headers: getAuthHeader(),
+    body: JSON.stringify(eventData),
+  });
+
+export const deleteCalendarEventAPI = (id) =>
+  request(`/api/calendar/events/${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeader(),
+  });
+
 export const bookCounsellingSlot = (bookingData) =>
   request('/api/counselling/book', {
     method: 'POST',

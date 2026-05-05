@@ -10,7 +10,9 @@ import faqRoutes from "./routes/faqRoutes.js";
 import studentRoutes from "./routes/studentRoutes.js";
 import counsellingRoutes from "./routes/counsellingRoutes.js";
 import syllabusRoutes from "./routes/syllabusRoutes.js";
+import calendarRoutes from "./routes/calendarRoutes.js";
 import { publishFAQ, getNewPublishedFAQs } from "./controllers/faqController.js";
+
 
 const app = express();
 
@@ -76,5 +78,7 @@ app.use("/api/syllabuses", syllabusRoutes); // /api/syllabuses CRUD
 app.use("/api/faqs", faqRoutes);          // /api/faqs FAQ operations
 app.use("/api/student", studentRoutes);   // /api/student operations
 app.use("/api/counselling", counsellingRoutes); // /api/counselling operations
+app.use("/api/calendar", calendarRoutes);       // /api/calendar operations
+
 
 export default app;

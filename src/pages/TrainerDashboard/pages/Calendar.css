@@ -198,6 +198,15 @@
   background: white;
 }
 
+.type-pill.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+}
+
+
 .v3-form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -896,6 +905,8 @@
   color: #065F46;
   border-left: 3px solid #10B981;
 }
+
+
 
 .event-pill.training {
   background: #F5F3FF;
