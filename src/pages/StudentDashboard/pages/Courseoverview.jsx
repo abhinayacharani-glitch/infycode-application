@@ -21,6 +21,58 @@ import './Courseoverview.css';
 
 const daysOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
+const COURSE_CONTENT_MAPPING = {
+  'Introduction to AI': {
+    objective: "Basics of AI, history, real-world applications, and core concepts like ML & DL.",
+    firstCard: {
+      title: "AI Fundamentals",
+      description: "Learn AI concepts, history, and real-world use cases."
+    }
+  },
+  'Aptitude': {
+    objective: "Improve problem-solving, logical reasoning, quantitative, and verbal skills.",
+    firstCard: {
+      title: "Problem Solving Skills",
+      description: "Practice quantitative, logical, and verbal reasoning."
+    }
+  },
+  'Ethical Hacking & Cyber Security': {
+    objective: "Learn security concepts, ethical hacking tools, vulnerability testing, and protection techniques.",
+    firstCard: {
+      title: "Cyber Security Basics",
+      description: "Learn ethical hacking, network security, and threat analysis."
+    }
+  },
+  'Data Science & AI': {
+    objective: "Learn data analysis, visualization, machine learning, and AI integration.",
+    firstCard: {
+      title: "Data Analysis",
+      description: "Work with data, visualization, and AI-based insights."
+    }
+  },
+  'Machine Learning Deep Dive': {
+    objective: "Understand advanced ML algorithms, model building, tuning, and deployment.",
+    firstCard: {
+      title: "ML Algorithms",
+      description: "Explore supervised and unsupervised learning techniques."
+    }
+  },
+  'Next.js 14 Masterclass': {
+    objective: "Learn modern full-stack development using Next.js 14, SSR, routing, and APIs.",
+    firstCard: {
+      title: "Next.js Development",
+      description: "Build fast and scalable web apps using Next.js."
+    }
+  },
+  'React JS Full Stack Development': {
+    objective: "Learn React, frontend + backend integration, APIs, and full-stack architecture.",
+    firstCard: {
+      title: "Frontend Development",
+      description: "Build dynamic UI using React and modern tools."
+    }
+  }
+};
+
 const parse12HourToMinutes = (time12) => {
   if (!time12) return 0;
   const [time, suffix] = time12.split(' ');
@@ -181,6 +233,14 @@ const CourseOverview = () => {
 
   const courseImage = getCourseImage(course);
 
+  const dynamicContent = COURSE_CONTENT_MAPPING[course.title] || {
+    objective: course.objective || course.description || "Our curriculum is designed to bridge the gap between academic theory and industry reality. By combining deep-dive technical modules with hands-on labs and real-world project simulations, we ensure that you master the architecture and problem-solving mindset required by top-tier tech companies.",
+    firstCard: {
+      title: (course.benefits && course.benefits[0]?.label) || "Multi-Cloud",
+      description: (course.benefits && course.benefits[0]?.desc) || "AWS, Azure & GCP covered"
+    }
+  };
+
   return (
     <div className="course-overview-page">
       <button className="co-back-btn" onClick={handleBack}>
@@ -285,14 +345,14 @@ const CourseOverview = () => {
       <div className="co-objective-section">
         <div className="co-section-label">Course Objective</div>
         <p className="co-objective-text">
-          {course.description || "Our curriculum is designed to bridge the gap between academic theory and industry reality. By combining deep-dive technical modules with hands-on labs and real-world project simulations, we ensure that you master the architecture and problem-solving mindset required by top-tier tech companies."}
+          {dynamicContent.objective}
         </p>
         <div className="co-benefits-grid">
           <div className="co-benefit-item">
             <div className="co-benefit-icon"><GraduationCap size={20} /></div>
             <div>
-              <div className="co-benefit-label">Multi-Cloud</div>
-              <div className="co-benefit-desc">AWS, Azure & GCP covered</div>
+              <div className="co-benefit-label">{dynamicContent.firstCard.title}</div>
+              <div className="co-benefit-desc">{dynamicContent.firstCard.description}</div>
             </div>
           </div>
           <div className="co-benefit-item">
