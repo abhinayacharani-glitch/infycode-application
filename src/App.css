@@ -198,6 +198,30 @@
   z-index: 9999;
 }
 
+/* Scroll To Top Floating Button */
+.scroll-to-top-float {
+  height: 46px;
+  width: 46px;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #2563eb;
+  border: 1.5px solid rgba(37, 99, 235, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  z-index: 9999;
+}
+
+.scroll-to-top-float:hover {
+  background: #2563eb;
+  color: #ffffff;
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(37, 99, 235, 0.3);
+}
+
 /* WhatsApp Floating Button - Premium Sliding Design */
 .whatsapp-float {
   position: relative;
