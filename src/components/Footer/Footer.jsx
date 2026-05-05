@@ -10,10 +10,14 @@ function Footer() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
-  // ── Handler: ↑ Arrow → native browser hash scroll to #hero ───────────────
-  // Uses window.location.href for 100% reliability — no React timing issues
+  // ── Handler: ↑ Arrow → Scroll to Hero Buttons ──────────────────────────
   const handleScrollToHero = () => {
-    window.location.href = "/#hero";
+    const section = document.getElementById("hero-actions");
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth", block: "center" });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   };
 
   // ── Handler: Logo → scroll to Hero ─────────────────────────────────────────
@@ -163,16 +167,18 @@ function Footer() {
               <i className="fa-brands fa-whatsapp"></i>
             </button>
 
-            {/* ↑ Arrow → scroll to Hero section */}
+            {/* ↑ Arrow → Smooth Scroll to Top */}
             <button
               type="button"
               className="scroll-top-btn"
               onClick={handleScrollToHero}
-              aria-label="Scroll to hero section"
-              title="Back to top"
+              aria-label="Scroll to top"
+              title="Back to Top"
             >
               <FaArrowUp />
             </button>
+
+
 
           </div>
 

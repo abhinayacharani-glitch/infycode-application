@@ -403,6 +403,26 @@ const Courses = () => {
                   <div className="card-content-modern">
                     <h3 className="card-title-modern">{course.title}</h3>
 
+                    {/* Stats Section: Students & Rating */}
+                    <div className="card-stats-modern">
+                      <span className="stat students-text">{course.students} students</span>
+                      <div className="stat stars-container">
+                        {[...Array(5)].map((_, index) => {
+                          const rating = course.rating || 5;
+                          const fullStars = Math.floor(rating);
+                          const hasHalfStar = rating % 1 >= 0.5;
+                          
+                          if (index < fullStars) {
+                            return <Star key={index} size={14} fill="#f59e0b" color="#f59e0b" />;
+                          } else if (index === fullStars && hasHalfStar) {
+                            return <Star key={index} size={14} fill="#f59e0b" color="#f59e0b" />;
+                          } else {
+                            return <Star key={index} size={14} color="#d1d5db" />;
+                          }
+                        })}
+                      </div>
+                    </div>
+
                     {/* Footer */}
                     <div className="card-footer-modern">
                       <div className="footer-info-left">
@@ -428,7 +448,7 @@ const Courses = () => {
                         >
                           <Eye size={20} />
                         </button>
-                        <span className="action-label">View Course</span>
+                        <span className="action-label">Overview</span>
                       </div>
                     </div>
                   </div>

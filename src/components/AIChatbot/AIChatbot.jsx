@@ -10,7 +10,6 @@ const AIChatbot = () => {
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
   const [hasGreeted, setHasGreeted] = useState(false);
-  const [showGreetingTooltip, setShowGreetingTooltip] = useState(false);
 
   const toggleChat = () => {
     const willOpen = !isOpen;
@@ -21,8 +20,6 @@ const AIChatbot = () => {
       setMessages([]);
       setHasGreeted(false);
     }
-    
-    setShowGreetingTooltip(false); 
   };
 
   const scrollToBottom = () => {
@@ -32,22 +29,6 @@ const AIChatbot = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages, isTyping]);
-
-  useEffect(() => {
-    // Show greeting tooltip 1 second after mount, hide after 3 seconds of being visible
-    const showTimer = setTimeout(() => {
-      setShowGreetingTooltip(true);
-    }, 1000);
-
-    const hideTimer = setTimeout(() => {
-      setShowGreetingTooltip(false);
-    }, 4000); // 1s wait + 3s display = 4s total
-
-    return () => {
-      clearTimeout(showTimer);
-      clearTimeout(hideTimer);
-    };
-  }, []);
 
   useEffect(() => {
     if (isOpen && !hasGreeted) {
@@ -125,20 +106,6 @@ const AIChatbot = () => {
     <div className="ai-chatbot-container">
       {/* Greeting Tooltip Container */}
       <div className="ai-bot-wrapper">
-        <AnimatePresence>
-          {showGreetingTooltip && !isOpen && (
-            <motion.div 
-              className="ai-greeting-popup"
-              initial={{ opacity: 0, x: 20, scale: 0.9 }}
-              animate={{ opacity: 1, x: 0, scale: 1 }}
-              exit={{ opacity: 0, x: 10, scale: 0.9 }}
-              transition={{ duration: 0.4 }}
-            >
-               Hi there! 👋 I am your AI Assistant. How can I help you navigate this page today?
-            </motion.div>
-          )}
-        </AnimatePresence>
-
         {/* Chat Window placed relative to wrapper */}
         <div className={`ai-chat-window ${isOpen ? 'open' : ''}`}>
           <div className="ai-chat-header">
