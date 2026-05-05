@@ -166,7 +166,7 @@ export const enrollInCourse = async (req, res) => {
     }
 
     const sanitizedEmail = email.trim().toLowerCase().replace(/\./g, ",");
-    
+
     // Add courseId to student's enrollment list
     await enrollmentsRef.child(sanitizedEmail).child(courseId).set({
       enrolledAt: new Date().toISOString(),
@@ -211,8 +211,130 @@ export const getEnrolledCourses = async (req, res) => {
   }
 };
 
+/**
+ * @desc  Get per-course batch + full trainer details for the logged-in student
+ * @route GET /api/student/my-batches
+ */
+export const getStudentBatches = async (req, res) => {
+  try {
+    const email = req.user?.email?.toLowerCase();
+    const idFromToken = req.user?.id;
+
+    // 1. Resolve student record
+    let studentData = null;
+    if (idFromToken) {
+      const snap = await studentsRef.child(idFromToken).once("value");
+      if (snap.exists()) studentData = { id: idFromToken, ...snap.val() };
+    }
+    if (!studentData && email) {
+      const allSnap = await studentsRef.once("value");
+      const all = allSnap.val() || {};
+      for (const key in all) {
+        if (all[key].email?.toLowerCase() === email) {
+          studentData = { id: key, ...all[key] };
+          break;
+        }
+      }
+    }
+    if (!studentData) {
+      return res.status(404).json({ success: false, message: "Student not found" });
+    }
+
+    // 2. Get batches map: { "Course Name": "batchFirebaseKey" }
+    const batchesMap = studentData.batches || {};
+    if (Object.keys(batchesMap).length === 0) {
+      return res.status(200).json({ success: true, batches: {} });
+    }
+
+    // 3. Fetch batch + trainer for each course
+    const batchesRef = db.ref("batch");
+    const trainersRef = db.ref("trainers");
+    const result = {};
+
+    // Pre-fetch all trainers for robust in-memory matching (avoids Firebase case-sensitivity issues)
+    const allTrainersSnap = await trainersRef.once("value");
+    const allTrainersRaw = allTrainersSnap.val() || {};
+    const trainersList = Object.entries(allTrainersRaw).map(([key, data]) => ({ key, ...data }));
+
+    for (const [courseName, batchKey] of Object.entries(batchesMap)) {
+      try {
+        const directSnap = await batchesRef.child(batchKey).once("value");
+        let batchData = null;
+        if (directSnap.exists()) {
+          batchData = { firebaseKey: batchKey, ...directSnap.val() };
+        } else {
+          const qSnap = await batchesRef.orderByChild("batchId").equalTo(batchKey).once("value");
+          if (qSnap.exists()) qSnap.forEach(c => { batchData = { firebaseKey: c.key, ...c.val() }; });
+        }
+        if (!batchData) continue;
+
+        // 4. Fetch full trainer profile (Case-insensitive matching)
+        const trainerNameStr = (batchData.trainerName || batchData.trainer || "").trim().toLowerCase();
+        let trainerDetails = null;
+
+        if (trainerNameStr) {
+          const matchedTrainer = trainersList.find(t => {
+            const tName = (t.fullName || t.fullname || t.name || "").trim().toLowerCase();
+            return tName === trainerNameStr || t.email?.toLowerCase() === trainerNameStr;
+          });
+
+          if (matchedTrainer) {
+            trainerDetails = {
+              name: matchedTrainer.fullName || matchedTrainer.fullname || matchedTrainer.name,
+              email: matchedTrainer.email || "",
+              phone: matchedTrainer.phone || matchedTrainer.mobile || "",
+              specialization: matchedTrainer.specialization || matchedTrainer.domain || "",
+              expertise: matchedTrainer.expertise || "",
+              experience: matchedTrainer.experience || "",
+              profileImage: matchedTrainer.profileImage || ""
+            };
+          } else {
+            trainerDetails = { name: batchData.trainerName || batchData.trainer, email: "", phone: "", specialization: "", experience: "", profileImage: "" };
+          }
+        }
+
+        // 5. Extract start date/time
+        let startDate = "", startTime = "";
+        if (batchData.startDateTime) {
+          const d = new Date(batchData.startDateTime);
+          startDate = d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+          startTime = d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
+        } else if (batchData.name && batchData.name.includes(" - ")) {
+          startDate = batchData.name.split(" - ").pop();
+        }
+
+        result[courseName] = {
+          batchId: batchData.batchId || batchKey,
+          batchName: batchData.name || courseName,
+          courseName: batchData.courseName || batchData.course || courseName,
+          courseId: batchData.courseId || "",
+          status: batchData.status || "Scheduled",
+          batchStatus: batchData.batchStatus || batchData.status || "Scheduled",
+          startDateTime: batchData.startDateTime || "",
+          startDate,
+          startTime,
+          duration: batchData.duration || "",
+          mode: batchData.mode || "Online",
+          capacity: batchData.capacity || 30,
+          enrolled: batchData.enrolled || 0,
+          liveClassLink: batchData.liveClassLink || batchData.meetLink || "",
+          trainer: trainerDetails
+        };
+      } catch (err) {
+        console.error(`[getStudentBatches] Error for "${courseName}":`, err.message);
+      }
+    }
+
+    return res.status(200).json({ success: true, batches: result });
+  } catch (error) {
+    console.error("[getStudentBatches] Error:", error.message);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
 export const getStudentProfile = async (req, res) => {
   try {
+
     const email = req.user?.email?.toLowerCase();
     const idFromToken = req.user?.id;
 
@@ -304,8 +426,10 @@ export const updateStudentProfile = async (req, res) => {
     const sanitized = {};
     for (const key of ALLOWED) {
       const val = body[key];
-      // Only include truthy strings (skip null, undefined, empty string)
-      if (val !== undefined && val !== null && val !== "") {
+      // Allow clearing profileImage
+      if (key === 'profileImage' && (val === null || val === "")) {
+        sanitized[key] = null; // Firebase removes keys set to null
+      } else if (val !== undefined && val !== null && val !== "") {
         sanitized[key] = val;
       }
     }
@@ -359,4 +483,80 @@ export const markAllStudentResultsAsSeen = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// ═══════════════════════════════════════════════════════════════════════════
+// POST /api/student/queries
+// ═══════════════════════════════════════════════════════════════════════════
+export const createStudentQuery = async (req, res) => {
+  try {
+    const { title, text, code, type, trainerName, batchId } = req.body;
+    const studentId = req.user.id;
+    
+    const snapshot = await studentsRef.child(studentId).once("value");
+    const studentData = snapshot.val();
+
+    const newQuery = {
+      studentId,
+      studentName: studentData.fullname || studentData.fullName || studentData.name || "Student",
+      title,
+      text,
+      code: code || "",
+      type: type || "chat", // chat, code, meet
+      trainerName,
+      batchId,
+      status: 'Pending',
+      createdAt: new Date().toISOString(),
+      readByTrainer: false,
+      readByStudent: true
+    };
+
+    const queriesRef = db.ref("queries");
+    const newRef = queriesRef.push();
+    await newRef.set(newQuery);
+
+    return res.status(201).json({ success: true, queryId: newRef.key });
+  } catch (error) {
+    console.error("[createStudentQuery] Error:", error.message);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// GET /api/student/queries
+// ═══════════════════════════════════════════════════════════════════════════
+export const getStudentQueries = async (req, res) => {
+  try {
+    const studentId = req.user.id;
+    const queriesRef = db.ref("queries");
+    const snapshot = await queriesRef.orderByChild("studentId").equalTo(studentId).once("value");
+    
+    const queries = [];
+    if (snapshot.exists()) {
+      snapshot.forEach(child => {
+        queries.push({ id: child.key, ...child.val() });
+      });
+    }
+
+    queries.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    return res.status(200).json({ success: true, queries });
+  } catch (error) {
+    console.error("[getStudentQueries] Error:", error.message);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PUT /api/student/queries/:queryId/read
+// ═══════════════════════════════════════════════════════════════════════════
+export const markQueryReadByStudent = async (req, res) => {
+  try {
+    const { queryId } = req.params;
+    await db.ref("queries").child(queryId).update({ readByStudent: true });
+    return res.status(200).json({ success: true });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 

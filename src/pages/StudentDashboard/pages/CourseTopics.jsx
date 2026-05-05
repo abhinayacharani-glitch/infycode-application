@@ -1,55 +1,93 @@
-import React from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronRight, BookOpen, Star, Zap, ArrowLeft, Target, CheckCircle, Calendar, Briefcase, FileText } from 'lucide-react';
+import { 
+  ChevronRight, 
+  BookOpen, 
+  Star, 
+  Zap, 
+  ArrowLeft, 
+  Target, 
+  CheckCircle, 
+  Calendar, 
+  Briefcase, 
+  FileText,
+  User,
+  Clock,
+  Hash,
+  Monitor
+} from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { COURSE_MAP } from './data/extraCourses';
+import { getStudentBatchesAPI } from '../../../services/api';
 import './CourseTopics.css';
 
 const CourseTopics = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { courseTitle, category } = location.state || { courseTitle: "Course Curriculum", category: "Technology" };
+  const { courseId: stateCourseId } = location.state || {};
 
-  const topicsData = [
-    {
-      level: "Beginner",
-      icon: <BookOpen className="level-icon beginner" />,
-      description: "Foundational concepts and core principles to get you started.",
-      topics: [
-        "Introduction and Environment Setup",
-        "Fundamental Syntax and Logic",
-        "Core Architecture Overview",
-        "First Practical Application",
-        "Best Practices for Beginners"
-      ]
-    },
-    {
-      level: "Intermediate",
-      icon: <Zap className="level-icon intermediate" />,
-      description: "Deep dive into complex patterns and professional workflows.",
-      topics: [
-        "Advanced State Management",
-        "API Integration and Data Flow",
-        "Performance Optimization Basics",
-        "Testing and Debugging Strategies",
-        "Component Reusability Patterns"
-      ]
-    },
-    {
-      level: "Advanced",
-      icon: <Star className="level-icon advanced" />,
-      description: "Mastering the ecosystem and expert-level optimizations.",
-      topics: [
-        "Enterprise System Architecture",
-        "Scalability and Security",
-        "Custom Hooks and Utilities",
-        "Server-Side Rendering (SSR)",
-        "Deployment and CI/CD Pipelines"
-      ]
+  const courseId = stateCourseId || 'java-fs-01';
+  const course = COURSE_MAP[courseId] || COURSE_MAP['java-fs-01'];
+
+  const [myBatches, setMyBatches] = useState({});
+  const [isLoadingBatches, setIsLoadingBatches] = useState(true);
+
+  useEffect(() => {
+    const fetchBatches = async () => {
+      try {
+        const response = await getStudentBatchesAPI();
+        if (response.success) {
+          setMyBatches(response.batches || {});
+        }
+      } catch (err) {
+        console.error("Failed to fetch student batches:", err);
+      } finally {
+        setIsLoadingBatches(false);
+      }
+    };
+    fetchBatches();
+    const interval = setInterval(fetchBatches, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const dynamicData = useMemo(() => {
+    const batchMatch = Object.values(myBatches).find(b => 
+      b.courseId === courseId || 
+      b.courseName === course.title ||
+      b.batchName?.includes(course.title)
+    );
+
+    if (batchMatch) {
+      return {
+        trainer: batchMatch.trainer ? {
+          name: batchMatch.trainer.name,
+          role: batchMatch.trainer.specialization || 'Lead Instructor',
+          experience: batchMatch.trainer.experience || '10+ Years',
+          specialization: batchMatch.trainer.specialization || course.category || 'Expert'
+        } : course.trainer,
+        batch: {
+          id: batchMatch.batchId,
+          name: batchMatch.batchName,
+          startDate: batchMatch.startDate || course.batch?.startDate,
+          timing: batchMatch.startTime || batchMatch.timing || course.batch?.timing || 'Flexible',
+          duration: batchMatch.duration || course.batch?.duration || '6 Months',
+          mode: batchMatch.mode || 'Online'
+        }
+      };
     }
-  ];
+    return { trainer: course.trainer, batch: course.batch };
+  }, [course, myBatches, courseId]);
 
-  const overview = "This course is designed to take you from a novice to an expert, equipping you with practical skills and deep theoretical knowledge required to excel in the industry. You will build real-world applications and learn best practices used by top professionals.";
+  const topicsData = course.modules.map(m => ({
+    level: m.subtitle,
+    icon: m.id === 'beginner' ? <BookOpen className="level-icon beginner" /> : 
+          m.id === 'intermediate' ? <Zap className="level-icon intermediate" /> : 
+          <Star className="level-icon advanced" />,
+    description: m.topics[0]?.content.replace(/<p>|<\/p>/g, '') || "Advanced curriculum topics.",
+    topics: m.topics.map(t => t.title).slice(0, 5)
+  }));
 
+  const overview = course.objective;
   const objectives = [
     "Master the core fundamentals and advanced concepts.",
     "Develop robust, scalable, and secure applications.",
@@ -64,20 +102,11 @@ const CourseTopics = () => {
     "Collaborate effectively using agile methodologies."
   ];
 
-  const syllabus = [
-    { week: "Week 1", title: "Introduction & Setup", content: "Environment configuration, basic syntax, and first steps." },
-    { week: "Week 2", title: "Core Fundamentals", content: "Data structures, control flows, and logic building." },
-    { week: "Week 3", title: "Advanced Functions", content: "Higher-order functions, closures, and functional programming." },
-    { week: "Week 4", title: "Object-Oriented Programming", content: "Classes, inheritance, and design patterns." },
-    { week: "Week 5", title: "Asynchronous Programming", content: "Promises, async/await, and event loops." },
-    { week: "Week 6", title: "API Integration", content: "RESTful APIs, data fetching, and error handling." },
-    { week: "Week 7", title: "State Management", content: "Handling complex states and data flow architectures." },
-    { week: "Week 8", title: "Database Foundations", content: "SQL/NoSQL basics, querying, and data modeling." },
-    { week: "Week 9", title: "Backend Integration", content: "Connecting services, authentication, and security." },
-    { week: "Week 10", title: "Performance & Testing", content: "Unit testing, optimization techniques, and profiling." },
-    { week: "Week 11", title: "Deployment & CI/CD", content: "Hosting, continuous integration, and standard workflows." },
-    { week: "Week 12", title: "Final Capstone Preparation", content: "Project planning, architecture review, and execution." }
-  ];
+  const syllabus = course.modules.map((m, i) => ({
+    week: `Module ${i + 1}`,
+    title: m.subtitle,
+    content: m.duration
+  }));
 
   const capstoneProjects = [
     { title: "E-Commerce Platform", desc: "A full-scale online store with payment gateway integration." },
@@ -100,10 +129,85 @@ const CourseTopics = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <span className="ct-category-tag">{category}</span>
-        <h1 className="ct-main-title">{courseTitle}</h1>
-        <p className="ct-main-subtitle">A comprehensive breakdown of the curriculum from foundations to mastery.</p>
+        <span className="ct-category-tag">{course.category || "Technology"}</span>
+        <h1 className="ct-main-title">{course.title}</h1>
+        <p className="ct-main-subtitle">{course.description}</p>
       </motion.div>
+
+      {/* Dynamic Trainer & Batch Info Section */}
+      <div className="ct-info-row" style={{ marginBottom: '40px' }}>
+          <motion.div className="ct-info-card" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
+            <div className="ct-card-header">
+              <User className="ct-hdr-icon" />
+              <h3>Assigned Trainer</h3>
+            </div>
+            <div className="ct-info-pill">
+               <div className="ct-avatar-sm">
+                 {dynamicData.trainer?.name?.charAt(0)}
+               </div>
+               <div>
+                 <div style={{ fontWeight: '800', color: '#0f172a' }}>{dynamicData.trainer?.name}</div>
+                 <div style={{ fontSize: '13px', color: '#64748b' }}>{dynamicData.trainer?.role}</div>
+               </div>
+            </div>
+            <div className="ct-batch-mini-grid" style={{ marginTop: '15px' }}>
+               <div className="ct-mini-card">
+                 <div className="ct-mini-label">Experience</div>
+                 <div className="ct-mini-value">{dynamicData.trainer?.experience}</div>
+               </div>
+               <div className="ct-mini-card">
+                 <div className="ct-mini-label">Specialization</div>
+                 <div className="ct-mini-value">{dynamicData.trainer?.specialization?.split(',')[0]}</div>
+               </div>
+            </div>
+          </motion.div>
+
+          <motion.div className="ct-info-card" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }}>
+            <div className="ct-card-header">
+              <Calendar className="ct-hdr-icon" style={{ color: '#10b981' }} />
+              <h3>Batch Schedule</h3>
+            </div>
+            <div className="ct-batch-mini-grid">
+               <div className="ct-mini-card">
+                 <div className="ct-mini-label">Batch ID</div>
+                 <div className="ct-mini-value">{dynamicData.batch?.id}</div>
+               </div>
+               <div className="ct-mini-card">
+                 <div className="ct-mini-label">Timing</div>
+                 <div className="ct-mini-value">{dynamicData.batch?.timing}</div>
+               </div>
+               <div className="ct-mini-card">
+                 <div className="ct-mini-label">Start Date</div>
+                 <div className="ct-mini-value">{dynamicData.batch?.startDate}</div>
+               </div>
+               <div className="ct-mini-card">
+                 <div className="ct-mini-label">Mode</div>
+                 <div className="ct-mini-value">{(() => {
+                      const dur = dynamicData.batch?.duration || '4 Months';
+                      const mod = (dynamicData.batch?.mode || 'Online').toLowerCase();
+                      const durationStr = /weeks|months|days/i.test(dur) ? dur : `${dur} weeks`;
+                      return `${durationStr} - ${mod}`;
+                    })()}</div>
+               </div>
+            </div>
+          </motion.div>
+
+          <motion.div className="ct-info-card" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }}>
+            <div className="ct-card-header">
+              <Target className="ct-hdr-icon" style={{ color: '#f59e0b' }} />
+              <h3>Current Progress</h3>
+            </div>
+            <div className="ct-progress-container">
+               <div className="ct-progress-labels">
+                 <span>Curriculum Completion</span>
+                 <span>{course.progress || 0}%</span>
+               </div>
+               <div className="ct-progress-bar-wrap">
+                 <div className="ct-progress-fill" style={{ width: `${course.progress || 0}%` }}></div>
+               </div>
+            </div>
+          </motion.div>
+      </div>
 
       <div className="ct-topics-grid">
         {topicsData.map((section, idx) => (
@@ -117,7 +221,7 @@ const CourseTopics = () => {
             <div className="ct-level-header">
               <div className="ct-icon-box">{section.icon}</div>
               <div>
-                <h2 className="ct-level-title">{section.level} Topics</h2>
+                <h2 className="ct-level-title">{section.level}</h2>
                 <p className="ct-level-desc">{section.description}</p>
               </div>
             </div>
@@ -135,13 +239,12 @@ const CourseTopics = () => {
               ))}
             </ul>
 
-            <button className="ct-enroll-btn">Unlock {section.level} Level</button>
+            <button className="ct-enroll-btn">Unlock {section.level}</button>
           </motion.div>
         ))}
       </div>
 
       <div className="ct-detailed-info">
-        {/* Course Overview & Objectives */}
         <div className="ct-info-row">
           <motion.div className="ct-info-card" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
             <div className="ct-card-header">
@@ -176,11 +279,10 @@ const CourseTopics = () => {
           </motion.div>
         </div>
 
-        {/* Syllabus / Modules */}
         <motion.div className="ct-syllabus-section" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
           <div className="ct-section-title">
             <Calendar className="ct-section-icon" />
-            <h2>12-Week Syllabus Map</h2>
+            <h2>Curriculum Roadmap</h2>
           </div>
           <div className="ct-syllabus-grid">
             {syllabus.map((mod, i) => (
@@ -193,7 +295,6 @@ const CourseTopics = () => {
           </div>
         </motion.div>
 
-        {/* Capstone Projects */}
         <motion.div className="ct-capstone-section" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
           <div className="ct-section-title">
             <Briefcase className="ct-section-icon" />

@@ -7,24 +7,24 @@ import "./BatchCreation.css";
 
 const initialFormState = {
   trainerName: "",
+  trainerId: "",
   courseName: "",
   numberOfStudents: "",
   startDateTime: "",
   duration: "",
+  mode: "Online",
   batchImage: null,
 };
 
 function BatchCreation() {
   const navigate = useNavigate();
-  const { trainers, batches, addBatch } = useAdmin();
+  const { trainers, batches, addBatch, startBatch } = useAdmin();
   const { publishedCourses } = useCourseContext();
   const [form, setForm] = useState(initialFormState);
   const [errors, setErrors] = useState({});
   const [showToast, setShowToast] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // ── Build course list: mirrors Student Dashboard EXACTLY ──────────────────
-  // Replicates reordering logic from StudentDashboard/pages/Course.jsx
   // ── Build course list: mirrors Student Dashboard EXACTLY ──────────────────
   // Replicates reordering logic from StudentDashboard/pages/Course.jsx
   const courseList = useMemo(() => {
@@ -99,14 +99,16 @@ function BatchCreation() {
     setIsSubmitting(true);
     try {
       const batchData = {
-        name: `${form.courseName} - ${new Date(form.startDateTime).toLocaleDateString()}`,
+        name: `${form.courseName} - ${new Date(form.startDateTime).toLocaleString('en-US', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`,
         course: form.courseName,
         trainer: form.trainerName,
+        trainerId: form.trainerId,
         capacity: Number(form.numberOfStudents),
-        status: 'Active',
-        duration: form.duration,
+        status: 'Scheduled',
         startDateTime: form.startDateTime,
-        batchImage: form.batchImage
+        duration: form.duration || "",
+        mode: form.mode || "Online",
+        batchImage: form.batchImage || ""
       };
 
       await addBatch(batchData);
@@ -174,7 +176,20 @@ function BatchCreation() {
 
                 <div className="form-group">
                   <label>Assign Trainer</label>
-                  <select name="trainerName" value={form.trainerName} onChange={handleChange} className={errors.trainerName ? 'input-error' : ''}>
+                  <select 
+                    name="trainerName" 
+                    value={form.trainerName} 
+                    onChange={(e) => {
+                      const selectedTrainer = trainers.find(t => t.name === e.target.value);
+                      setForm(prev => ({ 
+                        ...prev, 
+                        trainerName: e.target.value,
+                        trainerId: selectedTrainer ? selectedTrainer.id : ""
+                      }));
+                      if (errors.trainerName) setErrors(prev => ({ ...prev, trainerName: "" }));
+                    }} 
+                    className={errors.trainerName ? 'input-error' : ''}
+                  >
                     <option value="">— Select Trainer —</option>
                     {trainers.map(t => (
                       <option key={t.id} value={t.name}>{t.name}</option>
@@ -200,11 +215,18 @@ function BatchCreation() {
                   <label>Duration</label>
                   <input type="text" name="duration" placeholder="e.g. 12 Weeks" value={form.duration} onChange={handleChange} />
                 </div>
+                <div className="form-group">
+                  <label>Batch Mode</label>
+                  <select name="mode" value={form.mode} onChange={handleChange}>
+                    <option value="Online">Online</option>
+                    <option value="Offline">Offline</option>
+                  </select>
+                </div>
               </div>
 
               <div className="form-footer">
                 <button type="submit" className="batch-submit-btn" disabled={isSubmitting}>
-                  {isSubmitting ? "Finalizing..." : "Initialize Batch"}
+                  {isSubmitting ? "Finalizing..." : form.courseName ? `Start ${form.courseName} Batch` : "Initialize Batch"}
                 </button>
               </div>
             </form>
@@ -231,7 +253,12 @@ function BatchCreation() {
                           <h4 className="batch-title">{batch.courseName || batch.course}</h4>
                           <span className="batch-trainer">{batch.trainerName || batch.trainer}</span>
                         </div>
-                        <div className="batch-status-pill">{batch.status}</div>
+                        <div className="batch-status-pill" style={{ 
+                          background: (batch.status === 'Active' || batch.status === 'started') ? '#f0fdf4' : '#fff7ed',
+                          color: (batch.status === 'Active' || batch.status === 'started') ? '#16a34a' : '#ea580c'
+                        }}>
+                          {batch.status}
+                        </div>
                       </div>
 
                       <div className="batch-item-details">
@@ -241,7 +268,7 @@ function BatchCreation() {
                             {batch.startDateTime ?
                               new Date(batch.startDateTime).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }) + ' at ' +
                               new Date(batch.startDateTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
-                              : "TBD"
+                              : (batch.name && batch.name.includes(' - ')) ? batch.name.split(' - ').pop() : "-"
                             }
                           </span>
                         </div>
@@ -249,6 +276,25 @@ function BatchCreation() {
                           <span className="label">Students</span>
                           <span className="value">{batch.enrolled || 0} / {batch.capacity} Seats</span>
                         </div>
+                        <div className="detail">
+                          <span className="label">Mode</span>
+                          <span className="value">{batch.duration} - {batch.mode || "Online"}</span>
+                        </div>
+                        {(batch.status !== 'Active' && batch.status !== 'started') && (
+                          <div className="detail full-width" style={{ gridColumn: 'span 2', marginTop: '12px' }}>
+                            <button 
+                              className="start-batch-action-btn"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if(window.confirm("Start this batch now?")) {
+                                  startBatch(batch.id || batch.firebaseId);
+                                }
+                              }}
+                            >
+                              🚀 Start Batch Now
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}

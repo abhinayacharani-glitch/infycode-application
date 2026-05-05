@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
 import {
   Users, CheckCircle, Clock, Calendar,
   BookOpen, Play, History as HistoryIcon,
@@ -7,6 +7,7 @@ import {
   Monitor, Layout, Database, Zap, AlertCircle,
   Edit2, Trash2, Circle
 } from 'lucide-react';
+import { getBatchStudentsAPI } from '../../../services/api';
 import './BatchDetails.css';
 
 // 0. CENTRALIZED DATA SOURCE with DYNAMIC content
@@ -159,6 +160,7 @@ const generateStudentId = (existingCount) => {
 const BatchDetails = () => {
   const { batchId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleJoinSession = () => {
     // Use the session that's actually being displayed in the 'Next Session' card
@@ -172,7 +174,35 @@ const BatchDetails = () => {
     navigate("/trainer-dashboard/live-session", { state: sessionData });
   };
 
-  const baseBatch = baseBatchesData[batchId];
+  const passedBatch = location.state?.batch;
+  
+  const baseBatch = baseBatchesData[batchId] || {
+    title: passedBatch?.course || "Full Stack Development",
+    batchName: `Batch ${batchId}`,
+    startDate: passedBatch?.startDate || "2026-01-10",
+    endDate: passedBatch?.endDate || "2026-04-10",
+    mode: passedBatch?.mode || "Online",
+    progress: 0,
+    totalSessions: 20,
+    completedSessions: 0,
+    nextSession: {
+      topic: "Introduction Session",
+      date: "2026-05-10",
+      time: "10:00 AM"
+    },
+    syllabus: [
+      { id: 1, name: "JavaScript Basics", module: "Module 1" },
+      { id: 2, name: "ES6 Features", module: "Module 1" },
+      { id: 3, name: "React Fundamentals", module: "Module 2" },
+      { id: 4, name: "Components & Props", module: "Module 2" },
+      { id: 5, name: "React Hooks", module: "Module 2" },
+      { id: 6, name: "State Management", module: "Module 3" },
+      { id: 7, name: "Node.js & Express", module: "Module 4" },
+      { id: 8, name: "Database Design", module: "Module 4" },
+      { id: 9, name: "RESTful APIs", module: "Module 4" },
+      { id: 10, name: "Authentication & Auth", module: "Module 5" }
+    ]
+  };
 
   const [activeTab, setActiveTab] = useState('Overview');
   const [showAddSessionModal, setShowAddSessionModal] = useState(false);
@@ -196,22 +226,26 @@ const BatchDetails = () => {
     } catch { return {}; }
   });
 
-  const [students, setStudents] = useState(() => {
-    const dummyStudents = [
-      { id: "STD1001", name: "Arjun Sharma", email: "arjun.sharma@infycode.com", joined: "2026-04-10" },
-      { id: "STD1002", name: "Priya Patel", email: "priya.patel@infycode.com", joined: "2026-04-10" },
-      { id: "STD1003", name: "Rahul Verma", email: "rahul.verma@infycode.com", joined: "2026-04-10" },
-      { id: "STD1004", name: "Anjali Gupta", email: "anjali.gupta@infycode.com", joined: "2026-04-10" },
-    ];
-    try {
-      const stored = localStorage.getItem(`batch_students_v3_${batchId}`);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        return parsed.length > 0 ? parsed : dummyStudents;
+  const [students, setStudents] = useState([]);
+  const [loadingStudents, setLoadingStudents] = useState(true);
+
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        setLoadingStudents(true);
+        const res = await getBatchStudentsAPI(batchId);
+        if (res.success) {
+          setStudents(res.students || []);
+        }
+      } catch (err) {
+        console.error("Failed to fetch students for batch:", err);
+      } finally {
+        setLoadingStudents(false);
       }
-      return dummyStudents;
-    } catch { return dummyStudents; }
-  });
+    };
+    fetchStudents();
+  }, [batchId]);
+
 
 
 
@@ -482,23 +516,6 @@ const BatchDetails = () => {
     );
   };
 
-  // Early safety check
-  if (!baseBatch) {
-    return (
-      <div className="batch-details-production">
-        <div className="main-content">
-          <div className="card-production" style={{ textAlign: 'center', padding: '60px' }}>
-            <h2 className="title-bold">Batch Not Found</h2>
-            <p className="subtitle-gray">The batch ID "{batchId}" does not exist in our records.</p>
-            <button className="add-student-btn-prod" onClick={() => navigate('/trainer-dashboard/batches')} style={{ margin: '20px auto' }}>
-              Back to Batches
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="batch-details-production">
       <div className="main-content">
@@ -516,11 +533,7 @@ const BatchDetails = () => {
             <div className="info-top-row">
               <div className="info-item-prod">
                 <Calendar size={14} />
-                <span>{baseBatch?.startDate} — {baseBatch?.endDate}</span>
-              </div>
-              <div className="info-item-prod">
-                <Clock size={14} />
-                <span>{duration}</span>
+                <span>{baseBatch?.startDate}</span>
               </div>
               <div className="info-item-prod">
                 <Monitor size={14} />
@@ -592,19 +605,17 @@ const BatchDetails = () => {
                   </div>
                 )}
 
-                <div className="card-production tracker-card-v5">
-                  <h3 className="card-title-prod">Smart Session Tracker</h3>
-                  <div className="tracker-split-v5">
-                    <div className="tracker-box-v5 last">
-                      <p className="tiny-lbl">LAST COMPLETED</p>
-                      <p className="box-val">{lastCompleted ? lastCompleted.topic : 'None'}</p>
-                    </div>
-                    <div className="v-divider-v5"></div>
-                    <div className="tracker-box-v5 next">
-                      <p className="tiny-lbl">NEXT UPCOMING</p>
-                      <p className="box-val">{nextSession ? nextSession.topic : (pendingTopics[0]?.name || 'None')}</p>
-                    </div>
+                <div className="card-production notes-card-v5">
+                  <div className="notes-hdr-v5">
+                    <h3 className="card-title-prod">Trainer Notes</h3>
+                    {isSaving && <span className="save-tick-v5">Saved...</span>}
                   </div>
+                  <textarea
+                    className="notes-input-v5"
+                    placeholder="Type specific batch reminders..."
+                    value={notes}
+                    onChange={(e) => handleNotesChange(e.target.value)}
+                  />
                 </div>
               </div>
 
@@ -645,19 +656,6 @@ const BatchDetails = () => {
                       </button>
                     </div>
                   )}
-                </div>
-
-                <div className="card-production notes-card-v5">
-                  <div className="notes-hdr-v5">
-                    <h3 className="card-title-prod">Trainer Notes</h3>
-                    {isSaving && <span className="save-tick-v5">Saved...</span>}
-                  </div>
-                  <textarea
-                    className="notes-input-v5"
-                    placeholder="Type specific batch reminders..."
-                    value={notes}
-                    onChange={(e) => handleNotesChange(e.target.value)}
-                  />
                 </div>
               </div>
             </div>
@@ -797,7 +795,7 @@ const BatchDetails = () => {
 
                       </div>
                       <div className="st-card-footer">
-                        <span className="st-id-v5 badge-student-id">ID: {student.id}</span>
+                        <span className="st-id-v5 badge-student-id">ID: {student.studentId || student.id}</span>
                         <span className="st-date-v5">Joined {student.joined}</span>
                       </div>
                     </div>

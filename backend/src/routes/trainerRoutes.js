@@ -1,7 +1,7 @@
 import express from "express";
 const router = express.Router();
 
-import { trainerRegister, trainerVerifyOtp, trainerDashboard, getTrainerProfile, updateTrainerProfile, getTrainerBatches, startBatch } from "../controllers/trainerRegController.js";
+import { trainerRegister, trainerVerifyOtp, trainerDashboard, getTrainerProfile, updateTrainerProfile, getTrainerBatches, startBatch, getBatchStudents, getTrainerQueries, solveTrainerQuery, markQueryReadByTrainer, getQueryById } from "../controllers/trainerRegController.js";
 import { submitApplication } from "../controllers/trainerApplicationController.js";
 import { verifyToken, isTrainer } from "../middleware/authMiddleware.js";
 import { checkRole } from "../middleware/roleMiddleware.js";
@@ -33,13 +33,21 @@ router.put("/profile", verifyToken, isTrainer, updateTrainerProfile);
 
 // ✅ Trainer Batches — GET /api/trainer/batches (protected)
 router.get("/batches", verifyToken, isTrainer, getTrainerBatches);
-router.put("/batches/:id/start", verifyToken, isTrainer, startBatch);
+router.get("/batches/:batchId/students", verifyToken, isTrainer, getBatchStudents);
+router.put("/batches/:id/start", verifyToken, checkRole(["admin", "trainer"]), startBatch);
+
+// ✅ Trainer Queries (protected)
+router.get("/queries", verifyToken, isTrainer, getTrainerQueries);
+router.get("/queries/:queryId", verifyToken, isTrainer, getQueryById);
+router.put("/queries/:queryId/solve", verifyToken, isTrainer, solveTrainerQuery);
+router.put("/queries/:queryId/read", verifyToken, isTrainer, markQueryReadByTrainer);
+
 
 // ✅ Trainer Notifications (protected — trainer only)
-router.get("/notifications",            verifyToken, isTrainer, getTrainerNotifications);
-router.put("/notifications/mark-read",  verifyToken, isTrainer, markNotificationsRead);
-router.delete("/notifications/:id",     verifyToken, isTrainer, deleteTrainerNotification);
-router.post("/notifications/seed",      verifyToken, isTrainer, seedTrainerNotifications);
+router.get("/notifications", verifyToken, isTrainer, getTrainerNotifications);
+router.put("/notifications/mark-read", verifyToken, isTrainer, markNotificationsRead);
+router.delete("/notifications/:id", verifyToken, isTrainer, deleteTrainerNotification);
+router.post("/notifications/seed", verifyToken, isTrainer, seedTrainerNotifications);
 
 // ✅ Send notification TO a trainer (admin or student can call this)
 // Protected: caller must be logged in (admin/student/trainer)
