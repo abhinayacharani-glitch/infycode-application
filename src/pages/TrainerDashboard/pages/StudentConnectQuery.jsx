@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  ArrowLeft, User, MessageCircle, Code, Send, 
-  Video, Phone, MessageSquare, Download, CheckCircle, Clock, Terminal 
+import {
+  ArrowLeft, User, MessageCircle, Code, Send,
+  Video, Phone, MessageSquare, Download, CheckCircle, Clock, Terminal
 } from 'lucide-react';
 import Editor from '@monaco-editor/react';
 import './StudentConnectQuery.css';
@@ -87,7 +87,7 @@ const StudentConnectQuery = () => {
       return;
     }
     setOutput('Running code...');
-    
+
     setTimeout(() => {
       // Simulate dynamic output by extracting console.log or print statements
       let dynamicResult = "";
@@ -127,10 +127,10 @@ const StudentConnectQuery = () => {
         }
       } catch (e) { console.error(e); }
 
-      const outputMsg = dynamicResult 
-        ? `> Output:\n${dynamicResult}` 
+      const outputMsg = dynamicResult
+        ? `> Output:\n${dynamicResult}`
         : `> Code executed successfully.\n> No console output to display.`;
-        
+
       setOutput(`✔ Success! Result displayed below\n> Executing ${language} code...\n${outputMsg}`);
     }, 800);
   };
@@ -147,7 +147,7 @@ const StudentConnectQuery = () => {
       setStatus('Solved');
       setIsSaving(false);
       setShowSuccess(true);
-      
+
       const solution = {
         id: studentId,
         studentId,
@@ -160,7 +160,7 @@ const StudentConnectQuery = () => {
         status: 'Solved',
         solvedAt: new Date().toISOString()
       };
-      
+
       const existing = JSON.parse(localStorage.getItem('solved_queries') || '[]');
       localStorage.setItem('solved_queries', JSON.stringify([...existing, solution]));
       localStorage.removeItem(`draft_code_${studentId}`);
@@ -222,21 +222,21 @@ const StudentConnectQuery = () => {
           <div className="scq-panel-card comms-panel">
             <h4>Select Resolution Mode</h4>
             <div className="scq-comms-grid">
-              <button 
+              <button
                 className={`mode-btn ${selectedMode === 'editor' ? 'active' : selectedMode ? 'disabled' : ''}`}
                 onClick={() => setSelectedMode('editor')}
               >
                 <Code size={20} />
                 <span>Code Editor</span>
               </button>
-              <button 
+              <button
                 className={`mode-btn ${selectedMode === 'chat' ? 'active' : selectedMode ? 'disabled' : ''}`}
                 onClick={() => setSelectedMode('chat')}
               >
                 <MessageSquare size={20} />
                 <span>Chat Explanation</span>
               </button>
-              <button 
+              <button
                 className={`mode-btn ${selectedMode === 'meet' ? 'active' : selectedMode ? 'disabled' : ''}`}
                 onClick={() => setSelectedMode('meet')}
               >
@@ -285,10 +285,10 @@ const StudentConnectQuery = () => {
                   <div className="panel-header">
                     <div className="header-title"><MessageSquare size={18} /><span>Chat Response</span></div>
                   </div>
-                  <textarea 
-                    className="scq-chat-textarea" 
-                    placeholder="Write your detailed explanation here..." 
-                    value={response} 
+                  <textarea
+                    className="scq-chat-textarea"
+                    placeholder="Write your detailed explanation here..."
+                    value={response}
                     onChange={(e) => setResponse(e.target.value)}
                   />
                 </div>
@@ -307,7 +307,7 @@ const StudentConnectQuery = () => {
                         <input type="text" value={meetLink} readOnly />
                         <div className="meet-actions">
                           <button onClick={() => window.open(meetLink, '_blank')}>Join Meet</button>
-                          <button onClick={() => {navigator.clipboard.writeText(meetLink)}}>Copy Link</button>
+                          <button onClick={() => { navigator.clipboard.writeText(meetLink) }}>Copy Link</button>
                         </div>
                       </div>
                     )}
@@ -319,16 +319,16 @@ const StudentConnectQuery = () => {
                 {selectedMode !== 'chat' && (
                   <div className="explanation-wrap">
                     <label>Additional Notes</label>
-                    <textarea 
-                      value={response} 
-                      onChange={(e) => setResponse(e.target.value)} 
-                      placeholder="Explain your solution..." 
+                    <textarea
+                      value={response}
+                      onChange={(e) => setResponse(e.target.value)}
+                      placeholder="Explain your solution..."
                     />
                   </div>
                 )}
-                <button 
-                  className="scq-send-btn" 
-                  onClick={handleSendSolution} 
+                <button
+                  className="scq-send-btn"
+                  onClick={handleSendSolution}
                   disabled={isSaving || !response.trim()}
                 >
                   {isSaving ? "Submitting..." : "Submit Solution"}

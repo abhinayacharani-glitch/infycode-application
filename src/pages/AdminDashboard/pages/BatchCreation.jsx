@@ -11,6 +11,7 @@ const initialFormState = {
   numberOfStudents: "",
   startDateTime: "",
   duration: "",
+  mode: "Online",
   batchImage: null,
 };
 
@@ -104,6 +105,7 @@ function BatchCreation() {
         status: 'Scheduled',
         startDateTime: form.startDateTime,
         duration: form.duration || "",
+        mode: form.mode || "Online",
         batchImage: form.batchImage || ""
       };
 
@@ -198,6 +200,13 @@ function BatchCreation() {
                   <label>Duration</label>
                   <input type="text" name="duration" placeholder="e.g. 12 Weeks" value={form.duration} onChange={handleChange} />
                 </div>
+                <div className="form-group">
+                  <label>Batch Mode</label>
+                  <select name="mode" value={form.mode} onChange={handleChange}>
+                    <option value="Online">Online</option>
+                    <option value="Offline">Offline</option>
+                  </select>
+                </div>
               </div>
 
               <div className="form-footer">
@@ -251,6 +260,10 @@ function BatchCreation() {
                         <div className="detail">
                           <span className="label">Students</span>
                           <span className="value">{batch.enrolled || 0} / {batch.capacity} Seats</span>
+                        </div>
+                        <div className="detail">
+                          <span className="label">Mode</span>
+                          <span className="value">{batch.duration} - {batch.mode || "Online"}</span>
                         </div>
                         {(batch.status !== 'Active' && batch.status !== 'started') && (
                           <div className="detail full-width" style={{ gridColumn: 'span 2', marginTop: '12px' }}>

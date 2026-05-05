@@ -139,7 +139,7 @@ const Sidebar = ({ externalShowLogoutModal, setExternalShowLogoutModal }) => {
               <button className="sd-modal-cancel" onClick={() => { setInternalShowLogoutModal(false); setExternalShowLogoutModal?.(false); }}>
                 Cancel
               </button>
-               <button className="sd-modal-logout-red" onClick={() => handleLogout(logoutDest)}>
+              <button className="sd-modal-logout-red" onClick={() => handleLogout(logoutDest)}>
                 OK, Logout
               </button>
             </div>
