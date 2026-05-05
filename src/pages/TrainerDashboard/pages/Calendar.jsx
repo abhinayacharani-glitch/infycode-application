@@ -241,59 +241,7 @@ const Calendar = () => {
       <div className="v3-calendar-layout">
         {/* 1. INTERNAL SIDEBAR */}
         <aside className="v3-cal-sidebar">
-          <div className="v3-mini-calendar">
-            <div className="mini-cal-header">
-              <div className="mini-cal-title-group">
-                <span className="mini-cal-title">{monthLabel}</span>
-                <button className="mini-today-btn" onClick={() => handleNavigate('today')}>Today</button>
-              </div>
-              <div className="mini-cal-nav">
-                <button className="mini-nav-btn" onClick={() => handleNavigate('prev')}><ChevronLeft size={16} /></button>
-                <button className="mini-nav-btn" onClick={() => handleNavigate('next')}><ChevronRight size={16} /></button>
-              </div>
-            </div>
 
-            <div className={`mini-cal-content ${navDirection}`}>
-              <div className="mini-cal-grid">
-                {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(d => <div key={d} className="mini-day-label">{d}</div>)}
-                {daysInMonth.map((d, i) => {
-                  const isToday = d.date.toDateString() === new Date().toDateString();
-                  const isSelected = d.date.toDateString() === currentDate.toDateString();
-                  const dateEvents = getEventsForDate(d.date);
-
-                  return (
-                    <div
-                      key={i}
-                      className={`mini-date-cell ${d.isCurrentMonth ? '' : 'hidden-month'} ${isToday ? 'today' : ''} ${isSelected ? 'active' : ''}`}
-                      onClick={() => setCurrentDate(d.date)}
-                      onMouseEnter={() => setHoveredDate(d.date.toDateString())}
-                      onMouseLeave={() => setHoveredDate(null)}
-                    >
-                      <span className="mini-date-num">{d.date.getDate()}</span>
-                      {d.isCurrentMonth && dateEvents.length > 0 && (
-                        <div className="mini-event-dots">
-                          {dateEvents.slice(0, 3).map((_, idx) => (
-                            <span key={idx} className="mini-dot"></span>
-                          ))}
-                        </div>
-                      )}
-
-                      {hoveredDate === d.date.toDateString() && dateEvents.length > 0 && (
-                        <div className="mini-cal-tooltip">
-                          {dateEvents.map(ev => (
-                            <div key={ev.id} className="tooltip-event">
-                              <span className={`type-indicator ${ev.type}`}></span>
-                              {ev.title}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
 
           <div className="v3-cal-filters">
             <span className="filter-title">My Calendars</span>
@@ -320,7 +268,7 @@ const Calendar = () => {
           {/* ENHANCED GOOGLE CALENDAR HEADER */}
           <header className="v3-cal-page-header">
             <div className="v3-header-left">
-              <h1>📅 Calendar</h1>
+              <h1>Calendar</h1>
             </div>
 
             <div className="v3-header-center">
