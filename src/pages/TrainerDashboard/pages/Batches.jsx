@@ -98,16 +98,22 @@ const Batches = () => {
     e.stopPropagation();
     if (!window.confirm("Are you sure you want to start this batch? All enrolled students will be notified.")) return;
 
+    // Optimistic Update
+    const originalBatches = [...batches];
+    setBatches(prev => prev.map(b => b.firebaseId === firebaseId ? { ...b, status: 'Active' } : b));
+
     try {
       const response = await startBatchAPI(firebaseId);
       if (response.success) {
-        alert("Batch started successfully!");
-        // Refresh list
-        const res = await getTrainerBatchesAPI();
-        if (res.success) setBatches(res.batches || []);
+        // Refresh list silently in background to sync with server
+        getTrainerBatchesAPI().then(res => {
+          if (res.success) setBatches(res.batches || []);
+        });
       }
     } catch (error) {
       console.error("Error starting batch:", error);
+      // Revert on failure
+      setBatches(originalBatches);
       alert(error.message || "Failed to start batch");
     }
   };
@@ -224,8 +230,8 @@ const Batches = () => {
 
                   <div className="batch-card-meta-v3">
                     <div className="meta-item-saas">
-                      <Monitor size={14} />
-                      <span>{batch.mode}</span>
+                      {batch.mode === 'Offline' ? <Users size={14} /> : <Monitor size={14} />}
+                      <span>{batch.duration} - {batch.mode || "Online"}</span>
                     </div>
                   </div>
 

@@ -315,7 +315,7 @@
 
 .batch-item-details {
   display: grid;
-  grid-template-columns: 1.6fr 1fr;
+  grid-template-columns: 1.5fr 1fr 1fr;
   gap: 12px;
   padding-top: 16px;
   border-top: 1px solid #f1f5f9;

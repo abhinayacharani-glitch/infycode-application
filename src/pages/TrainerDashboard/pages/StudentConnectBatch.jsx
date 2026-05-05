@@ -27,7 +27,7 @@ const StudentConnectBatch = () => {
         return solvedData ? { ...s, status: 'Solved' } : s;
       });
       setStudents(updatedStudents);
-    } catch (e) { 
+    } catch (e) {
       console.error(e);
       setStudents(MOCK_STUDENTS);
     }
@@ -35,8 +35,8 @@ const StudentConnectBatch = () => {
 
   const filteredStudents = useMemo(() => {
     return students.filter(s => {
-      const matchesSearch = s.name.toLowerCase().includes(search.toLowerCase()) || 
-                            s.query.toLowerCase().includes(search.toLowerCase());
+      const matchesSearch = s.name.toLowerCase().includes(search.toLowerCase()) ||
+        s.query.toLowerCase().includes(search.toLowerCase());
       const matchesFilter = filter === 'All' || s.status === filter;
       return matchesSearch && matchesFilter;
     });
@@ -58,17 +58,17 @@ const StudentConnectBatch = () => {
       <div className="scb-controls">
         <div className="scb-search-box">
           <Search size={20} />
-          <input 
-            type="text" 
-            placeholder="Search students or queries..." 
+          <input
+            type="text"
+            placeholder="Search students or queries..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
         <div className="scb-filter-group">
           {['All', 'Pending', 'Solved'].map(f => (
-            <button 
-              key={f} 
+            <button
+              key={f}
               className={`scb-filter-btn ${filter === f ? 'active' : ''}`}
               onClick={() => setFilter(f)}
             >
@@ -107,7 +107,7 @@ const StudentConnectBatch = () => {
                 </td>
                 <td className="scb-time-cell">{student.time}</td>
                 <td className="text-right">
-                  <button 
+                  <button
                     className={`scb-solve-btn ${student.status === 'Solved' ? 'solved' : ''}`}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -126,7 +126,7 @@ const StudentConnectBatch = () => {
             ))}
           </tbody>
         </table>
-        
+
         {filteredStudents.length === 0 && (
           <div className="scb-empty">
             <Search size={48} />

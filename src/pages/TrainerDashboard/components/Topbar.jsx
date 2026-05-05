@@ -60,9 +60,9 @@ const TrashIcon = () => (
 /* ─── Notification type → icon + colour map ──────────────────────────── */
 const notifConfig = {
   success: { Icon: CheckCircleIcon, bg: '#dcfce7', color: '#16a34a', label: 'Admin' },
-  warning: { Icon: AlertIcon,       bg: '#fef3c7', color: '#d97706', label: 'Admin' },
-  student: { Icon: StudentIcon,     bg: '#ede9fe', color: '#7c3aed', label: 'Student' },
-  info:    { Icon: InfoIcon,        bg: '#dbeafe', color: '#2563eb', label: 'Admin' },
+  warning: { Icon: AlertIcon, bg: '#fef3c7', color: '#d97706', label: 'Admin' },
+  student: { Icon: StudentIcon, bg: '#ede9fe', color: '#7c3aed', label: 'Student' },
+  info: { Icon: InfoIcon, bg: '#dbeafe', color: '#2563eb', label: 'Admin' },
 };
 
 const getConfig = (type) => notifConfig[type] || notifConfig.info;
@@ -72,36 +72,36 @@ const formatTime = (createdAt) => {
   if (!createdAt) return '';
   const diff = Date.now() - createdAt;
   const mins = Math.floor(diff / 60000);
-  if (mins < 1)  return 'Just now';
+  if (mins < 1) return 'Just now';
   if (mins < 60) return `${mins}m ago`;
   const hrs = Math.floor(mins / 60);
-  if (hrs < 24)  return `${hrs}h ago`;
+  if (hrs < 24) return `${hrs}h ago`;
   return `${Math.floor(hrs / 24)}d ago`;
 };
 
 /* ══════════════════════════════════════════════════════════════════════ */
 const Topbar = () => {
-  const navigate  = useNavigate();
-  const location  = useLocation();
+  const navigate = useNavigate();
+  const location = useLocation();
   const { trainerData, profileImage } = useTrainer();
 
-  const userName    = trainerData.fullName || trainerData.fullname || trainerData.name || 'Trainer';
-  const role        = trainerData.role || 'Trainer';
+  const userName = trainerData.fullName || trainerData.fullname || trainerData.name || 'Trainer';
+  const role = trainerData.role || 'Trainer';
   const userInitial = userName.charAt(0).toUpperCase();
 
   /* ── UI state ── */
-  const [showLogoutModal,    setShowLogoutModal]    = useState(false);
-  const [modalType,          setModalType]          = useState('user-menu');
-  const [showNotifications,  setShowNotifications]  = useState(false);
-  const [showUserMenu,       setShowUserMenu]        = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [modalType, setModalType] = useState('user-menu');
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   /* ── Notification state ── */
   const [notifications, setNotifications] = useState([]);
-  const [notifLoading,  setNotifLoading]  = useState(false);
-  const [notifError,    setNotifError]    = useState(null);
+  const [notifLoading, setNotifLoading] = useState(false);
+  const [notifError, setNotifError] = useState(null);
 
   /* ── Refs for click-outside ── */
-  const notifRef   = useRef(null);
+  const notifRef = useRef(null);
   const userMenuRef = useRef(null);
 
   /* ── Fetch notifications ─────────────────────────────────────────── */
@@ -131,7 +131,7 @@ const Topbar = () => {
   /* ── Click-outside handler ───────────────────────────────────────── */
   useEffect(() => {
     const handler = (e) => {
-      if (notifRef.current   && !notifRef.current.contains(e.target))   setShowNotifications(false);
+      if (notifRef.current && !notifRef.current.contains(e.target)) setShowNotifications(false);
       if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setShowUserMenu(false);
     };
     document.addEventListener('mousedown', handler);

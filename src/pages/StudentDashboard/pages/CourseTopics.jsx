@@ -46,6 +46,8 @@ const CourseTopics = () => {
       }
     };
     fetchBatches();
+    const interval = setInterval(fetchBatches, 1000);
+    return () => clearInterval(interval);
   }, []);
 
   const dynamicData = useMemo(() => {
@@ -68,7 +70,8 @@ const CourseTopics = () => {
           name: batchMatch.batchName,
           startDate: batchMatch.startDate || course.batch?.startDate,
           timing: batchMatch.startTime || batchMatch.timing || course.batch?.timing || 'Flexible',
-          duration: batchMatch.duration || course.batch?.duration || '6 Months'
+          duration: batchMatch.duration || course.batch?.duration || '6 Months',
+          mode: batchMatch.mode || 'Online'
         }
       };
     }
@@ -179,7 +182,12 @@ const CourseTopics = () => {
                </div>
                <div className="ct-mini-card">
                  <div className="ct-mini-label">Mode</div>
-                 <div className="ct-mini-value">{dynamicData.batch?.duration}</div>
+                 <div className="ct-mini-value">{(() => {
+                      const dur = dynamicData.batch?.duration || '4 Months';
+                      const mod = (dynamicData.batch?.mode || 'Online').toLowerCase();
+                      const durationStr = /weeks|months|days/i.test(dur) ? dur : `${dur} weeks`;
+                      return `${durationStr} - ${mod}`;
+                    })()}</div>
                </div>
             </div>
           </motion.div>

@@ -148,8 +148,8 @@ const CourseOverview = () => {
     };
     fetchBatches();
 
-    // Polling every 10 seconds to catch Admin batch-start events
-    const pollInterval = setInterval(fetchBatches, 10000);
+    // Polling every 1 second for near-instant updates
+    const pollInterval = setInterval(fetchBatches, 1000);
     return () => clearInterval(pollInterval);
   }, []);
 
@@ -172,14 +172,16 @@ const CourseOverview = () => {
           name: batchMatch.trainer.name,
           role: batchMatch.trainer.specialization || 'Lead Instructor',
           experience: batchMatch.trainer.experience || '10+ Years',
-          specialization: batchMatch.trainer.specialization || course.category || 'Expert'
+          specialization: batchMatch.trainer.specialization || course.category || 'Expert',
+          expertise: batchMatch.trainer.expertise || ''
         } : course.trainer,
         batch: {
           id: batchMatch.batchId,
           name: batchMatch.batchName,
           startDate: batchMatch.startDate || course.batch?.startDate,
           timing: batchMatch.startTime || batchMatch.timing || course.batch?.timing || 'Flexible',
-          duration: batchMatch.duration || course.batch?.duration || '6 Months'
+          duration: batchMatch.duration || course.batch?.duration || '6 Months',
+          mode: batchMatch.mode || 'Online'
         },
         meetLink: batchMatch.liveClassLink || ''
       };
@@ -305,8 +307,8 @@ const CourseOverview = () => {
               <span className="co-pill-value">{dynamicCourse.trainer?.experience || '10+ Years'}</span>
             </div>
             <div className="co-stat-pill">
-              <span className="co-pill-label">Specialization</span>
-              <span className="co-pill-value">{dynamicCourse.trainer?.specialization?.split(',')[0] || 'Technical Expert'}</span>
+              <span className="co-pill-label">Expertise</span>
+              <span className="co-pill-value">{dynamicCourse.trainer?.expertise || dynamicCourse.trainer?.specialization || 'Technical Expert'}</span>
             </div>
           </div>
         </div>
@@ -334,7 +336,14 @@ const CourseOverview = () => {
             </div>
             <div className="co-batch-pill">
               <span className="co-pill-label"><Monitor size={12} /> Mode</span>
-              <span className="co-pill-value">{dynamicCourse.batch?.duration || 'Online Live'}</span>
+              <span className="co-pill-value">
+                {(() => {
+                  const dur = dynamicCourse.batch?.duration || '4 Months';
+                  const mod = (dynamicCourse.batch?.mode || 'Online').toLowerCase();
+                  const durationStr = /weeks|months|days/i.test(dur) ? dur : `${dur} weeks`;
+                  return `${durationStr} - ${mod}`;
+                })()}
+              </span>
             </div>
           </div>
         </div>
