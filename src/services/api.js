@@ -650,6 +650,53 @@ export const getStudentCounsellingSessions = () =>
     headers: getAuthHeader(),
   });
 
+export const getBatchStudentsAPI = (batchId) =>
+  request(`/api/trainer/batches/${batchId}/students`, {
+    headers: getAuthHeader(),
+  });
+
+export const getTrainerQueriesAPI = () =>
+  request('/api/trainer/queries', {
+    headers: getAuthHeader(),
+  });
+
+export const getQueryByIdAPI = (queryId) =>
+  request(`/api/trainer/queries/${queryId}`, {
+    headers: getAuthHeader(),
+  });
+
+
+export const solveTrainerQueryAPI = (queryId, solutionData) =>
+  request(`/api/trainer/queries/${queryId}/solve`, {
+    method: 'PUT',
+    headers: getAuthHeader(),
+    body: JSON.stringify(solutionData),
+  });
+
+export const markQueryReadByTrainerAPI = (queryId) =>
+  request(`/api/trainer/queries/${queryId}/read`, {
+    method: 'PUT',
+    headers: getAuthHeader(),
+  });
+
+export const getStudentQueriesAPI = () =>
+  request('/api/student/queries', {
+    headers: getAuthHeader(),
+  });
+
+export const createStudentQueryAPI = (queryData) =>
+  request('/api/student/queries', {
+    method: 'POST',
+    headers: getAuthHeader(),
+    body: JSON.stringify(queryData),
+  });
+
+export const markQueryReadByStudentAPI = (queryId) =>
+  request(`/api/student/queries/${queryId}/read`, {
+    method: 'PUT',
+    headers: getAuthHeader(),
+  });
+
 export const getPendingCounsellingCountAPI = () =>
   request('/api/counselling/pending-count', {
     headers: getAuthHeader(),
@@ -661,4 +708,3 @@ export const updateCounsellingStatusAPI = (bookingId, status) =>
     headers: getAuthHeader(),
     body: JSON.stringify({ bookingId, status }),
   });
-

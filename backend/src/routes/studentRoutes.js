@@ -7,9 +7,12 @@ import {
   getMyResults,
   enrollInCourse,
   getEnrolledCourses,
-  getStudentProfile,
   updateStudentProfile,
-  getStudentBatches
+  getStudentBatches,
+  getStudentProfile,
+  createStudentQuery,
+  getStudentQueries,
+  markQueryReadByStudent
 } from "../controllers/studentController.js";
 import { verifyToken, isAdmin } from "../middleware/authMiddleware.js";
 import { checkRole } from "../middleware/roleMiddleware.js";
@@ -28,6 +31,12 @@ router.get("/my-results", verifyToken, getMyResults);
 router.post("/enroll/:courseId", verifyToken, enrollInCourse);
 router.get("/enrolled-courses", verifyToken, getEnrolledCourses);
 router.get("/my-batches", verifyToken, getStudentBatches);
+
+// ✅ Student Queries (protected)
+router.post("/queries", verifyToken, createStudentQuery);
+router.get("/queries", verifyToken, getStudentQueries);
+router.put("/queries/:queryId/read", verifyToken, markQueryReadByStudent);
+
 
 // ✅ Admin fetch all results
 router.get("/admin/results", verifyToken, isAdmin, getStudentResults);

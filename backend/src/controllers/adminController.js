@@ -412,6 +412,7 @@ export const moveStudentsToBatch = async (req, res) => {
       batchUpdates[`students/${studentKey}`] = {
         name: student.name,
         email: student.email,
+        studentId: student.studentId || "",
         movedAt: new Date().toISOString()
       };
     });
