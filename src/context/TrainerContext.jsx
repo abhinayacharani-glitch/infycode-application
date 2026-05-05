@@ -1,5 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { getTrainerProfileAPI, updateTrainerProfileAPI } from '../services/api';
+import { getTrainerProfileAPI, updateTrainerProfileAPI, getPendingCounsellingCountAPI } from '../services/api';
+import { io } from 'socket.io-client';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
 
 const TrainerContext = createContext();
 
@@ -28,28 +32,64 @@ export const TrainerProvider = ({ children }) => {
     return userData.profileImage || localStorage.getItem('trainerProfileImage') || null;
   });
 
+  const [pendingCounsellingCount, setPendingCounsellingCount] = useState(0);
+
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchInitialData = async () => {
       try {
-        const response = await getTrainerProfileAPI();
-        if (response.success && response.profile) {
+        // Fetch Profile
+        const profileRes = await getTrainerProfileAPI();
+        if (profileRes.success && profileRes.profile) {
           setTrainerData(prev => {
-            const updated = { ...prev, ...response.profile };
+            const updated = { ...prev, ...profileRes.profile };
             const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
             localStorage.setItem('user', JSON.stringify({ ...currentUser, ...updated }));
             return updated;
           });
-          if (response.profile.profileImage) {
-            setProfileImage(response.profile.profileImage);
-            localStorage.setItem('trainerProfileImage', response.profile.profileImage);
+          if (profileRes.profile.profileImage) {
+            setProfileImage(profileRes.profile.profileImage);
+            localStorage.setItem('trainerProfileImage', profileRes.profile.profileImage);
           }
         }
+
+        // Fetch Pending Counselling Count
+        const countRes = await getPendingCounsellingCountAPI();
+        if (countRes.success) {
+          setPendingCounsellingCount(countRes.count);
+        }
       } catch (error) {
-        console.error("Error fetching trainer profile:", error);
+        console.error("Error fetching trainer initial data:", error);
       }
     };
-    fetchProfile();
-  }, []);
+
+    fetchInitialData();
+
+    // ─── Socket.io Integration ─────────────────────────────────────────────
+    const socket = io(API_BASE_URL);
+
+    if (trainerData?.id || trainerData?._id) {
+      const trainerId = trainerData.id || trainerData._id;
+      socket.emit("join_trainer_room", trainerId);
+
+      socket.on("NEW_COUNSELLING_ASSIGNED", (data) => {
+        console.log("[Socket] New counselling session assigned:", data);
+        setPendingCounsellingCount(prev => prev + 1);
+      });
+
+      socket.on("COUNSELLING_STATUS_UPDATED", (data) => {
+        console.log("[Socket] Counselling status updated:", data);
+        // Refresh count from API to be safe
+        getPendingCounsellingCountAPI().then(res => {
+          if (res.success) setPendingCounsellingCount(res.count);
+        });
+      });
+    }
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [trainerData?.id, trainerData?._id]);
+
 
   const updateTrainerProfile = async (newData, newImage) => {
     // 1. Update UI state immediately (optimistic update)
@@ -100,8 +140,11 @@ export const TrainerProvider = ({ children }) => {
   const value = {
     trainerData,
     profileImage,
-    updateTrainerProfile
+    updateTrainerProfile,
+    pendingCounsellingCount,
+    setPendingCounsellingCount
   };
+
 
   return (
     <TrainerContext.Provider value={value}>
