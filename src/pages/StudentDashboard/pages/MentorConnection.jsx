@@ -14,7 +14,6 @@ import {
   Eye
 } from 'lucide-react';
 import Editor from '@monaco-editor/react';
-import Editor from '@monaco-editor/react';
 import { getStudentBatchesAPI, createStudentQueryAPI, getStudentQueriesAPI } from '../../../services/api';
 import './MentorConnection.css';
 
