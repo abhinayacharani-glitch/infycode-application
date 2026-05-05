@@ -498,3 +498,163 @@ export const startBatch = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
+
+// ═══════════════════════════════════════════════════════════════════════════
+// GET /api/trainer/batches/:batchId/students
+// ═══════════════════════════════════════════════════════════════════════════
+export const getBatchStudents = async (req, res) => {
+  try {
+    const { batchId } = req.params; // Can be firebase key OR sequential ID
+    const batchesRef = db.ref("batch");
+    
+    // 1. Resolve batch
+    let batchData = null;
+    let batchKey = batchId;
+
+    const directSnap = await batchesRef.child(batchId).once("value");
+    if (directSnap.exists()) {
+      batchData = directSnap.val();
+      batchKey = batchId;
+    } else {
+      const qSnap = await batchesRef.orderByChild("batchId").equalTo(batchId).once("value");
+      if (qSnap.exists()) {
+        qSnap.forEach(c => {
+          batchData = c.val();
+          batchKey = c.key;
+        });
+      }
+    }
+
+    if (!batchData) {
+      return res.status(404).json({ success: false, message: "Batch not found" });
+    }
+
+    // 2. Extract students and enrich with studentId if missing
+    const studentsRaw = batchData.students || {};
+    const studentsRef = db.ref("students");
+    const allStudentsSnap = await studentsRef.once("value");
+    const allStudents = allStudentsSnap.val() || {};
+
+    const students = Object.entries(studentsRaw).map(([id, data]) => {
+      const mainStudentData = allStudents[id] || {};
+      return {
+        id,
+        name: data.name || mainStudentData.fullname || mainStudentData.fullName || "N/A",
+        email: data.email || mainStudentData.email || "",
+        studentId: data.studentId || mainStudentData.studentId || "",
+        joined: data.movedAt ? new Date(data.movedAt).toISOString().split('T')[0] : ""
+      };
+    });
+
+    return res.status(200).json({ success: true, students });
+  } catch (error) {
+    console.error("[getBatchStudents] Error:", error.message);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// GET /api/trainer/queries
+// ═══════════════════════════════════════════════════════════════════════════
+export const getTrainerQueries = async (req, res) => {
+  try {
+    const { email } = req.user;
+    const trainersRef = db.ref("trainers");
+    const trainerSnap = await trainersRef.orderByChild("email").equalTo(email).once("value");
+    
+    if (!trainerSnap.exists()) {
+      return res.status(404).json({ success: false, message: "Trainer not found" });
+    }
+
+    let trainerName = "";
+    trainerSnap.forEach(c => {
+      trainerName = c.val().fullName || c.val().fullname || c.val().name;
+    });
+
+    const queriesRef = db.ref("queries");
+    const queriesSnap = await queriesRef.orderByChild("trainerName").equalTo(trainerName).once("value");
+    
+    const queries = [];
+    if (queriesSnap.exists()) {
+      queriesSnap.forEach(child => {
+        queries.push({ id: child.key, ...child.val() });
+      });
+    }
+
+    // Sort: Pending first, then by date
+    queries.sort((a, b) => {
+      if (a.status === 'Pending' && b.status !== 'Pending') return -1;
+      if (a.status !== 'Pending' && b.status === 'Pending') return 1;
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
+
+    return res.status(200).json({ success: true, queries });
+  } catch (error) {
+    console.error("[getTrainerQueries] Error:", error.message);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PUT /api/trainer/queries/:queryId/solve
+// ═══════════════════════════════════════════════════════════════════════════
+export const solveTrainerQuery = async (req, res) => {
+  try {
+    const { queryId } = req.params;
+    const { solution, codeSolution, meetLink } = req.body;
+    const queriesRef = db.ref("queries");
+    
+    const querySnap = await queriesRef.child(queryId).once("value");
+    if (!querySnap.exists()) {
+      return res.status(404).json({ success: false, message: "Query not found" });
+    }
+
+    const updateData = {
+      status: 'Solved',
+      solution: solution || "",
+      codeSolution: codeSolution || "",
+      meetLink: meetLink || "",
+      solvedAt: new Date().toISOString(),
+      readByStudent: false // Reset unread for student
+    };
+
+    await queriesRef.child(queryId).update(updateData);
+    
+    return res.status(200).json({ success: true, message: "Query solved successfully" });
+  } catch (error) {
+    console.error("[solveTrainerQuery] Error:", error.message);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PUT /api/trainer/queries/:queryId/read
+// ═══════════════════════════════════════════════════════════════════════════
+export const markQueryReadByTrainer = async (req, res) => {
+  try {
+    const { queryId } = req.params;
+    await db.ref("queries").child(queryId).update({ readByTrainer: true });
+    return res.status(200).json({ success: true });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// GET /api/trainer/queries/:queryId
+// ═══════════════════════════════════════════════════════════════════════════
+export const getQueryById = async (req, res) => {
+  try {
+    const { queryId } = req.params;
+    const snap = await db.ref("queries").child(queryId).once("value");
+    if (!snap.exists()) {
+      return res.status(404).json({ success: false, message: "Query not found" });
+    }
+    return res.status(200).json({ success: true, query: { id: snap.key, ...snap.val() } });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
+

@@ -83,7 +83,8 @@ const LiveIcon = () => (
 
 const Sidebar = ({ isOpen, onClose, externalShowLogoutModal, setExternalShowLogoutModal }) => {
   const navigate = useNavigate();
-  const { trainerData, profileImage } = useTrainer();
+  const { trainerData, profileImage, pendingCounsellingCount } = useTrainer();
+
   const userName = trainerData.fullName || trainerData.fullname || trainerData.name || "Trainer";
   const userInitial = userName.charAt(0).toUpperCase();
   const [internalShowLogoutModal, setInternalShowLogoutModal] = useState(false);
@@ -163,7 +164,11 @@ const Sidebar = ({ isOpen, onClose, externalShowLogoutModal, setExternalShowLogo
             <div className="sd-box">
               <span className="sd-icon"><LiveIcon /></span>
               <span className="sd-text">Counselling sessions</span>
+              {pendingCounsellingCount > 0 && (
+                <span className="sd-count-badge">{pendingCounsellingCount}</span>
+              )}
             </div>
+
           </NavLink>
 
           <NavLink to="/trainer-dashboard/materials"

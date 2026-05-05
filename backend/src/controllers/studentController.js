@@ -484,3 +484,79 @@ export const markAllStudentResultsAsSeen = async (req, res) => {
   }
 };
 
+// ═══════════════════════════════════════════════════════════════════════════
+// POST /api/student/queries
+// ═══════════════════════════════════════════════════════════════════════════
+export const createStudentQuery = async (req, res) => {
+  try {
+    const { title, text, code, type, trainerName, batchId } = req.body;
+    const studentId = req.user.id;
+    
+    const snapshot = await studentsRef.child(studentId).once("value");
+    const studentData = snapshot.val();
+
+    const newQuery = {
+      studentId,
+      studentName: studentData.fullname || studentData.fullName || studentData.name || "Student",
+      title,
+      text,
+      code: code || "",
+      type: type || "chat", // chat, code, meet
+      trainerName,
+      batchId,
+      status: 'Pending',
+      createdAt: new Date().toISOString(),
+      readByTrainer: false,
+      readByStudent: true
+    };
+
+    const queriesRef = db.ref("queries");
+    const newRef = queriesRef.push();
+    await newRef.set(newQuery);
+
+    return res.status(201).json({ success: true, queryId: newRef.key });
+  } catch (error) {
+    console.error("[createStudentQuery] Error:", error.message);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// GET /api/student/queries
+// ═══════════════════════════════════════════════════════════════════════════
+export const getStudentQueries = async (req, res) => {
+  try {
+    const studentId = req.user.id;
+    const queriesRef = db.ref("queries");
+    const snapshot = await queriesRef.orderByChild("studentId").equalTo(studentId).once("value");
+    
+    const queries = [];
+    if (snapshot.exists()) {
+      snapshot.forEach(child => {
+        queries.push({ id: child.key, ...child.val() });
+      });
+    }
+
+    queries.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    return res.status(200).json({ success: true, queries });
+  } catch (error) {
+    console.error("[getStudentQueries] Error:", error.message);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PUT /api/student/queries/:queryId/read
+// ═══════════════════════════════════════════════════════════════════════════
+export const markQueryReadByStudent = async (req, res) => {
+  try {
+    const { queryId } = req.params;
+    await db.ref("queries").child(queryId).update({ readByStudent: true });
+    return res.status(200).json({ success: true });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+

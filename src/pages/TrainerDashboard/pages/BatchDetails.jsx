@@ -7,6 +7,7 @@ import {
   Monitor, Layout, Database, Zap, AlertCircle,
   Edit2, Trash2, Circle
 } from 'lucide-react';
+import { getBatchStudentsAPI } from '../../../services/api';
 import './BatchDetails.css';
 
 // 0. CENTRALIZED DATA SOURCE with DYNAMIC content
@@ -225,22 +226,26 @@ const BatchDetails = () => {
     } catch { return {}; }
   });
 
-  const [students, setStudents] = useState(() => {
-    const dummyStudents = [
-      { id: "STD1001", name: "Arjun Sharma", email: "arjun.sharma@infycode.com", joined: "2026-04-10" },
-      { id: "STD1002", name: "Priya Patel", email: "priya.patel@infycode.com", joined: "2026-04-10" },
-      { id: "STD1003", name: "Rahul Verma", email: "rahul.verma@infycode.com", joined: "2026-04-10" },
-      { id: "STD1004", name: "Anjali Gupta", email: "anjali.gupta@infycode.com", joined: "2026-04-10" },
-    ];
-    try {
-      const stored = localStorage.getItem(`batch_students_v3_${batchId}`);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        return parsed.length > 0 ? parsed : dummyStudents;
+  const [students, setStudents] = useState([]);
+  const [loadingStudents, setLoadingStudents] = useState(true);
+
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        setLoadingStudents(true);
+        const res = await getBatchStudentsAPI(batchId);
+        if (res.success) {
+          setStudents(res.students || []);
+        }
+      } catch (err) {
+        console.error("Failed to fetch students for batch:", err);
+      } finally {
+        setLoadingStudents(false);
       }
-      return dummyStudents;
-    } catch { return dummyStudents; }
-  });
+    };
+    fetchStudents();
+  }, [batchId]);
+
 
 
 
@@ -528,11 +533,7 @@ const BatchDetails = () => {
             <div className="info-top-row">
               <div className="info-item-prod">
                 <Calendar size={14} />
-                <span>{baseBatch?.startDate} — {baseBatch?.endDate}</span>
-              </div>
-              <div className="info-item-prod">
-                <Clock size={14} />
-                <span>{duration}</span>
+                <span>{baseBatch?.startDate}</span>
               </div>
               <div className="info-item-prod">
                 <Monitor size={14} />
@@ -794,7 +795,7 @@ const BatchDetails = () => {
 
                       </div>
                       <div className="st-card-footer">
-                        <span className="st-id-v5 badge-student-id">ID: {student.id}</span>
+                        <span className="st-id-v5 badge-student-id">ID: {student.studentId || student.id}</span>
                         <span className="st-date-v5">Joined {student.joined}</span>
                       </div>
                     </div>

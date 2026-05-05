@@ -5,7 +5,9 @@ import {
   assignTrainer, 
   getTrainerSessions, 
   getStudentSessions,
-  checkAndShiftSlots
+  checkAndShiftSlots,
+  getPendingCount,
+  updateSessionStatus
 } from "../controllers/counsellingController.js";
 import { verifyToken, isAdmin, isStudent, isTrainer } from "../middleware/authMiddleware.js";
 
@@ -18,4 +20,9 @@ router.post("/process-shifts", verifyToken, isAdmin, checkAndShiftSlots);
 router.get("/trainer-sessions", verifyToken, isTrainer, getTrainerSessions);
 router.get("/student-sessions", verifyToken, isStudent, getStudentSessions);
 
+// New Routes for Trainer Dashboard
+router.get("/pending-count", verifyToken, isTrainer, getPendingCount);
+router.put("/update-status", verifyToken, isTrainer, updateSessionStatus);
+
 export default router;
+
