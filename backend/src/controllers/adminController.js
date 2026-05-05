@@ -17,11 +17,11 @@ const matchesStatus = (val, targetStatuses) => {
   return targetStatuses.some(status => status.toLowerCase() === val.toLowerCase());
 };
 
-// Helper: Generate next Batch ID (B-0001)
+// Helper: Generate next Batch ID (BID-01)
 const generateNextBatchID = async () => {
   const snapshot = await batchesRef.once("value");
   const count = snapshot.numChildren();
-  return `B-${String(count + 1).padStart(4, "0")}`;
+  return `BID-${String(count + 1).padStart(2, "0")}`;
 };
 
 // ✅ ADMIN REGISTER
@@ -282,7 +282,7 @@ export const getDashboardStats = async (req, res) => {
  **/
 export const createBatch = async (req, res) => {
   try {
-    const { name, course, trainer, capacity, status, startDateTime, duration, batchImage } = req.body;
+    const { name, course, trainer, capacity, status, startDateTime, duration, batchImage, mode } = req.body;
 
     if (!name || !course || !trainer) {
       return res.status(400).json({ message: "Name, course, and trainer are required." });
@@ -301,6 +301,7 @@ export const createBatch = async (req, res) => {
       startDateTime: startDateTime || "",
       duration: duration || "",
       batchImage: batchImage || "",
+      mode: mode || "Online",
       createdAt: new Date().toISOString()
     };
 

@@ -16,12 +16,12 @@ const getCurrentTopic = (course) => {
 };
 
 const STATUS_CONFIG = {
-  Active:     { label: 'Active',     bg: '#dcfce7', color: '#16a34a' },
-  started:    { label: 'Started',    bg: '#dcfce7', color: '#16a34a' },
-  Ready:      { label: 'Ready',      bg: '#dbeafe', color: '#2563eb' },
-  Scheduled:  { label: 'Scheduled',  bg: '#fef3c7', color: '#d97706' },
-  Upcoming:   { label: 'Upcoming',   bg: '#fef3c7', color: '#d97706' },
-  Completed:  { label: 'Completed',  bg: '#f1f5f9', color: '#64748b' },
+  Active: { label: 'Active', bg: '#dcfce7', color: '#16a34a' },
+  started: { label: 'Started', bg: '#dcfce7', color: '#16a34a' },
+  Ready: { label: 'Ready', bg: '#dbeafe', color: '#2563eb' },
+  Scheduled: { label: 'Scheduled', bg: '#fef3c7', color: '#d97706' },
+  Upcoming: { label: 'Upcoming', bg: '#fef3c7', color: '#d97706' },
+  Completed: { label: 'Completed', bg: '#f1f5f9', color: '#64748b' },
 };
 
 const StatusBadge = ({ status }) => {
@@ -72,6 +72,20 @@ const EnrolledCourseCard = ({ course, batchInfo, onNavigate, index }) => {
 
       <div className="ecc-body">
         <h3 className="ecc-title">{course.title}</h3>
+
+        {batchInfo && (
+          <div className="ecc-batch-mode-indicator">
+            {batchInfo.mode === 'Offline' ? <Users size={14} /> : <Monitor size={14} />}
+            <span>
+              {(() => {
+                const dur = batchInfo.duration || '4 Months';
+                const mod = (batchInfo.mode || 'Online').toLowerCase();
+                const durationStr = /weeks|months|days/i.test(dur) ? dur : `${dur} weeks`;
+                return `${durationStr} - ${mod}`;
+              })()}
+            </span>
+          </div>
+        )}
 
         <div className="ecc-progress-wrap">
           <div className="ecc-progress-header">

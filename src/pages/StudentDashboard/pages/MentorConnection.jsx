@@ -14,6 +14,7 @@ import {
   Eye
 } from 'lucide-react';
 import Editor from '@monaco-editor/react';
+import { getStudentBatchesAPI } from '../../../services/api';
 import './MentorConnection.css';
 
 const MentorConnection = () => {
@@ -48,17 +49,55 @@ const MentorConnection = () => {
     fileInputRef.current?.click();
   };
 
-  const mentors = [
-    { id: 't1', n: 'Abhinaya', role: 'Senior Java Architect', spec: ['Java', 'Spring Boot', 'Microservices'], color: '#2563eb' },
-    { id: 't2', n: 'Charani', role: 'Lead Python Developer', spec: ['Python', 'Django', 'AI'], color: '#10b981' },
-    { id: 't3', n: 'Suresh Kumar', role: 'Cloud Solutions Architect', spec: ['AWS', 'Terraform', 'Kubernetes'], color: '#f59e0b' }
-  ];
+  const [mentors, setMentors] = useState([]);
+  const [loadingMentors, setLoadingMentors] = useState(true);
 
-  // Course-based languages
-  const languageOptions = {
-    't1': ['Java', 'Spring Boot', 'SQL'],
-    't2': ['Python', 'Django', 'Flask'],
-    't3': ['AWS', 'Terraform', 'Kubernetes', 'Docker']
+  useEffect(() => {
+    const fetchTrainers = async () => {
+      try {
+        const response = await getStudentBatchesAPI();
+        if (response.success && response.batches) {
+          const trainerMap = {};
+
+          Object.entries(response.batches).forEach(([courseName, batchData]) => {
+            const t = batchData.trainer;
+            if (t && t.name) {
+              const tId = t.id || t.name;
+              if (!trainerMap[tId]) {
+                trainerMap[tId] = {
+                  id: tId,
+                  n: t.name,
+                  role: t.specialization || t.expertise || 'Expert Trainer',
+                  courses: [courseName],
+                  color: ['#2563eb', '#10b981', '#f59e0b', '#8b5cf6'][Object.keys(trainerMap).length % 4]
+                };
+              } else {
+                if (!trainerMap[tId].courses.includes(courseName)) {
+                  trainerMap[tId].courses.push(courseName);
+                }
+              }
+            }
+          });
+
+          setMentors(Object.values(trainerMap));
+        }
+      } catch (err) {
+        console.error("Error fetching trainers:", err);
+      } finally {
+        setLoadingMentors(false);
+      }
+    };
+    fetchTrainers();
+  }, []);
+
+  const getLanguageOptions = (courses) => {
+    const all = [];
+    if (courses.some(c => c.toLowerCase().includes('java'))) all.push('Java', 'Spring Boot', 'SQL');
+    if (courses.some(c => c.toLowerCase().includes('python'))) all.push('Python', 'Django', 'Flask');
+    if (courses.some(c => c.toLowerCase().includes('aws') || c.toLowerCase().includes('cloud'))) all.push('AWS', 'Terraform', 'Docker');
+    if (courses.some(c => c.toLowerCase().includes('web') || c.toLowerCase().includes('ui'))) all.push('JavaScript', 'React', 'HTML/CSS');
+    if (all.length === 0) all.push('JavaScript', 'Python', 'Java');
+    return [...new Set(all)];
   };
 
   useEffect(() => {
@@ -149,26 +188,36 @@ const MentorConnection = () => {
           </div>
         </div>
         <div className="mentor-directory-grid">
-          {mentors.map((m, i) => (
-            <div className="dir-card-premium" key={i}>
-              <div className="dir-card-banner" style={{ background: `linear-gradient(135deg, ${m.color}e6, ${m.color})` }}></div>
-              <div className="dir-avatar-wrapper">
-                <div className="dir-avatar-circle" style={{ color: m.color }}>{m.n[0]}</div>
-              </div>
-              <div className="dir-card-body">
-                <div className="dir-title-section">
-                  <h2 className="dir-name">{m.n}</h2>
-                  <p className="dir-role">{m.role}</p>
+          {loadingMentors ? (
+            <div style={{ textAlign: 'center', padding: '40px', color: '#64748b', gridColumn: '1 / -1' }}>Loading assigned trainers...</div>
+          ) : mentors.length > 0 ? (
+            mentors.map((m, i) => (
+              <div className="dir-card-premium" key={i}>
+                <div className="dir-card-banner" style={{ background: `linear-gradient(135deg, ${m.color}e6, ${m.color})` }}></div>
+                <div className="dir-avatar-wrapper">
+                  <div className="dir-avatar-circle" style={{ color: m.color }}>{m.n[0]}</div>
                 </div>
-                <div className="dir-footer-section">
-                  <button className="dir-connect-action-btn" onClick={() => setSelected(i)}>
-                    <MessageCircle size={18} />
-                    <span>Raise Query</span>
-                  </button>
+                <div className="dir-card-body">
+                  <div className="dir-title-section">
+                    <h2 className="dir-name">{m.n}</h2>
+                    <p className="dir-role" style={{ color: '#3b82f6', fontWeight: '600', marginTop: '4px' }}>
+                      {m.courses.join(', ')}
+                    </p>
+                  </div>
+                  <div className="dir-footer-section">
+                    <button className="dir-connect-action-btn" onClick={() => setSelected(i)}>
+                      <MessageCircle size={18} />
+                      <span>Raise Query</span>
+                    </button>
+                  </div>
                 </div>
               </div>
+            ))
+          ) : (
+            <div style={{ textAlign: 'center', padding: '40px', color: '#64748b', gridColumn: '1 / -1', background: '#fff', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
+              No assigned trainers found. You need to be enrolled in an active batch.
             </div>
-          ))}
+          )}
         </div>
       </div>
     );
@@ -258,7 +307,7 @@ const MentorConnection = () => {
                 <div className="editor-header-actions">
                   <span className="editor-label">Code Workspace</span>
                   <select className="premium-select" value={language} onChange={e => setLanguage(e.target.value)}>
-                    {languageOptions[mentors[selected].id].map(l => (
+                    {getLanguageOptions(mentors[selected].courses).map(l => (
                       <option key={l} value={l.toLowerCase()}>{l}</option>
                     ))}
                   </select>

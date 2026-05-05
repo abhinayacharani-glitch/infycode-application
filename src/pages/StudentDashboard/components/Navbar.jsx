@@ -29,7 +29,7 @@ const Navbar = ({ onToggleSidebar }) => {
     };
     window.addEventListener('profileUpdate', handleProfileSync);
     window.addEventListener('storage', handleProfileSync);
-    
+
     // Global sync on mount to catch profileImage if missing from login
     import('../../../services/api').then(({ getStudentProfile }) => {
       getStudentProfile().then(res => {

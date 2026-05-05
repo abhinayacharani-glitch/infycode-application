@@ -209,10 +209,10 @@ export const getTrainerProfile = async (req, res) => {
       const batchesRef = db.ref("batch");
       const batchesSnap = await batchesRef.once("value");
       const batchesRaw = batchesSnap.val() || {};
-      
+
       let activeBatchesCount = 0;
       let totalStudentsCount = 0;
-      
+
       Object.values(batchesRaw).forEach(batch => {
         const batchTrainer = batch.trainerName || batch.trainer;
         if (batchTrainer === trainerFullName) {
@@ -220,7 +220,7 @@ export const getTrainerProfile = async (req, res) => {
           totalStudentsCount += parseInt(batch.enrolled) || 0;
         }
       });
-      
+
       profileData.activeBatches = activeBatchesCount;
       profileData.totalStudents = totalStudentsCount;
       profileData.avgAttendance = "92"; // Placeholder for avg attendance
@@ -408,14 +408,14 @@ export const startBatch = async (req, res) => {
 
     // --- Friendly display values ------------------------------------------------
     const courseName = batchData.courseName || batchData.course || "the course";
-    const batchName  = batchData.name || courseName;
+    const batchName = batchData.name || courseName;
     const trainerName = batchData.trainerName || batchData.trainer || "Your trainer";
 
     const startDisplay = batchData.startDateTime
       ? new Date(batchData.startDateTime).toLocaleString("en-US", {
-          month: "long", day: "numeric", year: "numeric",
-          hour: "2-digit", minute: "2-digit"
-        })
+        month: "long", day: "numeric", year: "numeric",
+        hour: "2-digit", minute: "2-digit"
+      })
       : `${dateStr} at ${timeStr}`;
     // ---------------------------------------------------------------------------
 
