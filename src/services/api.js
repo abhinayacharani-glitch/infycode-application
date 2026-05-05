@@ -739,9 +739,5 @@ export const getPendingCounsellingCountAPI = () =>
     headers: getAuthHeader(),
   });
 
-export const updateCounsellingStatusAPI = (bookingId, status) =>
-  request('/api/counselling/update-status', {
-    method: 'PUT',
-    headers: getAuthHeader(),
-    body: JSON.stringify({ bookingId, status }),
-  });
+
+
