@@ -80,7 +80,7 @@ function Footer() {
         <div className="footer-col">
           <h3>About Us</h3>
 
-          <Link to="/about" className="footer-link" onClick={() => window.scrollTo(0, 0)}>About</Link>
+          <a href="/about" className="footer-link" onClick={(e) => { e.preventDefault(); navigate('/about'); window.scrollTo(0, 0); }}>About</a>
           <a href="/#courses" className="footer-link" onClick={handleCoursesClick}>Courses</a>
           <Link to="/trainings" className="footer-link" onClick={() => window.scrollTo(0, 0)}>Trainings</Link>
           <Link to="/trainings/corporate" className="footer-link" onClick={() => window.scrollTo(0, 0)}>Corporate</Link>
@@ -96,8 +96,24 @@ function Footer() {
           <Link to="/resources/articles" className="footer-link" onClick={() => window.scrollTo(0, 0)}>Articles</Link>
           <Link to="/resources/ebooks" className="footer-link" onClick={() => window.scrollTo(0, 0)}>eBooks</Link>
           <Link to="/trainings/institutional" className="footer-link" onClick={() => window.scrollTo(0, 0)}>Institutional</Link>
-          <Link to="/#faq" className="footer-link" onClick={() => window.scrollTo(0, 0)}>FAQ</Link>
-          <Link to="/#testimonials" className="footer-link" onClick={() => window.scrollTo(0, 0)}>Testimonials</Link>
+          <a href="/#faq" className="footer-link" onClick={(e) => {
+            e.preventDefault();
+            if (pathname === "/") {
+              const section = document.getElementById("faq");
+              if (section) section.scrollIntoView({ behavior: "smooth" });
+            } else {
+              navigate("/#faq");
+            }
+          }}>FAQ</a>
+          <a href="/#testimonials" className="footer-link" onClick={(e) => {
+            e.preventDefault();
+            if (pathname === "/") {
+              const section = document.getElementById("testimonials");
+              if (section) section.scrollIntoView({ behavior: "smooth" });
+            } else {
+              navigate("/#testimonials");
+            }
+          }}>Testimonials</a>
         </div>
 
         {/* NEWSLETTER */}
