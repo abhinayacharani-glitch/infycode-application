@@ -7,7 +7,7 @@
     "node": "22.x"
   },
   "scripts": {
-    "dev": "vite",
+    "dev": "vite & (sleep 2; open -a 'Google Chrome' http://localhost:5173)",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
