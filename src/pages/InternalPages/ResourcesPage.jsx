@@ -1,4 +1,6 @@
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FiArrowLeft } from "react-icons/fi";
 import './ResourcesPage.css';
 
 const resources = [
@@ -29,6 +31,8 @@ const resources = [
 ];
 
 const ResourcesPage = () => {
+  const navigate = useNavigate();
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -37,8 +41,17 @@ const ResourcesPage = () => {
     <div className="resources-page">
       <div
         className="resources-hero"
-        style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&q=80&w=1920)' }}
+        style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&q=80&w=1920)', position: 'relative' }}
       >
+        <button 
+          className="fp-back-btn" 
+          onClick={() => navigate(-1)}
+          style={{ position: 'absolute', top: '20px', left: '20px', display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.2)', color: '#fff', border: '1px solid rgba(255,255,255,0.4)', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', zIndex: 10, backdropFilter: 'blur(5px)', fontSize: '15px', fontWeight: '600', transition: 'background 0.3s' }}
+          onMouseEnter={(e) => e.target.style.background = 'rgba(255,255,255,0.3)'}
+          onMouseLeave={(e) => e.target.style.background = 'rgba(255,255,255,0.2)'}
+        >
+          <FiArrowLeft size={18} /> Back
+        </button>
         <div className="resources-hero-content">
           <h1>Knowledge Base &amp; Resources</h1>
           <p>Accelerate your learning with free articles, developer guides, cheat sheets, and technical deep-dives authored by INFYCODE experts.</p>
