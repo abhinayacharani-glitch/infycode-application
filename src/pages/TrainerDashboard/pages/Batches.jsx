@@ -194,7 +194,7 @@ const Batches = () => {
               <div
                 key={batch.id}
                 className="batch-card-saas-v3"
-                onClick={() => navigate(`/trainer-dashboard/batches/${batch.id}`)}
+                onClick={() => navigate(`/trainer-dashboard/batches/${batch.id}`, { state: { batch } })}
               >
                 <div className="batch-card-accent-border"></div>
 
