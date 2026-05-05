@@ -324,10 +324,12 @@ export const getTrainerBatches = async (req, res) => {
         id: data.batchId || id,
         firebaseId: id,
         course: data.courseName || data.course,
+        name: data.name || "",
         trainer: data.trainerName || data.trainer,
         students: parseInt(data.enrolled) || 0,
         capacity: parseInt(data.capacity) || 30,
         startDate: data.startDateTime ? data.startDateTime.split('T')[0] : "",
+        startDateTime: data.startDateTime || "",
         endDate: "", // Logic to calculate endDate based on duration could go here
         duration: data.duration || "N/A",
         mode: "Online", // Defaulting to Online as per previous requirements
@@ -344,49 +346,155 @@ export const getTrainerBatches = async (req, res) => {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
-// PUT /api/trainer/batches/:id/start
+// PUT /api/trainer/batches/:id/start  (also used by Admin via same endpoint)
 // ═══════════════════════════════════════════════════════════════════════════
 export const startBatch = async (req, res) => {
   try {
-    const { id } = req.params; // firebase key
-    const { email } = req.user;
+    const { id } = req.params; // firebase push key
+    const { email, role } = req.user;
+    const isAdmin = role === "admin";
 
-    // 1. Get Trainer Profile
+    // 1. Resolve calling user's trainer profile (non-fatal for admins)
     const trainerSnapshot = await trainersRef.orderByChild("email").equalTo(email).once("value");
-    if (!trainerSnapshot.exists()) {
-      return res.status(404).json({ success: false, message: "Trainer not found" });
+    let callerFullName = "";
+    let callerTrainerKey = null;
+    if (trainerSnapshot.exists()) {
+      trainerSnapshot.forEach(child => {
+        callerFullName = child.val().fullName || child.val().fullname || child.val().name || "";
+        callerTrainerKey = child.key;
+      });
     }
 
-    let trainerFullName = "";
-    trainerSnapshot.forEach(child => {
-      trainerFullName = child.val().fullName || child.val().fullname || child.val().name;
-    });
-
-    // 2. Get Batch
+    // 2. Fetch batch
     const batchRef = db.ref("batch").child(id);
     const batchSnap = await batchRef.once("value");
     if (!batchSnap.exists()) {
       return res.status(404).json({ success: false, message: "Batch not found" });
     }
-
     const batchData = batchSnap.val();
 
-    // 3. Authorization check
-    if ((batchData.trainerName || batchData.trainer) !== trainerFullName) {
-      return res.status(403).json({ success: false, message: "You are not assigned to this batch" });
+    // 3. Re-activation guard — prevent starting an already-active batch
+    if (batchData.status === "Active") {
+      return res.status(400).json({
+        success: false,
+        message: "Batch has already been started. Cannot start it again."
+      });
     }
 
-    // 4. Update status
+    // 4. Authorization (admins bypass trainer check)
+    if (!isAdmin) {
+      if (!trainerSnapshot.exists()) {
+        return res.status(404).json({ success: false, message: "Trainer not found" });
+      }
+      const assignedTrainer = batchData.trainerName || batchData.trainer || "";
+      if (assignedTrainer !== callerFullName) {
+        return res.status(403).json({ success: false, message: "You are not assigned to this batch" });
+      }
+    }
+
+    // 5. Activate batch in Firebase
+    const startedAt = new Date().toISOString();
+    const d = new Date(startedAt);
+    const dateStr = d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    const timeStr = d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
+
     await batchRef.update({
-      status: "Active",
-      startedAt: new Date().toISOString(),
-      lastUpdated: new Date().toISOString()
+      status: "started",
+      batchStatus: "started",
+      batchStartedAt: startedAt,
+      startedAt,
+      lastUpdated: startedAt
     });
 
-    res.status(200).json({ success: true, message: "Batch started successfully!" });
+    // --- Friendly display values ------------------------------------------------
+    const courseName = batchData.courseName || batchData.course || "the course";
+    const batchName  = batchData.name || courseName;
+    const trainerName = batchData.trainerName || batchData.trainer || "Your trainer";
+
+    const startDisplay = batchData.startDateTime
+      ? new Date(batchData.startDateTime).toLocaleString("en-US", {
+          month: "long", day: "numeric", year: "numeric",
+          hour: "2-digit", minute: "2-digit"
+        })
+      : `${dateStr} at ${timeStr}`;
+    // ---------------------------------------------------------------------------
+
+    // 6. Push in-app notification to the assigned trainer
+    try {
+      let targetTrainerKey = callerTrainerKey;
+
+      if (!targetTrainerKey && trainerName) {
+        const nameSnap = await trainersRef.orderByChild("fullName").equalTo(trainerName).once("value");
+        if (nameSnap.exists()) nameSnap.forEach(c => { targetTrainerKey = c.key; });
+      }
+
+      if (targetTrainerKey) {
+        await db.ref("trainerNotifications").child(targetTrainerKey).child("items").push({
+          notificationId: `notif_${Date.now()}`,
+          title: `🚀 Your batch ${batchName} has started!`,
+          text: `Your batch ${batchName} for ${courseName} has been started on ${dateStr} at ${timeStr}. Please be ready to conduct the sessions.`,
+          batchId: batchData.batchId || id,
+          courseId: batchData.courseId || "",
+          type: "success",
+          read: false,
+          createdAt: Date.now()
+        });
+        console.log(`[startBatch] ✅ Notification sent to trainer key: ${targetTrainerKey}`);
+      }
+    } catch (notifErr) {
+      console.error("[startBatch] ⚠️ Trainer notification failed:", notifErr.message);
+    }
+
+    // 7. Send batch-start emails to enrolled students (once only)
+    if (batchData.emailSentAt) {
+      console.log("[startBatch] ℹ️ Emails already sent at", batchData.emailSentAt, "— skipping.");
+    } else {
+      try {
+        const sendEmail = (await import("../utils/sendEmail.js")).default;
+        const studentsInBatch = batchData.students ? Object.values(batchData.students) : [];
+
+        if (studentsInBatch.length > 0) {
+          const emailPromises = studentsInBatch.map(student => {
+            if (!student.email) return Promise.resolve();
+            return sendEmail({
+              to: student.email,
+              subject: `Your Batch Has Started - ${courseName}`,
+              html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+                  <h2 style="color: #1a73e8;">Your Batch Has Started - ${courseName}</h2>
+                  <p>Hello <strong>${student.name || "Student"}</strong>,</p>
+                  <p>We are happy to inform you that your enrolled batch for <strong>${courseName}</strong> has started.</p>
+                  <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                    <p style="margin: 5px 0;"><strong>Batch Name:</strong> ${batchName}</p>
+                    <p style="margin: 5px 0;"><strong>Trainer Name:</strong> ${trainerName}</p>
+                    <p style="margin: 5px 0;"><strong>Start Date:</strong> ${dateStr}</p>
+                    <p style="margin: 5px 0;"><strong>Start Time:</strong> ${timeStr}</p>
+                    <p style="margin: 5px 0;"><strong>Mode:</strong> Online Live</p>
+                  </div>
+                  <p>Please login to your student dashboard for complete details.</p>
+                  <p>Thank you.</p>
+                  <hr style="border: none; border-top: 1px solid #eee; margin-top: 30px;" />
+                  <p style="font-size: 12px; color: #777;">InfyCode Learning Solutions</p>
+                </div>
+              `
+            }).catch(err => console.error(`[startBatch] Email failed → ${student.email}:`, err.message));
+          });
+
+          await Promise.allSettled(emailPromises);
+          await batchRef.update({ emailSentAt: new Date().toISOString() });
+          console.log(`[startBatch] ✅ Emails sent to ${studentsInBatch.length} students.`);
+        }
+      } catch (emailErr) {
+        console.error("[startBatch] ⚠️ Email blast error:", emailErr.message);
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `Batch "${batchName}" started successfully! Trainer notified and student emails dispatched.`
+    });
   } catch (error) {
-    console.error("[startBatch] Error:", error.message);
+    console.error("[startBatch] ❌ Error:", error.message);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
-

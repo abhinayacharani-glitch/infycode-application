@@ -33,7 +33,7 @@ router.put("/profile", verifyToken, isTrainer, updateTrainerProfile);
 
 // ✅ Trainer Batches — GET /api/trainer/batches (protected)
 router.get("/batches", verifyToken, isTrainer, getTrainerBatches);
-router.put("/batches/:id/start", verifyToken, isTrainer, startBatch);
+router.put("/batches/:id/start", verifyToken, checkRole(["admin", "trainer"]), startBatch);
 
 // ✅ Trainer Notifications (protected — trainer only)
 router.get("/notifications",            verifyToken, isTrainer, getTrainerNotifications);

@@ -166,7 +166,7 @@ export const enrollInCourse = async (req, res) => {
     }
 
     const sanitizedEmail = email.trim().toLowerCase().replace(/\./g, ",");
-    
+
     // Add courseId to student's enrollment list
     await enrollmentsRef.child(sanitizedEmail).child(courseId).set({
       enrolledAt: new Date().toISOString(),
@@ -211,8 +211,128 @@ export const getEnrolledCourses = async (req, res) => {
   }
 };
 
+/**
+ * @desc  Get per-course batch + full trainer details for the logged-in student
+ * @route GET /api/student/my-batches
+ */
+export const getStudentBatches = async (req, res) => {
+  try {
+    const email = req.user?.email?.toLowerCase();
+    const idFromToken = req.user?.id;
+
+    // 1. Resolve student record
+    let studentData = null;
+    if (idFromToken) {
+      const snap = await studentsRef.child(idFromToken).once("value");
+      if (snap.exists()) studentData = { id: idFromToken, ...snap.val() };
+    }
+    if (!studentData && email) {
+      const allSnap = await studentsRef.once("value");
+      const all = allSnap.val() || {};
+      for (const key in all) {
+        if (all[key].email?.toLowerCase() === email) {
+          studentData = { id: key, ...all[key] };
+          break;
+        }
+      }
+    }
+    if (!studentData) {
+      return res.status(404).json({ success: false, message: "Student not found" });
+    }
+
+    // 2. Get batches map: { "Course Name": "batchFirebaseKey" }
+    const batchesMap = studentData.batches || {};
+    if (Object.keys(batchesMap).length === 0) {
+      return res.status(200).json({ success: true, batches: {} });
+    }
+
+    // 3. Fetch batch + trainer for each course
+    const batchesRef = db.ref("batch");
+    const trainersRef = db.ref("trainers");
+    const result = {};
+
+    // Pre-fetch all trainers for robust in-memory matching (avoids Firebase case-sensitivity issues)
+    const allTrainersSnap = await trainersRef.once("value");
+    const allTrainersRaw = allTrainersSnap.val() || {};
+    const trainersList = Object.entries(allTrainersRaw).map(([key, data]) => ({ key, ...data }));
+
+    for (const [courseName, batchKey] of Object.entries(batchesMap)) {
+      try {
+        const directSnap = await batchesRef.child(batchKey).once("value");
+        let batchData = null;
+        if (directSnap.exists()) {
+          batchData = { firebaseKey: batchKey, ...directSnap.val() };
+        } else {
+          const qSnap = await batchesRef.orderByChild("batchId").equalTo(batchKey).once("value");
+          if (qSnap.exists()) qSnap.forEach(c => { batchData = { firebaseKey: c.key, ...c.val() }; });
+        }
+        if (!batchData) continue;
+
+        // 4. Fetch full trainer profile (Case-insensitive matching)
+        const trainerNameStr = (batchData.trainerName || batchData.trainer || "").trim().toLowerCase();
+        let trainerDetails = null;
+        
+        if (trainerNameStr) {
+          const matchedTrainer = trainersList.find(t => {
+            const tName = (t.fullName || t.fullname || t.name || "").trim().toLowerCase();
+            return tName === trainerNameStr || t.email?.toLowerCase() === trainerNameStr;
+          });
+
+          if (matchedTrainer) {
+            trainerDetails = {
+              name:           matchedTrainer.fullName || matchedTrainer.fullname || matchedTrainer.name,
+              email:          matchedTrainer.email || "",
+              phone:          matchedTrainer.phone || matchedTrainer.mobile || "",
+              specialization: matchedTrainer.specialization || matchedTrainer.domain || "",
+              experience:     matchedTrainer.experience || "",
+              profileImage:   matchedTrainer.profileImage || ""
+            };
+          } else {
+            trainerDetails = { name: batchData.trainerName || batchData.trainer, email: "", phone: "", specialization: "", experience: "", profileImage: "" };
+          }
+        }
+
+        // 5. Extract start date/time
+        let startDate = "", startTime = "";
+        if (batchData.startDateTime) {
+          const d = new Date(batchData.startDateTime);
+          startDate = d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+          startTime = d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
+        } else if (batchData.name && batchData.name.includes(" - ")) {
+          startDate = batchData.name.split(" - ").pop();
+        }
+
+        result[courseName] = {
+          batchId:       batchData.batchId || batchKey,
+          batchName:     batchData.name || courseName,
+          courseName:    batchData.courseName || batchData.course || courseName,
+          courseId:      batchData.courseId || "",
+          status:        batchData.status || "Scheduled",
+          batchStatus:   batchData.batchStatus || batchData.status || "Scheduled",
+          startDateTime: batchData.startDateTime || "",
+          startDate,
+          startTime,
+          duration:      batchData.duration || "",
+          capacity:      batchData.capacity || 30,
+          enrolled:      batchData.enrolled || 0,
+          liveClassLink: batchData.liveClassLink || batchData.meetLink || "",
+          trainer:       trainerDetails
+        };
+      } catch (err) {
+        console.error(`[getStudentBatches] Error for "${courseName}":`, err.message);
+      }
+    }
+
+    return res.status(200).json({ success: true, batches: result });
+  } catch (error) {
+    console.error("[getStudentBatches] Error:", error.message);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
 export const getStudentProfile = async (req, res) => {
   try {
+
     const email = req.user?.email?.toLowerCase();
     const idFromToken = req.user?.id;
 

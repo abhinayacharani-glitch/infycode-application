@@ -282,7 +282,7 @@ export const getDashboardStats = async (req, res) => {
  **/
 export const createBatch = async (req, res) => {
   try {
-    const { name, course, trainer, capacity, status } = req.body;
+    const { name, course, trainer, capacity, status, startDateTime, duration, batchImage } = req.body;
 
     if (!name || !course || !trainer) {
       return res.status(400).json({ message: "Name, course, and trainer are required." });
@@ -290,7 +290,7 @@ export const createBatch = async (req, res) => {
 
     const nextBID = await generateNextBatchID();
     const newBatchRef = batchesRef.push();
-    const batchData = {
+    const rawBatchData = {
       batchId: nextBID, // Assign unique sequential Batch ID
       name,
       courseName: course,
@@ -298,8 +298,14 @@ export const createBatch = async (req, res) => {
       capacity: parseInt(capacity) || 30,
       enrolled: 0,
       status: status || 'Draft',
+      startDateTime: startDateTime || "",
+      duration: duration || "",
+      batchImage: batchImage || "",
       createdAt: new Date().toISOString()
     };
+
+    // Clean undefined/null to prevent Firebase errors
+    const batchData = Object.fromEntries(Object.entries(rawBatchData).filter(([_, v]) => v != null && v !== ""));
 
     await newBatchRef.set(batchData);
 
@@ -414,8 +420,13 @@ export const moveStudentsToBatch = async (req, res) => {
     // 4. Update Student records to link to batch
     const studentUpdates = {};
     studentsToMove.forEach(student => {
+      // Basic root fields
       studentUpdates[`${student.id}/batchId`] = batchId;
       studentUpdates[`${student.id}/batchName`] = batchData.name || batchData.courseName || batchData.course;
+      
+      // Multi-course support: Map the specific course to this batch key
+      const courseKey = (batchData.courseName || batchData.course || "General").replace(/\./g, ",");
+      studentUpdates[`${student.id}/batches/${courseKey}`] = batchId;
     });
     await studentsRef.update(studentUpdates);
 

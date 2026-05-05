@@ -206,23 +206,26 @@ const Batches = () => {
 
                   <h2 className="batch-card-title-v3">{batch.course}</h2>
 
-                  <div className="batch-card-dates-v3">
-                    <Calendar size={14} />
-                    <span>{batch.startDate} — {batch.endDate}</span>
+                  <div className="batch-item-details">
+                    <div className="detail">
+                      <span className="label">Starts</span>
+                      <span className="value">
+                        {batch.startDateTime ?
+                          new Date(batch.startDateTime).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+                          : (batch.name && batch.name.includes(' - ')) ? batch.name.split(' - ').pop() : "-"
+                        }
+                      </span>
+                    </div>
+                    <div className="detail">
+                      <span className="label">Students</span>
+                      <span className="value">{batch.students || batch.enrolled || 0} / {batch.capacity || 30} Seats</span>
+                    </div>
                   </div>
 
                   <div className="batch-card-meta-v3">
                     <div className="meta-item-saas">
-                      <Clock size={14} />
-                      <span>{calculateDuration(batch.startDate, batch.endDate)}</span>
-                    </div>
-                    <div className="meta-item-saas">
                       <Monitor size={14} />
                       <span>{batch.mode}</span>
-                    </div>
-                    <div className="meta-item-saas">
-                      <Users size={14} />
-                      <span>{batch.students} Students</span>
                     </div>
                   </div>
 

@@ -14,6 +14,7 @@ import {
   updateTrainerApplicationStatusAPI,
   markAllStudentResultsAsSeenAPI,
   moveStudentsToBatchAPI,
+  adminStartBatchAPI,
   createSyllabus as apiCreateSyllabus,
   getAllSyllabuses as apiGetAllSyllabuses
 } from '../services/api';
@@ -366,6 +367,19 @@ export const AdminProvider = ({ children }) => {
     }
   };
 
+  const startBatch = async (firebaseId) => {
+    try {
+      const response = await adminStartBatchAPI(firebaseId);
+      if (response.success) {
+        fetchDashboardStats();
+        return response;
+      }
+    } catch (error) {
+      console.error("Error starting batch:", error);
+      throw error;
+    }
+  };
+
   const loadCourses = async () => {
     try {
       const data = await getAllCourses();
@@ -404,6 +418,7 @@ export const AdminProvider = ({ children }) => {
     toggleCourseStatus,
     markNotificationRead,
     addBatch,
+    startBatch,
     addCourse,
     updateCourse,
     deleteCourse,

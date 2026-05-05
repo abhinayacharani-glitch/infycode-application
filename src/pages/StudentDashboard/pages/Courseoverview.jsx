@@ -2,21 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { COURSE_MAP } from './data/extraCourses';
 import { useCourseContext } from '../../../context/CourseContext';
-import { 
-  ArrowLeft, 
-  User, 
-  Calendar, 
-  Hash, 
-  Clock, 
-  Monitor, 
-  GraduationCap, 
-  Users, 
-  Lock, 
+import {
+  ArrowLeft,
+  User,
+  Calendar,
+  Hash,
+  Clock,
+  Monitor,
+  GraduationCap,
+  Users,
+  Lock,
   Layout,
   Video,
   ChevronRight
 } from 'lucide-react';
 import { getCourseImage } from '../../../utils/courseUtils';
+import { getStudentBatchesAPI } from '../../../services/api';
 import './Courseoverview.css';
 
 const daysOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -87,10 +88,10 @@ const CourseOverview = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { publishedCourses } = useCourseContext();
-  
+
   const courseIdFromState = location.state;
-  const courseId = (typeof courseIdFromState === 'object' && courseIdFromState !== null) 
-    ? courseIdFromState.courseId || courseIdFromState.id 
+  const courseId = (typeof courseIdFromState === 'object' && courseIdFromState !== null)
+    ? courseIdFromState.courseId || courseIdFromState.id
     : courseIdFromState || 'java-fs-01';
 
   let course = COURSE_MAP[courseId];
@@ -103,12 +104,12 @@ const CourseOverview = () => {
         ...published,
         id: published.courseId || published.id,
         trainer: published.trainer || { name: 'Expert Instructor', role: 'Senior Mentor', experience: '10+ Years', specialization: published.category || 'Tech' },
-        batch: published.batch || { 
-          name: 'Regular Batch', 
-          id: `BID-${(published.title || 'CRSE').substring(0,4).toUpperCase()}-${new Date().getFullYear()}`, 
-          startDate: published.startDate || 'Next Week', 
-          timing: 'Flexible', 
-          duration: published.duration || '3 Months' 
+        batch: published.batch || {
+          name: 'Regular Batch',
+          id: `BID-${(published.title || 'CRSE').substring(0, 4).toUpperCase()}-${new Date().getFullYear()}`,
+          startDate: published.startDate || 'Next Week',
+          timing: 'Flexible',
+          duration: published.duration || '3 Months'
         },
         level: published.level || 'Beginner',
         modules: published.modules || [
@@ -128,6 +129,64 @@ const CourseOverview = () => {
   const [sessionStatus, setSessionStatus] = useState('no-link');
   const [sessionConfig, setSessionConfig] = useState(null);
   const [dayStatuses, setDayStatuses] = useState([]);
+  const [myBatches, setMyBatches] = useState({});
+  const [isLoadingBatches, setIsLoadingBatches] = useState(true);
+
+  // 1. Fetch student batches on mount
+  useEffect(() => {
+    const fetchBatches = async () => {
+      try {
+        const response = await getStudentBatchesAPI();
+        if (response.success) {
+          setMyBatches(response.batches || {});
+        }
+      } catch (err) {
+        console.error("Failed to fetch student batches:", err);
+      } finally {
+        setIsLoadingBatches(false);
+      }
+    };
+    fetchBatches();
+
+    // Polling every 10 seconds to catch Admin batch-start events
+    const pollInterval = setInterval(fetchBatches, 10000);
+    return () => clearInterval(pollInterval);
+  }, []);
+
+  // 2. Resolve Dynamic Course Data (Trainer & Batch)
+  // If the student is assigned to a batch for this course, override details
+  const dynamicCourse = React.useMemo(() => {
+    if (!course) return null;
+
+    // Try to find a match in myBatches by course title
+    const batchMatch = Object.values(myBatches).find(b =>
+      b.courseName === course.title ||
+      b.batchName?.startsWith(course.title) ||
+      b.courseId === course.id
+    );
+
+    if (batchMatch) {
+      return {
+        ...course,
+        trainer: batchMatch.trainer ? {
+          name: batchMatch.trainer.name,
+          role: batchMatch.trainer.specialization || 'Lead Instructor',
+          experience: batchMatch.trainer.experience || '10+ Years',
+          specialization: batchMatch.trainer.specialization || course.category || 'Expert'
+        } : course.trainer,
+        batch: {
+          id: batchMatch.batchId,
+          name: batchMatch.batchName,
+          startDate: batchMatch.startDate || course.batch?.startDate,
+          timing: batchMatch.startTime || batchMatch.timing || course.batch?.timing || 'Flexible',
+          duration: batchMatch.duration || course.batch?.duration || '6 Months'
+        },
+        meetLink: batchMatch.liveClassLink || ''
+      };
+    }
+
+    return course;
+  }, [course, myBatches]);
 
   useEffect(() => {
     const check = () => {
@@ -140,12 +199,12 @@ const CourseOverview = () => {
         const todayIndex = (now.getDay() + 6) % 7;
         const todayName = daysOrder[todayIndex];
         const tomorrowName = daysOrder[(todayIndex + 1) % 7];
-        
+
         const computedStatuses = [
           { day: todayName, ...getDayStatus(todayName, liveSessionData[todayName], now) },
           { day: tomorrowName, ...getDayStatus(tomorrowName, liveSessionData[tomorrowName], now) },
         ];
-        
+
         setSessionConfig(config);
         setSessionStatus(getOverallStatus(config, now));
         setDayStatuses(computedStatuses);
@@ -191,12 +250,12 @@ const CourseOverview = () => {
       {/* Header Card */}
       <div className="co-hero">
         <div className="co-hero-bg">
-          <img src={courseImage} alt={course.title} className="co-hero-img" />
+          <img src={getCourseImage(dynamicCourse)} alt={dynamicCourse.title} className="co-hero-img" />
           <div className="co-hero-overlay"></div>
         </div>
         <div className="co-hero-left">
-          <span className="co-level-badge">{course.level}</span>
-          <h1 className="co-hero-title">{course.title}</h1>
+          <span className="co-level-badge">{dynamicCourse.level}</span>
+          <h1 className="co-hero-title">{dynamicCourse.title}</h1>
           <p className="co-subtitle">Master technical skills with our comprehensive industry-grade curriculum and expert-led training.</p>
         </div>
         <div className="co-hero-right">
@@ -234,20 +293,20 @@ const CourseOverview = () => {
             <h2>Trainer Details</h2>
           </div>
           <div className="co-trainer-main-pill">
-            <div className="co-trainer-avatar-blue">{course.trainer?.name?.charAt(0)}</div>
+            <div className="co-trainer-avatar-blue">{dynamicCourse.trainer?.name?.charAt(0)}</div>
             <div className="co-trainer-text">
-              <div className="co-t-name">{course.trainer?.name}</div>
-              <div className="co-t-role">{course.trainer?.role}</div>
+              <div className="co-t-name">{dynamicCourse.trainer?.name}</div>
+              <div className="co-t-role">{dynamicCourse.trainer?.role}</div>
             </div>
           </div>
           <div className="co-trainer-stats-row">
             <div className="co-stat-pill">
               <span className="co-pill-label">Experience</span>
-              <span className="co-pill-value">{course.trainer?.experience || '10+ Years'}</span>
+              <span className="co-pill-value">{dynamicCourse.trainer?.experience || '10+ Years'}</span>
             </div>
             <div className="co-stat-pill">
               <span className="co-pill-label">Specialization</span>
-              <span className="co-pill-value">{course.trainer?.specialization?.split(',')[0] || 'Technical Expert'}</span>
+              <span className="co-pill-value">{dynamicCourse.trainer?.specialization?.split(',')[0] || 'Technical Expert'}</span>
             </div>
           </div>
         </div>
@@ -263,19 +322,19 @@ const CourseOverview = () => {
           <div className="co-batch-grid">
             <div className="co-batch-pill">
               <span className="co-pill-label"><Hash size={12} /> Batch ID</span>
-              <span className="co-pill-value">{course.batch?.id || 'BID-1240'}</span>
+              <span className="co-pill-value">{dynamicCourse.batch?.id || 'BID-1240'}</span>
             </div>
             <div className="co-batch-pill">
               <span className="co-pill-label"><Clock size={12} /> Timing</span>
-              <span className="co-pill-value">{course.batch?.timing}</span>
+              <span className="co-pill-value">{dynamicCourse.batch?.timing}</span>
             </div>
             <div className="co-batch-pill">
               <span className="co-pill-label"><Calendar size={12} /> Start Date</span>
-              <span className="co-pill-value">{course.batch?.startDate}</span>
+              <span className="co-pill-value">{dynamicCourse.batch?.startDate}</span>
             </div>
             <div className="co-batch-pill">
               <span className="co-pill-label"><Monitor size={12} /> Mode</span>
-              <span className="co-pill-value">{course.batch?.duration || 'Online Live'}</span>
+              <span className="co-pill-value">{dynamicCourse.batch?.duration || 'Online Live'}</span>
             </div>
           </div>
         </div>
@@ -285,7 +344,7 @@ const CourseOverview = () => {
       <div className="co-objective-section">
         <div className="co-section-label">Course Objective</div>
         <p className="co-objective-text">
-          {course.description || "Our curriculum is designed to bridge the gap between academic theory and industry reality. By combining deep-dive technical modules with hands-on labs and real-world project simulations, we ensure that you master the architecture and problem-solving mindset required by top-tier tech companies."}
+          {dynamicCourse.description || "Our curriculum is designed to bridge the gap between academic theory and industry reality. By combining deep-dive technical modules with hands-on labs and real-world project simulations, we ensure that you master the architecture and problem-solving mindset required by top-tier tech companies."}
         </p>
         <div className="co-benefits-grid">
           <div className="co-benefit-item">

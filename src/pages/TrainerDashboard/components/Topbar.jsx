@@ -123,9 +123,10 @@ const Topbar = () => {
 
   useEffect(() => {
     fetchNotifications(); // load on mount
-    const interval = setInterval(() => fetchNotifications(), 60000); // poll every 60s
+    const interval = setInterval(() => fetchNotifications(), 15000); // poll every 15s for near-realtime
     return () => clearInterval(interval);
   }, [fetchNotifications]);
+
 
   /* ── Click-outside handler ───────────────────────────────────────── */
   useEffect(() => {
