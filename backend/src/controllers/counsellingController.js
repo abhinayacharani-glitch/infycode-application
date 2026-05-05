@@ -146,41 +146,98 @@ export const assignTrainer = async (req, res) => {
       });
     }
 
-    if (status === "accepted" && booking.studentEmail) {
+    console.log(`[Counselling] assignTrainer called. ID: ${bookingId}, Status: ${status}, Trainer: ${trainerId}`);
+
+    if (status === "accepted") {
       const meetingLink = "https://meet.google.com/wxs-wifp-tti"; // Standard meeting link for now
-      
-      await sendEmail({
-        to: booking.studentEmail,
-        subject: "Counselling Slot Approved - InfyCode",
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
-            <div style="background-color: #1a73e8; color: white; padding: 20px; text-align: center;">
-              <h1>Slot Approved!</h1>
-            </div>
-            <div style="padding: 20px; color: #333;">
-              <p>Hi <strong>${booking.studentName}</strong>,</p>
-              <p>Your counselling slot request for <strong>${booking.serviceTitle}</strong> has been approved.</p>
-              <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
-                <p style="margin: 5px 0;"><strong>Time Slot:</strong> ${booking.slotLabel}</p>
-                <p style="margin: 5px 0;"><strong>Trainer:</strong> ${trainerName || "Assigned Mentor"}</p>
-                <p style="margin: 5px 0;"><strong>Meeting Link:</strong> <a href="${meetingLink}">${meetingLink}</a></p>
+
+      // --- AUTOMATIC CALENDAR EVENT CREATION ---
+      try {
+        console.log("[Calendar] Attempting to create automated event...");
+        const calendarRef = db.ref("trainerCalendarEvents");
+        
+        // Map slotId to 24h startTime/endTime
+        const slotMap = {
+          slot1: { start: "10:00", end: "11:00" },
+          slot2: { start: "11:00", end: "12:00" },
+          slot3: { start: "14:00", end: "15:00" },
+          slot4: { start: "15:00", end: "16:00" },
+        };
+        const times = slotMap[booking.slotId] || { start: "09:00", end: "10:00" };
+
+        const finalTrainerId = booking.assignedTrainerId || trainerId;
+        const finalTrainerName = booking.assignedTrainerName || trainerName || "Trainer";
+
+        if (!finalTrainerId) {
+          console.log("[Calendar] Skip automation: No trainer assigned to this booking yet.");
+        } else {
+          const eventTitle = booking.serviceId === 1 ? "1-Many Counselling" : "1-1 Counselling";
+          
+          const eventId = booking.serviceId === 1 
+            ? `counselling_group_${finalTrainerId}_${booking.slotDate}_${booking.slotId}`
+            : `counselling_single_${bookingId}`;
+
+          const calendarEventData = {
+            id: eventId,
+            title: eventTitle,
+            type: "counselling",
+            date: booking.slotDate,
+            startTime: times.start,
+            endTime: times.end,
+            meetingLink: meetingLink,
+            description: `Counselling session for ${booking.studentName}${booking.serviceId === 1 ? " and others" : ""}.`,
+            trainerId: finalTrainerId,
+            trainerName: finalTrainerName,
+            status: "ACTIVE",
+            createdAt: Date.now()
+          };
+
+          await calendarRef.child(eventId).set(calendarEventData);
+          console.log(`[Calendar] Automated event created/updated: ${eventId} for trainer ${finalTrainerId}`);
+        }
+
+
+      } catch (calErr) {
+        console.error("Error creating calendar event:", calErr);
+        // We don't block the response if calendar fails, but log it
+      }
+      // --- END CALENDAR LOGIC ---
+
+      if (booking.studentEmail) {
+        await sendEmail({
+          to: booking.studentEmail,
+          subject: "Counselling Slot Approved - InfyCode",
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
+              <div style="background-color: #1a73e8; color: white; padding: 20px; text-align: center;">
+                <h1>Slot Approved!</h1>
               </div>
-              <p>Please click the button below to view your session details in the dashboard:</p>
-              <div style="text-align: center; margin: 30px 0;">
-                <a href="${process.env.FRONTEND_URL || "http://localhost:5173"}/student-dashboard/counselling/${booking.serviceId}" 
-                   style="background-color: #1a73e8; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-                  View Session
-                </a>
+              <div style="padding: 20px; color: #333;">
+                <p>Hi <strong>${booking.studentName}</strong>,</p>
+                <p>Your counselling slot request for <strong>${booking.serviceTitle}</strong> has been approved.</p>
+                <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                  <p style="margin: 5px 0;"><strong>Time Slot:</strong> ${booking.slotLabel}</p>
+                  <p style="margin: 5px 0;"><strong>Trainer:</strong> ${trainerName || "Assigned Mentor"}</p>
+                  <p style="margin: 5px 0;"><strong>Meeting Link:</strong> <a href="${meetingLink}">${meetingLink}</a></p>
+                </div>
+                <p>Please click the button below to view your session details in the dashboard:</p>
+                <div style="text-align: center; margin: 30px 0;">
+                  <a href="${process.env.FRONTEND_URL || "http://localhost:5173"}/student-dashboard/counselling/${booking.serviceId}" 
+                     style="background-color: #1a73e8; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                    View Session
+                  </a>
+                </div>
+                <p>Make sure to join on time!</p>
+                <p>Best Regards,<br/>Team InfyCode</p>
               </div>
-              <p>Make sure to join on time!</p>
-              <p>Best Regards,<br/>Team InfyCode</p>
             </div>
-          </div>
-        `,
-      });
+          `,
+        });
+      }
     }
 
     res.status(200).json({ success: true, message: `Request assigned and set to pending successfully.` });
+
   } catch (error) {
     console.error("Assign Trainer Error:", error);
     res.status(500).json({ success: false, message: error.message });

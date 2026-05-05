@@ -6,7 +6,8 @@
 
 const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 const rawApiUrl = import.meta.env.VITE_API_BASE_URL ||
-  (isLocalhost ? 'http://localhost:5001' : 'https://infycode-application.onrender.com');
+  (isLocalhost ? 'http://localhost:5000' : 'https://infycode-application.onrender.com');
+
 const BASE_URL = rawApiUrl.endsWith('/') ? rawApiUrl.slice(0, -1) : rawApiUrl;
 
 console.log(`[API Service] Using BASE_URL: ${BASE_URL}`);
@@ -621,6 +622,42 @@ export const getNewPublishedFAQs = () =>
 // COUNSELLING
 // ─────────────────────────────────────────────
 
+export const updateCounsellingStatusAPI = (bookingId, status) =>
+  request('/api/counselling/update-status', {
+    method: 'PUT',
+    headers: getAuthHeader(),
+    body: JSON.stringify({ bookingId, status }),
+  });
+
+// ─────────────────────────────────────────────
+// CALENDAR
+// ─────────────────────────────────────────────
+
+export const getCalendarEventsAPI = () =>
+  request('/api/calendar/events', {
+    headers: getAuthHeader(),
+  });
+
+export const createCalendarEventAPI = (eventData) =>
+  request('/api/calendar/events', {
+    method: 'POST',
+    headers: getAuthHeader(),
+    body: JSON.stringify(eventData),
+  });
+
+export const updateCalendarEventAPI = (id, eventData) =>
+  request(`/api/calendar/events/${id}`, {
+    method: 'PUT',
+    headers: getAuthHeader(),
+    body: JSON.stringify(eventData),
+  });
+
+export const deleteCalendarEventAPI = (id) =>
+  request(`/api/calendar/events/${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeader(),
+  });
+
 export const bookCounsellingSlot = (bookingData) =>
   request('/api/counselling/book', {
     method: 'POST',
@@ -702,9 +739,5 @@ export const getPendingCounsellingCountAPI = () =>
     headers: getAuthHeader(),
   });
 
-export const updateCounsellingStatusAPI = (bookingId, status) =>
-  request('/api/counselling/update-status', {
-    method: 'PUT',
-    headers: getAuthHeader(),
-    body: JSON.stringify({ bookingId, status }),
-  });
+
+

@@ -43,7 +43,9 @@ const CounsellingRequests = () => {
     }, {});
 
   const handleAccept = async (booking) => {
+    console.log("--- Accept Button Clicked ---", booking);
     const key = `${booking.slotDate}_${booking.slotId}`;
+
     if (booking.serviceId === 1 && (groupCounts[key] || 0) < 10) {
       setActionMsg({ type: 'error', text: `Minimum 10 students required for 1-Many session.` });
       setTimeout(() => setActionMsg(null), 4000);
