@@ -14,7 +14,8 @@ import {
   Eye
 } from 'lucide-react';
 import Editor from '@monaco-editor/react';
-import { getStudentBatchesAPI } from '../../../services/api';
+import Editor from '@monaco-editor/react';
+import { getStudentBatchesAPI, createStudentQueryAPI, getStudentQueriesAPI } from '../../../services/api';
 import './MentorConnection.css';
 
 const MentorConnection = () => {
@@ -69,6 +70,7 @@ const MentorConnection = () => {
                   n: t.name,
                   role: t.specialization || t.expertise || 'Expert Trainer',
                   courses: [courseName],
+                  batchId: batchData.batchId,
                   color: ['#2563eb', '#10b981', '#f59e0b', '#8b5cf6'][Object.keys(trainerMap).length % 4]
                 };
               } else {
@@ -90,6 +92,7 @@ const MentorConnection = () => {
     fetchTrainers();
   }, []);
 
+
   const getLanguageOptions = (courses) => {
     const all = [];
     if (courses.some(c => c.toLowerCase().includes('java'))) all.push('Java', 'Spring Boot', 'SQL');
@@ -101,16 +104,26 @@ const MentorConnection = () => {
   };
 
   useEffect(() => {
-    const raised = JSON.parse(localStorage.getItem('student_queries') || '[]');
-    const solved = JSON.parse(localStorage.getItem('solved_queries') || '[]');
-    const merged = raised.map(q => {
-      const isSolved = solved.find(s => s.id === q.id);
-      return isSolved ? { ...q, status: 'solved', response: isSolved.response } : q;
-    });
-    setMyQueries(merged);
+    const fetchMyQueries = async () => {
+      try {
+        const res = await getStudentQueriesAPI();
+        if (res.success) {
+          setMyQueries(res.queries);
+          // If we had an active ticket, refresh it
+          if (activeTicket) {
+            const updated = res.queries.find(q => q.id === activeTicket.id);
+            if (updated) setActiveTicket(updated);
+          }
+        }
+      } catch (e) {
+        console.error("Failed to fetch my queries", e);
+      }
+    };
+    fetchMyQueries();
   }, [querySuccess]);
 
-  const handleSubmitQuery = (e) => {
+
+  const handleSubmitQuery = async (e) => {
     if (e) e.preventDefault();
 
     // Validation
@@ -119,55 +132,36 @@ const MentorConnection = () => {
     if (solutionType === 'meet' && !description.trim()) return;
 
     setIsSubmitting(true);
+    try {
+      const payload = {
+        title: solutionType === 'meet' ? 'Meeting Request' : (description.substring(0, 40) || 'Code Review'),
+        text: description,
+        code: solutionType === 'editor' ? code : "",
+        type: solutionType,
+        trainerName: mentors[selected].n,
+        batchId: mentors[selected].batchId
+      };
 
-    setTimeout(() => {
-      let updatedQuery;
-      const existing = JSON.parse(localStorage.getItem('student_queries') || '[]');
-
-      if (isEditing && activeTicket) {
-        // Update existing query
-        updatedQuery = {
-          ...activeTicket,
-          description,
-          code: solutionType === 'editor' ? code : null,
-          language: solutionType === 'editor' ? language : null,
-          attachedFileName: attachedFile ? attachedFile.name : activeTicket.attachedFileName,
-          updatedAt: new Date().toISOString()
-        };
-        const newList = existing.map(q => q.id === activeTicket.id ? updatedQuery : q);
-        localStorage.setItem('student_queries', JSON.stringify(newList));
-      } else {
-        // Create new query
-        const qId = `QRY-${Math.floor(1000 + Math.random() * 9000)}`;
-        updatedQuery = {
-          id: qId,
-          studentId: 's1',
-          trainerId: mentors[selected].id,
-          trainerName: mentors[selected].n,
-          title: solutionType === 'meet' ? 'Meeting Request' : (description.substring(0, 40) || 'Code Review'),
-          description,
-          code: solutionType === 'editor' ? code : null,
-          language: solutionType === 'editor' ? language : null,
-          solutionType,
-          status: 'pending',
-          attachedFileName: attachedFile?.name || null,
-          createdAt: new Date().toISOString()
-        };
-        localStorage.setItem('student_queries', JSON.stringify([...existing, updatedQuery]));
+      const res = await createStudentQueryAPI(payload);
+      if (res.success) {
+        setQuerySuccess(true);
+        setToastVisible(true);
+        setTimeout(() => {
+          setToastVisible(false);
+          setQuerySuccess(false); // Reset to trigger list refresh
+        }, 3000);
+        
+        setDescription('');
+        setCode('');
+        setAttachedFile(null);
       }
-
+    } catch (err) {
+      console.error("Failed to submit query", err);
+    } finally {
       setIsSubmitting(false);
-      setQuerySuccess(true);
-      setActiveTicket(updatedQuery);
-      setAttachedFile(null);
-      setIsEditing(false);
-
-      // Show Success Toast
-      setToastVisible(true);
-      setTimeout(() => setToastVisible(false), 3000);
-
-    }, 1200);
+    }
   };
+
 
   const handleEditQuery = () => {
     if (!activeTicket) return;

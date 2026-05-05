@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, CheckCircle, Code, FileText, Terminal, Clock, MessageSquare, Video, Download } from 'lucide-react';
 import Editor from '@monaco-editor/react';
+import { getQueryByIdAPI } from '../../../services/api';
 import './StudentConnectSolution.css';
 
 const StudentConnectSolution = () => {
@@ -12,44 +13,28 @@ const StudentConnectSolution = () => {
   
   const batchId = paramBatchId || location.state?.batchId || 'B1';
 
-  const dummySolution = {
-    isDummy: true,
-    title: "Sample Query",
-    query: "Explain the difference between REST API and GraphQL with examples.",
-    mode: 'chat',
-    content: `REST API uses fixed endpoints like /users
-GraphQL uses single endpoint and flexible queries
-REST may cause over-fetching
-GraphQL fetches only required data
-
-Example:
-REST → GET /users (full data)
-GraphQL → query { user { name } } (only name)
-
-Conclusion:
-GraphQL is flexible, REST is simple and widely used`,
-    solvedAt: new Date().toISOString(),
-    studentName: "Rahul Sharma",
-    batchName: `Batch ${batchId} - Full Stack Development`
-  };
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    try {
-      const solved = JSON.parse(localStorage.getItem('solved_queries') || '[]');
-      const found = solved.find(s => s.studentId === studentId && s.batchId === batchId);
-      
-      if (found && found.content && found.content.trim() !== '') {
-        setSolution({ ...found, isDummy: false });
-      } else {
-        setSolution(dummySolution);
+    const fetchSolution = async () => {
+      try {
+        setLoading(true);
+        const res = await getQueryByIdAPI(studentId); // studentId is queryId
+        if (res.success) {
+          setSolution(res.query);
+        }
+      } catch (err) {
+        console.error("Failed to fetch solution", err);
+      } finally {
+        setLoading(false);
       }
-    } catch (e) { 
-      console.error(e);
-      setSolution(dummySolution);
-    }
-  }, [batchId, studentId]);
+    };
+    fetchSolution();
+  }, [studentId]);
 
-  if (!solution) return null;
+
+  if (loading || !solution) return <div className="sol-loading">Loading solution details...</div>;
+
 
   const renderBadge = (mode) => {
     switch (mode) {
@@ -103,24 +88,31 @@ GraphQL is flexible, REST is simple and widely used`,
           </div>
 
           <div className="solution-content">
-            {solution.mode === 'editor' ? (
+            {solution.codeSolution ? (
               <div className="editor-container">
                 <Editor
                   height="300px"
-                  language={solution.language || 'javascript'}
+                  language="javascript"
                   theme="vs-dark"
-                  value={solution.content}
+                  value={solution.codeSolution}
                   options={{ readOnly: true, minimap: { enabled: false }, fontSize: 14 }}
                 />
               </div>
-            ) : (
-              <div className="text-solution">
-                {solution.content.split('\n').map((line, i) => (
-                  <p key={i}>{line}</p>
-                ))}
+            ) : null}
+            
+            <div className="text-solution">
+              {(solution.solution || "").split('\n').map((line, i) => (
+                <p key={i}>{line}</p>
+              ))}
+            </div>
+
+            {solution.meetLink && (
+              <div className="meet-link-display">
+                <strong>Meet Link:</strong> <a href={solution.meetLink} target="_blank" rel="noreferrer">{solution.meetLink}</a>
               </div>
             )}
           </div>
+
 
           {solution.explanation && (
             <div className="trainer-note">
