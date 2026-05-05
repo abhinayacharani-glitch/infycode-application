@@ -5,7 +5,7 @@ export const COURSE_MAP = {
     description: "Master the complete Java ecosystem from core fundamentals to enterprise Spring Boot and React integration.",
     duration: "6 Months",
     students: 12500,
-    rating: 4.9,
+    rating: 5.0,
     level: "Intermediate",
     progress: 15,
     trainer: {

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCourseContext } from "../../context/CourseContext";
 import { motion } from "framer-motion";
-import { Search, Filter, Star, Clock, Users, ArrowRight, Eye, Calendar, User as UserIcon } from "lucide-react";
+import { Search, Filter, Star, StarHalf, Clock, Users, ArrowRight, Eye, Calendar, User as UserIcon } from "lucide-react";
 import { getCourseImage } from "../../utils/courseUtils";
 import "./Courses.css";
 import bgImage from "../../assets/course/bg.jpg";
@@ -47,8 +47,7 @@ export const ALL_COURSES = [
     category: "Java",
     badge: "Bestseller",
     color: "#e11d48",
-    rating: 4.8,
-    students: "15k",
+    rating: 5.0,
     duration: "6 months",
     startDate: "May 15, 2026",
     trainer: "Rohan",
@@ -62,8 +61,7 @@ export const ALL_COURSES = [
     category: "AI & Data",
     badge: "Trending",
     color: "#2563eb",
-    rating: 4.9,
-    students: "9k",
+    rating: 4.8,
     duration: "5 months",
     startDate: "May 20, 2026",
     trainer: "Gayathri",
@@ -78,7 +76,6 @@ export const ALL_COURSES = [
     badge: "NEW",
     color: "#7c3aed",
     rating: 4.7,
-    students: "7k",
     duration: "4 months",
     startDate: "June 01, 2026",
     trainer: "Abhinaya",
@@ -92,8 +89,7 @@ export const ALL_COURSES = [
     category: "Cybersecurity",
     badge: "Popular",
     color: "#059669",
-    rating: 4.8,
-    students: "12k",
+    rating: 4.5,
     duration: "4 months",
     startDate: "May 10, 2026",
     trainer: "Karthisha",
@@ -107,8 +103,7 @@ export const ALL_COURSES = [
     category: "Web Dev",
     badge: "Bestseller",
     color: "#0ea5e9",
-    rating: 4.9,
-    students: "20k",
+    rating: 5.0,
     duration: "3 months",
     startDate: "May 25, 2026",
     trainer: "Mohan",
@@ -122,8 +117,7 @@ export const ALL_COURSES = [
     category: "Python",
     badge: "Top Rated",
     color: "#3776ab",
-    rating: 4.9,
-    students: "25k",
+    rating: 4.8,
     duration: "2 months",
     startDate: "June 05, 2026",
     trainer: "Nagaharsha",
@@ -137,8 +131,7 @@ export const ALL_COURSES = [
     category: "Cloud",
     badge: "Hot",
     color: "#ff9900",
-    rating: 4.8,
-    students: "10k",
+    rating: 4.7,
     duration: "3 months",
     startDate: "June 10, 2026",
     trainer: "Rohan",
@@ -152,8 +145,7 @@ export const ALL_COURSES = [
     category: "Web Dev",
     badge: "NEW",
     color: "#000000",
-    rating: 4.8,
-    students: "5k",
+    rating: 4.5,
     duration: "2 months",
     startDate: "June 15, 2026",
     trainer: "Gayathri",
@@ -167,8 +159,7 @@ export const ALL_COURSES = [
     category: "Web Dev",
     badge: "Bestseller",
     color: "#47A248",
-    rating: 4.9,
-    students: "18k",
+    rating: 5.0,
     duration: "5 months",
     startDate: "May 30, 2026",
     trainer: "Abhinaya",
@@ -182,8 +173,7 @@ export const ALL_COURSES = [
     category: "Web Dev",
     badge: "Professional",
     color: "#DD0031",
-    rating: 4.7,
-    students: "8k",
+    rating: 4.8,
     duration: "4 months",
     startDate: "June 20, 2026",
     trainer: "Karthisha",
@@ -197,8 +187,7 @@ export const ALL_COURSES = [
     category: "App Dev",
     badge: "NEW",
     color: "#02569B",
-    rating: 4.8,
-    students: "11k",
+    rating: 4.7,
     duration: "5 months",
     startDate: "June 25, 2026",
     trainer: "Mohan",
@@ -212,8 +201,7 @@ export const ALL_COURSES = [
     category: "Python",
     badge: "ADVANCED",
     color: "#3776ab",
-    rating: 4.9,
-    students: "16k",
+    rating: 4.5,
     duration: "6 months",
     startDate: "July 01, 2026",
     trainer: "Nagaharsha",
@@ -403,9 +391,8 @@ const Courses = () => {
                   <div className="card-content-modern">
                     <h3 className="card-title-modern">{course.title}</h3>
 
-                    {/* Stats Section: Students & Rating */}
+                    {/* Stats Section: Rating */}
                     <div className="card-stats-modern">
-                      <span className="stat students-text">{course.students} students</span>
                       <div className="stat stars-container">
                         {[...Array(5)].map((_, index) => {
                           const rating = course.rating || 5;
@@ -415,7 +402,7 @@ const Courses = () => {
                           if (index < fullStars) {
                             return <Star key={index} size={14} fill="#f59e0b" color="#f59e0b" />;
                           } else if (index === fullStars && hasHalfStar) {
-                            return <Star key={index} size={14} fill="#f59e0b" color="#f59e0b" />;
+                            return <StarHalf key={index} size={14} fill="#f59e0b" color="#f59e0b" />;
                           } else {
                             return <Star key={index} size={14} color="#d1d5db" />;
                           }
