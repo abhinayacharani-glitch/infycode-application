@@ -1,7 +1,11 @@
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FiArrowLeft } from "react-icons/fi";
 import './TrainingsPage.css';
 
 const TrainingsPage = () => {
+  const navigate = useNavigate();
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -10,8 +14,17 @@ const TrainingsPage = () => {
     <div className="trainings-page">
       <div
         className="trainings-hero"
-        style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=1920)' }}
+        style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=1920)', position: 'relative' }}
       >
+        <button 
+          className="fp-back-btn" 
+          onClick={() => navigate(-1)}
+          style={{ position: 'absolute', top: '20px', left: '20px', display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.2)', color: '#fff', border: '1px solid rgba(255,255,255,0.4)', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', zIndex: 10, backdropFilter: 'blur(5px)', fontSize: '15px', fontWeight: '600', transition: 'background 0.3s' }}
+          onMouseEnter={(e) => e.target.style.background = 'rgba(255,255,255,0.3)'}
+          onMouseLeave={(e) => e.target.style.background = 'rgba(255,255,255,0.2)'}
+        >
+          <FiArrowLeft size={18} /> Back
+        </button>
         <div className="trainings-hero-content">
           <h1>Professional Training Solutions</h1>
           <p>Empowering organizations and institutions with cutting-edge technical skills, bespoke curriculums, and industry-expert trainers.</p>
