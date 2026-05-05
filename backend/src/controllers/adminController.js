@@ -282,7 +282,7 @@ export const getDashboardStats = async (req, res) => {
  **/
 export const createBatch = async (req, res) => {
   try {
-    const { name, course, trainer, capacity, status, startDateTime, duration, batchImage, mode } = req.body;
+    const { name, course, trainer, trainerId, capacity, status, startDateTime, duration, batchImage, mode } = req.body;
 
     if (!name || !course || !trainer) {
       return res.status(400).json({ message: "Name, course, and trainer are required." });
@@ -295,6 +295,7 @@ export const createBatch = async (req, res) => {
       name,
       courseName: course,
       trainerName: trainer,
+      trainerId: trainerId || null,
       capacity: parseInt(capacity) || 30,
       enrolled: 0,
       status: status || 'Draft',
@@ -309,6 +310,45 @@ export const createBatch = async (req, res) => {
     const batchData = Object.fromEntries(Object.entries(rawBatchData).filter(([_, v]) => v != null && v !== ""));
 
     await newBatchRef.set(batchData);
+
+    // --- AUTOMATIC CALENDAR EVENT CREATION FOR BATCHES ---
+    if (trainerId && startDateTime) {
+      try {
+        const calendarRef = db.ref("trainerCalendarEvents");
+        const eventId = `batch_${newBatchRef.key}`;
+        
+        // Extract time from startDateTime or use default
+        const dateObj = new Date(startDateTime);
+        const startTime = dateObj.toTimeString().slice(0, 5); // HH:MM
+        
+        // Calculate end time (duration is usually string like "2 Hours", default to 1h if parsing fails)
+        let endTime = "11:00";
+        try {
+          const endHour = (dateObj.getHours() + 1) % 24;
+          endTime = `${String(endHour).padStart(2, '0')}:${String(dateObj.getMinutes()).padStart(2, '0')}`;
+        } catch(e) {}
+
+        const calendarEventData = {
+          id: eventId,
+          title: `${nextBID} - ${course}`,
+          type: "training", // This triggers the violet background
+          date: startDateTime.split('T')[0],
+          startTime: startTime,
+          endTime: endTime,
+          description: `Batch: ${name}. Duration: ${duration}. Mode: ${mode}.`,
+          trainerId: trainerId,
+          trainerName: trainer,
+          status: "ACTIVE",
+          createdAt: Date.now()
+        };
+
+        await calendarRef.child(eventId).set(calendarEventData);
+        console.log(`[Calendar] Automated batch event created: ${eventId} for trainer ${trainerId}`);
+      } catch (calErr) {
+        console.error("Error creating batch calendar event:", calErr);
+      }
+    }
+
 
     res.status(201).json({
       message: "Batch created correctly and synced with Firebase.",
