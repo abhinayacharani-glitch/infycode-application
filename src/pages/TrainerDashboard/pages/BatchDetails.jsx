@@ -533,11 +533,7 @@ const BatchDetails = () => {
             <div className="info-top-row">
               <div className="info-item-prod">
                 <Calendar size={14} />
-                <span>{baseBatch?.startDate} — {baseBatch?.endDate}</span>
-              </div>
-              <div className="info-item-prod">
-                <Clock size={14} />
-                <span>{duration}</span>
+                <span>{baseBatch?.startDate}</span>
               </div>
               <div className="info-item-prod">
                 <Monitor size={14} />
