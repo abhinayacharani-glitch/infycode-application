@@ -359,8 +359,16 @@ const CourseOverview = () => {
           <div className="co-benefit-item">
             <div className="co-benefit-icon"><GraduationCap size={20} /></div>
             <div>
-              <div className="co-benefit-label">Multi-Cloud</div>
-              <div className="co-benefit-desc">AWS, Azure & GCP covered</div>
+              <div className="co-benefit-label">
+                {dynamicCourse.title?.toLowerCase().includes('ai') || dynamicCourse.title?.toLowerCase().includes('artificial') 
+                  ? 'AI Fundamentals' 
+                  : 'Multi-Cloud'}
+              </div>
+              <div className="co-benefit-desc">
+                {dynamicCourse.title?.toLowerCase().includes('ai') || dynamicCourse.title?.toLowerCase().includes('artificial')
+                  ? 'Learn the core concepts of Artificial Intelligence, including its history, types, machine learning basics, and real-world applications.'
+                  : 'AWS, Azure & GCP covered'}
+              </div>
             </div>
           </div>
           <div className="co-benefit-item">

@@ -924,5 +924,131 @@ export const COURSE_MAP = {
         "CI/CD pipeline with CodePipeline"
       ]
     }
+  },
+  'intro-ai-01': {
+    id: 'intro-ai-01',
+    title: "Introduction to Artificial Intelligence",
+    description: "Learn the fundamentals of Artificial Intelligence including machine learning, deep learning, NLP, and real-world applications.",
+    duration: "4 Months",
+    students: 8500,
+    rating: 4.8,
+    level: "Beginner",
+    progress: 0,
+    trainer: {
+      name: "Abhinaya",
+      role: "AI Research Scientist",
+      experience: "8+ Years",
+      specialization: "Neural Networks, NLP, Computer Vision"
+    },
+    batch: {
+      name: "Standard Batch",
+      id: "BID-AI-2026-01",
+      startDate: "May 10, 2026",
+      timing: "Mon, Wed, Fri — 6:00 PM to 8:00 PM",
+      duration: "4 Months · Online Live"
+    },
+    objective: "This program provides a solid foundation in Artificial Intelligence. You will explore the history and types of AI, dive into machine learning algorithms, understand the power of deep learning and neural networks, and learn how machines process language and images. The course concludes with a critical look at AI ethics and future trends.",
+    benefits: [
+      { icon: "learning", label: "Self-paced", desc: "Learn at your own speed" },
+      { icon: "trainer", label: "Expert Led", desc: "Guided by AI professionals" },
+      { icon: "access", label: "Lifetime Access", desc: "Unlimited access to resources" },
+      { icon: "projects", label: "Hands-on", desc: "Practical AI applications" }
+    ],
+    modules: [
+      {
+        id: 'ai-foundations',
+        label: "Module 1",
+        subtitle: "AI Foundations",
+        duration: "3–4 Weeks",
+        color: "#10b981",
+        topics: [
+          { id: 'ai-intro', title: "What is Artificial Intelligence?", content: "<p>Definition, goals, and the difference between narrow AI and general AI.</p>" },
+          { id: 'ai-history', title: "History of AI", content: "<p>The evolution of AI from early mechanical machines to modern neural networks.</p>" },
+          { id: 'ai-types', title: "Types of AI", content: "<p>Reactive machines, limited memory, theory of mind, and self-aware AI.</p>" },
+          { id: 'ai-ml-dl', title: "AI vs Machine Learning vs Deep Learning", content: "<p>Understanding the hierarchical relationship between AI disciplines.</p>" },
+          { id: 'ai-apps', title: "Real-world AI Applications", content: "<p>How AI is used in healthcare, finance, transportation, and entertainment.</p>" }
+        ]
+      },
+      {
+        id: 'ml-basics',
+        label: "Module 2",
+        subtitle: "Machine Learning Basics",
+        duration: "4 Weeks",
+        color: "#2563eb",
+        topics: [
+          { id: 'ml-intro', title: "Introduction to Machine Learning", content: "<p>The core philosophy of learning from data without explicit programming.</p>" },
+          { id: 'ml-supervised', title: "Supervised Learning", content: "<p>Regression and classification tasks with labeled datasets.</p>" },
+          { id: 'ml-unsupervised', title: "Unsupervised Learning", content: "<p>Clustering and association problems in unlabeled data.</p>" },
+          { id: 'ml-reinforcement', title: "Reinforcement Learning", content: "<p>Agent-based learning through rewards and penalties in an environment.</p>" },
+          { id: 'ml-algorithms', title: "ML Algorithms Overview", content: "<p>Brief look at Linear Regression, Decision Trees, and K-Means.</p>" }
+        ]
+      },
+      {
+        id: 'deep-learning',
+        label: "Module 3",
+        subtitle: "Deep Learning",
+        duration: "4 Weeks",
+        color: "#8b5cf6",
+        topics: [
+          { id: 'dl-neural', title: "Neural Networks Basics", content: "<p>Perceptrons, layers, weights, and how neurons transmit signals.</p>" },
+          { id: 'dl-activation', title: "Activation Functions", content: "<p>Sigmoid, ReLU, and Tanh — introducing non-linearity into networks.</p>" },
+          { id: 'dl-cnn', title: "CNN (Convolutional Neural Networks)", content: "<p>Specialized networks for spatial data like images and video.</p>" },
+          { id: 'dl-rnn', title: "RNN (Recurrent Neural Networks)", content: "<p>Handling sequential data like time-series and natural language.</p>" },
+          { id: 'dl-apps', title: "Deep Learning Applications", content: "<p>Generative AI, advanced robotics, and complex prediction systems.</p>" }
+        ]
+      },
+      {
+        id: 'nlp-basics',
+        label: "Module 4",
+        subtitle: "Natural Language Processing (NLP)",
+        duration: "3 Weeks",
+        color: "#ec4899",
+        topics: [
+          { id: 'nlp-intro', title: "Introduction to NLP", content: "<p>Bridging the gap between human communication and computer understanding.</p>" },
+          { id: 'nlp-processing', title: "Text Processing", content: "<p>Cleaning and preparing raw text data for analysis.</p>" },
+          { id: 'nlp-tokenization', title: "Tokenization & Stemming", content: "<p>Breaking text into units and reducing words to their root forms.</p>" },
+          { id: 'nlp-sentiment', title: "Sentiment Analysis", content: "<p>Using AI to determine the emotional tone behind a body of text.</p>" },
+          { id: 'nlp-chatbots', title: "Chatbots", content: "<p>Evolution of conversational agents from rule-based to LLM-driven.</p>" }
+        ]
+      },
+      {
+        id: 'computer-vision',
+        label: "Module 5",
+        subtitle: "Computer Vision",
+        duration: "3 Weeks",
+        color: "#f59e0b",
+        topics: [
+          { id: 'cv-intro', title: "Image Processing Basics", content: "<p>How computers perceive and manipulate digital image data.</p>" },
+          { id: 'cv-classification', title: "Image Classification", content: "<p>Teaching AI to identify what is in an image (e.g., Cat vs Dog).</p>" },
+          { id: 'cv-detection', title: "Object Detection", content: "<p>Identifying and locating multiple objects within a single frame.</p>" },
+          { id: 'cv-face', title: "Face Recognition", content: "<p>Technical architecture of biometric identification systems.</p>" },
+          { id: 'cv-apps', title: "Vision Applications", content: "<p>Self-driving cars, medical imaging, and security surveillance.</p>" }
+        ]
+      },
+      {
+        id: 'ai-ethics',
+        label: "Module 6",
+        subtitle: "AI Ethics & Future",
+        duration: "2 Weeks",
+        color: "#14b8a6",
+        topics: [
+          { id: 'ethics-intro', title: "Ethics in AI", content: "<p>Foundational principles for developing responsible and safe AI.</p>" },
+          { id: 'ethics-bias', title: "Bias in AI", content: "<p>How datasets can lead to unfair or discriminatory AI outcomes.</p>" },
+          { id: 'ethics-society', title: "AI in Society", content: "<p>Impact on jobs, privacy, and social interactions.</p>" },
+          { id: 'ethics-future', title: "Future of AI", content: "<p>AGI, singularity, and the next frontier of technological growth.</p>" },
+          { id: 'ethics-careers', title: "AI Career Paths", content: "<p>Roles in data science, ML engineering, and AI ethics research.</p>" }
+        ]
+      }
+    ],
+    finalAssignment: {
+      title: "AI Prototype",
+      description: "Build a basic AI model using one of the disciplines covered (ML, NLP, or Vision).",
+      requirements: [
+        "Clearly defined problem statement",
+        "Data collection or sourcing",
+        "Model training or API implementation",
+        "Result analysis and demonstration"
+      ]
+    }
   }
 };
