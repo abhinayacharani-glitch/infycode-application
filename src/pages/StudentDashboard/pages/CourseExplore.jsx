@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { COURSE_MAP } from './data/extraCourses';
+import { useCourseContext } from '../../../context/CourseContext';
 import './CourseExplore.css';
 
 /* ── Topic key-points generator ── */
@@ -30,6 +31,9 @@ const getKeyPoints = (topic) => {
   if (title.includes('ci/cd') || title.includes('jenkins') || title.includes('github action')) return ['Define pipeline stages: Build, Test, Deploy in a Jenkinsfile/workflow', 'Trigger pipelines automatically on Git push events', 'Run automated tests and publish test reports in CI', 'Deploy to a target environment on successful pipeline run'];
   if (title.includes('terraform')) return ['Write Terraform configuration files to provision cloud resources', 'Use variables, outputs, and modules for reusable infrastructure', 'Manage remote state with a Terraform backend (S3/Azure Blob)', 'Plan and apply infrastructure changes safely using terraform plan'];
   if (title.includes('aws') || title.includes('ec2') || title.includes('cloud')) return ['Understand the AWS Shared Responsibility Model for security', 'Launch and configure EC2 instances with appropriate instance types', 'Create IAM roles and policies following least-privilege principles', 'Monitor resources with CloudWatch metrics, logs, and alarms'];
+  if (title.includes('ai') || title.includes('artificial') || title.includes('machine learning') || title.includes('deep learning')) return ['Understand the mathematical foundations and core principles of Artificial Intelligence', 'Differentiate between Supervised, Unsupervised, and Reinforcement Learning', 'Learn how Neural Networks mimic human brain functions to process complex data', 'Explore real-world applications and the ethical implications of AI development'];
+  if (title.includes('nlp') || title.includes('language')) return ['Master text preprocessing techniques like tokenization, stemming, and lemmatization', 'Implement sentiment analysis models to determine emotional tone in text', 'Understand the architecture of modern Large Language Models (LLMs)', 'Build conversational agents and chatbots using advanced NLP libraries'];
+  if (title.includes('vision') || title.includes('image')) return ['Understand digital image representation and basic processing techniques', 'Implement image classification models to identify objects in visual data', 'Learn about Object Detection and its applications in autonomous systems', 'Explore Face Recognition and biometric security architectures'];
   return [
     `Understand the core concepts and motivation behind ${topic.title}`,
     `Apply the key techniques covered in this topic to real-world scenarios`,
@@ -68,6 +72,19 @@ const getSidebarData = (topic) => {
     };
   }
 
+  if (title.includes('ai') || title.includes('artificial') || title.includes('ml') || title.includes('learning')) {
+    return {
+      takeaways: [
+        "AI is the broad science of mimicking human intelligence",
+        "ML is a subset of AI focused on learning from data",
+        "Deep Learning uses multi-layered neural networks",
+        "Data quality is more important than algorithm complexity"
+      ],
+      reference: "model.fit(X_train, y_train)",
+      context: "The current AI revolution is driven by three factors: Massive Data, Increased Compute Power, and Algorithmic Innovations."
+    };
+  }
+
   return {
     takeaways: [
       `Master the core syntax of ${topic.title}`,
@@ -83,6 +100,30 @@ const getSidebarData = (topic) => {
 /* ── Detailed Topic Content Generator ── */
 const getDetailedContent = (topic) => {
   const title = topic.title.toLowerCase();
+
+  if (title.includes('ai') || title.includes('artificial')) {
+    return `
+      <div class="rich-reading-content">
+        <section class="reading-section">
+          <h3>1. The Core Philosophy of Artificial Intelligence</h3>
+          <p>Artificial Intelligence is not just about robots; it's about building systems that can <strong>reason, learn, and act</strong>. At its heart, AI seeks to automate tasks that typically require human cognition, such as visual perception, speech recognition, and decision-making.</p>
+          <div class="info-callout">
+            <strong>Key Insight:</strong> Modern AI has shifted from "Rule-Based Systems" (if-this-then-that) to "Data-Driven Systems" where the machine discovers the rules itself.
+          </div>
+        </section>
+        
+        <section class="reading-section">
+          <h3>2. The AI Hierarchy: AI vs ML vs DL</h3>
+          <p>It's crucial to understand how these terms relate:</p>
+          <ul>
+            <li><strong>Artificial Intelligence:</strong> The umbrella term for any technique that enables computers to mimic human behavior.</li>
+            <li><strong>Machine Learning:</strong> A subset of AI that uses statistical methods to enable machines to improve with experience.</li>
+            <li><strong>Deep Learning:</strong> A subset of ML based on Artificial Neural Networks with multiple layers (hence "deep").</li>
+          </ul>
+        </section>
+      </div>
+    `;
+  }
 
   if (title.includes('java') && title.includes('intro')) {
     return `
@@ -256,9 +297,41 @@ const CourseExplore = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const { publishedCourses } = useCourseContext();
   const state = location.state;
-  const courseId = (typeof state === 'string' ? state : state?.courseId) || 'java-fs-01';
-  const course = COURSE_MAP[courseId] || COURSE_MAP['java-fs-01'];
+  const courseId = (typeof state === 'string' ? state : state?.courseId);
+  
+  let course = null;
+
+  // 1. Try to match by ID in COURSE_MAP
+  if (courseId) {
+    course = COURSE_MAP[courseId];
+  }
+
+  // 2. If not found by ID, or if ID is a dynamic one, try matching by title from context or state
+  if (!course && publishedCourses && courseId) {
+    const published = publishedCourses.find(c => c.courseId === courseId || c.id === courseId);
+    if (published) {
+      const pTitle = published.title.toLowerCase();
+      if (pTitle.includes('ai') || pTitle.includes('artificial') || pTitle.includes('intelligence') || pTitle.includes('machine learning')) {
+        course = COURSE_MAP['intro-ai-01'];
+      }
+    }
+  }
+
+  // 3. Last resort: Broad title match across COURSE_MAP if we have no ID or still no course
+  if (!course) {
+    course = Object.values(COURSE_MAP).find(c => {
+      const t = c.title.toLowerCase();
+      return t.includes('artificial intelligence') || 
+             t.includes('introduction to ai') ||
+             t.includes('ai foundations') ||
+             t.includes('machine learning');
+    });
+  }
+
+  // 4. Final fallback to Java (only if absolutely no match found)
+  if (!course) course = COURSE_MAP['java-fs-01'];
 
   const [openModules, setOpenModules] = useState({});
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -409,16 +482,7 @@ const CourseExplore = () => {
                         ))}
                       </div>
 
-                      {m.assignment && (
-                        <div className="curr-assignment-box">
-                          <div className="curr-assignment-header">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                            Module Assignment
-                          </div>
-                          <p className="curr-assignment-desc">{m.assignment}</p>
-                          <button className="curr-submit-btn">Mark as Completed</button>
-                        </div>
-                      )}
+                      {/* Module Assignment removed per request */}
                     </div>
                   </div>
                 </div>

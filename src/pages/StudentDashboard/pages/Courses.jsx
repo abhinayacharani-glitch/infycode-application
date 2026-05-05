@@ -4,7 +4,7 @@ import { getEnrolledCourses, getStudentBatchesAPI } from '../../../services/api'
 import { COURSE_MAP } from './data/extraCourses';
 import { ALL_COURSES } from '../../../components/Courses/Courses';
 import { useCourseContext } from '../../../context/CourseContext';
-import { Play, BookOpen, User, CalendarDays, Clock, Monitor, Mail, Phone, Video, ExternalLink } from 'lucide-react';
+import { Play, ArrowRight, User, CalendarDays, Clock, Monitor, Mail, Phone, Video, ExternalLink } from 'lucide-react';
 import { getCourseImage } from '../../../utils/courseUtils';
 import './Courses.css';
 
@@ -102,20 +102,8 @@ const EnrolledCourseCard = ({ course, batchInfo, onNavigate, index }) => {
           </div>
         </div>
 
-        {/* Live Class Link */}
-        {batchInfo?.liveClassLink && (
-          <a
-            href={batchInfo.liveClassLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="ecc-live-btn"
-          >
-            <Video size={13} />
-            <span>Join Live Class</span>
-            <ExternalLink size={11} />
-          </a>
-        )}
       </div>
+
 
       <div className="ecc-footer">
         <button
@@ -134,10 +122,16 @@ const EnrolledCourseCard = ({ course, batchInfo, onNavigate, index }) => {
 
         <button
           className="ecc-btn ecc-join-btn"
-          onClick={() => onNavigate('/student-dashboard/course-overview', course.id)}
+          onClick={() => {
+            if (batchInfo?.liveClassLink) {
+              window.open(batchInfo.liveClassLink, '_blank');
+            } else {
+              onNavigate('/student-dashboard/course-overview', course.id);
+            }
+          }}
         >
-          <BookOpen size={14} />
-          <span>Overview</span>
+          <Video size={14} />
+          <span>Join Class</span>
         </button>
       </div>
     </motion.div>
@@ -179,10 +173,15 @@ const EnrollCourses = ({ onNavigate }) => {
                 enrolled.push({ ...matchedAllCourse, id: matchedAllCourse.courseId, modules: [] });
               }
             } else {
-              const matchedPublishedCourse = publishedCourses.find(c => c.courseId === id);
-              if (matchedPublishedCourse) {
+            const matchedPublishedCourse = publishedCourses.find(c => c.courseId === id);
+            if (matchedPublishedCourse) {
+              const pTitle = matchedPublishedCourse.title.toLowerCase();
+              if (pTitle.includes('introduction to ai') || pTitle.includes('artificial intelligence')) {
+                enrolled.push(COURSE_MAP['intro-ai-01']);
+              } else {
                 enrolled.push({ ...matchedPublishedCourse, id: matchedPublishedCourse.courseId, modules: [] });
               }
+            }
             }
           }
         });
