@@ -128,12 +128,22 @@ export const AdminProvider = ({ children }) => {
   };
 
   const addBatch = async (batch) => {
+    const tempId = `temp_${Date.now()}`;
+    const optimisticBatch = { ...batch, id: tempId, enrolled: 0 };
+    
+    // Optimistic Update
+    setBatches(prev => [...prev, optimisticBatch]);
+
     try {
       const data = await createBatch(batch);
-      setBatches(prev => [...prev, data.batch]);
-      fetchDashboardStats(); // Refresh stats after creation
+      // Replace temporary batch with the one from server
+      setBatches(prev => prev.map(b => b.id === tempId ? data.batch : b));
+      fetchDashboardStats(); 
     } catch (error) {
       console.error("Error creating batch:", error.message);
+      // Revert on error
+      setBatches(prev => prev.filter(b => b.id !== tempId));
+      alert("Failed to create batch: " + error.message);
     }
   };
 
@@ -368,6 +378,13 @@ export const AdminProvider = ({ children }) => {
   };
 
   const startBatch = async (firebaseId) => {
+    const originalBatches = [...batches];
+    
+    // Optimistic Update
+    setBatches(prev => prev.map(b => 
+      (b.firebaseId === firebaseId || b.id === firebaseId) ? { ...b, status: 'started' } : b
+    ));
+
     try {
       const response = await adminStartBatchAPI(firebaseId);
       if (response.success) {
@@ -376,6 +393,8 @@ export const AdminProvider = ({ children }) => {
       }
     } catch (error) {
       console.error("Error starting batch:", error);
+      // Revert on error
+      setBatches(originalBatches);
       throw error;
     }
   };
@@ -401,7 +420,7 @@ export const AdminProvider = ({ children }) => {
       loadCourses();
       loadSyllabuses();
       loadPendingFAQs();
-    }, 30000);
+    }, 1000);
     return () => clearInterval(interval);
   }, []);
 

@@ -271,7 +271,7 @@ export const getStudentBatches = async (req, res) => {
         // 4. Fetch full trainer profile (Case-insensitive matching)
         const trainerNameStr = (batchData.trainerName || batchData.trainer || "").trim().toLowerCase();
         let trainerDetails = null;
-        
+
         if (trainerNameStr) {
           const matchedTrainer = trainersList.find(t => {
             const tName = (t.fullName || t.fullname || t.name || "").trim().toLowerCase();
@@ -280,12 +280,13 @@ export const getStudentBatches = async (req, res) => {
 
           if (matchedTrainer) {
             trainerDetails = {
-              name:           matchedTrainer.fullName || matchedTrainer.fullname || matchedTrainer.name,
-              email:          matchedTrainer.email || "",
-              phone:          matchedTrainer.phone || matchedTrainer.mobile || "",
+              name: matchedTrainer.fullName || matchedTrainer.fullname || matchedTrainer.name,
+              email: matchedTrainer.email || "",
+              phone: matchedTrainer.phone || matchedTrainer.mobile || "",
               specialization: matchedTrainer.specialization || matchedTrainer.domain || "",
-              experience:     matchedTrainer.experience || "",
-              profileImage:   matchedTrainer.profileImage || ""
+              expertise: matchedTrainer.expertise || "",
+              experience: matchedTrainer.experience || "",
+              profileImage: matchedTrainer.profileImage || ""
             };
           } else {
             trainerDetails = { name: batchData.trainerName || batchData.trainer, email: "", phone: "", specialization: "", experience: "", profileImage: "" };
@@ -303,20 +304,21 @@ export const getStudentBatches = async (req, res) => {
         }
 
         result[courseName] = {
-          batchId:       batchData.batchId || batchKey,
-          batchName:     batchData.name || courseName,
-          courseName:    batchData.courseName || batchData.course || courseName,
-          courseId:      batchData.courseId || "",
-          status:        batchData.status || "Scheduled",
-          batchStatus:   batchData.batchStatus || batchData.status || "Scheduled",
+          batchId: batchData.batchId || batchKey,
+          batchName: batchData.name || courseName,
+          courseName: batchData.courseName || batchData.course || courseName,
+          courseId: batchData.courseId || "",
+          status: batchData.status || "Scheduled",
+          batchStatus: batchData.batchStatus || batchData.status || "Scheduled",
           startDateTime: batchData.startDateTime || "",
           startDate,
           startTime,
-          duration:      batchData.duration || "",
-          capacity:      batchData.capacity || 30,
-          enrolled:      batchData.enrolled || 0,
+          duration: batchData.duration || "",
+          mode: batchData.mode || "Online",
+          capacity: batchData.capacity || 30,
+          enrolled: batchData.enrolled || 0,
           liveClassLink: batchData.liveClassLink || batchData.meetLink || "",
-          trainer:       trainerDetails
+          trainer: trainerDetails
         };
       } catch (err) {
         console.error(`[getStudentBatches] Error for "${courseName}":`, err.message);

@@ -36,10 +36,10 @@ router.get("/batches", verifyToken, isTrainer, getTrainerBatches);
 router.put("/batches/:id/start", verifyToken, checkRole(["admin", "trainer"]), startBatch);
 
 // ✅ Trainer Notifications (protected — trainer only)
-router.get("/notifications",            verifyToken, isTrainer, getTrainerNotifications);
-router.put("/notifications/mark-read",  verifyToken, isTrainer, markNotificationsRead);
-router.delete("/notifications/:id",     verifyToken, isTrainer, deleteTrainerNotification);
-router.post("/notifications/seed",      verifyToken, isTrainer, seedTrainerNotifications);
+router.get("/notifications", verifyToken, isTrainer, getTrainerNotifications);
+router.put("/notifications/mark-read", verifyToken, isTrainer, markNotificationsRead);
+router.delete("/notifications/:id", verifyToken, isTrainer, deleteTrainerNotification);
+router.post("/notifications/seed", verifyToken, isTrainer, seedTrainerNotifications);
 
 // ✅ Send notification TO a trainer (admin or student can call this)
 // Protected: caller must be logged in (admin/student/trainer)

@@ -191,3 +191,32 @@
 .animate-fade-in {
   animation: fade-in 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
+
+.loading-state-sc, .empty-state-sc {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 0;
+  color: #64748b;
+  text-align: center;
+  background: white;
+  border-radius: 20px;
+  border: 2px dashed #e2e8f0;
+}
+
+.loading-state-sc p, .empty-state-sc p {
+  margin-top: 16px;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.loading-state-sc svg {
+  color: #3b82f6;
+}
+
+.empty-state-sc svg {
+  color: #94a3b8;
+  margin-bottom: 8px;
+}
