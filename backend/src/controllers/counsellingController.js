@@ -1,5 +1,7 @@
 import db from "../config/firebase.js";
 import sendEmail from "../utils/sendEmail.js";
+import { emitToTrainer } from "../utils/socket.js";
+
 
 const counsellingRef = db.ref("counsellingBookings");
 
@@ -100,15 +102,49 @@ export const assignTrainer = async (req, res) => {
       return res.status(400).json({ success: false, message: "Booking ID and status are required" });
     }
 
-    const updates = { status };
+    // Fetch the booking to get details
+    const bookingSnapshot = await counsellingRef.child(bookingId).once("value");
+    if (!bookingSnapshot.exists()) {
+      return res.status(404).json({ success: false, message: "Booking not found" });
+    }
+    const booking = bookingSnapshot.val();
+
+    // Determine session type
+    const sessionType = booking.serviceId === 1 ? "1-many" : "1-1";
+
+    const updates = { 
+      status: "pending", // Always set to pending for trainer to accept/reject
+      sessionType 
+    };
     if (trainerId) updates.assignedTrainerId = trainerId;
     if (trainerName) updates.assignedTrainerName = trainerName;
 
     await counsellingRef.child(bookingId).update(updates);
 
-    // Fetch the booking to get student details for email
-    const bookingSnapshot = await counsellingRef.child(bookingId).once("value");
-    const booking = bookingSnapshot.val();
+    // ─── Create Notification for Trainer ────────────────────────────────────
+    if (trainerId) {
+      const notificationsRef = db.ref("trainerNotifications");
+      const notifText = sessionType === "1-1" 
+        ? "New counselling session assigned (1-1)" 
+        : "New group counselling session assigned (1-many)";
+      
+      const newNotifRef = notificationsRef.child(trainerId).child("items").push();
+      await newNotifRef.set({
+        title: "New Counselling Session",
+        text: notifText,
+        type: "info",
+        senderName: "Admin",
+        senderRole: "admin",
+        read: false,
+        createdAt: Date.now(),
+      });
+
+      // ─── Real-Time Update (Socket) ─────────────────────────────────────────
+      emitToTrainer(trainerId, "NEW_COUNSELLING_ASSIGNED", {
+        message: notifText,
+        bookingId
+      });
+    }
 
     if (status === "accepted" && booking.studentEmail) {
       const meetingLink = "https://meet.google.com/wxs-wifp-tti"; // Standard meeting link for now
@@ -144,12 +180,13 @@ export const assignTrainer = async (req, res) => {
       });
     }
 
-    res.status(200).json({ success: true, message: `Request ${status} successfully.` });
+    res.status(200).json({ success: true, message: `Request assigned and set to pending successfully.` });
   } catch (error) {
     console.error("Assign Trainer Error:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
 
 /**
  * @desc Get assigned sessions for Trainer
@@ -273,3 +310,64 @@ export const checkAndShiftSlots = async (req, res) => {
     if (res) res.status(500).json({ success: false, message: error.message });
   }
 };
+
+/**
+ * @desc Get pending counselling sessions count for Trainer
+ * @route GET /api/counselling/pending-count
+ */
+export const getPendingCount = async (req, res) => {
+  try {
+    const trainerId = req.user.id;
+    const snapshot = await counsellingRef
+      .orderByChild("assignedTrainerId")
+      .equalTo(trainerId)
+      .once("value");
+    
+    const data = snapshot.val() || {};
+    const pendingCount = Object.values(data).filter(b => b.status === "pending").length;
+
+    res.status(200).json({ success: true, count: pendingCount });
+  } catch (error) {
+    console.error("Get Pending Count Error:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+/**
+ * @desc Update counselling session status (Trainer)
+ * @route PUT /api/counselling/update-status
+ */
+export const updateSessionStatus = async (req, res) => {
+  try {
+    const { bookingId, status } = req.body;
+    const trainerId = req.user.id;
+
+    if (!bookingId || !status) {
+      return res.status(400).json({ success: false, message: "Booking ID and status are required" });
+    }
+
+    // Verify booking belongs to this trainer
+    const snap = await counsellingRef.child(bookingId).once("value");
+    if (!snap.exists()) {
+      return res.status(404).json({ success: false, message: "Booking not found" });
+    }
+    const booking = snap.val();
+    if (booking.assignedTrainerId !== trainerId) {
+      return res.status(403).json({ success: false, message: "Not authorized to update this session" });
+    }
+
+    await counsellingRef.child(bookingId).update({ status });
+
+    // ─── Real-Time Update (Socket) ─────────────────────────────────────────
+    emitToTrainer(trainerId, "COUNSELLING_STATUS_UPDATED", {
+      bookingId,
+      newStatus: status
+    });
+
+    res.status(200).json({ success: true, message: `Status updated to ${status}` });
+  } catch (error) {
+    console.error("Update Session Status Error:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+

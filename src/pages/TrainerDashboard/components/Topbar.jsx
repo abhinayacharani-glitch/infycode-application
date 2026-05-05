@@ -2,7 +2,11 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTrainer } from '../../../context/TrainerContext';
 import { LogOut, User } from 'lucide-react';
+import { io } from 'socket.io-client';
 import './Topbar.css';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
 
 import icLogo from '../../../assets/infycode-final-logo4-1.png';
 import {
@@ -123,9 +127,30 @@ const Topbar = () => {
 
   useEffect(() => {
     fetchNotifications(); // load on mount
-    const interval = setInterval(() => fetchNotifications(), 15000); // poll every 15s for near-realtime
-    return () => clearInterval(interval);
-  }, [fetchNotifications]);
+
+    // ─── Socket.io Integration ─────────────────────────────────────────────
+    const socket = io(API_BASE_URL);
+
+    if (trainerData?.id || trainerData?._id) {
+      const trainerId = trainerData.id || trainerData._id;
+      socket.emit("join_trainer_room", trainerId);
+
+      socket.on("NEW_COUNSELLING_ASSIGNED", (data) => {
+        console.log("[Socket] New counselling session assigned, refreshing notifications:", data);
+        fetchNotifications();
+      });
+
+      socket.on("COUNSELLING_STATUS_UPDATED", (data) => {
+        console.log("[Socket] Counselling status updated, refreshing notifications:", data);
+        fetchNotifications();
+      });
+    }
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [fetchNotifications, trainerData?.id, trainerData?._id]);
+
 
 
   /* ── Click-outside handler ───────────────────────────────────────── */

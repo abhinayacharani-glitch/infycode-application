@@ -649,3 +649,16 @@ export const getStudentCounsellingSessions = () =>
   request('/api/counselling/student-sessions', {
     headers: getAuthHeader(),
   });
+
+export const getPendingCounsellingCountAPI = () =>
+  request('/api/counselling/pending-count', {
+    headers: getAuthHeader(),
+  });
+
+export const updateCounsellingStatusAPI = (bookingId, status) =>
+  request('/api/counselling/update-status', {
+    method: 'PUT',
+    headers: getAuthHeader(),
+    body: JSON.stringify({ bookingId, status }),
+  });
+

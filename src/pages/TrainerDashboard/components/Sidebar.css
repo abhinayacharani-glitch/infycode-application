@@ -144,6 +144,25 @@
   opacity: 0.7;
 }
 
+.sd-count-badge {
+  background: #3B82F6;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-left: auto;
+  min-width: 20px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+.sd-item.active .sd-count-badge {
+  background: #3B82F6;
+  color: white;
+}
+
+
 .sd-item:not(.active):hover .sd-box {
   background: var(--sd-hover-bg);
   color: var(--sd-text-primary);
