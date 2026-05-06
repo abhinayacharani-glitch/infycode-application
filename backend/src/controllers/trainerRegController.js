@@ -333,7 +333,7 @@ export const getTrainerBatches = async (req, res) => {
         endDate: "", // Logic to calculate endDate based on duration could go here
         duration: data.duration || "N/A",
         mode: "Online", // Defaulting to Online as per previous requirements
-        status: data.status || "Active",
+        status: data.status || "Scheduled",
         lastUpdated: data.createdAt || new Date().toISOString()
       }))
       .filter(b => b.trainer === trainerFullName);

@@ -28,11 +28,33 @@ export const TrainerProvider = ({ children }) => {
     const savedUser = localStorage.getItem('user');
     const savedLoggedUser = localStorage.getItem('loggedUser');
     const userData = JSON.parse(savedUser || savedLoggedUser || '{}');
-    
+
     return userData.profileImage || localStorage.getItem('trainerProfileImage') || null;
   });
 
   const [pendingCounsellingCount, setPendingCounsellingCount] = useState(0);
+  const [notifications, setNotifications] = useState([]);
+  const [batchNotificationCount, setBatchNotificationCount] = useState(0);
+  
+  const fetchTrainerNotifications = async () => {
+    try {
+      const { getTrainerNotificationsAPI } = await import('../services/api');
+      const res = await getTrainerNotificationsAPI();
+      if (res.success) {
+        setNotifications(res.notifications || []);
+      }
+    } catch (error) {
+      console.error("Error fetching trainer notifications:", error);
+    }
+  };
+
+  useEffect(() => {
+    const batchUnread = (notifications || []).filter(n => 
+      !n.read && 
+      (n.title?.toLowerCase().includes('batch') || n.text?.toLowerCase().includes('batch'))
+    );
+    setBatchNotificationCount(batchUnread.length);
+  }, [notifications]);
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -63,6 +85,7 @@ export const TrainerProvider = ({ children }) => {
     };
 
     fetchInitialData();
+    fetchTrainerNotifications();
 
     // ─── Socket.io Integration ─────────────────────────────────────────────
     const socket = io(API_BASE_URL);
@@ -83,6 +106,16 @@ export const TrainerProvider = ({ children }) => {
           if (res.success) setPendingCounsellingCount(res.count);
         });
       });
+
+      socket.on("NEW_NOTIFICATION", () => {
+        console.log("[Socket] New notification received, refreshing...");
+        fetchTrainerNotifications();
+      });
+
+      // Listen for batch specific updates if any
+      socket.on("BATCH_UPDATED", () => {
+        fetchTrainerNotifications();
+      });
     }
 
     return () => {
@@ -95,7 +128,7 @@ export const TrainerProvider = ({ children }) => {
     // 1. Update UI state immediately (optimistic update)
     setTrainerData(prev => {
       const updated = { ...prev, ...(newData || {}) };
-      
+
       if (newImage !== undefined) {
         updated.profileImage = newImage;
         setProfileImage(newImage);
@@ -105,19 +138,19 @@ export const TrainerProvider = ({ children }) => {
           localStorage.removeItem('trainerProfileImage');
         }
       }
-      
+
       // Ensure we keep the token from the existing storage if it's not in updated
       const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
       const finalUser = { ...currentUser, ...updated };
       localStorage.setItem('user', JSON.stringify(finalUser));
-      
+
       return updated;
     });
 
     try {
       const payload = { ...(newData || {}) };
       if (newImage !== undefined) payload.profileImage = newImage;
-      
+
       const response = await updateTrainerProfileAPI(payload);
       if (response.success && response.profile) {
         // Sync state with the actual data from DB
@@ -142,7 +175,12 @@ export const TrainerProvider = ({ children }) => {
     profileImage,
     updateTrainerProfile,
     pendingCounsellingCount,
-    setPendingCounsellingCount
+    setPendingCounsellingCount,
+    notifications,
+    setNotifications,
+    batchNotificationCount,
+    setBatchNotificationCount,
+    fetchTrainerNotifications
   };
 
 

@@ -29,7 +29,7 @@ const StudentConnectBatch = () => {
           const merged = allBatchStudents.map(student => {
             // Find query for this student in this batch
             const studentQuery = allQueries.find(q => q.studentId === student.id && q.batchId === batchId);
-            
+
             return {
               id: student.id,
               studentId: student.studentId,
