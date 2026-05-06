@@ -57,8 +57,16 @@ const CourseTopics = () => {
       b.batchName?.includes(course.title)
     );
 
+    const isStarted = batchMatch && (
+      batchMatch.status === 'started' || 
+      batchMatch.status === 'Active' || 
+      batchMatch.batchStatus === 'started' || 
+      batchMatch.batchStatus === 'Active'
+    );
+
     if (batchMatch) {
       return {
+        isStarted,
         trainer: batchMatch.trainer ? {
           name: batchMatch.trainer.name,
           role: batchMatch.trainer.specialization || 'Lead Instructor',
@@ -75,7 +83,7 @@ const CourseTopics = () => {
         }
       };
     }
-    return { trainer: course.trainer, batch: course.batch };
+    return { trainer: course.trainer, batch: course.batch, isStarted: false };
   }, [course, myBatches, courseId]);
 
   const topicsData = course.modules.map(m => ({
@@ -134,80 +142,82 @@ const CourseTopics = () => {
         <p className="ct-main-subtitle">{course.description}</p>
       </motion.div>
 
-      {/* Dynamic Trainer & Batch Info Section */}
-      <div className="ct-info-row" style={{ marginBottom: '40px' }}>
-          <motion.div className="ct-info-card" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
-            <div className="ct-card-header">
-              <User className="ct-hdr-icon" />
-              <h3>Assigned Trainer</h3>
-            </div>
-            <div className="ct-info-pill">
-               <div className="ct-avatar-sm">
-                 {dynamicData.trainer?.name?.charAt(0)}
-               </div>
-               <div>
-                 <div style={{ fontWeight: '800', color: '#0f172a' }}>{dynamicData.trainer?.name}</div>
-                 <div style={{ fontSize: '13px', color: '#64748b' }}>{dynamicData.trainer?.role}</div>
-               </div>
-            </div>
-            <div className="ct-batch-mini-grid" style={{ marginTop: '15px' }}>
-               <div className="ct-mini-card">
-                 <div className="ct-mini-label">Experience</div>
-                 <div className="ct-mini-value">{dynamicData.trainer?.experience}</div>
-               </div>
-               <div className="ct-mini-card">
-                 <div className="ct-mini-label">Specialization</div>
-                 <div className="ct-mini-value">{dynamicData.trainer?.specialization?.split(',')[0]}</div>
-               </div>
-            </div>
-          </motion.div>
+      {/* Dynamic Trainer & Batch Info Section - Only show if batch is started */}
+      {dynamicData.isStarted && (
+        <div className="ct-info-row" style={{ marginBottom: '40px' }}>
+            <motion.div className="ct-info-card" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
+              <div className="ct-card-header">
+                <User className="ct-hdr-icon" />
+                <h3>Assigned Trainer</h3>
+              </div>
+              <div className="ct-info-pill">
+                 <div className="ct-avatar-sm">
+                   {dynamicData.trainer?.name?.charAt(0)}
+                 </div>
+                 <div>
+                   <div style={{ fontWeight: '800', color: '#0f172a' }}>{dynamicData.trainer?.name}</div>
+                   <div style={{ fontSize: '13px', color: '#64748b' }}>{dynamicData.trainer?.role}</div>
+                 </div>
+              </div>
+              <div className="ct-batch-mini-grid" style={{ marginTop: '15px' }}>
+                 <div className="ct-mini-card">
+                   <div className="ct-mini-label">Experience</div>
+                   <div className="ct-mini-value">{dynamicData.trainer?.experience}</div>
+                 </div>
+                 <div className="ct-mini-card">
+                   <div className="ct-mini-label">Specialization</div>
+                   <div className="ct-mini-value">{dynamicData.trainer?.specialization?.split(',')[0]}</div>
+                 </div>
+              </div>
+            </motion.div>
 
-          <motion.div className="ct-info-card" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }}>
-            <div className="ct-card-header">
-              <Calendar className="ct-hdr-icon" style={{ color: '#10b981' }} />
-              <h3>Batch Schedule</h3>
-            </div>
-            <div className="ct-batch-mini-grid">
-               <div className="ct-mini-card">
-                 <div className="ct-mini-label">Batch ID</div>
-                 <div className="ct-mini-value">{dynamicData.batch?.id}</div>
-               </div>
-               <div className="ct-mini-card">
-                 <div className="ct-mini-label">Timing</div>
-                 <div className="ct-mini-value">{dynamicData.batch?.timing}</div>
-               </div>
-               <div className="ct-mini-card">
-                 <div className="ct-mini-label">Start Date</div>
-                 <div className="ct-mini-value">{dynamicData.batch?.startDate}</div>
-               </div>
-               <div className="ct-mini-card">
-                 <div className="ct-mini-label">Mode</div>
-                 <div className="ct-mini-value">{(() => {
-                      const dur = dynamicData.batch?.duration || '4 Months';
-                      const mod = (dynamicData.batch?.mode || 'Online').toLowerCase();
-                      const durationStr = /weeks|months|days/i.test(dur) ? dur : `${dur} weeks`;
-                      return `${durationStr} - ${mod}`;
-                    })()}</div>
-               </div>
-            </div>
-          </motion.div>
+            <motion.div className="ct-info-card" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }}>
+              <div className="ct-card-header">
+                <Calendar className="ct-hdr-icon" style={{ color: '#10b981' }} />
+                <h3>Batch Schedule</h3>
+              </div>
+              <div className="ct-batch-mini-grid">
+                 <div className="ct-mini-card">
+                   <div className="ct-mini-label">Batch ID</div>
+                   <div className="ct-mini-value">{dynamicData.batch?.id}</div>
+                 </div>
+                 <div className="ct-mini-card">
+                   <div className="ct-mini-label">Timing</div>
+                   <div className="ct-mini-value">{dynamicData.batch?.timing}</div>
+                 </div>
+                 <div className="ct-mini-card">
+                   <div className="ct-mini-label">Start Date</div>
+                   <div className="ct-mini-value">{dynamicData.batch?.startDate}</div>
+                 </div>
+                 <div className="ct-mini-card">
+                   <div className="ct-mini-label">Mode</div>
+                   <div className="ct-mini-value">{(() => {
+                        const dur = dynamicData.batch?.duration || '4 Months';
+                        const mod = (dynamicData.batch?.mode || 'Online').toLowerCase();
+                        const durationStr = /weeks|months|days/i.test(dur) ? dur : `${dur} weeks`;
+                        return `${durationStr} - ${mod}`;
+                      })()}</div>
+                 </div>
+              </div>
+            </motion.div>
 
-          <motion.div className="ct-info-card" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }}>
-            <div className="ct-card-header">
-              <Target className="ct-hdr-icon" style={{ color: '#f59e0b' }} />
-              <h3>Current Progress</h3>
-            </div>
-            <div className="ct-progress-container">
-               <div className="ct-progress-labels">
-                 <span>Curriculum Completion</span>
-                 <span>{course.progress || 0}%</span>
-               </div>
-               <div className="ct-progress-bar-wrap">
-                 <div className="ct-progress-fill" style={{ width: `${course.progress || 0}%` }}></div>
-               </div>
-            </div>
-          </motion.div>
-      </div>
+            <motion.div className="ct-info-card" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }}>
+              <div className="ct-card-header">
+                <Target className="ct-hdr-icon" style={{ color: '#f59e0b' }} />
+                <h3>Current Progress</h3>
+              </div>
+              <div className="ct-progress-container">
+                 <div className="ct-progress-labels">
+                   <span>Curriculum Completion</span>
+                   <span>{course.progress || 0}%</span>
+                 </div>
+                 <div className="ct-progress-bar-wrap">
+                   <div className="ct-progress-fill" style={{ width: `${course.progress || 0}%` }}></div>
+                 </div>
+              </div>
+            </motion.div>
+        </div>
+      )}
 
       <div className="ct-topics-grid">
         {topicsData.map((section, idx) => (

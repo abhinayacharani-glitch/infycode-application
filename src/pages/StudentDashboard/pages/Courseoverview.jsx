@@ -165,9 +165,17 @@ const CourseOverview = () => {
       b.courseId === course.id
     );
 
+    const isStarted = batchMatch && (
+      batchMatch.status === 'started' || 
+      batchMatch.status === 'Active' || 
+      batchMatch.batchStatus === 'started' || 
+      batchMatch.batchStatus === 'Active'
+    );
+
     if (batchMatch) {
       return {
         ...course,
+        isStarted,
         trainer: batchMatch.trainer ? {
           name: batchMatch.trainer.name,
           role: batchMatch.trainer.specialization || 'Lead Instructor',
@@ -187,7 +195,7 @@ const CourseOverview = () => {
       };
     }
 
-    return course;
+    return { ...course, isStarted: false };
   }, [course, myBatches]);
 
   useEffect(() => {
@@ -284,70 +292,72 @@ const CourseOverview = () => {
         </div>
       </div>
 
-      {/* Info Layout (Trainer & Batch) */}
-      <div className="co-info-layout">
-        {/* Trainer Card */}
-        <div className="co-info-card">
-          <div className="co-info-header">
-            <div className="co-header-icon">
-              <User size={18} />
+      {/* Info Layout (Trainer & Batch) - Only show if batch is started */}
+      {dynamicCourse.isStarted && (
+        <div className="co-info-layout">
+          {/* Trainer Card */}
+          <div className="co-info-card">
+            <div className="co-info-header">
+              <div className="co-header-icon">
+                <User size={18} />
+              </div>
+              <h2>Trainer Details</h2>
             </div>
-            <h2>Trainer Details</h2>
+            <div className="co-trainer-main-pill">
+              <div className="co-trainer-avatar-blue">{dynamicCourse.trainer?.name?.charAt(0)}</div>
+              <div className="co-trainer-text">
+                <div className="co-t-name">{dynamicCourse.trainer?.name}</div>
+                <div className="co-t-role">{dynamicCourse.trainer?.role}</div>
+              </div>
+            </div>
+            <div className="co-trainer-stats-row">
+              <div className="co-stat-pill">
+                <span className="co-pill-label">Experience</span>
+                <span className="co-pill-value">{dynamicCourse.trainer?.experience || '10+ Years'}</span>
+              </div>
+              <div className="co-stat-pill">
+                <span className="co-pill-label">Expertise</span>
+                <span className="co-pill-value">{dynamicCourse.trainer?.expertise || dynamicCourse.trainer?.specialization || 'Technical Expert'}</span>
+              </div>
+            </div>
           </div>
-          <div className="co-trainer-main-pill">
-            <div className="co-trainer-avatar-blue">{dynamicCourse.trainer?.name?.charAt(0)}</div>
-            <div className="co-trainer-text">
-              <div className="co-t-name">{dynamicCourse.trainer?.name}</div>
-              <div className="co-t-role">{dynamicCourse.trainer?.role}</div>
-            </div>
-          </div>
-          <div className="co-trainer-stats-row">
-            <div className="co-stat-pill">
-              <span className="co-pill-label">Experience</span>
-              <span className="co-pill-value">{dynamicCourse.trainer?.experience || '10+ Years'}</span>
-            </div>
-            <div className="co-stat-pill">
-              <span className="co-pill-label">Expertise</span>
-              <span className="co-pill-value">{dynamicCourse.trainer?.expertise || dynamicCourse.trainer?.specialization || 'Technical Expert'}</span>
-            </div>
-          </div>
-        </div>
 
-        {/* Batch Card */}
-        <div className="co-info-card">
-          <div className="co-info-header">
-            <div className="co-header-icon" style={{ background: '#ecfdf5', color: '#10b981' }}>
-              <Calendar size={18} />
+          {/* Batch Card */}
+          <div className="co-info-card">
+            <div className="co-info-header">
+              <div className="co-header-icon" style={{ background: '#ecfdf5', color: '#10b981' }}>
+                <Calendar size={18} />
+              </div>
+              <h2>Batch Details</h2>
             </div>
-            <h2>Batch Details</h2>
-          </div>
-          <div className="co-batch-grid">
-            <div className="co-batch-pill">
-              <span className="co-pill-label"><Hash size={12} /> Batch ID</span>
-              <span className="co-pill-value">{dynamicCourse.batch?.id || 'BID-1240'}</span>
-            </div>
-            <div className="co-batch-pill">
-              <span className="co-pill-label"><Clock size={12} /> Timing</span>
-              <span className="co-pill-value">{dynamicCourse.batch?.timing}</span>
-            </div>
-            <div className="co-batch-pill">
-              <span className="co-pill-label"><Calendar size={12} /> Start Date</span>
-              <span className="co-pill-value">{dynamicCourse.batch?.startDate}</span>
-            </div>
-            <div className="co-batch-pill">
-              <span className="co-pill-label"><Monitor size={12} /> Mode</span>
-              <span className="co-pill-value">
-                {(() => {
-                  const dur = dynamicCourse.batch?.duration || '4 Months';
-                  const mod = (dynamicCourse.batch?.mode || 'Online').toLowerCase();
-                  const durationStr = /weeks|months|days/i.test(dur) ? dur : `${dur} weeks`;
-                  return `${durationStr} - ${mod}`;
-                })()}
-              </span>
+            <div className="co-batch-grid">
+              <div className="co-batch-pill">
+                <span className="co-pill-label"><Hash size={12} /> Batch ID</span>
+                <span className="co-pill-value">{dynamicCourse.batch?.id || 'BID-1240'}</span>
+              </div>
+              <div className="co-batch-pill">
+                <span className="co-pill-label"><Clock size={12} /> Timing</span>
+                <span className="co-pill-value">{dynamicCourse.batch?.timing}</span>
+              </div>
+              <div className="co-batch-pill">
+                <span className="co-pill-label"><Calendar size={12} /> Start Date</span>
+                <span className="co-pill-value">{dynamicCourse.batch?.startDate}</span>
+              </div>
+              <div className="co-batch-pill">
+                <span className="co-pill-label"><Monitor size={12} /> Mode</span>
+                <span className="co-pill-value">
+                  {(() => {
+                    const dur = dynamicCourse.batch?.duration || '4 Months';
+                    const mod = (dynamicCourse.batch?.mode || 'Online').toLowerCase();
+                    const durationStr = /weeks|months|days/i.test(dur) ? dur : `${dur} weeks`;
+                    return `${durationStr} - ${mod}`;
+                  })()}
+                </span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Course Objective Section */}
       <div className="co-objective-section">

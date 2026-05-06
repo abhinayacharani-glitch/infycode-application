@@ -491,7 +491,7 @@ export const createStudentQuery = async (req, res) => {
   try {
     const { title, text, code, type, trainerName, batchId } = req.body;
     const studentId = req.user.id;
-    
+
     const snapshot = await studentsRef.child(studentId).once("value");
     const studentData = snapshot.val();
 
@@ -529,7 +529,7 @@ export const getStudentQueries = async (req, res) => {
     const studentId = req.user.id;
     const queriesRef = db.ref("queries");
     const snapshot = await queriesRef.orderByChild("studentId").equalTo(studentId).once("value");
-    
+
     const queries = [];
     if (snapshot.exists()) {
       snapshot.forEach(child => {

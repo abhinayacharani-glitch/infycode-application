@@ -60,6 +60,10 @@ const MentorConnection = () => {
           const trainerMap = {};
 
           Object.entries(response.batches).forEach(([courseName, batchData]) => {
+            // Only display trainers for batches that have been started
+            const isStarted = batchData.status === 'started' || batchData.status === 'Active' || batchData.batchStatus === 'started' || batchData.batchStatus === 'Active';
+            if (!isStarted) return;
+
             const t = batchData.trainer;
             if (t && t.name) {
               const tId = t.id || t.name;
