@@ -49,7 +49,12 @@ const Counselling = () => {
 
       <div className="counselling-grid">
         {cards.map((card, index) => (
-          <div key={index} className="counselling-card-premium">
+          <div 
+            key={index} 
+            className="counselling-card-premium"
+            onClick={() => !card.isUpcoming && navigate(`/student-dashboard/counselling/${card.id}`)}
+            style={{ cursor: card.isUpcoming ? 'default' : 'pointer' }}
+          >
             <div className="card-image-wrapper">
               <img src={card.imageUrl} alt={card.title} className="card-image" />
             </div>
