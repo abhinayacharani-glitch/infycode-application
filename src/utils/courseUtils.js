@@ -14,13 +14,13 @@ export const getCourseImage = (course) => {
   if (title.includes('aptitude'))
     return 'https://images.unsplash.com/photo-1509228468518-180dd4864904?q=80&w=800';
 
-  if (title.includes('introduction to ai'))
-    return 'https://media.licdn.com/dms/image/v2/D4E12AQEh_sMxJAgP6Q/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1701859130483?e=2147483647&v=beta&t=aFxAGcy8EMMTISysYNRT6Jz9IypwJC63FA4lBQWsBPk';
+  if (title.includes('introduction to ai') || title.includes('artificial intelligence'))
+    return 'https://images.unsplash.com/photo-1677442135136-760c813028c0?q=80&w=800';
 
   if (title.includes('machine learning'))
     return 'https://images.unsplash.com/photo-1677442135136-760c813028c0?q=80&w=800';
 
-  if (title.includes('data science'))
+  if (title.includes('data science') || title.includes('data science & ai'))
     return 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfUFmKmFDvY4rg76EzhS6nH0r_B7Uk_oxluw&s';
 
   if (title.includes('ethical hacking') || title.includes('cyber'))
@@ -73,4 +73,27 @@ export const getCourseImage = (course) => {
     return 'https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=800';
 
   return course.image || 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=800';
+};
+
+/**
+ * Helper to parse the bracket-formatted curriculum string into a structured modules array.
+ */
+export const parseCurriculum = (text) => {
+  if (!text) return [];
+  const sections = text.split(/(?=\[.*\])/g).filter(Boolean);
+  return sections.map((section, idx) => {
+    const lines = section.trim().split('\n').filter(Boolean);
+    const headerLine = lines[0];
+    const isHeader = headerLine.startsWith('[') && headerLine.endsWith(']');
+    const title = isHeader ? headerLine.slice(1, -1) : 'General';
+    const topics = isHeader ? lines.slice(1) : lines;
+    return {
+      id: `module-${idx}`,
+      subtitle: title,
+      topics: topics.map((t, i) => ({
+        id: `topic-${idx}-${i}`,
+        title: t
+      }))
+    };
+  });
 };

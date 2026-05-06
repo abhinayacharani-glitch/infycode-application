@@ -1,160 +1,67 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ALL_COURSES } from "../../components/Courses/Courses";
 import { useCourseContext } from "../../context/CourseContext";
-import { ArrowLeft, Clock, Users, Star, BookOpen, ChevronDown, ChevronUp, CheckCircle, Eye, Calendar, User as UserIcon, Download } from "lucide-react";
-import jsPDF from 'jspdf';
-import { getCourseImage } from "../../utils/courseUtils";
+import {
+  ArrowLeft, Clock, Star, BookOpen, ChevronDown, ChevronUp,
+  CheckCircle, Eye, Calendar, User as UserIcon, Download,
+  Layers, Target, Trophy, Globe, PlayCircle
+} from "lucide-react";
+import jsPDF from "jspdf";
+import { getCourseImage, parseCurriculum } from "../../utils/courseUtils";
 import "../../components/Courses/Courses.css";
 import "./CourseDetailsPage.css";
 
-const SYLLABUS_DB = {
-  "Java": [
-    {
-      id: 1, title: "Core Java", topics: [
-        { main: "Introduction & Essentials", subtopics: ["JVM Architecture & Data Types", "Operators & Control Flow"] },
-        { main: "Object-Oriented Programming", subtopics: ["Classes, Objects, Methods", "Inheritance, Polymorphism", "Abstraction, Encapsulation"] }
-      ]
-    },
-    {
-      id: 2, title: "ADV.JAVA", topics: [
-        {
-          main: "JDBC (Java Database Connectivity)", subtopics: [
-            "Introduction to JDBC",
-            "Establishing Connection to Database",
-            "Statement",
-            "PreparedStatement",
-            "CallableStatement",
-            "ResultSet Interface & Metadata",
-            "Batch Updates",
-            "Transaction Management"
-          ]
-        },
-        {
-          main: "Servlet", subtopics: [
-            "Servlet Lifecycle",
-            "Request & Response Interfaces",
-            "Session Tracking"
-          ]
-        },
-        { main: "JSP", subtopics: ["JSP Architecture & Lifecycle", "Scripting Elements & Directives", "JSTL & Custom Tags"] }
-      ]
-    },
-    { id: 3, title: "Oracle", topics: [{ main: "Database Management", subtopics: ["SQL Fundamentals", "Joins & Subqueries", "PL/SQL Basics"] }] },
-    { id: 4, title: "HTML", topics: [{ main: "Structure & Semantics", subtopics: ["HTML5 Forms & Inputs", "Media Elements"] }] },
-    { id: 5, title: "CSS", topics: [{ main: "Styling & Layouts", subtopics: ["CSS3 Properties", "Flexbox & Grid Layouts"] }] },
-    { id: 6, title: "JavaScript", topics: [{ main: "Behavior & Logic", subtopics: ["ES6+ Features", "DOM Manipulation", "Promises & Async/Await"] }] },
-    { id: 7, title: "BootStrap", topics: [{ main: "Responsive Design", subtopics: ["Grid System", "Components & Utilities"] }] }
-  ],
-  "Web Dev": [
-    {
-      id: 1, title: "Frontend Fundamentals", topics: [
-        { main: "HTML5 & CSS3 Masterclass", subtopics: ["Semantic HTML", "Advanced CSS Selectors", "Flexbox & CSS Grid"] },
-        { main: "JavaScript Core (ES6+)", subtopics: ["Variables, Scopes & Closures", "Asynchronous JavaScript (Promises, Async/Await)", "DOM Manipulation"] }
-      ]
-    },
-    {
-      id: 2, title: "React.js Framework", topics: [
-        { main: "React Essentials", subtopics: ["Components, Props, & State", "React Hooks (useState, useEffect)", "Context API"] },
-        { main: "Advanced React", subtopics: ["Redux Toolkit Integration", "React Router Navigation", "Performance Optimization"] }
-      ]
-    },
-    {
-      id: 3, title: "Backend Development", topics: [
-        { main: "Node.js & Express.js", subtopics: ["RESTful API Creation", "Middleware & Error Handling", "Authentication & JWT"] },
-        { main: "Database Integration", subtopics: ["MongoDB & Mongoose", "SQL Basics (PostgreSQL)"] }
-      ]
-    }
-  ],
-  "Python": [
-    {
-      id: 1, title: "Python Core", topics: [
-        { main: "Syntax & Data Structures", subtopics: ["Variables & Operators", "Lists, Tuples, Dictionaries, Sets", "Control Flow (Loops & Conditionals)"] },
-        { main: "Functions & OOP", subtopics: ["Decorators & Generators", "Classes & Object-Oriented Principles"] }
-      ]
-    },
-    {
-      id: 2, title: "Advanced Python", topics: [
-        { main: "File & Error Handling", subtopics: ["Reading & Writing Files (CSV, JSON)", "Exception Handling (Try, Except)"] },
-        { main: "Modules & APIs", subtopics: ["Using Requests library", "Regular Expressions", "Multithreading Basics"] }
-      ]
-    },
-    {
-      id: 3, title: "Django Web Framework", topics: [
-        { main: "Building APIs", subtopics: ["Models & ORM", "Views & Templates", "Django REST Framework (DRF)"] }
-      ]
-    }
-  ],
-  "AI & Data": [
-    {
-      id: 1, title: "Data Analysis & Manipulation", topics: [
-        { main: "Python for Data Science", subtopics: ["NumPy Arrays & Mathematical Operations", "Pandas DataFrames", "Data Cleaning Techniques"] }
-      ]
-    },
-    {
-      id: 2, title: "Machine Learning Elements", topics: [
-        { main: "Supervised Learning", subtopics: ["Linear & Logistic Regression", "Decision Trees & Random Forests", "Model Evaluation & Metrics"] },
-        { main: "Unsupervised Learning", subtopics: ["K-Means Clustering", "PCA (Principal Component Analysis)"] }
-      ]
-    },
-    {
-      id: 3, title: "Deep Learning Foundations", topics: [
-        { main: "Neural Networks", subtopics: ["Perceptrons & Backpropagation", "Building Models with TensorFlow & Keras"] }
-      ]
-    }
-  ]
+/* ─── Curriculum parser: bracket format → module objects ─── */
+const parseDynamicCurriculum = (curriculumStr) => {
+  if (!curriculumStr) return [];
+  try {
+    const blocks = curriculumStr.split("\n\n").filter((b) => b.trim());
+    return blocks.map((block, idx) => {
+      const lines = block.split("\n").filter((l) => l.trim());
+      const titleLine = lines[0] || "";
+      const titleMatch = titleLine.match(/\[(.*?)\]/);
+      const title = titleMatch ? titleMatch[1] : `Module ${idx + 1}`;
+      const topics = lines.slice(1).map((t) => ({ main: t.trim(), subtopics: [] }));
+      return { id: idx + 1, title, topics };
+    });
+  } catch {
+    return [];
+  }
 };
 
-const DEFAULT_SYLLABUS = [
-  { id: 1, title: "Module 1: Introduction", topics: [{ main: "Course Fundamentals", subtopics: ["Overview of Concepts", "Environment Setup"] }] },
-  { id: 2, title: "Module 2: Core Architecture", topics: [{ main: "Deep Dive", subtopics: ["Main Architecture", "System Design Patterns"] }] },
-  { id: 3, title: "Module 3: Advanced Concepts", topics: [{ main: "Masterclass Topics", subtopics: ["Advanced Implementations", "Real-world Error Handling"] }] },
-
-];
-
-
-
+/* ─── Main Page ─── */
 const CourseDetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("Overview");
-  const [openModules, setOpenModules] = useState([]); // All modules closed by default
+  const [openModules, setOpenModules] = useState([]);
   const { publishedCourses } = useCourseContext();
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+  }, [id]);
 
-  const combinedCourses = [...publishedCourses, ...ALL_COURSES];
-  const course = combinedCourses.find((c) => c.courseId === id);
+  const course = useMemo(
+    () => publishedCourses.find((c) => c.courseId === id || c.id === id),
+    [publishedCourses, id]
+  );
 
-  if (!course) {
-    return (
-      <div className="cd-not-found">
-        <h2>Course Not Found</h2>
-        <button onClick={() => navigate(-1)} className="cd-back-btn">Go Back</button>
-      </div>
-    );
-  }
+  const courseSyllabus = useMemo(
+    () => parseDynamicCurriculum(course?.curriculum),
+    [course]
+  );
 
   const toggleModule = (modId) => {
-    if (openModules.includes(modId)) {
-      setOpenModules(openModules.filter(id => id !== modId));
-    } else {
-      setOpenModules([...openModules, modId]);
-    }
+    setOpenModules((prev) =>
+      prev.includes(modId) ? prev.filter((x) => x !== modId) : [...prev, modId]
+    );
   };
 
   const handleEnroll = () => {
     const userStr = localStorage.getItem("loggedUser");
     let userObj = null;
-    try {
-      userObj = userStr ? JSON.parse(userStr) : null;
-    } catch {
-      console.error("Session data corrupted.");
-    }
-
-    if (userObj && userObj.role === "Student") {
+    try { userObj = userStr ? JSON.parse(userStr) : null; } catch {}
+    if (userObj?.role === "Student") {
       navigate("/student-dashboard/courses");
     } else {
       navigate("/login", { state: { redirect: "/student-dashboard/courses" } });
@@ -162,94 +69,70 @@ const CourseDetailsPage = () => {
   };
 
   const handleDownloadCurriculum = () => {
+    if (!course) return;
     const doc = new jsPDF();
-    let yPos = 20;
+    let y = 20;
 
-    // Header
     doc.setFontSize(22);
-    doc.setTextColor(14, 165, 233); // #0ea5e9
-    doc.text(course.title, 20, yPos);
-    yPos += 10;
+    doc.setTextColor(14, 165, 233);
+    doc.text(course.title, 20, y); y += 10;
 
-    doc.setFontSize(14);
-    doc.setTextColor(100);
-    doc.text(`Instructor: ${course.trainer}`, 20, yPos);
-    yPos += 10;
-    doc.text(`Duration: ${course.duration}`, 20, yPos);
-    yPos += 20;
+    doc.setFontSize(13);
+    doc.setTextColor(80);
+    doc.text(`Instructor: ${course.trainer}`, 20, y); y += 8;
+    doc.text(`Duration: ${course.duration}`, 20, y); y += 8;
+    doc.text(`Level: ${course.level}`, 20, y); y += 14;
 
-    // Curriculum Header
-    doc.setFontSize(18);
-    doc.setTextColor(15, 23, 42); // #0f172a
-    doc.text("Course Curriculum", 20, yPos);
-    yPos += 15;
+    doc.setFontSize(17);
+    doc.setTextColor(15, 23, 42);
+    doc.text("Course Curriculum", 20, y); y += 12;
 
-    // Syllabus
     courseSyllabus.forEach((mod) => {
-      if (yPos > 270) {
-        doc.addPage();
-        yPos = 20;
-      }
-
-      doc.setFontSize(14);
+      if (y > 270) { doc.addPage(); y = 20; }
+      doc.setFontSize(13);
       doc.setFont("helvetica", "bold");
-      doc.text(mod.title, 20, yPos);
-      yPos += 8;
-
-      mod.topics.forEach((topic) => {
-        doc.setFontSize(12);
+      doc.text(mod.title, 20, y); y += 7;
+      mod.topics.forEach((t) => {
+        doc.setFontSize(11);
         doc.setFont("helvetica", "normal");
-        doc.text(`• ${topic.main}`, 25, yPos);
-        yPos += 6;
-
-        if (topic.subtopics) {
-          topic.subtopics.forEach((sub) => {
-            doc.setFontSize(10);
-            doc.text(`  - ${sub}`, 30, yPos);
-            yPos += 5;
-
-            if (yPos > 280) {
-              doc.addPage();
-              yPos = 20;
-            }
-          });
-        }
-        yPos += 4;
+        doc.text(`  • ${t.main}`, 25, y); y += 5;
+        if (y > 280) { doc.addPage(); y = 20; }
       });
-      yPos += 10;
+      y += 5;
     });
 
     doc.save(`${course.title}_Curriculum.pdf`);
   };
 
-  // Only two tabs allowed
-  const tabs = ["Overview", "Curriculum"];
-
-  // Calculate specific syllabus based on category
-  let courseSyllabus = SYLLABUS_DB[course.category] || DEFAULT_SYLLABUS;
-
-  // Handle dynamically parsed curriculum from Firebase published courses
-  if (course.curriculum) {
-    try {
-      // The curriculum format from Firebase is e.g.:
-      // [Module Name]
-      // Topic 1
-      // Topic 2
-      const blocks = course.curriculum.split('\n\n').filter(b => b.trim());
-      if (blocks.length > 0) {
-        courseSyllabus = blocks.map((block, idx) => {
-          const lines = block.split('\n').filter(l => l.trim());
-          const titleLine = lines[0] || '';
-          const titleMatch = titleLine.match(/\[(.*?)\]/);
-          const title = titleMatch ? titleMatch[1] : `Module ${idx + 1}`;
-          const topics = lines.slice(1).map(t => ({ main: t, subtopics: [] }));
-          return { id: idx + 1, title, topics };
-        });
-      }
-    } catch (e) {
-      console.error("Failed to parse dynamic curriculum", e);
-    }
+  /* ─── Loading / Not Found states ─── */
+  if (!course && publishedCourses.length === 0) {
+    return (
+      <div className="cd-not-found">
+        <div className="cd-not-found-inner">
+          <BookOpen size={48} style={{ color: "#0ea5e9", marginBottom: 16 }} />
+          <h2>Loading course details...</h2>
+          <p>Please wait while we fetch the course information.</p>
+        </div>
+      </div>
+    );
   }
+
+  if (!course) {
+    return (
+      <div className="cd-not-found">
+        <div className="cd-not-found-inner">
+          <BookOpen size={48} style={{ color: "#ef4444", marginBottom: 16 }} />
+          <h2>Course Not Found</h2>
+          <p>The course you're looking for doesn't exist or may have been removed.</p>
+          <button onClick={() => navigate(-1)} className="cd-back-btn">
+            ← Go Back
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const totalTopics = courseSyllabus.reduce((acc, m) => acc + m.topics.length, 0);
 
   return (
     <div className="cd-page-wrapper">
@@ -261,28 +144,31 @@ const CourseDetailsPage = () => {
           <span>Back to Courses</span>
         </button>
 
-        {/* Header Section */}
+        {/* ── Hero Header ── */}
         <div className="cd-header-card">
           <div className="cd-header-info">
             <div className="cd-tags">
-              <span className="cd-cat-tag" style={{ background: `${course.color}15`, color: course.color }}>
+              <span className="cd-cat-tag" style={{ background: "#0ea5e915", color: "#0ea5e9" }}>
                 {course.category}
               </span>
-              <span className="cd-level-tag">{course.level || "Beginner to Pro"}</span>
+              <span className="cd-level-tag">{course.level || "All Levels"}</span>
             </div>
 
             <h1 className="cd-main-title">{course.title}</h1>
-            <p className="cd-subtitle">Build real-world skills through interactive, hands-on learning with expert guidance.</p>
+            <p className="cd-subtitle">
+              {course.description || "Build real-world skills through interactive, hands-on learning with expert guidance."}
+            </p>
 
             <div className="cd-stats">
               <span className="cd-stat"><Star size={16} className="text-yellow" /> {course.rating} Rating</span>
               <span className="cd-stat"><Clock size={16} /> {course.duration}</span>
-              <span className="cd-stat trainer-stat">
-                <UserIcon size={16} />
-                {course.trainer}
+              <span className="cd-stat"><Layers size={16} /> {courseSyllabus.length} Modules</span>
+              <span className="cd-stat"><Target size={16} /> {totalTopics} Topics</span>
+              <span className="cd-stat">
+                <UserIcon size={16} /> {course.trainer}
                 <button className="cd-mini-download" onClick={handleDownloadCurriculum} title="Download Curriculum">
                   <Download size={14} />
-                  <span>Download Curriculum</span>
+                  <span>Download</span>
                 </button>
               </span>
             </div>
@@ -291,20 +177,58 @@ const CourseDetailsPage = () => {
               <button className="cd-hero-enroll" onClick={handleEnroll}>
                 Enroll Now
               </button>
-              <button className="cd-hero-pricing" title="Pricing">
-                ₹
-              </button>
+              <button className="cd-hero-pricing" title="View Pricing">₹</button>
             </div>
           </div>
+
           <div className="cd-header-image">
             <img src={getCourseImage(course)} alt={course.title} />
           </div>
         </div>
 
-        {/* Tab Navigation */}
+        {/* ── Quick Stats Bar ── */}
+        <div className="cd-quick-stats-bar">
+          <div className="cd-quick-stat">
+            <BookOpen size={20} />
+            <div>
+              <span className="qs-num">{courseSyllabus.length}</span>
+              <span className="qs-lbl">Modules</span>
+            </div>
+          </div>
+          <div className="cd-quick-stat">
+            <Target size={20} />
+            <div>
+              <span className="qs-num">{totalTopics}</span>
+              <span className="qs-lbl">Topics</span>
+            </div>
+          </div>
+          <div className="cd-quick-stat">
+            <Clock size={20} />
+            <div>
+              <span className="qs-num">{course.duration}</span>
+              <span className="qs-lbl">Duration</span>
+            </div>
+          </div>
+          <div className="cd-quick-stat">
+            <Globe size={20} />
+            <div>
+              <span className="qs-num">Self-Paced</span>
+              <span className="qs-lbl">Mode</span>
+            </div>
+          </div>
+          <div className="cd-quick-stat">
+            <Trophy size={20} />
+            <div>
+              <span className="qs-num">Certificate</span>
+              <span className="qs-lbl">On Completion</span>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Tab Navigation ── */}
         <div className="cd-tabs-wrapper">
           <div className="cd-tabs-container">
-            {tabs.map((tab) => (
+            {["Overview", "Curriculum"].map((tab) => (
               <button
                 key={tab}
                 className={`cd-tab-btn ${activeTab === tab ? "active" : ""}`}
@@ -316,46 +240,88 @@ const CourseDetailsPage = () => {
           </div>
         </div>
 
-        {/* Tab Content Area */}
+        {/* ── Tab Content ── */}
         <div className="cd-content-area">
 
           {/* OVERVIEW TAB */}
           {activeTab === "Overview" && (
             <div className="cd-tab-panel">
+
+              {/* Course Overview */}
               <section className="cd-section">
                 <h2 className="cd-section-title">Course Overview</h2>
                 <div className="cd-desc-block">
                   <p>
-                    Welcome to the <strong>{course.title}</strong> program. This course is meticulously designed to take you from foundational concepts to advanced practical implementation. Whether you're looking to break into the industry, upgrade your current skillset, or shift your career trajectory, this program provides the comprehensive knowledge necessary to succeed.
+                    Welcome to the <strong>{course.title}</strong> program. This course is meticulously designed
+                    to take you from foundational concepts to advanced practical implementation. Whether you're
+                    looking to break into the industry, upgrade your current skillset, or shift your career
+                    trajectory, this program provides the comprehensive knowledge necessary to succeed.
                   </p>
-
                   <h4>Skills You Will Gain</h4>
                   <ul className="cd-skills-list">
                     <li><CheckCircle size={16} /> Complete mastery of industry-standard {course.category} tools.</li>
                     <li><CheckCircle size={16} /> Ability to architect, design, and deploy robust applications.</li>
-                    <li><CheckCircle size={16} /> Strong problem-solving methodologies.</li>
-                    <li><CheckCircle size={16} /> Best practices and modern workflows used by top companies.</li>
+                    <li><CheckCircle size={16} /> Strong problem-solving methodologies used by top companies.</li>
+                    <li><CheckCircle size={16} /> Best practices and modern workflows adopted in the industry.</li>
+                    <li><CheckCircle size={16} /> Portfolio-ready projects to showcase to employers.</li>
                   </ul>
-
                 </div>
               </section>
 
+              {/* Curriculum Preview (first 3 modules) */}
+              {courseSyllabus.length > 0 && (
+                <section className="cd-section mt-8">
+                  <h2 className="cd-section-title">Curriculum Preview</h2>
+                  <div className="cd-curriculum-preview">
+                    {courseSyllabus.slice(0, 3).map((mod) => (
+                      <div key={mod.id} className="cd-preview-module">
+                        <div className="cd-preview-module-header">
+                          <PlayCircle size={18} />
+                          <span>{mod.title}</span>
+                          <span className="cd-preview-count">{mod.topics.length} topics</span>
+                        </div>
+                        <ul className="cd-preview-topics">
+                          {mod.topics.slice(0, 4).map((t, i) => (
+                            <li key={i}><CheckCircle size={12} />{t.main}</li>
+                          ))}
+                          {mod.topics.length > 4 && (
+                            <li className="cd-more-topics">+{mod.topics.length - 4} more topics</li>
+                          )}
+                        </ul>
+                      </div>
+                    ))}
+                    {courseSyllabus.length > 3 && (
+                      <button
+                        className="cd-see-all-btn"
+                        onClick={() => setActiveTab("Curriculum")}
+                      >
+                        View Full Curriculum ({courseSyllabus.length} Modules)
+                      </button>
+                    )}
+                  </div>
+                </section>
+              )}
+
+              {/* Description */}
               <section className="cd-section mt-8">
                 <h2 className="cd-section-title">Description</h2>
                 <div className="cd-desc-block">
                   <h4>Course Structure</h4>
                   <p>
-                    The curriculum is broken down into structured, easily digestible modules. We start with core principles and gradually build up to complex, multi-layered concepts. Each week focuses on specific deliverables and practical assignments.
+                    The curriculum is broken down into {courseSyllabus.length} structured, easily digestible modules.
+                    We start with core principles and gradually build up to complex, multi-layered concepts.
+                    Each module focuses on specific deliverables and practical exercises.
                   </p>
-
                   <h4>Learning Approach</h4>
                   <p>
-                    We believe in learning by doing. While theoretical knowledge forms the base, 80% of this course is practical. You'll be writing code, executing strategies, and solving challenges exactly as you would in a real job environment.
+                    We believe in learning by doing. While theoretical knowledge forms the base, 80% of this
+                    course is practical. You'll be writing code, executing strategies, and solving challenges
+                    exactly as you would in a real job environment.
                   </p>
                 </div>
               </section>
 
-              {/* Related Courses Section */}
+              {/* Suggested / Related Courses */}
               <RelatedCourses currentCourse={course} navigate={navigate} publishedCourses={publishedCourses} />
             </div>
           )}
@@ -364,201 +330,177 @@ const CourseDetailsPage = () => {
           {activeTab === "Curriculum" && (
             <div className="cd-tab-panel">
               <section className="cd-section">
-                <h2 className="cd-section-title">Course Curriculum</h2>
-
-                <div className="cd-accordion-container">
-                  {courseSyllabus.map((mod) => {
-                    const isOpen = openModules.includes(mod.id);
-                    return (
-                      <div key={mod.id} className={`cd-accordion-item ${isOpen ? "open" : ""}`}>
-                        <div className="cd-accordion-header" onClick={() => toggleModule(mod.id)}>
-                          <div className="cd-accordion-title">
-                            {mod.title}
-                          </div>
-                          <div className="cd-accordion-icon">
-                            {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                          </div>
-                        </div>
-
-                        <div className={`cd-accordion-body ${isOpen ? "expanded" : ""}`}>
-                          <ul className="cd-topic-list">
-                            {mod.topics.map((topicBlock, i) => (
-                              <li key={i} className="cd-topic-item">
-                                <span className="cd-topic-main">{topicBlock.main}</span>
-                                {topicBlock.subtopics && topicBlock.subtopics.length > 0 && (
-                                  <ul className="cd-subtopic-list">
-                                    {topicBlock.subtopics.map((sub, j) => (
-                                      <li key={j}>{sub}</li>
-                                    ))}
-                                  </ul>
-                                )}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-                    )
-                  })}
+                <div className="cd-curriculum-header-row">
+                  <h2 className="cd-section-title">Course Curriculum</h2>
+                  <div className="cd-curriculum-meta">
+                    <span><Layers size={15} /> {courseSyllabus.length} Modules</span>
+                    <span><Target size={15} /> {totalTopics} Topics</span>
+                    <button className="cd-download-btn" onClick={handleDownloadCurriculum}>
+                      <Download size={15} /> Download PDF
+                    </button>
+                  </div>
                 </div>
+
+                {courseSyllabus.length === 0 ? (
+                  <div className="cd-no-curriculum">
+                    <BookOpen size={40} />
+                    <p>Curriculum content is being prepared. Check back soon!</p>
+                  </div>
+                ) : (
+                  <div className="cd-accordion-container">
+                    {courseSyllabus.map((mod) => {
+                      const isOpen = openModules.includes(mod.id);
+                      return (
+                        <div key={mod.id} className={`cd-accordion-item ${isOpen ? "open" : ""}`}>
+                          <div className="cd-accordion-header" onClick={() => toggleModule(mod.id)}>
+                            <div className="cd-accordion-title-wrap">
+                              <span className="cd-module-num">Module {mod.id}</span>
+                              <span className="cd-accordion-title">{mod.title}</span>
+                            </div>
+                            <div className="cd-accordion-right">
+                              <span className="cd-topic-count">{mod.topics.length} topics</span>
+                              {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                            </div>
+                          </div>
+
+                          <div className={`cd-accordion-body ${isOpen ? "expanded" : ""}`}>
+                            <ul className="cd-topic-list">
+                              {mod.topics.map((t, i) => (
+                                <li key={i} className="cd-topic-item">
+                                  <CheckCircle size={14} className="cd-topic-check" />
+                                  <span className="cd-topic-main">{t.main}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </section>
             </div>
           )}
-
         </div>
-
       </div>
     </div>
   );
 };
 
-/* ----------  Related Courses Component (Animated Slider) ---------- */
-const statusColors = {
-  "BEST SELLER": { bg: "rgba(249,115,22,0.12)", color: "#f97316" },
-  "TRENDING": { bg: "rgba(16,185,129,0.12)", color: "#10b981" },
-  "POPULAR": { bg: "rgba(99,102,241,0.12)", color: "#6366f1" },
-  "HOT": { bg: "rgba(220,38,38,0.12)", color: "#dc2626" },
-  "NEW": { bg: "rgba(14,165,233,0.12)", color: "#0ea5e9" },
-  "ADVANCED": { bg: "rgba(139,92,246,0.12)", color: "#8b5cf6" },
-  "INTERMEDIATE": { bg: "rgba(16,185,129,0.12)", color: "#10b981" },
-  "BEGINNER": { bg: "rgba(99,102,241,0.12)", color: "#6366f1" },
-};
-
+/* ─── Related / Suggested Courses Slider ─── */
 const RelatedCourses = ({ currentCourse, navigate, publishedCourses }) => {
-  // Get suggestions
-  const combinedCourses = [...publishedCourses, ...ALL_COURSES];
-
-  const sameCat = combinedCourses.filter(
+  const sameCat = publishedCourses.filter(
     (c) => c.courseId !== currentCourse.courseId && c.category === currentCourse.category
   );
-  const others = combinedCourses.filter(
+  const others = publishedCourses.filter(
     (c) => c.courseId !== currentCourse.courseId && c.category !== currentCourse.category
   );
   const originalSuggestions = [...sameCat, ...others].slice(0, 8);
-
-  // Triple the items for a seamless loop
   const suggestions = [...originalSuggestions, ...originalSuggestions, ...originalSuggestions];
 
   const [index, setIndex] = useState(originalSuggestions.length);
   const [isTransitioning, setIsTransitioning] = useState(true);
 
-  if (originalSuggestions.length === 0) return null;
-
-  const next = () => {
-    setIndex((prev) => prev + 1);
-  };
-
-  const prev = () => {
-    setIndex((prev) => prev - 1);
-  };
-
-  // Seamless reset logic
   useEffect(() => {
     if (index >= originalSuggestions.length * 2) {
-      setTimeout(() => {
-        setIsTransitioning(false);
-        setIndex(originalSuggestions.length);
-      }, 600);
+      setTimeout(() => { setIsTransitioning(false); setIndex(originalSuggestions.length); }, 600);
     } else if (index < originalSuggestions.length) {
-      setTimeout(() => {
-        setIsTransitioning(false);
-        setIndex(originalSuggestions.length * 2 - 1);
-      }, 600);
+      setTimeout(() => { setIsTransitioning(false); setIndex(originalSuggestions.length * 2 - 1); }, 600);
     } else {
       setIsTransitioning(true);
     }
   }, [index, originalSuggestions.length]);
 
-  // Auto-scroll logic
   useEffect(() => {
-    const interval = setInterval(() => {
-      next();
-    }, 4000);
+    const interval = setInterval(() => setIndex((p) => p + 1), 4000);
     return () => clearInterval(interval);
-  }, [index, originalSuggestions.length]);
+  }, [originalSuggestions.length]);
+
+  if (originalSuggestions.length === 0) return null;
+
+  const cols = window.innerWidth > 1024 ? 3 : window.innerWidth > 768 ? 2 : 1;
 
   return (
     <div className="cd-related-section slider-mode">
       <div className="cd-related-header">
-        <h2 className="cd-related-title">Course Related Suggestions</h2>
+        <h2 className="cd-related-title">Suggested Courses</h2>
         <p className="cd-related-sub">Explore more courses to accelerate your learning journey</p>
       </div>
 
       <div className="cd-slider-container">
-        <button className="cd-slider-nav prev" onClick={prev}>❮</button>
+        <button className="cd-slider-nav prev" onClick={() => setIndex((p) => p - 1)}>❮</button>
 
         <div className="cd-slider-viewport">
           <div
             className="cd-slider-track"
             style={{
-              transform: `translateX(-${index * (100 / (window.innerWidth > 1024 ? 3 : window.innerWidth > 768 ? 2 : 1))}%)`,
-              transition: isTransitioning ? "transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)" : "none"
+              transform: `translateX(-${index * (100 / cols)}%)`,
+              transition: isTransitioning ? "transform 0.5s cubic-bezier(0.4,0,0.2,1)" : "none"
             }}
           >
-            {suggestions.map((c, i) => {
-              return (
-                <div
-                  key={`${c.courseId}-${i}`}
-                  className="cd-slider-item"
-                  style={{ flex: `0 0 ${100 / (window.innerWidth > 1024 ? 3 : window.innerWidth > 768 ? 2 : 1)}%` }}
-                >
-                  <div className="course-card-modern">
-                    <div
-                      className="card-img-banner"
+            {suggestions.map((c, i) => (
+              <div
+                key={`${c.courseId}-${i}`}
+                className="cd-slider-item"
+                style={{ flex: `0 0 ${100 / cols}%` }}
+              >
+                <div className="course-card-modern">
+                  <div
+                    className="card-img-banner"
+                    onClick={() => { navigate(`/course-details/${c.courseId}`); window.scrollTo(0, 0); }}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <img src={getCourseImage(c)} alt={c.title} />
+                  </div>
+
+                  <div className="card-content-modern">
+                    <h3
+                      className="card-title-modern"
                       onClick={() => { navigate(`/course-details/${c.courseId}`); window.scrollTo(0, 0); }}
                       style={{ cursor: "pointer" }}
                     >
-                      <img src={getCourseImage(c)} alt={c.title} />
-                    </div>
+                      {c.title}
+                    </h3>
 
-                    <div className="card-content-modern">
-                      <h3
-                        className="card-title-modern"
-                        onClick={() => { navigate(`/course-details/${c.courseId}`); window.scrollTo(0, 0); }}
-                        style={{ cursor: "pointer" }}
-                      >
-                        {c.title}
-                      </h3>
-
-                      <div className="card-footer-modern">
-                        <div className="footer-info-left">
-                          <div className="info-item">
-                            <UserIcon size={14} />
-                            <span>{c.trainer}</span>
-                          </div>
-                          <div className="info-item">
-                            <Calendar size={14} />
-                            <span>{c.startDate}</span>
-                          </div>
-                          <div className="info-item duration-highlight">
-                            <Clock size={14} />
-                            <span>{c.duration}</span>
-                          </div>
+                    <div className="card-footer-modern">
+                      <div className="footer-info-left">
+                        <div className="info-item">
+                          <UserIcon size={14} />
+                          <span>{c.trainer}</span>
                         </div>
-
-                        <div className="details-action-wrapper">
-                          <button
-                            className="btn-view-details"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate(`/course-details/${c.courseId}`);
-                              window.scrollTo(0, 0);
-                            }}
-                            title="View Course Details"
-                          >
-                            <Eye size={20} />
-                          </button>
-                          <span className="action-label">View Course</span>
+                        <div className="info-item">
+                          <Calendar size={14} />
+                          <span>{c.startDate || "Upcoming"}</span>
                         </div>
+                        <div className="info-item duration-highlight">
+                          <Clock size={14} />
+                          <span>{c.duration}</span>
+                        </div>
+                      </div>
+
+                      <div className="details-action-wrapper">
+                        <button
+                          className="btn-view-details"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/course-details/${c.courseId}`);
+                            window.scrollTo(0, 0);
+                          }}
+                          title="View Course Details"
+                        >
+                          <Eye size={20} />
+                        </button>
+                        <span className="action-label">View Course</span>
                       </div>
                     </div>
                   </div>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         </div>
 
-        <button className="cd-slider-nav next" onClick={next}>❯</button>
+        <button className="cd-slider-nav next" onClick={() => setIndex((p) => p + 1)}>❯</button>
       </div>
     </div>
   );

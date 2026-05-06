@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { getEnrolledCourses, getStudentBatchesAPI } from '../../../services/api';
-import { COURSE_MAP } from './data/extraCourses';
-import { ALL_COURSES } from '../../../components/Courses/Courses';
 import { useCourseContext } from '../../../context/CourseContext';
-import { Play, ArrowRight, User, CalendarDays, Clock, Monitor, Mail, Phone, Video, ExternalLink } from 'lucide-react';
-import { getCourseImage } from '../../../utils/courseUtils';
+import { parseCurriculum, getCourseImage } from '../../../utils/courseUtils';
+import { Play, ArrowRight, User, CalendarDays, Clock, Monitor, Mail, Phone, Video, ExternalLink, Users } from 'lucide-react';
 import './Courses.css';
 
 const getCurrentTopic = (course) => {
@@ -123,11 +121,7 @@ const EnrolledCourseCard = ({ course, batchInfo, onNavigate, index }) => {
         <button
           className="ecc-btn ecc-join-btn"
           onClick={() => {
-            if (batchInfo?.liveClassLink) {
-              window.open(batchInfo.liveClassLink, '_blank');
-            } else {
-              onNavigate('/student-dashboard/course-overview', course.id);
-            }
+            onNavigate('/student-dashboard/course-overview', { courseId: course.id });
           }}
         >
           <Video size={14} />
@@ -159,32 +153,20 @@ const EnrollCourses = ({ onNavigate }) => {
         const data = enrollData.status === 'fulfilled' ? enrollData.value : [];
         const enrolledIds = Array.isArray(data) ? data : (data.enrolledCourses || []);
 
-        const enrolled = [];
-        enrolledIds.forEach(id => {
-          if (COURSE_MAP[id]) {
-            enrolled.push(COURSE_MAP[id]);
-          } else {
-            const matchedAllCourse = ALL_COURSES.find(c => c.courseId === id);
-            if (matchedAllCourse) {
-              const matchedMapCourse = Object.values(COURSE_MAP).find(c => c.title === matchedAllCourse.title);
-              if (matchedMapCourse) {
-                enrolled.push(matchedMapCourse);
-              } else {
-                enrolled.push({ ...matchedAllCourse, id: matchedAllCourse.courseId, modules: [] });
-              }
-            } else {
-            const matchedPublishedCourse = publishedCourses.find(c => c.courseId === id);
-            if (matchedPublishedCourse) {
-              const pTitle = matchedPublishedCourse.title.toLowerCase();
-              if (pTitle.includes('introduction to ai') || pTitle.includes('artificial intelligence')) {
-                enrolled.push(COURSE_MAP['intro-ai-01']);
-              } else {
-                enrolled.push({ ...matchedPublishedCourse, id: matchedPublishedCourse.courseId, modules: [] });
-              }
-            }
-            }
+        const enrolled = enrolledIds.map(id => {
+          // Find the full course details from publishedCourses
+          const baseCourse = publishedCourses.find(c => c.id === id || c.courseId === id);
+          if (baseCourse) {
+            // Ensure modules are available by parsing curriculum if needed
+            const modules = baseCourse.modules || parseCurriculum(baseCourse.curriculum);
+            return {
+              ...baseCourse,
+              id: baseCourse.id || baseCourse.courseId,
+              modules
+            };
           }
-        });
+          return null;
+        }).filter(Boolean);
 
         setEnrolledCourses(enrolled);
       } catch (err) {
