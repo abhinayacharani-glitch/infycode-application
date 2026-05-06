@@ -192,41 +192,6 @@ const CourseFeed = ({ courses, onToggleLike, onUpdateCourse, onDeleteCourse, isE
             {filtered.map((course, idx) => {
               const lvl = LEVEL_COLORS[course.level] || LEVEL_COLORS.Beginner;
 
-              if (editingId === course.id) {
-                return (
-                  <article key={course.id || idx} className="cf-card cf-edit-card">
-                    <h3 className="cf-edit-title">✏️ Edit Course</h3>
-                    <div className="cf-edit-field">
-                      <label>Title</label>
-                      <input className="cf-edit-input" value={editData.title} onChange={e => setEditData({ ...editData, title: e.target.value })} />
-                    </div>
-                    <div className="cf-edit-field">
-                      <label>Description</label>
-                      <textarea className="cf-edit-input" value={editData.description} onChange={e => setEditData({ ...editData, description: e.target.value })} />
-                    </div>
-                    <div className="cf-edit-row">
-                      <div className="cf-edit-field">
-                        <label>Instructor</label>
-                        <input className="cf-edit-input" value={editData.instructor} onChange={e => setEditData({ ...editData, instructor: e.target.value })} />
-                      </div>
-                      <div className="cf-edit-field">
-                        <label>Duration</label>
-                        <input className="cf-edit-input" value={editData.duration} onChange={e => setEditData({ ...editData, duration: e.target.value })} />
-                      </div>
-                    </div>
-                    <div className="cf-edit-field">
-                      <label>Detailed Curriculum (Bracket Format)</label>
-                      <textarea className="cf-edit-input" value={editData.curriculum} onChange={e => setEditData({ ...editData, curriculum: e.target.value })} style={{ minHeight: '120px', fontFamily: 'monospace' }} />
-                    </div>
-                    <div className="cf-edit-actions">
-                      <button className="cf-edit-save" onClick={() => handleSave(course.id)} disabled={savingId === course.id}>
-                        {savingId === course.id ? 'Saving...' : 'Save Changes'}
-                      </button>
-                      <button className="cf-edit-cancel" onClick={() => setEditingId(null)}>Cancel</button>
-                    </div>
-                  </article>
-                );
-              }
 
               return (
                 <article key={course.id || idx} className="cf-card">
@@ -240,15 +205,15 @@ const CourseFeed = ({ courses, onToggleLike, onUpdateCourse, onDeleteCourse, isE
                       <span>{course.instructor || 'Anonymous'}</span>
                     </div>
                     <h3 className="cf-card-title">{course.title}</h3>
-                    <p className="cf-card-desc">{course.description}</p>
+                    
                     <div className="cf-meta">
                       <span className="cf-meta-item"><Clock size={13} /> {course.duration}</span>
                       <span className="cf-level-badge" style={{ background: lvl.bg, color: lvl.color }}>{course.level}</span>
                     </div>
 
                     <div className="cf-social">
-                      <button className="cf-action-btn cf-ml-auto" onClick={() => startEdit(course)}><Edit2 size={15} /></button>
-                      <button className="cf-action-btn cf-delete-btn" onClick={() => handleDelete(course.id)}><Trash2 size={15} /></button>
+                      <button className="cf-action-btn cf-ml-auto" onClick={() => startEdit(course)}><Edit2 size={14} /></button>
+                      <button className="cf-action-btn cf-delete-btn" onClick={() => handleDelete(course.id)}><Trash2 size={14} /></button>
                     </div>
                   </div>
                   <div className="cf-card-footer"><button className="cf-enroll-btn">Enroll Now →</button></div>
@@ -258,6 +223,48 @@ const CourseFeed = ({ courses, onToggleLike, onUpdateCourse, onDeleteCourse, isE
           </div>
         )}
       </div>
+
+      {/* ── Edit Modal ── */}
+      {editingId && (
+        <div className="cf-modal-overlay" onClick={() => setEditingId(null)}>
+          <div className="cf-modal-content" onClick={e => e.stopPropagation()}>
+            <div className="cf-modal-header">
+              <h3>✏️ Edit Course</h3>
+              <button className="cf-modal-close" onClick={() => setEditingId(null)}><X size={20} /></button>
+            </div>
+            <div className="cf-modal-body">
+              <div className="cf-edit-field">
+                <label>Title</label>
+                <input className="cf-edit-input" value={editData.title} onChange={e => setEditData({ ...editData, title: e.target.value })} />
+              </div>
+              <div className="cf-edit-field">
+                <label>Description</label>
+                <textarea className="cf-edit-input" value={editData.description} onChange={e => setEditData({ ...editData, description: e.target.value })} />
+              </div>
+              <div className="cf-edit-row">
+                <div className="cf-edit-field">
+                  <label>Instructor</label>
+                  <input className="cf-edit-input" value={editData.instructor} onChange={e => setEditData({ ...editData, instructor: e.target.value })} />
+                </div>
+                <div className="cf-edit-field">
+                  <label>Duration</label>
+                  <input className="cf-edit-input" value={editData.duration} onChange={e => setEditData({ ...editData, duration: e.target.value })} />
+                </div>
+              </div>
+              <div className="cf-edit-field">
+                <label>Detailed Curriculum (Bracket Format)</label>
+                <textarea className="cf-edit-input" value={editData.curriculum} onChange={e => setEditData({ ...editData, curriculum: e.target.value })} style={{ minHeight: '150px', fontFamily: 'monospace' }} />
+              </div>
+            </div>
+            <div className="cf-modal-footer">
+              <button className="cf-modal-cancel" onClick={() => setEditingId(null)}>Cancel</button>
+              <button className="cf-modal-save" onClick={() => handleSave(editingId)} disabled={savingId === editingId}>
+                {savingId === editingId ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
