@@ -10,23 +10,30 @@
 
 .certificate-card-wrapper {
   background: #ffffff;
-  padding: 12px;
+  padding: 20px; /* Increased padding to ensure border visibility */
   border-radius: 8px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
   width: 100%;
-  max-width: 900px;
+  max-width: 794px; /* A4 width at 96 DPI in portrait */
+  aspect-ratio: 1 / 1.414; /* A4 Portrait aspect ratio */
   position: relative;
-  overflow: hidden;
+  overflow: visible; /* Ensure borders aren't clipped */
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
 }
 
-/* 🔷 THE CERTIFICATE DESIGN */
 .certificate-inner-frame {
-  border: 4px double #1e3a8a;
-  /* Double border for authority */
-  padding: 3rem 2.5rem;
+  border: 12px double #1e3a8a; /* Thicker border for better visibility */
+  padding: 4rem 2.5rem;
   background: #ffffff;
   position: relative;
   text-align: center;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
 }
 
 .cert-watermark-overlay {
