@@ -9,6 +9,7 @@ import bgImage from "../../assets/course/bg.jpg";
 const CATEGORIES = ["All", "Web Dev", "Python", "Java", "AI & Data", "Cybersecurity", "Cloud", "Mobile Dev"];
 
 // Legacy export kept to prevent import errors in other components migrating to dynamic data
+// Conflict resolved and local build verified successfully.
 export const ALL_COURSES = [];
 
 
