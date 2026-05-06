@@ -7,97 +7,8 @@ import {
 import { useAdmin } from '../../../../context/AdminContext';
 import './AdminPage.css';
 
-const CATEGORIES = ['Development', 'Design', 'Marketing', 'Business', 'Data Science', 'Cloud & DevOps'];
+const CATEGORIES = ['Development', 'Design', 'Marketing', 'Business', 'Data Science', 'Cybersecurity'];
 const LEVELS = ['Beginner', 'Intermediate', 'Advanced'];
-
-const JAVA_SYLLABUS = `[Java Basics]
-Introduction
-Fundamentals
-Methods
-Arrays
-Strings
-Regular Expressions
-
-[OOP & Interfaces]
-Classes and Objects
-Access Modifiers
-Constructor
-OOP
-Packages
-Interfaces
-
-[Collections]
-Collections
-Collection Classes
-Collection Interface
-Iterator
-Comparator Interface
-
-[Exception Handling]
-Exception Handling
-Try Catch Block
-Final, Finally, Finalize
-Chained Exceptions
-Null Pointer Exception
-Method Overloading
-
-[Java Advanced]
-Multithreading
-Synchronization
-File Handling
-Method References
-Java 8 Streams
-Networking
-JDBC
-Memory Management
-Garbage Collection
-Memory Leaks`;
-
-const PYTHON_SYLLABUS = `[Python Fundamentals]
-Introduction to Python
-Data Types & Variables
-Control Flow (If/Else, Loops)
-Functions & Modules
-List Comprehensions
-
-[Object Oriented Programming]
-Classes and Objects
-Inheritance
-Polymorphism
-Encapsulation
-Magic Methods
-
-[Data Science Libraries]
-NumPy Basics
-Pandas DataFrames
-Matplotlib Visualization
-Seaborn
-
-[Web Development with Django]
-Django Project Structure
-Models and Migrations
-Views and Templates
-Django Rest Framework`;
-
-const CLOUD_SYLLABUS = `[Introduction to Cloud Rendering]
-Cloud Concepts
-IAM & Security
-Virtual Private Cloud (VPC)
-
-[Compute Services]
-EC2 Instances
-AWS Lambda (Serverless)
-Elastic Beanstalk
-
-[Storage & Databases]
-S3 Buckets
-RDS & DynamoDB
-Elastic File System
-
-[DevOps & Monitoring]
-CloudWatch
-CloudTrail
-CI/CD Pipelines (CodePipeline)`;
 
 const EMPTY_FORM = {
   title: '', description: '', instructor: '',
@@ -299,17 +210,12 @@ const AdminPage = ({ onCoursePublished, isEmbedded = false }) => {
             <input type="file" accept="image/*" onChange={handleImageChange} />
           </div>
 
-          {/* Section 03: Detailed Curriculum */}
           <div className="ap-section-label" style={{ display: 'flex', alignItems: 'center', width: '100%', marginTop: '30px' }}>
             <span>03</span> Detailed Curriculum
             <select
               defaultValue=""
               onChange={(e) => {
                 const val = e.target.value;
-                if (val === 'java') setFormData(prev => ({ ...prev, curriculum: JAVA_SYLLABUS }));
-                if (val === 'python') setFormData(prev => ({ ...prev, curriculum: PYTHON_SYLLABUS }));
-                if (val === 'cloud') setFormData(prev => ({ ...prev, curriculum: CLOUD_SYLLABUS }));
-                
                 const selectedSyllabus = syllabuses.find(s => s.id === val);
                 if (selectedSyllabus) {
                   const formatted = selectedSyllabus.modules.map(m => 
@@ -331,11 +237,8 @@ const AdminPage = ({ onCoursePublished, isEmbedded = false }) => {
                 outline: 'none'
               }}
             >
-              <option value="" disabled hidden>Load Syllabus</option>
-              <option value="java">Java Syllabus</option>
-              <option value="python">Python Syllabus</option>
-              <option value="cloud">Cloud Computing Syllabus</option>
-              {syllabuses && syllabuses.map(s => (
+              <option value="" disabled hidden>Load Syllabus Template</option>
+              {syllabuses && [...syllabuses].sort((a, b) => a.title.localeCompare(b.title)).map(s => (
                 <option key={s.id} value={s.id}>{s.title}</option>
               ))}
             </select>

@@ -17,20 +17,27 @@ import {
   Monitor
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { COURSE_MAP } from './data/extraCourses';
+import { useCourseContext } from '../../../context/CourseContext';
 import { getStudentBatchesAPI } from '../../../services/api';
 import './CourseTopics.css';
 
 const CourseTopics = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { publishedCourses } = useCourseContext();
   const { courseId: stateCourseId } = location.state || {};
 
   const courseId = stateCourseId || 'java-fs-01';
-  const course = COURSE_MAP[courseId] || COURSE_MAP['java-fs-01'];
+  
+  const course = useMemo(() => {
+    if (!publishedCourses) return null;
+    return publishedCourses.find(c => c.id === courseId || c.courseId === courseId) || publishedCourses[0];
+  }, [publishedCourses, courseId]);
 
   const [myBatches, setMyBatches] = useState({});
   const [isLoadingBatches, setIsLoadingBatches] = useState(true);
+
+  if (!course) return <div className="ct-viewport">Loading...</div>;
 
   useEffect(() => {
     const fetchBatches = async () => {

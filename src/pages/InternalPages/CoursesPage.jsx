@@ -1,4 +1,8 @@
+import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCourseContext } from '../../context/CourseContext';
+import { getCourseImage } from '../../utils/courseUtils';
+import './CoursesPage.css';
 
 // ✅ SVG Icons (Reusable Components)
 const ClockIcon = () => (
@@ -21,11 +25,20 @@ const UsersIcon = () => (
 );
 
 const CoursesPage = () => {
+  const navigate = useNavigate();
   const { publishedCourses } = useCourseContext();
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const filtered = useMemo(() => {
+    return publishedCourses.filter(c => 
+      c.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.category?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [publishedCourses, searchTerm]);
 
   return (
     <div className="courses-page">
@@ -37,7 +50,12 @@ const CoursesPage = () => {
           <h1>Master the Skills of Tomorrow</h1>
           <p>Explore our highly-curated, industry-aligned courses designed to take you from a beginner to a job-ready professional.</p>
           <div className="courses-search">
-            <input type="text" placeholder="What do you want to learn today?" />
+            <input 
+              type="text" 
+              placeholder="What do you want to learn today?" 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
             <button>Search</button>
           </div>
         </div>
@@ -46,25 +64,38 @@ const CoursesPage = () => {
       <div className="courses-section" id="popular">
         <h2 className="courses-section-title">Explore Our Premium Courses</h2>
         <div className="courses-grid">
-          {publishedCourses.map((course) => (
-            <div className="courses-card" key={course.id}>
-              <img src={course.image || course.img} alt={course.title} className="courses-card-img" />
+          {filtered.map((course) => (
+            <div 
+              className="courses-card" 
+              key={course.id || course.courseId} 
+              onClick={() => navigate(`/course-details/${course.courseId || course.id}`)}
+              style={{ cursor: 'pointer' }}
+            >
+              <img src={getCourseImage(course)} alt={course.title} className="courses-card-img" />
               <div className="courses-card-info">
-                <span className="courses-card-tag">{course.badge || course.tag}</span>
+                <span className="courses-card-tag">{course.badge || course.category || "NEW"}</span>
                 <h3>{course.title}</h3>
-                <p>{course.description || course.desc}</p>
+                <p>{course.description}</p>
 
                 <div className="courses-card-meta">
 
                   <span className="meta-item">
-                    <ClockIcon /> {course.duration || course.hours}
+                    <ClockIcon /> {course.duration}
                   </span>
 
                   <span className="meta-item">
-                    <UsersIcon /> {course.students}
+                    <UsersIcon /> {course.students || '0'}
                   </span>
 
-                  <button className="courses-enroll-btn">Enroll Now</button>
+                  <button 
+                    className="courses-enroll-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/course-details/${course.courseId || course.id}`);
+                    }}
+                  >
+                    Enroll Now
+                  </button>
                 </div>
 
               </div>
@@ -76,4 +107,4 @@ const CoursesPage = () => {
   );
 };
 
-export default CoursesPage;
+export default CoursesPage;
