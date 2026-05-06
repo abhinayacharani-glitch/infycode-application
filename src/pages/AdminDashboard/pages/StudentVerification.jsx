@@ -6,12 +6,56 @@ const FileIcon = () => (
 );
 
 const StudentVerification = () => {
-  const { students, approveStudent, rejectStudent, batches, moveStudentsToBatch } = useAdmin();
+  const { students, approveStudent, rejectStudent, batches, moveStudentsToBatch, courses } = useAdmin();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
   const [selectedStudents, setSelectedStudents] = useState([]);
   const [viewingStudent, setViewingStudent] = useState(null);
   const [exportState, setExportState] = useState('idle'); // idle | downloading | success
+  
+  const LEGACY_COURSE_MAP = {
+    'java-fs-01': 'Java Full Stack Development',
+    'aws-cloud-01': 'AWS Cloud Practitioner',
+    'python-master-01': 'Python Programming Masterclass',
+    'ml-deep-01': 'Machine Learning Deep Dive',
+    'mern-01': 'MERN Stack Development',
+    'angular-01': 'Angular Enterprise Development',
+    'flutter-01': 'Flutter Mobile Apps',
+    'data-sci-01': 'Data Science & AI',
+    '-OoyWfE4A0EISvZsQyfF': 'Java Full Stack Development'
+  };
+
+  const getCourseNames = (courseStr) => {
+    if (!courseStr || courseStr === "N/A") return "N/A";
+    
+    // Split by comma in case of multiple courses
+    const courseIds = courseStr.split(',').map(id => id.trim());
+    
+    const courseNames = courseIds.map(id => {
+      // Check legacy map first
+      if (LEGACY_COURSE_MAP[id]) {
+        return LEGACY_COURSE_MAP[id];
+      }
+
+      // Try to find course by various possible ID fields
+      if (courses && courses.length > 0) {
+        const foundCourse = courses.find(c => 
+          c.id === id || 
+          c.courseId === id || 
+          c.courseCode === id || 
+          c.firebaseId === id ||
+          c.title === id ||
+          c.courseName === id
+        );
+        if (foundCourse) {
+          return foundCourse.title || foundCourse.courseName || foundCourse.name || id;
+        }
+      }
+      return id;
+    });
+    
+    return courseNames.join(', ');
+  };
   
   const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
   const [selectedBatchId, setSelectedBatchId] = useState("");
@@ -43,7 +87,7 @@ const StudentVerification = () => {
         s.id, 
         `"${s.name}"`, 
         s.email, 
-        `"${s.course}"`, 
+        `"${getCourseNames(s.course)}"`, 
         s.status, 
         s.date || new Date().toLocaleDateString()
       ]);
@@ -208,7 +252,7 @@ const StudentVerification = () => {
                         </div>
                       </td>
                       <td style={{ textAlign: 'center' }}>{formatDate(student.createdAt || student.date)}</td>
-                      <td style={{ textAlign: 'center' }}>{student.course || "N/A"}</td>
+                      <td style={{ textAlign: 'center' }}>{getCourseNames(student.course)}</td>
                       <td style={{ textAlign: 'center' }}>{getStatusBadge(student.status)}</td>
                     </tr>
                    ))
@@ -243,7 +287,7 @@ const StudentVerification = () => {
             <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '16px' }}>
               <div style={{ color: '#666' }}>Full Name:</div><div style={{ fontWeight: '600' }}>{viewingStudent.name}</div>
               <div style={{ color: '#666' }}>Email:</div><div>{viewingStudent.email}</div>
-              <div style={{ color: '#666' }}>Course:</div><div>{viewingStudent.course}</div>
+              <div style={{ color: '#666' }}>Course:</div><div>{getCourseNames(viewingStudent.course)}</div>
               <div style={{ color: '#666' }}>Reg. Date:</div><div>{viewingStudent.date}</div>
               <div style={{ color: '#666' }}>Status:</div><div>{getStatusBadge(viewingStudent.status)}</div>
               <div style={{ color: '#666' }}>ID Proof:</div><div style={{ color: 'var(--blue-600)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}><FileIcon /> document-092.pdf</div>
