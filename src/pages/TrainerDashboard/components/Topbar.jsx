@@ -1,8 +1,12 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTrainer } from '../../../context/TrainerContext';
-import { LogOut } from 'lucide-react';
+import { LogOut, User } from 'lucide-react';
+import { io } from 'socket.io-client';
 import './Topbar.css';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
 
 import icLogo from '../../../assets/infycode-final-logo4-1.png';
 import {
@@ -60,9 +64,9 @@ const TrashIcon = () => (
 /* ─── Notification type → icon + colour map ──────────────────────────── */
 const notifConfig = {
   success: { Icon: CheckCircleIcon, bg: '#dcfce7', color: '#16a34a', label: 'Admin' },
-  warning: { Icon: AlertIcon,       bg: '#fef3c7', color: '#d97706', label: 'Admin' },
-  student: { Icon: StudentIcon,     bg: '#ede9fe', color: '#7c3aed', label: 'Student' },
-  info:    { Icon: InfoIcon,        bg: '#dbeafe', color: '#2563eb', label: 'Admin' },
+  warning: { Icon: AlertIcon, bg: '#fef3c7', color: '#d97706', label: 'Admin' },
+  student: { Icon: StudentIcon, bg: '#ede9fe', color: '#7c3aed', label: 'Student' },
+  info: { Icon: InfoIcon, bg: '#dbeafe', color: '#2563eb', label: 'Admin' },
 };
 
 const getConfig = (type) => notifConfig[type] || notifConfig.info;
@@ -72,36 +76,36 @@ const formatTime = (createdAt) => {
   if (!createdAt) return '';
   const diff = Date.now() - createdAt;
   const mins = Math.floor(diff / 60000);
-  if (mins < 1)  return 'Just now';
+  if (mins < 1) return 'Just now';
   if (mins < 60) return `${mins}m ago`;
   const hrs = Math.floor(mins / 60);
-  if (hrs < 24)  return `${hrs}h ago`;
+  if (hrs < 24) return `${hrs}h ago`;
   return `${Math.floor(hrs / 24)}d ago`;
 };
 
 /* ══════════════════════════════════════════════════════════════════════ */
 const Topbar = () => {
-  const navigate  = useNavigate();
-  const location  = useLocation();
+  const navigate = useNavigate();
+  const location = useLocation();
   const { trainerData, profileImage } = useTrainer();
 
-  const userName    = trainerData.fullName || trainerData.fullname || trainerData.name || 'Trainer';
-  const role        = trainerData.role || 'Trainer';
+  const userName = trainerData.fullName || trainerData.fullname || trainerData.name || 'Trainer';
+  const role = trainerData.role || 'Trainer';
   const userInitial = userName.charAt(0).toUpperCase();
 
   /* ── UI state ── */
-  const [showLogoutModal,    setShowLogoutModal]    = useState(false);
-  const [modalType,          setModalType]          = useState('user-menu');
-  const [showNotifications,  setShowNotifications]  = useState(false);
-  const [showUserMenu,       setShowUserMenu]        = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [modalType, setModalType] = useState('user-menu');
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   /* ── Notification state ── */
   const [notifications, setNotifications] = useState([]);
-  const [notifLoading,  setNotifLoading]  = useState(false);
-  const [notifError,    setNotifError]    = useState(null);
+  const [notifLoading, setNotifLoading] = useState(false);
+  const [notifError, setNotifError] = useState(null);
 
   /* ── Refs for click-outside ── */
-  const notifRef   = useRef(null);
+  const notifRef = useRef(null);
   const userMenuRef = useRef(null);
 
   /* ── Fetch notifications ─────────────────────────────────────────── */
@@ -123,14 +127,36 @@ const Topbar = () => {
 
   useEffect(() => {
     fetchNotifications(); // load on mount
-    const interval = setInterval(() => fetchNotifications(), 60000); // poll every 60s
-    return () => clearInterval(interval);
-  }, [fetchNotifications]);
+
+    // ─── Socket.io Integration ─────────────────────────────────────────────
+    const socket = io(API_BASE_URL);
+
+    if (trainerData?.id || trainerData?._id) {
+      const trainerId = trainerData.id || trainerData._id;
+      socket.emit("join_trainer_room", trainerId);
+
+      socket.on("NEW_COUNSELLING_ASSIGNED", (data) => {
+        console.log("[Socket] New counselling session assigned, refreshing notifications:", data);
+        fetchNotifications();
+      });
+
+      socket.on("COUNSELLING_STATUS_UPDATED", (data) => {
+        console.log("[Socket] Counselling status updated, refreshing notifications:", data);
+        fetchNotifications();
+      });
+    }
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [fetchNotifications, trainerData?.id, trainerData?._id]);
+
+
 
   /* ── Click-outside handler ───────────────────────────────────────── */
   useEffect(() => {
     const handler = (e) => {
-      if (notifRef.current   && !notifRef.current.contains(e.target))   setShowNotifications(false);
+      if (notifRef.current && !notifRef.current.contains(e.target)) setShowNotifications(false);
       if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setShowUserMenu(false);
     };
     document.addEventListener('mousedown', handler);
@@ -346,7 +372,7 @@ const Topbar = () => {
           {profileImage ? (
             <img src={profileImage} alt={userName} className="tb-user-avatar-new" />
           ) : (
-            <div className="tb-avatar-initial">{userInitial}</div>
+            <div className="tb-avatar-initial" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><User size={20} /></div>
           )}
           {showUserMenu && (
             <div className="tb-user-dropdown">
@@ -354,7 +380,7 @@ const Topbar = () => {
                 {profileImage ? (
                   <img src={profileImage} alt={userName} className="tb-udrop-avatar" />
                 ) : (
-                  <div className="tb-udrop-avatar tb-avatar-initial-small">{userInitial}</div>
+                  <div className="tb-udrop-avatar tb-avatar-initial-small" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><User size={16} /></div>
                 )}
                 <div>
                   <div className="tb-udrop-name">{userName}</div>
@@ -398,7 +424,7 @@ const Topbar = () => {
                   {profileImage ? (
                     <img src={profileImage} alt="Profile" className="tb-user-avatar-new" style={{ width: '100%', height: '100%', borderRadius: '50%' }} />
                   ) : (
-                    <div className="tb-avatar-initial-modal">{userInitial}</div>
+                    <div className="tb-avatar-initial-modal" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', borderRadius: '50%', backgroundColor: '#94a3b8', color: 'white' }}><User size={24} /></div>
                   )}
                 </div>
                 <h3>{userName}</h3>

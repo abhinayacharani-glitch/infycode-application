@@ -98,16 +98,22 @@ const Batches = () => {
     e.stopPropagation();
     if (!window.confirm("Are you sure you want to start this batch? All enrolled students will be notified.")) return;
 
+    // Optimistic Update
+    const originalBatches = [...batches];
+    setBatches(prev => prev.map(b => b.firebaseId === firebaseId ? { ...b, status: 'Active' } : b));
+
     try {
       const response = await startBatchAPI(firebaseId);
       if (response.success) {
-        alert("Batch started successfully!");
-        // Refresh list
-        const res = await getTrainerBatchesAPI();
-        if (res.success) setBatches(res.batches || []);
+        // Refresh list silently in background to sync with server
+        getTrainerBatchesAPI().then(res => {
+          if (res.success) setBatches(res.batches || []);
+        });
       }
     } catch (error) {
       console.error("Error starting batch:", error);
+      // Revert on failure
+      setBatches(originalBatches);
       alert(error.message || "Failed to start batch");
     }
   };
@@ -194,7 +200,7 @@ const Batches = () => {
               <div
                 key={batch.id}
                 className="batch-card-saas-v3"
-                onClick={() => navigate(`/trainer-dashboard/batches/${batch.id}`)}
+                onClick={() => navigate(`/trainer-dashboard/batches/${batch.id}`, { state: { batch } })}
               >
                 <div className="batch-card-accent-border"></div>
 
@@ -206,23 +212,26 @@ const Batches = () => {
 
                   <h2 className="batch-card-title-v3">{batch.course}</h2>
 
-                  <div className="batch-card-dates-v3">
-                    <Calendar size={14} />
-                    <span>{batch.startDate} — {batch.endDate}</span>
+                  <div className="batch-item-details">
+                    <div className="detail">
+                      <span className="label">Starts</span>
+                      <span className="value">
+                        {batch.startDateTime ?
+                          new Date(batch.startDateTime).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+                          : (batch.name && batch.name.includes(' - ')) ? batch.name.split(' - ').pop() : "-"
+                        }
+                      </span>
+                    </div>
+                    <div className="detail">
+                      <span className="label">Students</span>
+                      <span className="value">{batch.students || batch.enrolled || 0} / {batch.capacity || 30} Seats</span>
+                    </div>
                   </div>
 
                   <div className="batch-card-meta-v3">
                     <div className="meta-item-saas">
-                      <Clock size={14} />
-                      <span>{calculateDuration(batch.startDate, batch.endDate)}</span>
-                    </div>
-                    <div className="meta-item-saas">
-                      <Monitor size={14} />
-                      <span>{batch.mode}</span>
-                    </div>
-                    <div className="meta-item-saas">
-                      <Users size={14} />
-                      <span>{batch.students} Students</span>
+                      {batch.mode === 'Offline' ? <Users size={14} /> : <Monitor size={14} />}
+                      <span>{batch.duration} - {batch.mode || "Online"}</span>
                     </div>
                   </div>
 

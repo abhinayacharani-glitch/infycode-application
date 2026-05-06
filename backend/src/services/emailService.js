@@ -50,3 +50,46 @@ Support Team`,
     return false;
   }
 };
+/**
+ * Send an email notification for calendar events.
+ * @param {object} event - The event details.
+ * @param {boolean} isUpdate - Whether this is an update notification.
+ * @param {string} trainerEmail - The trainer's email.
+ */
+export const sendCalendarEventEmail = async (event, isUpdate, trainerEmail) => {
+  try {
+    const adminEmail = "admin@charani.in";
+    const subject = isUpdate ? `Event Updated: ${event.title} 🔄` : `New Event Scheduled: ${event.title} 📅`;
+    
+    const body = `
+      Hello,
+
+      ${isUpdate ? "An event has been updated" : "A new event has been scheduled"} by ${event.trainerName || "the Trainer"}.
+
+      Event Details:
+      - Title: ${event.title}
+      - Type: Admin Interaction
+      - Date: ${event.date}
+      - Time: ${event.startTime} - ${event.endTime}
+      - Meeting Link: ${event.meetingLink || "No link provided"}
+
+
+      Best regards,
+      InfyCode System
+    `;
+
+    const mailOptions = {
+      from: `"InfyCode Calendar" <${process.env.EMAIL_USER}>`,
+      to: `${adminEmail}, ${trainerEmail}`,
+      subject,
+      text: body,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`Calendar email sent to ${adminEmail} and ${trainerEmail}: ${info.response}`);
+    return true;
+  } catch (error) {
+    console.error("Error sending calendar email:", error);
+    return false;
+  }
+};

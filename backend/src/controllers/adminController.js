@@ -17,11 +17,11 @@ const matchesStatus = (val, targetStatuses) => {
   return targetStatuses.some(status => status.toLowerCase() === val.toLowerCase());
 };
 
-// Helper: Generate next Batch ID (B-0001)
+// Helper: Generate next Batch ID (BID-01)
 const generateNextBatchID = async () => {
   const snapshot = await batchesRef.once("value");
   const count = snapshot.numChildren();
-  return `B-${String(count + 1).padStart(4, "0")}`;
+  return `BID-${String(count + 1).padStart(2, "0")}`;
 };
 
 // ✅ ADMIN REGISTER
@@ -282,7 +282,7 @@ export const getDashboardStats = async (req, res) => {
  **/
 export const createBatch = async (req, res) => {
   try {
-    const { name, course, trainer, capacity, status } = req.body;
+    const { name, course, trainer, trainerId, capacity, status, startDateTime, duration, batchImage, mode } = req.body;
 
     if (!name || !course || !trainer) {
       return res.status(400).json({ message: "Name, course, and trainer are required." });
@@ -290,18 +290,65 @@ export const createBatch = async (req, res) => {
 
     const nextBID = await generateNextBatchID();
     const newBatchRef = batchesRef.push();
-    const batchData = {
+    const rawBatchData = {
       batchId: nextBID, // Assign unique sequential Batch ID
       name,
       courseName: course,
       trainerName: trainer,
+      trainerId: trainerId || null,
       capacity: parseInt(capacity) || 30,
       enrolled: 0,
       status: status || 'Draft',
+      startDateTime: startDateTime || "",
+      duration: duration || "",
+      batchImage: batchImage || "",
+      mode: mode || "Online",
       createdAt: new Date().toISOString()
     };
 
+    // Clean undefined/null to prevent Firebase errors
+    const batchData = Object.fromEntries(Object.entries(rawBatchData).filter(([_, v]) => v != null && v !== ""));
+
     await newBatchRef.set(batchData);
+
+    // --- AUTOMATIC CALENDAR EVENT CREATION FOR BATCHES ---
+    if (trainerId && startDateTime) {
+      try {
+        const calendarRef = db.ref("trainerCalendarEvents");
+        const eventId = `batch_${newBatchRef.key}`;
+        
+        // Extract time from startDateTime or use default
+        const dateObj = new Date(startDateTime);
+        const startTime = dateObj.toTimeString().slice(0, 5); // HH:MM
+        
+        // Calculate end time (duration is usually string like "2 Hours", default to 1h if parsing fails)
+        let endTime = "11:00";
+        try {
+          const endHour = (dateObj.getHours() + 1) % 24;
+          endTime = `${String(endHour).padStart(2, '0')}:${String(dateObj.getMinutes()).padStart(2, '0')}`;
+        } catch(e) {}
+
+        const calendarEventData = {
+          id: eventId,
+          title: `${nextBID} - ${course}`,
+          type: "training", // This triggers the violet background
+          date: startDateTime.split('T')[0],
+          startTime: startTime,
+          endTime: endTime,
+          description: `Batch: ${name}. Duration: ${duration}. Mode: ${mode}.`,
+          trainerId: trainerId,
+          trainerName: trainer,
+          status: "ACTIVE",
+          createdAt: Date.now()
+        };
+
+        await calendarRef.child(eventId).set(calendarEventData);
+        console.log(`[Calendar] Automated batch event created: ${eventId} for trainer ${trainerId}`);
+      } catch (calErr) {
+        console.error("Error creating batch calendar event:", calErr);
+      }
+    }
+
 
     res.status(201).json({
       message: "Batch created correctly and synced with Firebase.",
@@ -405,6 +452,7 @@ export const moveStudentsToBatch = async (req, res) => {
       batchUpdates[`students/${studentKey}`] = {
         name: student.name,
         email: student.email,
+        studentId: student.studentId || "",
         movedAt: new Date().toISOString()
       };
     });
@@ -414,8 +462,13 @@ export const moveStudentsToBatch = async (req, res) => {
     // 4. Update Student records to link to batch
     const studentUpdates = {};
     studentsToMove.forEach(student => {
+      // Basic root fields
       studentUpdates[`${student.id}/batchId`] = batchId;
       studentUpdates[`${student.id}/batchName`] = batchData.name || batchData.courseName || batchData.course;
+      
+      // Multi-course support: Map the specific course to this batch key
+      const courseKey = (batchData.courseName || batchData.course || "General").replace(/\./g, ",");
+      studentUpdates[`${student.id}/batches/${courseKey}`] = batchId;
     });
     await studentsRef.update(studentUpdates);
 

@@ -1,5 +1,7 @@
 import db from "../config/firebase.js";
 import sendEmail from "../utils/sendEmail.js";
+import { emitToTrainer } from "../utils/socket.js";
+
 
 const counsellingRef = db.ref("counsellingBookings");
 
@@ -100,56 +102,148 @@ export const assignTrainer = async (req, res) => {
       return res.status(400).json({ success: false, message: "Booking ID and status are required" });
     }
 
-    const updates = { status };
+    // Fetch the booking to get details
+    const bookingSnapshot = await counsellingRef.child(bookingId).once("value");
+    if (!bookingSnapshot.exists()) {
+      return res.status(404).json({ success: false, message: "Booking not found" });
+    }
+    const booking = bookingSnapshot.val();
+
+    // Determine session type
+    const sessionType = booking.serviceId === 1 ? "1-many" : "1-1";
+
+    const updates = { 
+      status: "pending", // Always set to pending for trainer to accept/reject
+      sessionType 
+    };
     if (trainerId) updates.assignedTrainerId = trainerId;
     if (trainerName) updates.assignedTrainerName = trainerName;
 
     await counsellingRef.child(bookingId).update(updates);
 
-    // Fetch the booking to get student details for email
-    const bookingSnapshot = await counsellingRef.child(bookingId).once("value");
-    const booking = bookingSnapshot.val();
-
-    if (status === "accepted" && booking.studentEmail) {
-      const meetingLink = "https://meet.google.com/wxs-wifp-tti"; // Standard meeting link for now
+    // ─── Create Notification for Trainer ────────────────────────────────────
+    if (trainerId) {
+      const notificationsRef = db.ref("trainerNotifications");
+      const notifText = sessionType === "1-1" 
+        ? "New counselling session assigned (1-1)" 
+        : "New group counselling session assigned (1-many)";
       
-      await sendEmail({
-        to: booking.studentEmail,
-        subject: "Counselling Slot Approved - InfyCode",
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
-            <div style="background-color: #1a73e8; color: white; padding: 20px; text-align: center;">
-              <h1>Slot Approved!</h1>
-            </div>
-            <div style="padding: 20px; color: #333;">
-              <p>Hi <strong>${booking.studentName}</strong>,</p>
-              <p>Your counselling slot request for <strong>${booking.serviceTitle}</strong> has been approved.</p>
-              <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
-                <p style="margin: 5px 0;"><strong>Time Slot:</strong> ${booking.slotLabel}</p>
-                <p style="margin: 5px 0;"><strong>Trainer:</strong> ${trainerName || "Assigned Mentor"}</p>
-                <p style="margin: 5px 0;"><strong>Meeting Link:</strong> <a href="${meetingLink}">${meetingLink}</a></p>
-              </div>
-              <p>Please click the button below to view your session details in the dashboard:</p>
-              <div style="text-align: center; margin: 30px 0;">
-                <a href="${process.env.FRONTEND_URL || "http://localhost:5173"}/student-dashboard/counselling/${booking.serviceId}" 
-                   style="background-color: #1a73e8; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-                  View Session
-                </a>
-              </div>
-              <p>Make sure to join on time!</p>
-              <p>Best Regards,<br/>Team InfyCode</p>
-            </div>
-          </div>
-        `,
+      const newNotifRef = notificationsRef.child(trainerId).child("items").push();
+      await newNotifRef.set({
+        title: "New Counselling Session",
+        text: notifText,
+        type: "info",
+        senderName: "Admin",
+        senderRole: "admin",
+        read: false,
+        createdAt: Date.now(),
+      });
+
+      // ─── Real-Time Update (Socket) ─────────────────────────────────────────
+      emitToTrainer(trainerId, "NEW_COUNSELLING_ASSIGNED", {
+        message: notifText,
+        bookingId
       });
     }
 
-    res.status(200).json({ success: true, message: `Request ${status} successfully.` });
+    console.log(`[Counselling] assignTrainer called. ID: ${bookingId}, Status: ${status}, Trainer: ${trainerId}`);
+
+    if (status === "accepted") {
+      const meetingLink = "https://meet.google.com/wxs-wifp-tti"; // Standard meeting link for now
+
+      // --- AUTOMATIC CALENDAR EVENT CREATION ---
+      try {
+        console.log("[Calendar] Attempting to create automated event...");
+        const calendarRef = db.ref("trainerCalendarEvents");
+        
+        // Map slotId to 24h startTime/endTime
+        const slotMap = {
+          slot1: { start: "10:00", end: "11:00" },
+          slot2: { start: "11:00", end: "12:00" },
+          slot3: { start: "14:00", end: "15:00" },
+          slot4: { start: "15:00", end: "16:00" },
+        };
+        const times = slotMap[booking.slotId] || { start: "09:00", end: "10:00" };
+
+        const finalTrainerId = booking.assignedTrainerId || trainerId;
+        const finalTrainerName = booking.assignedTrainerName || trainerName || "Trainer";
+
+        if (!finalTrainerId) {
+          console.log("[Calendar] Skip automation: No trainer assigned to this booking yet.");
+        } else {
+          const eventTitle = booking.serviceId === 1 ? "1-Many Counselling" : "1-1 Counselling";
+          
+          const eventId = booking.serviceId === 1 
+            ? `counselling_group_${finalTrainerId}_${booking.slotDate}_${booking.slotId}`
+            : `counselling_single_${bookingId}`;
+
+          const calendarEventData = {
+            id: eventId,
+            title: eventTitle,
+            type: "counselling",
+            date: booking.slotDate,
+            startTime: times.start,
+            endTime: times.end,
+            meetingLink: meetingLink,
+            description: `Counselling session for ${booking.studentName}${booking.serviceId === 1 ? " and others" : ""}.`,
+            trainerId: finalTrainerId,
+            trainerName: finalTrainerName,
+            status: "ACTIVE",
+            createdAt: Date.now()
+          };
+
+          await calendarRef.child(eventId).set(calendarEventData);
+          console.log(`[Calendar] Automated event created/updated: ${eventId} for trainer ${finalTrainerId}`);
+        }
+
+
+      } catch (calErr) {
+        console.error("Error creating calendar event:", calErr);
+        // We don't block the response if calendar fails, but log it
+      }
+      // --- END CALENDAR LOGIC ---
+
+      if (booking.studentEmail) {
+        await sendEmail({
+          to: booking.studentEmail,
+          subject: "Counselling Slot Approved - InfyCode",
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
+              <div style="background-color: #1a73e8; color: white; padding: 20px; text-align: center;">
+                <h1>Slot Approved!</h1>
+              </div>
+              <div style="padding: 20px; color: #333;">
+                <p>Hi <strong>${booking.studentName}</strong>,</p>
+                <p>Your counselling slot request for <strong>${booking.serviceTitle}</strong> has been approved.</p>
+                <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                  <p style="margin: 5px 0;"><strong>Time Slot:</strong> ${booking.slotLabel}</p>
+                  <p style="margin: 5px 0;"><strong>Trainer:</strong> ${trainerName || "Assigned Mentor"}</p>
+                  <p style="margin: 5px 0;"><strong>Meeting Link:</strong> <a href="${meetingLink}">${meetingLink}</a></p>
+                </div>
+                <p>Please click the button below to view your session details in the dashboard:</p>
+                <div style="text-align: center; margin: 30px 0;">
+                  <a href="${process.env.FRONTEND_URL || "http://localhost:5173"}/student-dashboard/counselling/${booking.serviceId}" 
+                     style="background-color: #1a73e8; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                    View Session
+                  </a>
+                </div>
+                <p>Make sure to join on time!</p>
+                <p>Best Regards,<br/>Team InfyCode</p>
+              </div>
+            </div>
+          `,
+        });
+      }
+    }
+
+    res.status(200).json({ success: true, message: `Request assigned and set to pending successfully.` });
+
   } catch (error) {
     console.error("Assign Trainer Error:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
 
 /**
  * @desc Get assigned sessions for Trainer
@@ -273,3 +367,64 @@ export const checkAndShiftSlots = async (req, res) => {
     if (res) res.status(500).json({ success: false, message: error.message });
   }
 };
+
+/**
+ * @desc Get pending counselling sessions count for Trainer
+ * @route GET /api/counselling/pending-count
+ */
+export const getPendingCount = async (req, res) => {
+  try {
+    const trainerId = req.user.id;
+    const snapshot = await counsellingRef
+      .orderByChild("assignedTrainerId")
+      .equalTo(trainerId)
+      .once("value");
+    
+    const data = snapshot.val() || {};
+    const pendingCount = Object.values(data).filter(b => b.status === "pending").length;
+
+    res.status(200).json({ success: true, count: pendingCount });
+  } catch (error) {
+    console.error("Get Pending Count Error:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+/**
+ * @desc Update counselling session status (Trainer)
+ * @route PUT /api/counselling/update-status
+ */
+export const updateSessionStatus = async (req, res) => {
+  try {
+    const { bookingId, status } = req.body;
+    const trainerId = req.user.id;
+
+    if (!bookingId || !status) {
+      return res.status(400).json({ success: false, message: "Booking ID and status are required" });
+    }
+
+    // Verify booking belongs to this trainer
+    const snap = await counsellingRef.child(bookingId).once("value");
+    if (!snap.exists()) {
+      return res.status(404).json({ success: false, message: "Booking not found" });
+    }
+    const booking = snap.val();
+    if (booking.assignedTrainerId !== trainerId) {
+      return res.status(403).json({ success: false, message: "Not authorized to update this session" });
+    }
+
+    await counsellingRef.child(bookingId).update({ status });
+
+    // ─── Real-Time Update (Socket) ─────────────────────────────────────────
+    emitToTrainer(trainerId, "COUNSELLING_STATUS_UPDATED", {
+      bookingId,
+      newStatus: status
+    });
+
+    res.status(200).json({ success: true, message: `Status updated to ${status}` });
+  } catch (error) {
+    console.error("Update Session Status Error:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+

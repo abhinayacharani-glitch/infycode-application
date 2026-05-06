@@ -4,6 +4,7 @@ import { useTrainer } from '../../../context/TrainerContext';
 import './Sidebar.css';
 import icLogo from '../../../assets/infycode-final-logo4-1.png';
 import bannerLogo from '../../../assets/color-logo-3.png';
+import { User } from 'lucide-react';
 
 // ✅ SVG Icons
 const DashboardIcon = () => (
@@ -82,7 +83,8 @@ const LiveIcon = () => (
 
 const Sidebar = ({ isOpen, onClose, externalShowLogoutModal, setExternalShowLogoutModal }) => {
   const navigate = useNavigate();
-  const { trainerData, profileImage } = useTrainer();
+  const { trainerData, profileImage, pendingCounsellingCount } = useTrainer();
+
   const userName = trainerData.fullName || trainerData.fullname || trainerData.name || "Trainer";
   const userInitial = userName.charAt(0).toUpperCase();
   const [internalShowLogoutModal, setInternalShowLogoutModal] = useState(false);
@@ -112,7 +114,9 @@ const Sidebar = ({ isOpen, onClose, externalShowLogoutModal, setExternalShowLogo
               {profileImage ? (
                 <img src={profileImage} alt="Profile" className="sd-avatar-img" />
               ) : (
-                userInitial
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', color: 'white' }}>
+                  <User size={20} />
+                </div>
               )}
             </div>
             <div className="sd-user-info">
@@ -160,7 +164,11 @@ const Sidebar = ({ isOpen, onClose, externalShowLogoutModal, setExternalShowLogo
             <div className="sd-box">
               <span className="sd-icon"><LiveIcon /></span>
               <span className="sd-text">Counselling sessions</span>
+              {pendingCounsellingCount > 0 && (
+                <span className="sd-count-badge">{pendingCounsellingCount}</span>
+              )}
             </div>
+
           </NavLink>
 
           <NavLink to="/trainer-dashboard/materials"
@@ -218,7 +226,9 @@ const Sidebar = ({ isOpen, onClose, externalShowLogoutModal, setExternalShowLogo
                 {profileImage ? (
                   <img src={profileImage} alt="Profile" className="sd-avatar-img" />
                 ) : (
-                  userInitial
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', color: 'white', backgroundColor: '#94a3b8', borderRadius: '50%' }}>
+                    <User size={30} />
+                  </div>
                 )}
               </div>
               <h3>{userName}</h3>

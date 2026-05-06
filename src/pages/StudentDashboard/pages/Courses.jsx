@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { getEnrolledCourses } from '../../../services/api';
+import { getEnrolledCourses, getStudentBatchesAPI } from '../../../services/api';
 import { COURSE_MAP } from './data/extraCourses';
 import { ALL_COURSES } from '../../../components/Courses/Courses';
 import { useCourseContext } from '../../../context/CourseContext';
-import { Play, BookOpen } from 'lucide-react';
+import { Play, ArrowRight, User, CalendarDays, Clock, Monitor, Mail, Phone, Video, ExternalLink } from 'lucide-react';
 import { getCourseImage } from '../../../utils/courseUtils';
 import './Courses.css';
 
@@ -15,12 +15,28 @@ const getCurrentTopic = (course) => {
   return allTopics[idx];
 };
 
-const EnrolledCourseCard = ({ course, onNavigate, index }) => {
-  // Calculate dynamic progress
+const STATUS_CONFIG = {
+  Active: { label: 'Active', bg: '#dcfce7', color: '#16a34a' },
+  started: { label: 'Started', bg: '#dcfce7', color: '#16a34a' },
+  Ready: { label: 'Ready', bg: '#dbeafe', color: '#2563eb' },
+  Scheduled: { label: 'Scheduled', bg: '#fef3c7', color: '#d97706' },
+  Upcoming: { label: 'Upcoming', bg: '#fef3c7', color: '#d97706' },
+  Completed: { label: 'Completed', bg: '#f1f5f9', color: '#64748b' },
+};
+
+const StatusBadge = ({ status }) => {
+  const cfg = STATUS_CONFIG[status] || STATUS_CONFIG.Scheduled;
+  return (
+    <span className="ecc-status-badge" style={{ background: cfg.bg, color: cfg.color }}>
+      {cfg.label}
+    </span>
+  );
+};
+
+const EnrolledCourseCard = ({ course, batchInfo, onNavigate, index }) => {
   const dynamicProgress = (() => {
     const saved = localStorage.getItem(`course_progress_${course.id}`);
     if (!saved) return course.progress || 0;
-
     const completedSet = new Set(JSON.parse(saved));
     const navList = [];
     course.modules.forEach((m) => {
@@ -29,15 +45,14 @@ const EnrolledCourseCard = ({ course, onNavigate, index }) => {
         navList.push({ type: 'topic_assignment', id: `topic_assignment::${m.id}::${t.id}` });
       });
     });
-    
     if (navList.length === 0) return course.progress || 0;
-    
-    const doneCount = Array.from(completedSet).length;
-    return Math.round((doneCount / navList.length) * 100);
+    return Math.round((Array.from(completedSet).length / navList.length) * 100);
   })();
 
   const currentTopic = getCurrentTopic({ ...course, progress: dynamicProgress });
   const courseImage = getCourseImage(course);
+  const trainer = batchInfo?.trainer || null;
+  const trainerInitial = trainer?.name ? trainer.name.charAt(0).toUpperCase() : '?';
 
   return (
     <motion.div
@@ -48,26 +63,47 @@ const EnrolledCourseCard = ({ course, onNavigate, index }) => {
     >
       <div className="ecc-header">
         <img src={courseImage} alt={course.title} className="ecc-image" />
+        {batchInfo?.status && (
+          <div className="ecc-status-overlay">
+            <StatusBadge status={batchInfo.status} />
+          </div>
+        )}
       </div>
 
       <div className="ecc-body">
         <h3 className="ecc-title">{course.title}</h3>
-        
+
+        {batchInfo && (
+          <div className="ecc-batch-mode-indicator">
+            {batchInfo.mode === 'Offline' ? <Users size={14} /> : <Monitor size={14} />}
+            <span>
+              {(() => {
+                const dur = batchInfo.duration || '4 Months';
+                const mod = (batchInfo.mode || 'Online').toLowerCase();
+                const durationStr = /weeks|months|days/i.test(dur) ? dur : `${dur} weeks`;
+                return `${durationStr} - ${mod}`;
+              })()}
+            </span>
+          </div>
+        )}
+
         <div className="ecc-progress-wrap">
           <div className="ecc-progress-header">
             <span>Course Progress</span>
             <span className="ecc-progress-percent">{dynamicProgress}%</span>
           </div>
           <div className="ecc-progress-bar">
-            <motion.div 
-              className="ecc-progress-fill" 
+            <motion.div
+              className="ecc-progress-fill"
               initial={{ width: 0 }}
               animate={{ width: `${dynamicProgress}%` }}
               transition={{ duration: 1, ease: "easeOut" }}
             />
           </div>
         </div>
+
       </div>
+
 
       <div className="ecc-footer">
         <button
@@ -83,12 +119,18 @@ const EnrolledCourseCard = ({ course, onNavigate, index }) => {
           <Play size={14} fill="currentColor" />
           <span>Resume</span>
         </button>
-        
+
         <button
           className="ecc-btn ecc-join-btn"
-          onClick={() => onNavigate('/student-dashboard/course-overview', course.id)}
+          onClick={() => {
+            if (batchInfo?.liveClassLink) {
+              window.open(batchInfo.liveClassLink, '_blank');
+            } else {
+              onNavigate('/student-dashboard/course-overview', course.id);
+            }
+          }}
         >
-          <BookOpen size={14} />
+          <Video size={14} />
           <span>Join Class</span>
         </button>
       </div>
@@ -98,13 +140,23 @@ const EnrolledCourseCard = ({ course, onNavigate, index }) => {
 
 const EnrollCourses = ({ onNavigate }) => {
   const [enrolledCourses, setEnrolledCourses] = useState([]);
+  const [studentBatches, setStudentBatches] = useState({});
   const [loading, setLoading] = useState(true);
   const { publishedCourses } = useCourseContext();
 
   useEffect(() => {
-    const fetchEnrolled = async () => {
+    const fetchData = async () => {
       try {
-        const data = await getEnrolledCourses();
+        const [enrollData, batchData] = await Promise.allSettled([
+          getEnrolledCourses(),
+          getStudentBatchesAPI()
+        ]);
+
+        if (batchData.status === 'fulfilled' && batchData.value?.batches) {
+          setStudentBatches(batchData.value.batches);
+        }
+
+        const data = enrollData.status === 'fulfilled' ? enrollData.value : [];
         const enrolledIds = Array.isArray(data) ? data : (data.enrolledCourses || []);
 
         const enrolled = [];
@@ -121,10 +173,15 @@ const EnrollCourses = ({ onNavigate }) => {
                 enrolled.push({ ...matchedAllCourse, id: matchedAllCourse.courseId, modules: [] });
               }
             } else {
-              const matchedPublishedCourse = publishedCourses.find(c => c.courseId === id);
-              if (matchedPublishedCourse) {
-                 enrolled.push({ ...matchedPublishedCourse, id: matchedPublishedCourse.courseId, modules: [] });
+            const matchedPublishedCourse = publishedCourses.find(c => c.courseId === id);
+            if (matchedPublishedCourse) {
+              const pTitle = matchedPublishedCourse.title.toLowerCase();
+              if (pTitle.includes('introduction to ai') || pTitle.includes('artificial intelligence')) {
+                enrolled.push(COURSE_MAP['intro-ai-01']);
+              } else {
+                enrolled.push({ ...matchedPublishedCourse, id: matchedPublishedCourse.courseId, modules: [] });
               }
+            }
             }
           }
         });
@@ -136,7 +193,11 @@ const EnrollCourses = ({ onNavigate }) => {
         setLoading(false);
       }
     };
-    if (publishedCourses) fetchEnrolled();
+    if (publishedCourses) fetchData();
+
+    // Polling every 10 seconds to catch Admin batch-start events
+    const pollInterval = setInterval(fetchData, 10000);
+    return () => clearInterval(pollInterval);
   }, [publishedCourses]);
 
   if (loading) {
@@ -154,18 +215,28 @@ const EnrollCourses = ({ onNavigate }) => {
         <h2>Enrolled Courses</h2>
         <p>Keep track of your progress and continue your learning journey where you left off.</p>
       </header>
-      
+
       <div className="enroll-course-grid">
         <div className="enroll-cards-wrapper">
           {enrolledCourses.length > 0 ? (
-            enrolledCourses.map((course, index) => (
-              <EnrolledCourseCard 
-                key={course.id} 
-                course={course} 
-                onNavigate={onNavigate} 
-                index={index}
-              />
-            ))
+            enrolledCourses.map((course, index) => {
+              // Match batch by course title (fuzzy)
+              const batchInfo = Object.entries(studentBatches).find(
+                ([courseName]) =>
+                  courseName.toLowerCase().includes(course.title?.toLowerCase()) ||
+                  course.title?.toLowerCase().includes(courseName.toLowerCase())
+              )?.[1] || null;
+
+              return (
+                <EnrolledCourseCard
+                  key={course.id}
+                  course={course}
+                  batchInfo={batchInfo}
+                  onNavigate={onNavigate}
+                  index={index}
+                />
+              );
+            })
           ) : (
             <div className="no-courses-container">
               <h2 className="no-courses-title">No Enrolled Courses Found</h2>

@@ -5,8 +5,9 @@
  */
 
 const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-const rawApiUrl = import.meta.env.VITE_API_BASE_URL || 
-                 (isLocalhost ? 'http://localhost:5001' : 'https://infycode-application.onrender.com');
+const rawApiUrl = import.meta.env.VITE_API_BASE_URL ||
+  (isLocalhost ? 'http://localhost:5000' : 'https://infycode-application.onrender.com');
+
 const BASE_URL = rawApiUrl.endsWith('/') ? rawApiUrl.slice(0, -1) : rawApiUrl;
 
 console.log(`[API Service] Using BASE_URL: ${BASE_URL}`);
@@ -400,11 +401,19 @@ export const startBatchAPI = (firebaseId) => {
     headers: { Authorization: `Bearer ${user.token || ''}` },
   });
 };
- 
+
+export const adminStartBatchAPI = (firebaseId) => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return request(`/api/admin/start-batch/${firebaseId}`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${user.token || ''}` },
+  });
+};
+
 // ─────────────────────────────────────────────
 // TRAINER APPLICATION WORKFLOW
 // ─────────────────────────────────────────────
- 
+
 /**
  * POST /api/trainer/apply (public)
  */
@@ -413,7 +422,7 @@ export const applyToBecomeTrainer = (formData) =>
     method: 'POST',
     body: JSON.stringify(formData),
   });
- 
+
 /**
  * PUT /api/admin/trainers/:id/status (protected)
  */
@@ -456,14 +465,14 @@ export const resetPassword = (token, newPassword, confirmPassword) =>
 export const verifyRegistrationOTP = (email, otp, role) =>
   request('/api/auth/verify-registration-otp', {
     method: 'POST',
-    body: JSON.stringify({ email, otp,  role }),
+    body: JSON.stringify({ email, otp, role }),
   });
 
 export const resendRegistrationOTP = (emailOrObj, role) => {
-  const payload = typeof emailOrObj === 'object' 
-    ? emailOrObj 
+  const payload = typeof emailOrObj === 'object'
+    ? emailOrObj
     : { email: emailOrObj, role };
-    
+
   return request('/api/auth/resend-registration-otp', {
     method: 'POST',
     body: JSON.stringify(payload),
@@ -542,6 +551,12 @@ export const getEnrolledCourses = () =>
     headers: getAuthHeader(),
   });
 
+export const getStudentBatchesAPI = () =>
+  request('/api/student/my-batches', {
+    headers: getAuthHeader(),
+  });
+
+
 
 // ─────────────────────────────────────────────
 // DASHBOARDS
@@ -607,6 +622,42 @@ export const getNewPublishedFAQs = () =>
 // COUNSELLING
 // ─────────────────────────────────────────────
 
+export const updateCounsellingStatusAPI = (bookingId, status) =>
+  request('/api/counselling/update-status', {
+    method: 'PUT',
+    headers: getAuthHeader(),
+    body: JSON.stringify({ bookingId, status }),
+  });
+
+// ─────────────────────────────────────────────
+// CALENDAR
+// ─────────────────────────────────────────────
+
+export const getCalendarEventsAPI = () =>
+  request('/api/calendar/events', {
+    headers: getAuthHeader(),
+  });
+
+export const createCalendarEventAPI = (eventData) =>
+  request('/api/calendar/events', {
+    method: 'POST',
+    headers: getAuthHeader(),
+    body: JSON.stringify(eventData),
+  });
+
+export const updateCalendarEventAPI = (id, eventData) =>
+  request(`/api/calendar/events/${id}`, {
+    method: 'PUT',
+    headers: getAuthHeader(),
+    body: JSON.stringify(eventData),
+  });
+
+export const deleteCalendarEventAPI = (id) =>
+  request(`/api/calendar/events/${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeader(),
+  });
+
 export const bookCounsellingSlot = (bookingData) =>
   request('/api/counselling/book', {
     method: 'POST',
@@ -635,3 +686,58 @@ export const getStudentCounsellingSessions = () =>
   request('/api/counselling/student-sessions', {
     headers: getAuthHeader(),
   });
+
+export const getBatchStudentsAPI = (batchId) =>
+  request(`/api/trainer/batches/${batchId}/students`, {
+    headers: getAuthHeader(),
+  });
+
+export const getTrainerQueriesAPI = () =>
+  request('/api/trainer/queries', {
+    headers: getAuthHeader(),
+  });
+
+export const getQueryByIdAPI = (queryId) =>
+  request(`/api/trainer/queries/${queryId}`, {
+    headers: getAuthHeader(),
+  });
+
+
+export const solveTrainerQueryAPI = (queryId, solutionData) =>
+  request(`/api/trainer/queries/${queryId}/solve`, {
+    method: 'PUT',
+    headers: getAuthHeader(),
+    body: JSON.stringify(solutionData),
+  });
+
+export const markQueryReadByTrainerAPI = (queryId) =>
+  request(`/api/trainer/queries/${queryId}/read`, {
+    method: 'PUT',
+    headers: getAuthHeader(),
+  });
+
+export const getStudentQueriesAPI = () =>
+  request('/api/student/queries', {
+    headers: getAuthHeader(),
+  });
+
+export const createStudentQueryAPI = (queryData) =>
+  request('/api/student/queries', {
+    method: 'POST',
+    headers: getAuthHeader(),
+    body: JSON.stringify(queryData),
+  });
+
+export const markQueryReadByStudentAPI = (queryId) =>
+  request(`/api/student/queries/${queryId}/read`, {
+    method: 'PUT',
+    headers: getAuthHeader(),
+  });
+
+export const getPendingCounsellingCountAPI = () =>
+  request('/api/counselling/pending-count', {
+    headers: getAuthHeader(),
+  });
+
+
+

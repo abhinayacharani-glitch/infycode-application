@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  ArrowLeft, User, MessageCircle, Code, Send, 
-  Video, Phone, MessageSquare, Download, CheckCircle, Clock, Terminal 
+import {
+  ArrowLeft, User, MessageCircle, Code, Send,
+  Video, Phone, MessageSquare, Download, CheckCircle, Clock, Terminal
 } from 'lucide-react';
 import Editor from '@monaco-editor/react';
+import { getQueryByIdAPI, solveTrainerQueryAPI, markQueryReadByTrainerAPI } from '../../../services/api';
+import { formatDistanceToNow } from 'date-fns';
 import './StudentConnectQuery.css';
 
 const StudentConnectQuery = () => {
@@ -21,50 +23,30 @@ const StudentConnectQuery = () => {
   const [course, setCourse] = useState('Full Stack Development');
   const [meetLink, setMeetLink] = useState('');
 
+  const [loading, setLoading] = useState(true);
+  const [queryData, setQueryData] = useState(null);
+
   useEffect(() => {
-    // Load draft if exists
-    const draft = localStorage.getItem(`draft_code_${studentId}`);
-    if (draft) setCode(draft);
+    const fetchQuery = async () => {
+      try {
+        setLoading(true);
+        const res = await getQueryByIdAPI(studentId); // studentId is actually queryId from the route
+        if (res.success) {
+          setQueryData(res.query);
+          setStatus(res.query.status);
+          setCode(res.query.code || '// No code provided...');
+          // Mark as read
+          markQueryReadByTrainerAPI(studentId);
+        }
+      } catch (err) {
+        console.error("Failed to fetch query details", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchQuery();
   }, [studentId]);
 
-  useEffect(() => {
-    // Auto-save draft
-    const timeout = setTimeout(() => {
-      localStorage.setItem(`draft_code_${studentId}`, code);
-    }, 1000);
-    return () => clearTimeout(timeout);
-  }, [code, studentId]);
-
-  useEffect(() => {
-    try {
-      const savedBatches = JSON.parse(localStorage.getItem('trainer_batches_v2') || '[]');
-      const currentBatch = savedBatches.find(b => b.id === batchId);
-      if (currentBatch) {
-        setCourse(currentBatch.course);
-        if (currentBatch.course.toLowerCase().includes('python')) setLanguage('python');
-        else if (currentBatch.course.toLowerCase().includes('java')) setLanguage('java');
-        else setLanguage('javascript');
-      }
-    } catch (e) { console.error(e); }
-  }, [batchId]);
-
-  const languages = useMemo(() => {
-    const c = course.toLowerCase();
-    if (c.includes('java full stack')) return ["java"];
-    if (c.includes('python')) return ["python"];
-    if (c.includes('mern') || c.includes('web')) return ["javascript", "typescript", "html", "css"];
-    return ["javascript", "java", "python", "sql"];
-  }, [course]);
-
-  const student = {
-    name: 'Rahul Sharma',
-    batch: `Batch ${batchId} - ${course}`,
-    title: 'React useEffect dependency array doubt',
-    description: 'I am struggling with the useEffect hook. When I use an empty dependency array, my state updates are not reflected in the component after the initial render. How can I properly sync the state?',
-    attachment: 'useEffect_debug.png',
-    size: '1.2 MB',
-    timestamp: '2h ago'
-  };
 
   const validateCode = () => {
     if (language === 'python') {
@@ -87,7 +69,7 @@ const StudentConnectQuery = () => {
       return;
     }
     setOutput('Running code...');
-    
+
     setTimeout(() => {
       // Simulate dynamic output by extracting console.log or print statements
       let dynamicResult = "";
@@ -127,10 +109,10 @@ const StudentConnectQuery = () => {
         }
       } catch (e) { console.error(e); }
 
-      const outputMsg = dynamicResult 
-        ? `> Output:\n${dynamicResult}` 
+      const outputMsg = dynamicResult
+        ? `> Output:\n${dynamicResult}`
         : `> Code executed successfully.\n> No console output to display.`;
-        
+
       setOutput(`✔ Success! Result displayed below\n> Executing ${language} code...\n${outputMsg}`);
     }, 800);
   };
@@ -140,37 +122,32 @@ const StudentConnectQuery = () => {
     setMeetLink(link);
   };
 
-  const handleSendSolution = () => {
+  const handleSendSolution = async () => {
     if (!response.trim()) return;
     setIsSaving(true);
-    setTimeout(() => {
-      setStatus('Solved');
-      setIsSaving(false);
-      setShowSuccess(true);
-      
-      const solution = {
-        id: studentId,
-        studentId,
-        batchId,
-        mode: selectedMode,
-        content: selectedMode === 'editor' ? code : (selectedMode === 'chat' ? response : meetLink),
-        explanation: response,
-        language: selectedMode === 'editor' ? language : null,
-        output: selectedMode === 'editor' ? output : null,
-        status: 'Solved',
-        solvedAt: new Date().toISOString()
+    try {
+      const solutionData = {
+        solution: response,
+        codeSolution: selectedMode === 'editor' ? code : "",
+        meetLink: selectedMode === 'meet' ? meetLink : ""
       };
-      
-      const existing = JSON.parse(localStorage.getItem('solved_queries') || '[]');
-      localStorage.setItem('solved_queries', JSON.stringify([...existing, solution]));
-      localStorage.removeItem(`draft_code_${studentId}`);
 
-      setTimeout(() => {
-        setShowSuccess(false);
-        navigate(`/trainer-dashboard/student-connect/${batchId}`);
-      }, 2000);
-    }, 1500);
+      const res = await solveTrainerQueryAPI(studentId, solutionData);
+      if (res.success) {
+        setStatus('Solved');
+        setShowSuccess(true);
+        setTimeout(() => {
+          setShowSuccess(false);
+          navigate(`/trainer-dashboard/student-connect/${batchId}`);
+        }, 2000);
+      }
+    } catch (err) {
+      console.error("Failed to submit solution", err);
+    } finally {
+      setIsSaving(false);
+    }
   };
+
 
   const handleDownload = (filename) => {
     // Simulate download
@@ -180,6 +157,8 @@ const StudentConnectQuery = () => {
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 2000);
   };
+
+  if (loading || !queryData) return <div className="scq-loading">Loading query details...</div>;
 
   return (
     <div className="scq-container animate-fade-in">
@@ -200,43 +179,46 @@ const StudentConnectQuery = () => {
         <div className="scq-side-panel">
           <div className="scq-panel-card student-info">
             <div className="scq-student-header">
-              <div className="scq-avatar-large">RS</div>
+              <div className="scq-avatar-large">{queryData.studentName?.charAt(0) || 'S'}</div>
               <div>
-                <h3>{student.name}</h3>
-                <p>{student.batch}</p>
+                <h3>{queryData.studentName}</h3>
+                <p>Batch {queryData.batchId}</p>
               </div>
             </div>
             <div className="scq-query-content">
-              <h4 className="scq-query-title">{student.title}</h4>
-              <p className="scq-query-desc">{student.description}</p>
-              {student.attachment && (
-                <button className="download-btn" onClick={() => handleDownload(student.attachment)}>
+              <h4 className="scq-query-title">{queryData.title}</h4>
+              <p className="scq-query-desc">{queryData.text}</p>
+              {queryData.attachment && (
+                <button className="download-btn" onClick={() => handleDownload(queryData.attachment)}>
                   <Download size={16} />
-                  <span>{student.attachment} ({student.size})</span>
+                  <span>{queryData.attachment}</span>
                 </button>
               )}
-              <span className="scq-timestamp">{student.timestamp}</span>
+              <span className="scq-timestamp">
+                {queryData.createdAt ? formatDistanceToNow(new Date(queryData.createdAt), { addSuffix: true }) : 'Recently'}
+              </span>
             </div>
           </div>
+
 
           <div className="scq-panel-card comms-panel">
             <h4>Select Resolution Mode</h4>
             <div className="scq-comms-grid">
-              <button 
+              <button
                 className={`mode-btn ${selectedMode === 'editor' ? 'active' : selectedMode ? 'disabled' : ''}`}
                 onClick={() => setSelectedMode('editor')}
               >
                 <Code size={20} />
                 <span>Code Editor</span>
               </button>
-              <button 
+              <button
                 className={`mode-btn ${selectedMode === 'chat' ? 'active' : selectedMode ? 'disabled' : ''}`}
                 onClick={() => setSelectedMode('chat')}
               >
                 <MessageSquare size={20} />
                 <span>Chat Explanation</span>
               </button>
-              <button 
+              <button
                 className={`mode-btn ${selectedMode === 'meet' ? 'active' : selectedMode ? 'disabled' : ''}`}
                 onClick={() => setSelectedMode('meet')}
               >
@@ -285,10 +267,10 @@ const StudentConnectQuery = () => {
                   <div className="panel-header">
                     <div className="header-title"><MessageSquare size={18} /><span>Chat Response</span></div>
                   </div>
-                  <textarea 
-                    className="scq-chat-textarea" 
-                    placeholder="Write your detailed explanation here..." 
-                    value={response} 
+                  <textarea
+                    className="scq-chat-textarea"
+                    placeholder="Write your detailed explanation here..."
+                    value={response}
                     onChange={(e) => setResponse(e.target.value)}
                   />
                 </div>
@@ -307,7 +289,7 @@ const StudentConnectQuery = () => {
                         <input type="text" value={meetLink} readOnly />
                         <div className="meet-actions">
                           <button onClick={() => window.open(meetLink, '_blank')}>Join Meet</button>
-                          <button onClick={() => {navigator.clipboard.writeText(meetLink)}}>Copy Link</button>
+                          <button onClick={() => { navigator.clipboard.writeText(meetLink) }}>Copy Link</button>
                         </div>
                       </div>
                     )}
@@ -319,16 +301,16 @@ const StudentConnectQuery = () => {
                 {selectedMode !== 'chat' && (
                   <div className="explanation-wrap">
                     <label>Additional Notes</label>
-                    <textarea 
-                      value={response} 
-                      onChange={(e) => setResponse(e.target.value)} 
-                      placeholder="Explain your solution..." 
+                    <textarea
+                      value={response}
+                      onChange={(e) => setResponse(e.target.value)}
+                      placeholder="Explain your solution..."
                     />
                   </div>
                 )}
-                <button 
-                  className="scq-send-btn" 
-                  onClick={handleSendSolution} 
+                <button
+                  className="scq-send-btn"
+                  onClick={handleSendSolution}
                   disabled={isSaving || !response.trim()}
                 >
                   {isSaving ? "Submitting..." : "Submit Solution"}
