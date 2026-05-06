@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCourseContext } from "../../context/CourseContext";
 import { motion } from "framer-motion";
-import { Search, Filter, Star, Clock, Users, ArrowRight, Eye, Calendar, User as UserIcon } from "lucide-react";
+import { Search, Filter, Star, StarHalf, Clock, Users, ArrowRight, Eye, Calendar, User as UserIcon } from "lucide-react";
 import { getCourseImage } from "../../utils/courseUtils";
 import "./Courses.css";
 import bgImage from "../../assets/course/bg.jpg";
@@ -33,6 +33,7 @@ const statusColors = {
   "EFFICIENT": { bg: "rgba(16, 185, 129, 0.12)", color: "#10b981" },
   "SUCCESS": { bg: "rgba(244, 63, 94, 0.12)", color: "#f43f5e" },
 };
+
 
 const Courses = () => {
   const navigate = useNavigate();
@@ -214,6 +215,25 @@ const Courses = () => {
                   <div className="card-content-modern">
                     <h3 className="card-title-modern">{course.title}</h3>
 
+                    {/* Stats Section: Rating */}
+                    <div className="card-stats-modern">
+                      <div className="stat stars-container">
+                        {[...Array(5)].map((_, index) => {
+                          const rating = course.rating || 5;
+                          const fullStars = Math.floor(rating);
+                          const hasHalfStar = rating % 1 >= 0.5;
+                          
+                          if (index < fullStars) {
+                            return <Star key={index} size={14} fill="#f59e0b" color="#f59e0b" />;
+                          } else if (index === fullStars && hasHalfStar) {
+                            return <StarHalf key={index} size={14} fill="#f59e0b" color="#f59e0b" />;
+                          } else {
+                            return <Star key={index} size={14} color="#d1d5db" />;
+                          }
+                        })}
+                      </div>
+                    </div>
+
                     {/* Footer */}
                     <div className="card-footer-modern">
                       <div className="footer-info-left">
@@ -239,7 +259,7 @@ const Courses = () => {
                         >
                           <Eye size={20} />
                         </button>
-                        <span className="action-label">View Course</span>
+                        <span className="action-label">Overview</span>
                       </div>
                     </div>
                   </div>

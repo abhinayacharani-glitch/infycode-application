@@ -15,13 +15,22 @@ import {
   Settings,
   Link as LinkIcon
 } from 'lucide-react';
+import {
+  getCalendarEventsAPI,
+  createCalendarEventAPI,
+  updateCalendarEventAPI,
+  deleteCalendarEventAPI
+} from '../../../services/api';
 import './Calendar.css';
+
 
 const EVENT_TYPES = [
   { id: 'meeting', label: 'Admin Interaction', color: '#F472B6', bg: '#FFF1F2' },
   { id: 'counselling', label: 'Counselling', color: '#10B981', bg: '#ECFDF5' },
   { id: 'training', label: 'Training', color: '#8B5CF6', bg: '#F5F3FF' }
 ];
+
+
 
 const formatTo12Hr = (time24) => {
   if (!time24) return '';
@@ -43,25 +52,11 @@ const Calendar = () => {
     meeting: true, counselling: true, training: true
   });
 
-  const [events, setEvents] = useState(() => {
-    const saved = localStorage.getItem('trainer_calendar_events');
-    if (saved) return JSON.parse(saved);
 
-    const today = new Date();
-    const tStr = (offset = 0) => {
-      const d = new Date();
-      d.setDate(today.getDate() + offset);
-      return d.toISOString().split('T')[0];
-    };
 
-    return [
-      { id: 'm1', title: 'Admin Meeting – Project Alpha', date: tStr(0), startTime: '10:00', endTime: '11:00', type: 'meeting', meetingLink: 'https://meet.google.com/abc-defg-hij', description: 'Alpha phase briefing.' },
-      { id: 'm2', title: 'Admin Meeting – Team Sync', date: tStr(2), startTime: '14:00', endTime: '15:00', type: 'meeting', meetingLink: 'https://teams.microsoft.com/l/meetup-join/...' },
-      { id: 't1', title: 'React Training – Batch A', date: tStr(1), startTime: '11:30', endTime: '13:30', type: 'training', description: 'Hooks and context deep dive.' },
-      { id: 'c1', title: 'Counselling Session – Student A', date: tStr(3), startTime: '16:00', endTime: '17:00', type: 'counselling' },
-      { id: 'm3', title: 'Admin Meeting – Curriculum', date: tStr(-1), startTime: '09:30', endTime: '10:30', type: 'meeting' }
-    ];
-  });
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -82,8 +77,23 @@ const Calendar = () => {
   });
 
   useEffect(() => {
-    localStorage.setItem('trainer_calendar_events', JSON.stringify(events));
-  }, [events]);
+    fetchEvents();
+  }, []);
+
+  const fetchEvents = async () => {
+    setLoading(true);
+    try {
+      const res = await getCalendarEventsAPI();
+      if (res.success) {
+        setEvents(res.events);
+      }
+    } catch (error) {
+      console.error("Error fetching events:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   // --- LOGIC: CALENDAR GENERATION ---
   const daysInMonth = useMemo(() => {
@@ -157,50 +167,69 @@ const Calendar = () => {
     setSelectedEvent(null);
   };
 
-  const handleCreateEvent = (e) => {
+  const handleCreateEvent = async (e) => {
     e.preventDefault();
     setIsSaving(true);
 
-    // Simulate API delay
-    setTimeout(() => {
+    try {
+      let res;
       if (isEditing) {
-        setEvents(events.map(ev => ev.id === newEvent.id ? { ...newEvent } : ev));
+        res = await updateCalendarEventAPI(newEvent.id, newEvent);
       } else {
-        const id = Date.now().toString();
-        setEvents([...events, { ...newEvent, id }]);
+        res = await createCalendarEventAPI(newEvent);
       }
-      
+
+      if (res.success) {
+        await fetchEvents();
+        setShowCreateModal(false);
+        setIsEditing(false);
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 3000);
+
+        setNewEvent({
+          title: '',
+          date: new Date().toISOString().split('T')[0],
+          startTime: '10:00',
+          endTime: '11:00',
+          type: 'meeting',
+          meetingLink: '',
+          description: ''
+        });
+      }
+    } catch (error) {
+      console.error("Error saving event:", error);
+      alert(error.message || "Failed to save event");
+    } finally {
       setIsSaving(false);
-      setShowCreateModal(false);
-      setIsEditing(false);
-      setShowToast(true);
-
-      // Auto hide toast
-      setTimeout(() => setShowToast(false), 3000);
-
-      setNewEvent({
-        title: '',
-        date: new Date().toISOString().split('T')[0],
-        startTime: '10:00',
-        endTime: '11:00',
-        type: 'meeting',
-        meetingLink: '',
-        description: ''
-      });
-    }, 800);
-  };
-
-  const handleDeleteEvent = (id) => {
-    if (window.confirm("Delete this event?")) {
-      setEvents(events.filter(e => e.id !== id));
-      setSelectedEvent(null);
     }
   };
 
+
+  const handleDeleteEvent = async (id) => {
+    if (window.confirm("Delete this event?")) {
+      try {
+        const res = await deleteCalendarEventAPI(id);
+        if (res.success) {
+          setEvents(events.filter(e => e.id !== id));
+          setSelectedEvent(null);
+        }
+      } catch (error) {
+        console.error("Error deleting event:", error);
+      }
+    }
+  };
+
+
   const getEventsForDate = (date) => {
-    const dateStr = date.toISOString().split('T')[0];
+    // Use local YYYY-MM-DD format to match database dates exactly
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}`;
+    
     return filteredEvents.filter(e => e.date === dateStr);
   };
+
 
   return (
     <div className="v3-calendar-page-container">
@@ -212,59 +241,7 @@ const Calendar = () => {
       <div className="v3-calendar-layout">
         {/* 1. INTERNAL SIDEBAR */}
         <aside className="v3-cal-sidebar">
-          <div className="v3-mini-calendar">
-            <div className="mini-cal-header">
-              <div className="mini-cal-title-group">
-                <span className="mini-cal-title">{monthLabel}</span>
-                <button className="mini-today-btn" onClick={() => handleNavigate('today')}>Today</button>
-              </div>
-              <div className="mini-cal-nav">
-                <button className="mini-nav-btn" onClick={() => handleNavigate('prev')}><ChevronLeft size={16} /></button>
-                <button className="mini-nav-btn" onClick={() => handleNavigate('next')}><ChevronRight size={16} /></button>
-              </div>
-            </div>
 
-            <div className={`mini-cal-content ${navDirection}`}>
-              <div className="mini-cal-grid">
-                {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(d => <div key={d} className="mini-day-label">{d}</div>)}
-                {daysInMonth.map((d, i) => {
-                  const isToday = d.date.toDateString() === new Date().toDateString();
-                  const isSelected = d.date.toDateString() === currentDate.toDateString();
-                  const dateEvents = getEventsForDate(d.date);
-
-                  return (
-                    <div
-                      key={i}
-                      className={`mini-date-cell ${d.isCurrentMonth ? '' : 'hidden-month'} ${isToday ? 'today' : ''} ${isSelected ? 'active' : ''}`}
-                      onClick={() => setCurrentDate(d.date)}
-                      onMouseEnter={() => setHoveredDate(d.date.toDateString())}
-                      onMouseLeave={() => setHoveredDate(null)}
-                    >
-                      <span className="mini-date-num">{d.date.getDate()}</span>
-                      {d.isCurrentMonth && dateEvents.length > 0 && (
-                        <div className="mini-event-dots">
-                          {dateEvents.slice(0, 3).map((_, idx) => (
-                            <span key={idx} className="mini-dot"></span>
-                          ))}
-                        </div>
-                      )}
-
-                      {hoveredDate === d.date.toDateString() && dateEvents.length > 0 && (
-                        <div className="mini-cal-tooltip">
-                          {dateEvents.map(ev => (
-                            <div key={ev.id} className="tooltip-event">
-                              <span className={`type-indicator ${ev.type}`}></span>
-                              {ev.title}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
 
           <div className="v3-cal-filters">
             <span className="filter-title">My Calendars</span>
@@ -291,7 +268,7 @@ const Calendar = () => {
           {/* ENHANCED GOOGLE CALENDAR HEADER */}
           <header className="v3-cal-page-header">
             <div className="v3-header-left">
-              <h1>📅 Calendar</h1>
+              <h1>Calendar</h1>
             </div>
 
             <div className="v3-header-center">
@@ -482,20 +459,31 @@ const Calendar = () => {
                   <div className="v3-form-group">
                     <label>Event Type</label>
                     <div className="type-pill-group">
-                      {EVENT_TYPES.map(t => (
-                        <button
-                          key={t.id}
-                          type="button"
-                          className={`type-pill ${newEvent.type === t.id ? 'active' : ''}`}
-                          onClick={() => setNewEvent({ ...newEvent, type: t.id })}
-                          style={{ '--pill-color': t.color }}
-                        >
-                          <span className="pill-dot"></span>
-                          {t.label}
-                        </button>
-                      ))}
+                      {EVENT_TYPES.map(t => {
+                        const isDisabled = t.id !== 'meeting';
+                        return (
+                          <button
+                            key={t.id}
+                            type="button"
+                            className={`type-pill ${newEvent.type === t.id ? 'active' : ''} ${isDisabled ? 'disabled' : ''}`}
+                            onClick={() => !isDisabled && setNewEvent({ ...newEvent, type: t.id })}
+                            style={{ 
+                              '--pill-color': t.color,
+                              cursor: isDisabled ? 'not-allowed' : 'pointer',
+                              opacity: isDisabled ? 0.5 : 1
+                            }}
+                            disabled={isDisabled}
+                            title={isDisabled ? "Only Admin Interaction is allowed" : ""}
+                          >
+                            <span className="pill-dot"></span>
+                            {t.label}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
+
+
 
                   <div className="v3-form-row">
                     <div className="v3-form-group">

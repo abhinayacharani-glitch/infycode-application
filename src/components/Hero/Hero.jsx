@@ -87,7 +87,7 @@ function Hero() {
                   <span>{slideContent[(i - 1 + images.length) % images.length].title2}</span>
                 </h1>
 
-                <div className="hero-buttons">
+                <div className="hero-buttons" id="hero-actions">
 
                   <button
                     className="btn"

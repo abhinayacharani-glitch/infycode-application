@@ -6,6 +6,7 @@ import Popup from "./components/popup/popup";
 import Navbar from "./components/Navbar/Navbar";
 import AIChatbot from "./components/AIChatbot/AIChatbot";
 import { motion, AnimatePresence } from "framer-motion";
+import { ArrowUp } from "lucide-react";
 import { AdminProvider } from "./context/AdminContext";
 import { CourseProvider } from "./context/CourseContext";
 
@@ -162,25 +163,23 @@ function HomePage() {
         <Footer />
       </div>
       <AnimatePresence>
-        {showFloaters && (
-          <motion.div
-            className="floating-buttons-container"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{
-              y: [0, -6, 0],
-              opacity: 1
-            }}
-            exit={{ opacity: 0, y: 20 }}
-            style={{ pointerEvents: "auto" }}
-            transition={{
-              y: { duration: 3, repeat: Infinity, ease: "easeInOut" },
-              opacity: { duration: 0.3 }
-            }}
-          >
-            <AIChatbot />
-            <WhatsAppFloat />
-          </motion.div>
-        )}
+        <motion.div
+          className="floating-buttons-container"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{
+            y: [0, -6, 0],
+            opacity: showFloaters ? 1 : 0,
+            pointerEvents: showFloaters ? "auto" : "none"
+          }}
+          exit={{ opacity: 0, y: 20 }}
+          transition={{
+            y: { duration: 3, repeat: Infinity, ease: "easeInOut" },
+            opacity: { duration: 0.3 }
+          }}
+        >
+          <AIChatbot />
+          <WhatsAppFloat />
+        </motion.div>
       </AnimatePresence>
     </>
   );

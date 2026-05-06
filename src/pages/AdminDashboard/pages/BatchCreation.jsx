@@ -7,6 +7,7 @@ import "./BatchCreation.css";
 
 const initialFormState = {
   trainerName: "",
+  trainerId: "",
   courseName: "",
   numberOfStudents: "",
   startDateTime: "",
@@ -101,6 +102,7 @@ function BatchCreation() {
         name: `${form.courseName} - ${new Date(form.startDateTime).toLocaleString('en-US', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`,
         course: form.courseName,
         trainer: form.trainerName,
+        trainerId: form.trainerId,
         capacity: Number(form.numberOfStudents),
         status: 'Scheduled',
         startDateTime: form.startDateTime,
@@ -174,7 +176,20 @@ function BatchCreation() {
 
                 <div className="form-group">
                   <label>Assign Trainer</label>
-                  <select name="trainerName" value={form.trainerName} onChange={handleChange} className={errors.trainerName ? 'input-error' : ''}>
+                  <select 
+                    name="trainerName" 
+                    value={form.trainerName} 
+                    onChange={(e) => {
+                      const selectedTrainer = trainers.find(t => t.name === e.target.value);
+                      setForm(prev => ({ 
+                        ...prev, 
+                        trainerName: e.target.value,
+                        trainerId: selectedTrainer ? selectedTrainer.id : ""
+                      }));
+                      if (errors.trainerName) setErrors(prev => ({ ...prev, trainerName: "" }));
+                    }} 
+                    className={errors.trainerName ? 'input-error' : ''}
+                  >
                     <option value="">— Select Trainer —</option>
                     {trainers.map(t => (
                       <option key={t.id} value={t.name}>{t.name}</option>
