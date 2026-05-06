@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { COURSE_MAP } from './data/extraCourses';
 import { useCourseContext } from '../../../context/CourseContext';
 import {
   ArrowLeft,
@@ -94,37 +93,27 @@ const CourseOverview = () => {
     ? courseIdFromState.courseId || courseIdFromState.id
     : courseIdFromState || 'java-fs-01';
 
-  let course = COURSE_MAP[courseId];
-
-  // If not in hardcoded map, try to find it in published courses
-  if (!course) {
+  // Find the course in published courses
+  const course = React.useMemo(() => {
+    if (!publishedCourses || !courseId) return null;
     const published = publishedCourses.find(c => c.courseId === courseId || c.id === courseId);
-    if (published) {
-      course = {
-        ...published,
-        id: published.courseId || published.id,
-        trainer: published.trainer || { name: 'Expert Instructor', role: 'Senior Mentor', experience: '10+ Years', specialization: published.category || 'Tech' },
-        batch: published.batch || {
-          name: 'Regular Batch',
-          id: `BID-${(published.title || 'CRSE').substring(0, 4).toUpperCase()}-${new Date().getFullYear()}`,
-          startDate: published.startDate || 'Next Week',
-          timing: 'Flexible',
-          duration: published.duration || '3 Months'
-        },
-        level: published.level || 'Beginner',
-        modules: published.modules || [
-          {
-            id: 'mod1',
-            label: 'Module 1',
-            subtitle: 'Introduction',
-            duration: '1 Week',
-            color: '#10b981',
-            topics: [{ id: 't1', title: `Getting Started with ${published.title}`, content: `<p>Welcome to the ${published.title} course!</p>` }]
-          }
-        ]
-      };
-    }
-  }
+    if (!published) return null;
+
+    return {
+      ...published,
+      id: published.courseId || published.id,
+      trainer: published.trainer || { name: 'Expert Instructor', role: 'Senior Mentor', experience: '10+ Years', specialization: published.category || 'Tech' },
+      batch: published.batch || {
+        name: 'Regular Batch',
+        id: `BID-${(published.title || 'CRSE').substring(0, 4).toUpperCase()}-${new Date().getFullYear()}`,
+        startDate: published.startDate || 'Next Week',
+        timing: 'Flexible',
+        duration: published.duration || '3 Months'
+      },
+      level: published.level || 'Beginner',
+      modules: published.modules || []
+    };
+  }, [publishedCourses, courseId]);
 
   const [sessionStatus, setSessionStatus] = useState('no-link');
   const [sessionConfig, setSessionConfig] = useState(null);
@@ -165,17 +154,9 @@ const CourseOverview = () => {
       b.courseId === course.id
     );
 
-    const isStarted = batchMatch && (
-      batchMatch.status === 'started' || 
-      batchMatch.status === 'Active' || 
-      batchMatch.batchStatus === 'started' || 
-      batchMatch.batchStatus === 'Active'
-    );
-
     if (batchMatch) {
       return {
         ...course,
-        isStarted,
         trainer: batchMatch.trainer ? {
           name: batchMatch.trainer.name,
           role: batchMatch.trainer.specialization || 'Lead Instructor',
@@ -195,7 +176,7 @@ const CourseOverview = () => {
       };
     }
 
-    return { ...course, isStarted: false };
+    return course;
   }, [course, myBatches]);
 
   useEffect(() => {
@@ -252,168 +233,184 @@ const CourseOverview = () => {
 
   return (
     <div className="course-overview-page">
-      <button className="co-back-btn" onClick={handleBack}>
-        <ArrowLeft size={18} />
-        <span>Back to Courses</span>
-      </button>
+      <div className="co-top-bar">
+        <button className="co-back-btn" onClick={handleBack}>
+          <ArrowLeft size={18} />
+          <span>Back to Courses</span>
+        </button>
+      </div>
 
-      {/* Header Card */}
+      {/* Header Card (Hero) */}
       <div className="co-hero">
-        <div className="co-hero-bg">
-          <img src={getCourseImage(dynamicCourse)} alt={dynamicCourse.title} className="co-hero-img" />
-          <div className="co-hero-overlay"></div>
-        </div>
         <div className="co-hero-left">
-          <span className="co-level-badge">{dynamicCourse.level}</span>
+          <div className="co-level-badge">{dynamicCourse.level}</div>
           <h1 className="co-hero-title">{dynamicCourse.title}</h1>
-          <p className="co-subtitle">Master technical skills with our comprehensive industry-grade curriculum and expert-led training.</p>
+          <p className="co-subtitle">
+            {dynamicCourse.title?.toLowerCase().includes('aptitude')
+              ? 'Learn and Practice Aptitude with Shortcuts to boost your analytical and logical skills.'
+              : 'Master technical skills with our comprehensive industry-grade curriculum and expert-led training.'}
+          </p>
         </div>
+
         <div className="co-hero-right">
-          <div className={`session-status-badge ${statusLabel.className}`}>
-            <span className="status-dot"></span>
+          <div className={`co-status-badge ${statusLabel.className}`}>
             {statusLabel.text}
           </div>
-          <div className="co-day-status-list">
+          <div className="co-schedule-card">
             {dayStatuses.map((item) => (
-              <div key={item.day} className={`co-day-status-row ${item.state}`}>
-                <span className="co-day-name">{item.day}</span>
-                <span className="co-day-value">{item.text}</span>
+              <div key={item.day} className="co-schedule-row">
+                <span className="co-day">{item.day}</span>
+                <span className={`co-status ${item.state === 'completed' ? 'over' : ''}`}>{item.text}</span>
               </div>
             ))}
           </div>
           <button
-            className={`co-join-btn ${sessionStatus !== 'live' ? 'disabled' : ''}`}
+            className={`co-join-live-btn ${sessionStatus !== 'live' ? 'disabled' : ''}`}
             onClick={handleJoin}
-            disabled={sessionStatus !== 'live'}
           >
             <Video size={18} />
-            Join Live Class
+            <span>Join Live Class</span>
           </button>
         </div>
       </div>
 
-      {/* Info Layout (Trainer & Batch) - Only show if batch is started */}
-      {dynamicCourse.isStarted && (
-        <div className="co-info-layout">
-          {/* Trainer Card */}
-          <div className="co-info-card">
-            <div className="co-info-header">
-              <div className="co-header-icon">
-                <User size={18} />
-              </div>
-              <h2>Trainer Details</h2>
+      {/* Info Cards Row (Trainer & Batch) */}
+      <div className="co-info-row">
+        {/* Trainer Details */}
+        <div className="co-card co-trainer-card">
+          <div className="co-card-header">
+            <div className="co-icon-box blue">
+              <User size={18} />
             </div>
-            <div className="co-trainer-main-pill">
-              <div className="co-trainer-avatar-blue">{dynamicCourse.trainer?.name?.charAt(0)}</div>
-              <div className="co-trainer-text">
-                <div className="co-t-name">{dynamicCourse.trainer?.name}</div>
-                <div className="co-t-role">{dynamicCourse.trainer?.role}</div>
-              </div>
+            <h2>Trainer Details</h2>
+          </div>
+          <div className="co-trainer-profile">
+            <div className="co-avatar">
+              {dynamicCourse.trainer?.name?.charAt(0)}
             </div>
-            <div className="co-trainer-stats-row">
-              <div className="co-stat-pill">
-                <span className="co-pill-label">Experience</span>
-                <span className="co-pill-value">{dynamicCourse.trainer?.experience || '10+ Years'}</span>
-              </div>
-              <div className="co-stat-pill">
-                <span className="co-pill-label">Expertise</span>
-                <span className="co-pill-value">{dynamicCourse.trainer?.expertise || dynamicCourse.trainer?.specialization || 'Technical Expert'}</span>
-              </div>
+            <div className="co-trainer-info">
+              <h3>{dynamicCourse.trainer?.name}</h3>
+              <p>{dynamicCourse.trainer?.role}</p>
             </div>
           </div>
-
-          {/* Batch Card */}
-          <div className="co-info-card">
-            <div className="co-info-header">
-              <div className="co-header-icon" style={{ background: '#ecfdf5', color: '#10b981' }}>
-                <Calendar size={18} />
-              </div>
-              <h2>Batch Details</h2>
+          <div className="co-stats-grid">
+            <div className="co-stat-box">
+              <span className="co-label">EXPERIENCE</span>
+              <span className="co-value">{dynamicCourse.trainer?.experience || '10+ Years'}</span>
             </div>
-            <div className="co-batch-grid">
-              <div className="co-batch-pill">
-                <span className="co-pill-label"><Hash size={12} /> Batch ID</span>
-                <span className="co-pill-value">{dynamicCourse.batch?.id || 'BID-1240'}</span>
-              </div>
-              <div className="co-batch-pill">
-                <span className="co-pill-label"><Clock size={12} /> Timing</span>
-                <span className="co-pill-value">{dynamicCourse.batch?.timing}</span>
-              </div>
-              <div className="co-batch-pill">
-                <span className="co-pill-label"><Calendar size={12} /> Start Date</span>
-                <span className="co-pill-value">{dynamicCourse.batch?.startDate}</span>
-              </div>
-              <div className="co-batch-pill">
-                <span className="co-pill-label"><Monitor size={12} /> Mode</span>
-                <span className="co-pill-value">
-                  {(() => {
-                    const dur = dynamicCourse.batch?.duration || '4 Months';
-                    const mod = (dynamicCourse.batch?.mode || 'Online').toLowerCase();
-                    const durationStr = /weeks|months|days/i.test(dur) ? dur : `${dur} weeks`;
-                    return `${durationStr} - ${mod}`;
-                  })()}
-                </span>
-              </div>
+            <div className="co-stat-box">
+              <span className="co-label">EXPERTISE</span>
+              <span className="co-value">{dynamicCourse.trainer?.expertise || dynamicCourse.trainer?.specialization || 'Technical Expert'}</span>
             </div>
           </div>
         </div>
-      )}
+
+        {/* Batch Details */}
+        <div className="co-card co-batch-card">
+          <div className="co-card-header">
+            <div className="co-icon-box green">
+              <Calendar size={18} />
+            </div>
+            <h2>Batch Details</h2>
+          </div>
+          <div className="co-batch-grid">
+            <div className="co-stat-box">
+              <span className="co-label"># BATCH ID</span>
+              <span className="co-value">{dynamicCourse.batch?.id || 'BID-1240'}</span>
+            </div>
+            <div className="co-stat-box">
+              <span className="co-label">TIMING</span>
+              <span className="co-value">{dynamicCourse.batch?.timing}</span>
+            </div>
+            <div className="co-stat-box">
+              <span className="co-label">START DATE</span>
+              <span className="co-value">{dynamicCourse.batch?.startDate}</span>
+            </div>
+            <div className="co-stat-box">
+              <span className="co-label">MODE</span>
+              <span className="co-value">
+                {(() => {
+                  const dur = dynamicCourse.batch?.duration || '4 Months';
+                  const mod = (dynamicCourse.batch?.mode || 'Online').toLowerCase();
+                  const durationStr = /weeks|months|days/i.test(dur) ? dur : `${dur} weeks`;
+                  return `${durationStr} - ${mod}`;
+                })()}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Course Objective Section */}
-      <div className="co-objective-section">
-        <div className="co-section-label">Course Objective</div>
-        <p className="co-objective-text">
-          {dynamicCourse.description || "Our curriculum is designed to bridge the gap between academic theory and industry reality. By combining deep-dive technical modules with hands-on labs and real-world project simulations, we ensure that you master the architecture and problem-solving mindset required by top-tier tech companies."}
+      <div className="co-objective-card">
+        <div className="co-section-label">COURSE OBJECTIVE</div>
+        <p className="co-objective-desc">
+          {dynamicCourse.description ||
+            (dynamicCourse.title?.toLowerCase().includes('aptitude')
+              ? "Our Aptitude program is designed to build a strong foundation in quantitative, logical, and verbal reasoning. By focusing on time-saving shortcuts, mental calculation techniques, and diverse problem patterns, we prepare you for the rigorous selection processes of leading global organizations."
+              : "Master the complete Java ecosystem from core fundamentals to enterprise Spring Boot and React integration.")}
         </p>
-        <div className="co-benefits-grid">
-          <div className="co-benefit-item">
-            <div className="co-benefit-icon"><GraduationCap size={20} /></div>
-            <div>
-              <div className="co-benefit-label">
-                {dynamicCourse.title?.toLowerCase().includes('ai') || dynamicCourse.title?.toLowerCase().includes('artificial') 
-                  ? 'AI Fundamentals' 
-                  : 'Multi-Cloud'}
-              </div>
-              <div className="co-benefit-desc">
-                {dynamicCourse.title?.toLowerCase().includes('ai') || dynamicCourse.title?.toLowerCase().includes('artificial')
-                  ? 'Learn the core concepts of Artificial Intelligence, including its history, types, machine learning basics, and real-world applications.'
-                  : 'AWS, Azure & GCP covered'}
-              </div>
+
+        <div className="co-features-grid">
+          <div className="co-feature-item">
+            <div className="co-feature-icon">
+              <GraduationCap size={20} />
+            </div>
+            <div className="co-feature-text">
+              <h4>
+                {dynamicCourse.title?.toLowerCase().includes('java') ? 'Core Java' :
+                 dynamicCourse.title?.toLowerCase().includes('ai') || dynamicCourse.title?.toLowerCase().includes('artificial') ? 'AI Foundations' :
+                 dynamicCourse.title?.toLowerCase().includes('aptitude') ? 'Quant & Logic' :
+                 dynamicCourse.title?.toLowerCase().includes('react') ? 'React Mastery' : 'Industry Focused'}
+              </h4>
+              <p>
+                {dynamicCourse.title?.toLowerCase().includes('java') ? 'Fundamentals to Advanced' :
+                 dynamicCourse.title?.toLowerCase().includes('ai') || dynamicCourse.title?.toLowerCase().includes('artificial') ? 'Neural Networks & ML' :
+                 dynamicCourse.title?.toLowerCase().includes('aptitude') ? 'Shortcuts & Patterns' :
+                 dynamicCourse.title?.toLowerCase().includes('react') ? 'Hooks & Architecture' : 'Real-world curriculum'}
+              </p>
             </div>
           </div>
-          <div className="co-benefit-item">
-            <div className="co-benefit-icon"><Users size={20} /></div>
-            <div>
-              <div className="co-benefit-label">Certified Trainers</div>
-              <div className="co-benefit-desc">Industry experts only</div>
+          <div className="co-feature-item">
+            <div className="co-feature-icon">
+              <Users size={20} />
+            </div>
+            <div className="co-feature-text">
+              <h4>Certified Trainers</h4>
+              <p>Industry experts only</p>
             </div>
           </div>
-          <div className="co-benefit-item">
-            <div className="co-benefit-icon"><Lock size={20} /></div>
-            <div>
-              <div className="co-benefit-label">Lifetime Access</div>
-              <div className="co-benefit-desc">Recordings stay active</div>
+          <div className="co-feature-item">
+            <div className="co-feature-icon">
+              <Lock size={20} />
+            </div>
+            <div className="co-feature-text">
+              <h4>Lifetime Access</h4>
+              <p>Recordings stay active</p>
             </div>
           </div>
-          <div className="co-benefit-item">
-            <div className="co-benefit-icon"><Layout size={20} /></div>
-            <div>
-              <div className="co-benefit-label">Hands-on Labs</div>
-              <div className="co-benefit-desc">100+ Cloud exercises</div>
+          <div className="co-feature-item">
+            <div className="co-feature-icon">
+              <Monitor size={20} />
+            </div>
+            <div className="co-feature-text">
+              <h4>Hands-on Labs</h4>
+              <p>100+ Cloud exercises</p>
             </div>
           </div>
         </div>
+
+        <div className="co-cta">
+          <button className="co-start-learning-btn" onClick={handleStart}>
+            <span>Start Learning</span>
+            <ChevronRight size={20} />
+          </button>
+        </div>
       </div>
 
-      {/* CTA Section */}
-      <div className="co-cta-section">
-        <button className="co-start-btn" onClick={handleStart}>
-          Start Learning
-          <ChevronRight size={22} />
-        </button>
-      </div>
     </div>
   );
 };
 
-export default CourseOverview;
+
+export default CourseOverview;

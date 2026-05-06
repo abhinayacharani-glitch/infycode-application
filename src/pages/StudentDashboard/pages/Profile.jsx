@@ -88,42 +88,23 @@ const Profile = () => {
         setAcademic({ degree: p.degree || "", branch: p.branch || "", college: p.college || "", passOutYear: p.passOutYear || "", cgpa: p.cgpa || "" });
       }
 
-      // Fetch enrolled courses (Synced with Courses.jsx logic)
+      // Fetch enrolled courses (Synced with dynamic PublishedCourses)
       const cRes = await getEnrolledCourses();
       const enrolledIds = Array.isArray(cRes) ? cRes : (cRes.enrolledCourses || []);
 
-      try {
-        const { COURSE_MAP } = await import('./data/extraCourses');
-        const { ALL_COURSES } = await import('../../../components/Courses/Courses');
+      const enrolled = enrolledIds.map(id => {
+        const found = publishedCourses?.find(c => c.courseId === id || c.id === id);
+        if (found) {
+          return {
+            ...found,
+            id: found.courseId || found.id,
+            modules: found.modules || []
+          };
+        }
+        return null;
+      }).filter(Boolean);
 
-        const enrolled = [];
-
-        enrolledIds.forEach(id => {
-          if (COURSE_MAP[id]) {
-            enrolled.push(COURSE_MAP[id]);
-          } else {
-            const matchedAllCourse = ALL_COURSES.find(c => c.courseId === id);
-            if (matchedAllCourse) {
-              const matchedMapCourse = Object.values(COURSE_MAP).find(c => c.title === matchedAllCourse.title);
-              if (matchedMapCourse) {
-                enrolled.push(matchedMapCourse);
-              } else {
-                enrolled.push({ ...matchedAllCourse, id: matchedAllCourse.courseId, modules: [] });
-              }
-            } else {
-              const matchedPublishedCourse = publishedCourses?.find(c => c.courseId === id);
-              if (matchedPublishedCourse) {
-                 enrolled.push({ ...matchedPublishedCourse, id: matchedPublishedCourse.courseId, modules: [] });
-              }
-            }
-          }
-        });
-
-        setEnrolledCourses(enrolled);
-      } catch (err) {
-        console.error("Failed to sync course data:", err);
-        setEnrolledCourses([]);
-      }
+      setEnrolledCourses(enrolled);
 
       // Fetch test results
       const tRes = await getMyResults();

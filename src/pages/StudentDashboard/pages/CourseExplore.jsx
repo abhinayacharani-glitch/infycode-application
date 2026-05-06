@@ -1,39 +1,44 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { COURSE_MAP } from './data/extraCourses';
 import { useCourseContext } from '../../../context/CourseContext';
+import { parseCurriculum } from '../../../utils/courseUtils';
 import './CourseExplore.css';
 
 /* ── Topic key-points generator ── */
 const getKeyPoints = (topic) => {
   if (topic.points) return topic.points;
   const title = topic.title.toLowerCase();
+  
+  // Java & Backend
   if (title.includes('java') || title.includes('jvm')) return ['Understand the JVM (Java Virtual Machine) architecture and how it executes bytecode', 'Set up JDK 17+ and configure IntelliJ IDEA for Java development', 'Write, compile, and run your first Java program from the command line', 'Learn how Java achieves platform independence through "Write Once, Run Anywhere"'];
-  if (title.includes('variable') || title.includes('data type')) return ['Distinguish between primitive types (int, char, boolean, double) and reference types', 'Understand how Java stores variables on the stack vs heap memory', 'Apply type casting (implicit and explicit) safely in Java programs', 'Use wrapper classes (Integer, Boolean, etc.) and understand autoboxing'];
-  if (title.includes('control') || title.includes('loop')) return ['Write conditional logic using if-else and nested conditions', 'Implement for, while, and do-while loops for iteration', 'Use break and continue to control loop execution', 'Apply switch statements for multi-branch decision making'];
-  if (title.includes('array') || title.includes('string')) return ['Declare and initialise single and multi-dimensional arrays', 'Traverse arrays using enhanced for-each loops', 'Apply common String methods: length(), substring(), indexOf(), equals()', 'Use StringBuilder for efficient mutable string operations'];
-  if (title.includes('method') || title.includes('recursion')) return ['Define methods with parameters, return types, and proper naming conventions', 'Understand method overloading and when to apply it', 'Implement recursive methods and identify base cases', 'Analyse the call stack and avoid StackOverflow errors'];
-  if (title.includes('exception')) return ['Distinguish between checked and unchecked exceptions', 'Use try-catch-finally blocks to handle runtime errors gracefully', 'Create custom exception classes by extending Exception', 'Apply best practices: do not swallow exceptions, use specific catch blocks'];
-  if (title.includes('file') || title.includes('scanner') || title.includes('i/o')) return ['Read data from files using FileReader and BufferedReader', 'Write to files using FileWriter and BufferedWriter', 'Handle IOException with proper try-with-resources syntax', 'Accept user input at runtime using the Scanner class'];
-  if (title.includes('package') || title.includes('access')) return ['Organise classes into meaningful package hierarchies', 'Apply access modifiers: public, private, protected, and package-private', 'Understand why encapsulation is a core OOP principle', 'Use static imports and wildcard imports appropriately'];
-  if (title.includes('oop') || title.includes('class') || title.includes('object')) return ['Define classes with fields, constructors, and methods', 'Create and instantiate objects with the new keyword', 'Understand the four pillars of OOP: Encapsulation, Inheritance, Polymorphism, Abstraction', 'Differentiate between class (static) and instance members'];
-  if (title.includes('encapsulation') || title.includes('inheritance')) return ['Protect class fields using private access and expose them via getters/setters', 'Use the extends keyword to create a class hierarchy', 'Understand method hiding vs method overriding', 'Call superclass constructors and methods using super keyword'];
-  if (title.includes('polymorphism') || title.includes('abstraction')) return ['Override methods in subclasses to change runtime behaviour', 'Declare abstract classes and abstract methods', 'Implement interfaces to define behavioural contracts', 'Understand upcasting, downcasting, and the instanceof operator'];
-  if (title.includes('collection')) return ['Choose the right collection: ArrayList, LinkedList, HashMap, HashSet, TreeMap', 'Iterate over collections using Iterator and enhanced for-each', 'Sort collections using Comparable and Comparator interfaces', 'Understand Big-O complexity for common collection operations'];
-  if (title.includes('spring boot')) return ['Bootstrap a Spring Boot project using Spring Initializr', 'Create REST controllers with @RestController and @RequestMapping', 'Define service layers and inject dependencies with @Service and @Autowired', 'Configure application properties and understand auto-configuration'];
-  if (title.includes('react') || title.includes('frontend')) return ['Set up a React project with Vite and connect to a Spring Boot backend', 'Create functional components and manage local state with useState', 'Fetch data from REST APIs using Axios or fetch()', 'Handle CORS configuration on the Spring Boot server'];
-  if (title.includes('python') || title.includes('setup') || title.includes('install')) return ['Install Python 3.x and configure a virtual environment', 'Understand Python\'s indentation-based syntax and dynamic typing', 'Write and execute your first Python script from the terminal', 'Use pip to install and manage third-party packages'];
+  if (title.includes('spring') || title.includes('boot')) return ['Bootstrap a Spring Boot project using Spring Initializr', 'Create REST controllers with @RestController and @RequestMapping', 'Define service layers and inject dependencies with @Service and @Autowired', 'Configure application properties and understand auto-configuration'];
+  
+  // React & Next.js
   if (title.includes('react') && title.includes('fundamental')) return ['Understand the Virtual DOM and how React efficiently updates the UI', 'Create functional components and pass data using props', 'Manage local state with the useState hook', 'Compose complex UIs by nesting simpler components'];
+  if (title.includes('next.js') || title.includes('nextjs')) return ['Master Server Components vs Client Components for optimal performance', 'Implement dynamic routing and nested layouts in the App Router', 'Optimise data fetching using fetch() with server-side caching', 'Deploy high-performance web apps to Vercel or custom servers'];
+  
+  // Angular
+  if (title.includes('angular')) return ['Understand the Component-based architecture and Dependency Injection', 'Master Reactive Forms for complex data entry validation', 'Implement state management using NgRx or simple services', 'Build modular applications with feature modules and lazy loading'];
+
+  // Mobile Dev (Flutter)
+  if (title.includes('flutter') || title.includes('dart')) return ['Learn Dart programming language fundamentals for Flutter development', 'Master Widget-based UI construction: Stateless vs Stateful widgets', 'Implement cross-platform navigation and state management (Provider/Riverpod)', 'Build and deploy apps for both iOS and Android from a single codebase'];
+
+  // Node & MERN
   if (title.includes('node') || title.includes('express')) return ['Understand the Node.js event-driven, non-blocking architecture', 'Create an Express.js server and define route handlers', 'Use middleware for logging, parsing, and error handling', 'Connect to MongoDB using Mongoose from an Express application'];
   if (title.includes('mongodb') || title.includes('mongoose')) return ['Design MongoDB schemas using Mongoose models', 'Perform CRUD operations with Mongoose (find, save, updateOne, deleteOne)', 'Set up indexes to optimise query performance', 'Understand document embedding vs referencing for relationships'];
-  if (title.includes('docker') || title.includes('container')) return ['Write a Dockerfile with a multi-stage build for smaller images', 'Build, tag, and push Docker images to a container registry', 'Run containers with environment variables and volume mounts', 'Define multi-service stacks using Docker Compose'];
-  if (title.includes('kubernetes') || title.includes('k8s')) return ['Understand Kubernetes architecture: nodes, pods, and control plane', 'Deploy applications using Deployment manifests and manage replicas', 'Expose applications internally and externally with Services', 'Configure applications using ConfigMaps and Secrets'];
-  if (title.includes('ci/cd') || title.includes('jenkins') || title.includes('github action')) return ['Define pipeline stages: Build, Test, Deploy in a Jenkinsfile/workflow', 'Trigger pipelines automatically on Git push events', 'Run automated tests and publish test reports in CI', 'Deploy to a target environment on successful pipeline run'];
-  if (title.includes('terraform')) return ['Write Terraform configuration files to provision cloud resources', 'Use variables, outputs, and modules for reusable infrastructure', 'Manage remote state with a Terraform backend (S3/Azure Blob)', 'Plan and apply infrastructure changes safely using terraform plan'];
+
+  // Cloud & DevOps
   if (title.includes('aws') || title.includes('ec2') || title.includes('cloud')) return ['Understand the AWS Shared Responsibility Model for security', 'Launch and configure EC2 instances with appropriate instance types', 'Create IAM roles and policies following least-privilege principles', 'Monitor resources with CloudWatch metrics, logs, and alarms'];
+  if (title.includes('docker') || title.includes('container')) return ['Write a Dockerfile with a multi-stage build for smaller images', 'Build, tag, and push Docker images to a container registry', 'Run containers with environment variables and volume mounts', 'Define multi-service stacks using Docker Compose'];
+  
+  // AI, Data Science & ML
   if (title.includes('ai') || title.includes('artificial') || title.includes('machine learning') || title.includes('deep learning')) return ['Understand the mathematical foundations and core principles of Artificial Intelligence', 'Differentiate between Supervised, Unsupervised, and Reinforcement Learning', 'Learn how Neural Networks mimic human brain functions to process complex data', 'Explore real-world applications and the ethical implications of AI development'];
   if (title.includes('nlp') || title.includes('language')) return ['Master text preprocessing techniques like tokenization, stemming, and lemmatization', 'Implement sentiment analysis models to determine emotional tone in text', 'Understand the architecture of modern Large Language Models (LLMs)', 'Build conversational agents and chatbots using advanced NLP libraries'];
   if (title.includes('vision') || title.includes('image')) return ['Understand digital image representation and basic processing techniques', 'Implement image classification models to identify objects in visual data', 'Learn about Object Detection and its applications in autonomous systems', 'Explore Face Recognition and biometric security architectures'];
+  
+  // Aptitude
+  if (title.includes('aptitude') || title.includes('number system') || title.includes('percentage') || title.includes('ratio')) return ['Master speed math techniques and mental calculation shortcuts', 'Understand the underlying patterns and logical steps for each problem type', 'Practice with diverse difficulty levels to improve accuracy and speed', 'Learn to eliminate incorrect options quickly using estimation and unit digits'];
+  
   return [
     `Understand the core concepts and motivation behind ${topic.title}`,
     `Apply the key techniques covered in this topic to real-world scenarios`,
@@ -42,46 +47,56 @@ const getKeyPoints = (topic) => {
   ];
 };
 
+
 /* ── Sidebar Data Generator ── */
 const getSidebarData = (topic) => {
   const title = topic.title.toLowerCase();
 
-  if (title.includes('java') && title.includes('intro')) {
+  if (title.includes('java') || title.includes('spring')) {
     return {
-      takeaways: [
-        "Java code is compiled to Bytecode, not machine code",
-        "The JVM provides platform independence (WORA)",
-        "JRockit and HotSpot are common JVM implementations",
-        "JDK includes JRE and development tools like javac"
-      ],
-      reference: "java -version, javac HelloWorld.java",
-      context: "Used in 90% of Fortune 500 companies for backend systems due to its reliability and massive ecosystem."
+      takeaways: ["Java uses platform-independent Bytecode", "JVM provides automatic memory management", "Spring Boot simplifies production-ready apps", "Dependency Injection is core to Spring Framework"],
+      reference: "java -version, mvn spring-boot:run",
+      context: "Powers massive enterprise backends for 90% of Fortune 500 companies."
     };
   }
 
-  if (title.includes('variable')) {
+  if (title.includes('react') || title.includes('next')) {
     return {
-      takeaways: [
-        "Primitives: byte, short, int, long, float, double, char, boolean",
-        "Stack memory for primitives, Heap for objects",
-        "Strings are reference types but behave uniquely",
-        "Final variables cannot be reassigned"
-      ],
-      reference: "int x = 10; float f = 10.5f; char c = 'A';",
-      context: "Memory management in Java is handled by the Garbage Collector, making variable scope critical for performance."
+      takeaways: ["React components use a declarative approach", "Next.js App Router optimizes SEO and performance", "Server Components reduce client-side JS bundles", "State management with Hooks vs external stores"],
+      reference: "npx create-next-app@latest",
+      context: "Industry standard for high-performance, SEO-friendly web frontends."
     };
   }
 
-  if (title.includes('ai') || title.includes('artificial') || title.includes('ml') || title.includes('learning')) {
+  if (title.includes('flutter')) {
     return {
-      takeaways: [
-        "AI is the broad science of mimicking human intelligence",
-        "ML is a subset of AI focused on learning from data",
-        "Deep Learning uses multi-layered neural networks",
-        "Data quality is more important than algorithm complexity"
-      ],
-      reference: "model.fit(X_train, y_train)",
-      context: "The current AI revolution is driven by three factors: Massive Data, Increased Compute Power, and Algorithmic Innovations."
+      takeaways: ["Flutter uses Dart for high-performance rendering", "The Skia engine ensures consistent UI across OS", "Hot Reload significantly accelerates development", "Everything in Flutter is a Widget"],
+      reference: "flutter doctor, flutter run",
+      context: "Primary choice for building native-feel cross-platform mobile apps."
+    };
+  }
+
+  if (title.includes('ai') || title.includes('ml') || title.includes('deep learning')) {
+    return {
+      takeaways: ["AI mimics human cognition with statistics", "Neural networks learn patterns from raw data", "Deep Learning requires high compute power (GPUs)", "Data ethics are as critical as accuracy"],
+      reference: "import tensorflow as tf; import torch",
+      context: "The fastest growing technology field, transforming every modern industry."
+    };
+  }
+
+  if (title.includes('cloud') || title.includes('aws')) {
+    return {
+      takeaways: ["Cloud offers on-demand scalability", "Infrastructure as Code (IaC) is industry standard", "Serverless computing reduces operational overhead", "Security is a shared responsibility model"],
+      reference: "aws s3 ls, terraform apply",
+      context: "Critical for modern scalable software architecture and DevOps pipelines."
+    };
+  }
+
+  if (title.includes('aptitude')) {
+    return {
+      takeaways: ["Time management is the key to exam success", "Shortcuts reduce 2-min problems to 10 seconds", "Logic patterns recur across different domains", "Daily practice builds mental agility"],
+      reference: "Ratio, Proportion, Digital Roots",
+      context: "Foundational skill for all placements and competitive engineering exams."
     };
   }
 
@@ -101,119 +116,96 @@ const getSidebarData = (topic) => {
 const getDetailedContent = (topic) => {
   const title = topic.title.toLowerCase();
 
-  if (title.includes('ai') || title.includes('artificial')) {
+  // 1. AI & Machine Learning (Comprehensive)
+  if (title.includes('ai') || title.includes('artificial intelligence') || title.includes('deep learning')) {
     return `
       <div class="rich-reading-content">
         <section class="reading-section">
           <h3>1. The Core Philosophy of Artificial Intelligence</h3>
-          <p>Artificial Intelligence is not just about robots; it's about building systems that can <strong>reason, learn, and act</strong>. At its heart, AI seeks to automate tasks that typically require human cognition, such as visual perception, speech recognition, and decision-making.</p>
+          <p>Artificial Intelligence is the science of building systems that can <strong>reason, learn, and act</strong> autonomously. It seeks to automate cognitive tasks like perception, reasoning, and planning.</p>
           <div class="info-callout">
-            <strong>Key Insight:</strong> Modern AI has shifted from "Rule-Based Systems" (if-this-then-that) to "Data-Driven Systems" where the machine discovers the rules itself.
+            <strong>Key Insight:</strong> AI has evolved from rule-based systems to data-driven learning models that discover patterns without explicit programming.
           </div>
         </section>
-        
         <section class="reading-section">
-          <h3>2. The AI Hierarchy: AI vs ML vs DL</h3>
-          <p>It's crucial to understand how these terms relate:</p>
+          <h3>2. The Hierarchy: AI vs ML vs DL</h3>
           <ul>
-            <li><strong>Artificial Intelligence:</strong> The umbrella term for any technique that enables computers to mimic human behavior.</li>
-            <li><strong>Machine Learning:</strong> A subset of AI that uses statistical methods to enable machines to improve with experience.</li>
-            <li><strong>Deep Learning:</strong> A subset of ML based on Artificial Neural Networks with multiple layers (hence "deep").</li>
+            <li><strong>AI:</strong> The broad umbrella of mimicking human intelligence.</li>
+            <li><strong>Machine Learning:</strong> A subset using statistical learning to improve from experience.</li>
+            <li><strong>Deep Learning:</strong> Uses multi-layered Artificial Neural Networks (ANNs).</li>
           </ul>
+        </section>
+        <section class="reading-section">
+          <h3>3. Real-World Applications & Ethics</h3>
+          <p>AI powers autonomous driving, medical diagnosis, and generative models like LLMs. However, it raises critical ethical concerns regarding <strong>bias, transparency, and accountability</strong>.</p>
         </section>
       </div>
     `;
   }
 
-  if (title.includes('java') && title.includes('intro')) {
+  // 2. Next.js & React
+  if (title.includes('next.js') || title.includes('react')) {
     return `
       <div class="rich-reading-content">
         <section class="reading-section">
-          <h3>1. The Evolution of Java & The JVM Ecosystem</h3>
-          <p>Java's journey from a "Green Project" for consumer electronics to the backbone of enterprise software is legendary. Its primary innovation was the <strong>Java Virtual Machine (JVM)</strong>. Unlike C++, where programs are compiled directly into OS-specific machine code, Java compiles into platform-independent <strong>Bytecode</strong>.</p>
+          <h3>1. Modern Web Architecture with Next.js</h3>
+          <p>Next.js simplifies React development by providing built-in routing, SSR (Server Side Rendering), and SSG (Static Site Generation). The <strong>App Router</strong> is the modern standard for structuring performant web apps.</p>
           <div class="info-callout">
-            <strong>Key Insight:</strong> The JVM acts as a translation layer. As long as a device has a JVM installed, it can run any Java .class file, regardless of the underlying hardware.
+            <strong>Performance Tip:</strong> Use Server Components by default to reduce the JavaScript sent to the client, improving page load speeds significantly.
           </div>
         </section>
-        
         <section class="reading-section">
-          <h3>2. Deep Dive: The Compilation Lifecycle</h3>
-          <p>Understanding the path from a <code>.java</code> file to execution is crucial for debugging and optimization:</p>
-          <ol>
-            <li><strong>Development:</strong> You write source code in <code>.java</code> files.</li>
-            <li><strong>Compilation:</strong> The <code>javac</code> compiler checks for syntax errors and generates <code>.class</code> files (Bytecode).</li>
-            <li><strong>Loading:</strong> The <strong>ClassLoader</strong> loads the bytecode into the JVM memory.</li>
-            <li><strong>Verification:</strong> The Bytecode Verifier ensures the code doesn't violate security constraints.</li>
-            <li><strong>Execution:</strong> The <strong>Interpreter</strong> reads bytecode. For performance, the <strong>JIT (Just-In-Time) Compiler</strong> identifies "hot spots" and compiles them into native machine code.</li>
-          </ol>
-        </section>
-
-        <section class="reading-section">
-          <h3>3. Memory Management: Stack vs. Heap</h3>
-          <p>Java manages memory automatically, but developers must understand where data lives:</p>
-          <ul>
-            <li><strong>Stack Memory:</strong> Stores local variables and method call frames. It is fast and follows LIFO (Last-In-First-Out).</li>
-            <li><strong>Heap Memory:</strong> Stores all objects and instance variables. This is where the <strong>Garbage Collector (GC)</strong> operates, reclaiming memory from unused objects.</li>
-          </ul>
+          <h3>2. Data Fetching Patterns</h3>
+          <p>Next.js extends the standard <code>fetch</code> API to include automatic caching and revalidation, allowing you to build dynamic sites that feel as fast as static ones.</p>
         </section>
       </div>
     `;
   }
 
-  if (title.includes('variable')) {
+  // 3. Flutter & Mobile Dev
+  if (title.includes('flutter') || title.includes('mobile')) {
     return `
       <div class="rich-reading-content">
         <section class="reading-section">
-          <h3>1. Data Types: Primitives & Memory Allocation</h3>
-          <p>Java is a strictly typed language, meaning every piece of data has a predefined size and behavior. This prevents common errors like buffer overflows.</p>
-          <table class="data-type-table">
-            <thead>
-              <tr><th>Type</th><th>Size</th><th>Range</th></tr>
-            </thead>
-            <tbody>
-              <tr><td>byte</td><td>1 byte</td><td>-128 to 127</td></tr>
-              <tr><td>int</td><td>4 bytes</td><td>-2^31 to 2^31-1</td></tr>
-              <tr><td>double</td><td>8 bytes</td><td>Floating point numbers</td></tr>
-            </tbody>
-          </table>
-        </section>
-        
-        <section class="reading-section">
-          <h3>2. Reference Types vs. Primitives</h3>
-          <p>When you create an object, the variable doesn't hold the object itself — it holds a <strong>reference</strong> (memory address) to where the object lives in the Heap. Primitives, however, store the actual numeric or boolean value directly on the Stack.</p>
-          <div class="warning-callout">
-            <strong>Danger Zone:</strong> Comparing reference types (like Strings) with <code>==</code> compares their memory addresses, not their content. Always use <code>.equals()</code> for content comparison.
+          <h3>1. Cross-Platform Excellence with Flutter</h3>
+          <p>Flutter allows developers to build natively compiled applications for mobile, web, and desktop from a single codebase. It uses the <strong>Dart</strong> language and a unique rendering engine called <strong>Skia</strong>.</p>
+          <div class="info-callout">
+            <strong>The "Widget" Concept:</strong> In Flutter, everything is a widget—from the layout to the smallest icon. This composition-based UI makes it incredibly flexible.
           </div>
         </section>
-
         <section class="reading-section">
-          <h3>3. Scope and Lifecycle</h3>
-          <p>Variable scope determines visibility and lifetime. Variables declared inside a method (local) are destroyed when the method finishes. Instance variables (fields) live as long as their containing object exists.</p>
+          <h3>2. State Management Strategies</h3>
+          <p>Effective state management (using Provider, Riverpod, or Bloc) is crucial for building responsive mobile apps that handle user interactions and data updates smoothly.</p>
         </section>
       </div>
     `;
   }
 
-  if (title.includes('control') || title.includes('loop')) {
+  // 4. MERN & Node.js
+  if (title.includes('mern') || title.includes('node') || title.includes('express')) {
     return `
       <div class="rich-reading-content">
         <section class="reading-section">
-          <h3>1. Structural Logic: Branching & Selection</h3>
-          <p>Decision making is the core of any algorithm. In Java, <code>if-else</code> blocks are best for range-based logic (e.g., <code>score > 90</code>), while <code>switch</code> expressions are optimized for equality checks against discrete constants.</p>
+          <h3>1. The MERN Stack: Unified JavaScript Development</h3>
+          <p>MERN (MongoDB, Express, React, Node) allows for full-stack development using a single language: JavaScript. This unification accelerates development and simplifies the tech stack.</p>
+          <div class="info-callout">
+            <strong>Non-Blocking I/O:</strong> Node.js uses an event loop to handle thousands of concurrent connections efficiently, making it ideal for data-intensive real-time applications.
+          </div>
         </section>
-        
-        <section class="reading-section">
-          <h3>2. Iteration Engineering: Selecting the Right Loop</h3>
-          <p>Choosing the wrong loop can lead to performance bottlenecks or infinite recursion:</p>
-          <ul>
-            <li><strong>Deterministic (for):</strong> Use when the number of iterations is known (e.g., iterating over an array of 10 items).</li>
-            <li><strong>Non-Deterministic (while):</strong> Use when the stop condition depends on external factors (e.g., reading lines from a file until EOF).</li>
-          </ul>
-        </section>
+      </div>
+    `;
+  }
 
+  // 5. Aptitude & Reasoning
+  if (title.includes('aptitude') || title.includes('logic')) {
+    return `
+      <div class="rich-reading-content">
         <section class="reading-section">
-          <h3>3. Optimization: Break and Continue</h3>
-          <p>These jump statements provide granular control. <code>break</code> terminates the innermost loop, whereas <code>continue</code> skips to the next check. Overuse can make code harder to follow—always prefer clear exit conditions over frequent breaks.</p>
+          <h3>1. Analytical Problem Solving</h3>
+          <p>Aptitude testing measures your ability to solve complex problems using logic and math. It is a critical gateway for technical and management careers.</p>
+          <div class="info-callout">
+            <strong>Pro Strategy:</strong> Master "Digital Roots" and "Unit Digits" to verify mathematical answers in seconds without full calculation.
+          </div>
         </section>
       </div>
     `;
@@ -226,22 +218,13 @@ const getDetailedContent = (topic) => {
         <h3>Architecture of ${topic.title}</h3>
         <p>This module provides a comprehensive deep-dive into <strong>${topic.title}</strong>, focusing on the architectural patterns and implementation strategies used in large-scale enterprise environments.</p>
       </section>
-
       <section class="reading-section">
         <h3>Key Technical Pillars</h3>
         <ul>
-          <li><strong>Efficiency:</strong> How ${topic.title} impacts CPU and Memory utilization.</li>
-          <li><strong>Decoupling:</strong> Applying the Single Responsibility Principle (SRP) to this logic.</li>
-          <li><strong>Scalability:</strong> Ensuring the implementation can handle high-throughput scenarios.</li>
+          <li><strong>Efficiency:</strong> Optimized resource utilization.</li>
+          <li><strong>Decoupling:</strong> Applying modular design principles.</li>
+          <li><strong>Scalability:</strong> Built for high-throughput scenarios.</li>
         </ul>
-      </section>
-
-      <section class="reading-section">
-        <h3>Industry Implementation</h3>
-        <p>${topic.content.replace(/<p>|<\/p>/g, '')}</p>
-        <div class="info-callout">
-          <strong>Best Practice:</strong> Always validate inputs and handle edge cases at the entry point of your ${topic.title} implementation.
-        </div>
       </section>
     </div>
   `;
@@ -301,43 +284,31 @@ const CourseExplore = () => {
   const state = location.state;
   const courseId = (typeof state === 'string' ? state : state?.courseId);
   
-  let course = null;
+  // 1. Find the course from publishedCourses
+  const activeCourse = useMemo(() => {
+    if (!publishedCourses || !courseId) return null;
+    return publishedCourses.find(c => c.id === courseId || c.courseId === courseId);
+  }, [publishedCourses, courseId]);
 
-  // 1. Try to match by ID in COURSE_MAP
-  if (courseId) {
-    course = COURSE_MAP[courseId];
-  }
+  // 2. Resolve final course object (prefer dynamic data, then fallback)
+  const course = useMemo(() => {
+    if (!activeCourse) return null;
 
-  // 2. If not found by ID, or if ID is a dynamic one, try matching by title from context or state
-  if (!course && publishedCourses && courseId) {
-    const published = publishedCourses.find(c => c.courseId === courseId || c.id === courseId);
-    if (published) {
-      const pTitle = published.title.toLowerCase();
-      if (pTitle.includes('ai') || pTitle.includes('artificial') || pTitle.includes('intelligence') || pTitle.includes('machine learning')) {
-        course = COURSE_MAP['intro-ai-01'];
-      }
-    }
-  }
+    // If it has modules already (from static map), use them
+    if (activeCourse.modules) return activeCourse;
 
-  // 3. Last resort: Broad title match across COURSE_MAP if we have no ID or still no course
-  if (!course) {
-    course = Object.values(COURSE_MAP).find(c => {
-      const t = c.title.toLowerCase();
-      return t.includes('artificial intelligence') || 
-             t.includes('introduction to ai') ||
-             t.includes('ai foundations') ||
-             t.includes('machine learning');
-    });
-  }
-
-  // 4. Final fallback to Java (only if absolutely no match found)
-  if (!course) course = COURSE_MAP['java-fs-01'];
+    // Otherwise parse curriculum string
+    return {
+      ...activeCourse,
+      modules: parseCurriculum(activeCourse.curriculum)
+    };
+  }, [activeCourse]);
 
   const [openModules, setOpenModules] = useState({});
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
-    if (state?.topicId) {
+    if (state?.topicId && course?.modules) {
       const targetModule = course.modules.find(m => 
         m.topics.some(t => t.id === state.topicId)
       );
@@ -374,8 +345,16 @@ const CourseExplore = () => {
   const toggleModule = (id) =>
     setOpenModules(prev => ({ ...prev, [id]: !prev[id] }));
 
-  const totalTopics = course.modules.reduce((sum, m) => sum + m.topics.length, 0);
-  const totalModules = course.modules.length;
+  const totalTopics = course?.modules?.reduce((sum, m) => sum + m.topics.length, 0) || 0;
+  const totalModules = course?.modules?.length || 0;
+
+  if (!course) {
+    return (
+      <div className="curr-page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '80vh' }}>
+        <div className="ap-success-loader" />
+      </div>
+    );
+  }
 
   return (
     <div className="curr-page">

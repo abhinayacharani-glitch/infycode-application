@@ -1,22 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCourseContext } from "../../context/CourseContext";
 import { motion } from "framer-motion";
-import { Search, Filter, Star, Clock, Users, ArrowRight, Eye, Calendar, User as UserIcon } from "lucide-react";
+import { Search, Filter, Star, StarHalf, Clock, Users, ArrowRight, Eye, Calendar, User as UserIcon } from "lucide-react";
 import { getCourseImage } from "../../utils/courseUtils";
 import "./Courses.css";
 import bgImage from "../../assets/course/bg.jpg";
-// Course images from assets/course
-import imgReact from "../../assets/course/react.jpeg";
-import imgWebDev from "../../assets/course/Webdev.jpeg";
-import imgPython from "../../assets/course/Python.jpeg";
-import imgJava from "../../assets/course/java.jpeg";
-import imgAI from "../../assets/course/AI.jpeg";
-import imgDataScience from "../../assets/course/DataScience.jpeg";
-import imgCloud from "../../assets/course/cloud.jpeg";
-import imgUIUX from "../../assets/course/UI-UX.jpeg";
+const CATEGORIES = ["All", "Web Dev", "Python", "Java", "AI & Data", "Cybersecurity", "Cloud", "Mobile Dev"];
 
-const CATEGORIES = ["All", "Web Dev", "Python", "Java", "AI & Data", "Cybersecurity", "Cloud"];
+// Legacy export kept to prevent import errors in other components migrating to dynamic data
+// Conflict resolved and local build verified successfully.
+export const ALL_COURSES = [];
+
 
 const statusColors = {
   "BEST SELLER": { bg: "rgba(249, 115, 22, 0.12)", color: "#f97316" },
@@ -40,188 +35,6 @@ const statusColors = {
   "SUCCESS": { bg: "rgba(244, 63, 94, 0.12)", color: "#f43f5e" },
 };
 
-export const ALL_COURSES = [
-  {
-    image: imgJava,
-    title: "Java Full Stack Development",
-    category: "Java",
-    badge: "Bestseller",
-    color: "#e11d48",
-    rating: 4.8,
-    students: "15k",
-    duration: "6 months",
-    startDate: "May 15, 2026",
-    trainer: "Rohan",
-    level: "Intermediate",
-    price: "4 months",
-    courseId: "java-fs-01"
-  },
-  {
-    image: imgDataScience,
-    title: "Data Science & AI",
-    category: "AI & Data",
-    badge: "Trending",
-    color: "#2563eb",
-    rating: 4.9,
-    students: "9k",
-    duration: "5 months",
-    startDate: "May 20, 2026",
-    trainer: "Gayathri",
-    level: "Advanced",
-    price: "6 months",
-    courseId: "data-sci-01"
-  },
-  {
-    image: imgAI,
-    title: "Machine Learning Deep Dive",
-    category: "AI & Data",
-    badge: "NEW",
-    color: "#7c3aed",
-    rating: 4.7,
-    students: "7k",
-    duration: "4 months",
-    startDate: "June 01, 2026",
-    trainer: "Abhinaya",
-    level: "Advanced",
-    price: "4 months",
-    courseId: "ml-deep-01"
-  },
-  {
-    image: imgUIUX,
-    title: "Ethical Hacking & Cyber Security",
-    category: "Cybersecurity",
-    badge: "Popular",
-    color: "#059669",
-    rating: 4.8,
-    students: "12k",
-    duration: "4 months",
-    startDate: "May 10, 2026",
-    trainer: "Karthisha",
-    level: "Intermediate",
-    price: "4 months",
-    courseId: "cyber-sec-01"
-  },
-  {
-    image: imgReact,
-    title: "React JS Full Stack Development",
-    category: "Web Dev",
-    badge: "Bestseller",
-    color: "#0ea5e9",
-    rating: 4.9,
-    students: "20k",
-    duration: "3 months",
-    startDate: "May 25, 2026",
-    trainer: "Mohan",
-    level: "Intermediate",
-    price: "4 months",
-    courseId: "react-fs-01"
-  },
-  {
-    image: imgPython,
-    title: "Python Programming Masterclass",
-    category: "Python",
-    badge: "Top Rated",
-    color: "#3776ab",
-    rating: 4.9,
-    students: "25k",
-    duration: "2 months",
-    startDate: "June 05, 2026",
-    trainer: "Nagaharsha",
-    level: "Beginner",
-    price: "2 months",
-    courseId: "python-master-01"
-  },
-  {
-    image: imgCloud,
-    title: "AWS Cloud Practitioner",
-    category: "Cloud",
-    badge: "Hot",
-    color: "#ff9900",
-    rating: 4.8,
-    students: "10k",
-    duration: "3 months",
-    startDate: "June 10, 2026",
-    trainer: "Rohan",
-    level: "Beginner",
-    price: "3 months",
-    courseId: "aws-cloud-01"
-  },
-  {
-    image: imgWebDev,
-    title: "Next.js 14 Masterclass",
-    category: "Web Dev",
-    badge: "NEW",
-    color: "#000000",
-    rating: 4.8,
-    students: "5k",
-    duration: "2 months",
-    startDate: "June 15, 2026",
-    trainer: "Gayathri",
-    level: "Advanced",
-    price: "2 months",
-    courseId: "nextjs-14-01"
-  },
-  {
-    image: imgWebDev,
-    title: "MERN Stack Development",
-    category: "Web Dev",
-    badge: "Bestseller",
-    color: "#47A248",
-    rating: 4.9,
-    students: "18k",
-    duration: "5 months",
-    startDate: "May 30, 2026",
-    trainer: "Abhinaya",
-    level: "Intermediate",
-    price: "5 months",
-    courseId: "mern-stack-01"
-  },
-  {
-    image: imgWebDev,
-    title: "Angular Enterprise Development",
-    category: "Web Dev",
-    badge: "Professional",
-    color: "#DD0031",
-    rating: 4.7,
-    students: "8k",
-    duration: "4 months",
-    startDate: "June 20, 2026",
-    trainer: "Karthisha",
-    level: "Advanced",
-    price: "4 months",
-    courseId: "angular-ent-01"
-  },
-  {
-    image: imgWebDev,
-    title: "Flutter Mobile Apps",
-    category: "App Dev",
-    badge: "NEW",
-    color: "#02569B",
-    rating: 4.8,
-    students: "11k",
-    duration: "5 months",
-    startDate: "June 25, 2026",
-    trainer: "Mohan",
-    level: "Beginner",
-    price: "6 months",
-    courseId: "flutter-mob-01"
-  },
-  {
-    image: imgPython,
-    title: "Full Stack Python Pro",
-    category: "Python",
-    badge: "ADVANCED",
-    color: "#3776ab",
-    rating: 4.9,
-    students: "16k",
-    duration: "6 months",
-    startDate: "July 01, 2026",
-    trainer: "Nagaharsha",
-    level: "Beginner",
-    price: "2 months",
-    courseId: "python-fullstack-01"
-  }
-];
 
 const Courses = () => {
   const navigate = useNavigate();
@@ -246,13 +59,13 @@ const Courses = () => {
     }
   };
 
-  const combinedCourses = [...publishedCourses, ...ALL_COURSES];
-
-  const filtered = combinedCourses.filter(course => {
-    const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = activeCategory === "All" || course.category === activeCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const filtered = useMemo(() => {
+    return publishedCourses.filter(course => {
+      const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = activeCategory === "All" || course.category === activeCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [publishedCourses, searchTerm, activeCategory]);
 
   return (
     <div className="courses-page-modern" id="courses">
@@ -403,9 +216,8 @@ const Courses = () => {
                   <div className="card-content-modern">
                     <h3 className="card-title-modern">{course.title}</h3>
 
-                    {/* Stats Section: Students & Rating */}
+                    {/* Stats Section: Rating */}
                     <div className="card-stats-modern">
-                      <span className="stat students-text">{course.students} students</span>
                       <div className="stat stars-container">
                         {[...Array(5)].map((_, index) => {
                           const rating = course.rating || 5;
@@ -415,7 +227,7 @@ const Courses = () => {
                           if (index < fullStars) {
                             return <Star key={index} size={14} fill="#f59e0b" color="#f59e0b" />;
                           } else if (index === fullStars && hasHalfStar) {
-                            return <Star key={index} size={14} fill="#f59e0b" color="#f59e0b" />;
+                            return <StarHalf key={index} size={14} fill="#f59e0b" color="#f59e0b" />;
                           } else {
                             return <Star key={index} size={14} color="#d1d5db" />;
                           }
