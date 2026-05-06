@@ -30,12 +30,13 @@ const CertificateModule = ({
 
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF({
-        orientation: 'landscape',
-        unit: 'px',
-        format: [canvas.width, canvas.height]
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
       });
 
-      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+      // A4 Portrait dimensions are 210mm x 297mm
+      pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
       pdf.save(`Certificate_${studentName.replace(/\s+/g, '_')}.pdf`);
     } catch (error) {
       console.error('Error generating PDF:', error);
