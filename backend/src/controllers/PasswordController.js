@@ -2,8 +2,9 @@ import crypto from "crypto";
 import db from "../config/firebase.js";
 import bcrypt from "bcryptjs";
 import sendEmail from "../utils/sendEmail.js";
+import admin from 'firebase-admin';
 
-const resetTokensRef = db.ref("passwordResetTokens");
+const resetTokensRef = db.collection("passwordResetTokens");
 
 // ─────────────────────────────────────────────
 // Helper: find all users by email (admins / trainers / students)
@@ -12,18 +13,15 @@ const resetTokensRef = db.ref("passwordResetTokens");
 const findUsersByEmail = async (email, role) => {
   const normalizedEmail = email.trim().toLowerCase();
 
-  const checkIn = async (refName) => {
-    const snap = await db.ref(refName)
-      .orderByChild("email")
-      .equalTo(normalizedEmail)
-      .once("value");
+  const checkIn = async (collectionName) => {
+    const snapshot = await db.collection(collectionName)
+      .where("email", "==", normalizedEmail)
+      .limit(1)
+      .get();
 
-    if (snap.exists()) {
-      let user = null;
-      snap.forEach((child) => {
-        user = { ...child.val(), _ref: refName, _key: child.key };
-      });
-      return user;
+    if (!snapshot.empty) {
+      const doc = snapshot.docs[0];
+      return { ...doc.data(), _ref: collectionName, _key: doc.id };
     }
     return null;
   };
@@ -81,7 +79,7 @@ export const forgotPassword = async (req, res) => {
     const otpExpiry = Date.now() + 1 * 60 * 1000; // 1 minute (Updated from 5 minutes)
 
     // Store OTP on the user's own Firebase record
-    await db.ref(user._ref).child(user._key).update({
+    await db.collection(user._ref).doc(user._key).update({
       resetOTP: otp,
       otpExpiry,
     });
@@ -159,9 +157,9 @@ export const verifyOTP = async (req, res) => {
 
     if (expiredUser && !validUser) {
       // Clear expired OTP from Firebase
-      await db.ref(expiredUser._ref).child(expiredUser._key).update({
-        resetOTP: null,
-        otpExpiry: null,
+      await db.collection(expiredUser._ref).doc(expiredUser._key).update({
+        resetOTP: admin.firestore.FieldValue.delete(),
+        otpExpiry: admin.firestore.FieldValue.delete(),
       });
       return res.status(400).json({ success: false, message: "OTP expired. Please request a new one." });
     }
@@ -173,16 +171,16 @@ export const verifyOTP = async (req, res) => {
     const user = validUser;
 
     // ✅ OTP is valid — clear it from Firebase
-    await db.ref(user._ref).child(user._key).update({
-      resetOTP: null,
-      otpExpiry: null,
+    await db.collection(user._ref).doc(user._key).update({
+      resetOTP: admin.firestore.FieldValue.delete(),
+      otpExpiry: admin.firestore.FieldValue.delete(),
     });
 
     // Generate a short-lived reset token (15 min) for the reset-password step
     const resetToken = crypto.randomBytes(32).toString("hex");
     const resetTokenExpiry = Date.now() + 15 * 60 * 1000;
 
-    await resetTokensRef.child(resetToken).set({
+    await resetTokensRef.doc(resetToken).set({
       email: email.trim().toLowerCase(),
       expiresAt: resetTokenExpiry,
       userRef: user._ref,
@@ -220,17 +218,17 @@ export const resetPassword = async (req, res) => {
     }
 
     // Get token from Firebase
-    const tokenSnap = await resetTokensRef.child(token).once("value");
+    const doc = await resetTokensRef.doc(token).get();
 
-    if (!tokenSnap.exists()) {
+    if (!doc.exists) {
       return res.status(400).json({ message: "Invalid or expired reset token" });
     }
 
-    const tokenData = tokenSnap.val();
+    const tokenData = doc.data();
 
     // Check expiry
     if (Date.now() > tokenData.expiresAt) {
-      await resetTokensRef.child(token).remove();
+      await resetTokensRef.doc(token).delete();
       return res.status(400).json({ message: "Reset token has expired. Please start over." });
     }
 
@@ -238,12 +236,12 @@ export const resetPassword = async (req, res) => {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     // Update the user's password in Firebase
-    await db.ref(tokenData.userRef).child(tokenData.userKey).update({
+    await db.collection(tokenData.userRef).doc(tokenData.userKey).update({
       password: hashedPassword,
     });
 
     // Delete token so it can't be reused
-    await resetTokensRef.child(token).remove();
+    await resetTokensRef.doc(token).delete();
 
     res.json({ message: "Password reset successful. You can now log in with your new password." });
   } catch (error) {
@@ -251,3 +249,4 @@ export const resetPassword = async (req, res) => {
     res.status(500).json({ error: "Failed to reset password. Please try again." });
   }
 };
+

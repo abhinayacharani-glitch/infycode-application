@@ -2,6 +2,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useCourseContext } from '../../../context/CourseContext';
 import { parseCurriculum } from '../../../utils/courseUtils';
+import { getStudentBatchesAPI, getBatchMaterialsAPI } from '../../../services/api';
+import { FileText, Download, Clock } from 'lucide-react';
 import './CourseExplore.css';
 
 /* ── Topic key-points generator ── */
@@ -282,13 +284,23 @@ const CourseExplore = () => {
 
   const { publishedCourses } = useCourseContext();
   const state = location.state;
-  const courseId = (typeof state === 'string' ? state : state?.courseId);
+  
+  // Try to get courseId from state, then localStorage
+  const courseId = useMemo(() => {
+    const idFromState = (typeof state === 'string' ? state : state?.courseId);
+    if (idFromState) {
+      localStorage.setItem('lastExploredCourseId', idFromState);
+      return idFromState;
+    }
+    return localStorage.getItem('lastExploredCourseId');
+  }, [state]);
   
   // 1. Find the course from publishedCourses
   const activeCourse = useMemo(() => {
     if (!publishedCourses || !courseId) return null;
     return publishedCourses.find(c => c.id === courseId || c.courseId === courseId);
   }, [publishedCourses, courseId]);
+
 
   // 2. Resolve final course object (prefer dynamic data, then fallback)
   const course = useMemo(() => {
@@ -306,6 +318,49 @@ const CourseExplore = () => {
 
   const [openModules, setOpenModules] = useState({});
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [myBatches, setMyBatches] = useState({});
+  const [batchMaterials, setBatchMaterials] = useState([]);
+
+  useEffect(() => {
+    const fetchBatches = async () => {
+      try {
+        const response = await getStudentBatchesAPI();
+        if (response.success) {
+          setMyBatches(response.batches || {});
+        }
+      } catch (err) {
+        console.error("Failed to fetch student batches:", err);
+      }
+    };
+    fetchBatches();
+  }, []);
+
+  useEffect(() => {
+    const fetchMaterials = async () => {
+      const batchMatch = Object.values(myBatches).find(b => 
+        b.courseId === courseId || 
+        b.courseName === course?.title ||
+        b.batchName?.includes(course?.title)
+      );
+
+      if (batchMatch) {
+        try {
+          const bId = batchMatch.batchId || batchMatch.id || batchMatch.firebaseKey;
+          console.log(`[CourseExplore] Fetching materials for batch: ${bId}`);
+          const res = await getBatchMaterialsAPI(bId);
+          if (res.success) {
+            setBatchMaterials(res.materials || []);
+          }
+        } catch (err) {
+          console.error("Failed to fetch batch materials:", err);
+        }
+      }
+    };
+
+    if (course && Object.keys(myBatches).length > 0) {
+      fetchMaterials();
+    }
+  }, [myBatches, courseId, course]);
 
   useEffect(() => {
     if (state?.topicId && course?.modules) {
@@ -461,7 +516,56 @@ const CourseExplore = () => {
                         ))}
                       </div>
 
-                      {/* Module Assignment removed per request */}
+                      {/* Separate Section for Resources & Materials */}
+                      <div className="curr-resource-section">
+                        <div className="curr-topics-header" style={{ marginTop: '20px', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
+                          Resource Materials
+                        </div>
+                        {(() => {
+                          const modMaterial = batchMaterials.find(mat => {
+                            const mName = (mat.moduleName || "").trim().toLowerCase();
+                            const targetSubtitle = (m.subtitle || "").trim().toLowerCase();
+                            const targetLabel = (m.label || "").trim().toLowerCase();
+                            
+                            return mName === targetSubtitle || 
+                                   targetSubtitle.includes(mName) || 
+                                   mName.includes(targetSubtitle) ||
+                                   mName === targetLabel;
+                          });
+
+                          if (modMaterial) {
+                            return (
+                              <div className="curr-material-card">
+                                <div className="curr-mat-left">
+                                  <div className="curr-mat-icon">
+                                    <FileText size={18} />
+                                  </div>
+                                  <div className="curr-mat-info">
+                                    <div className="curr-mat-title">{modMaterial.fileName}</div>
+                                    <div className="curr-mat-meta">Uploaded by {modMaterial.trainerName || 'Trainer'}</div>
+                                  </div>
+                                </div>
+                                <a 
+                                  href={modMaterial.fileUrl} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="curr-mat-btn"
+                                  style={{ textDecoration: 'none' }}
+                                >
+                                  <Download size={16} /> Open PDF
+                                </a>
+                              </div>
+                            );
+                          }
+
+                          return (
+                            <div className="curr-material-empty">
+                              <Clock size={16} />
+                              <span>No materials uploaded for this module yet.</span>
+                            </div>
+                          );
+                        })()}
+                      </div>
                     </div>
                   </div>
                 </div>

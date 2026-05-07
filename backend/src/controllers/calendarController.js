@@ -1,7 +1,7 @@
 import db from "../config/firebase.js";
 import { sendCalendarEventEmail } from "../services/emailService.js";
 
-const calendarRef = db.ref("trainerCalendarEvents");
+const calendarRef = db.collection("trainerCalendarEvents");
 
 /**
  * Helper to check if event is completed
@@ -31,9 +31,9 @@ export const createEvent = async (req, res) => {
       });
     }
 
-    const newEventRef = calendarRef.push();
+    const docRef = calendarRef.doc();
     const eventData = {
-      id: newEventRef.key,
+      id: docRef.id,
       title,
       type,
       date,
@@ -47,7 +47,7 @@ export const createEvent = async (req, res) => {
       createdAt: Date.now()
     };
 
-    await newEventRef.set(eventData);
+    await docRef.set(eventData);
 
     // Trigger Email
     await sendCalendarEventEmail(eventData, false, trainerEmail);
@@ -69,33 +69,34 @@ export const createEvent = async (req, res) => {
 export const getEvents = async (req, res) => {
   try {
     const trainerId = req.user.id;
-    const snapshot = await calendarRef.orderByChild("trainerId").equalTo(trainerId).once("value");
+    const snapshot = await calendarRef.where("trainerId", "==", trainerId).get();
 
-    if (!snapshot.exists()) {
+    if (snapshot.empty) {
       return res.status(200).json({ success: true, events: [] });
     }
 
     const events = [];
-    const updates = {};
-    const now = Date.now();
+    const batch = db.batch();
+    let hasBatchUpdates = false;
 
-    snapshot.forEach((child) => {
-      const event = child.val();
+    snapshot.forEach((doc) => {
+      const event = doc.data();
       
       // Automatic completion handling
       if (event.status === "ACTIVE" && checkCompletion(event)) {
         event.status = "COMPLETED";
-        updates[`${child.key}/status`] = "COMPLETED";
+        batch.update(doc.ref, { status: "COMPLETED" });
+        hasBatchUpdates = true;
       }
 
       // Return only ACTIVE events (as per requirement 6)
       if (event.status === "ACTIVE") {
-        events.push(event);
+        events.push({ id: doc.id, ...event });
       }
     });
 
-    if (Object.keys(updates).length > 0) {
-      await calendarRef.update(updates);
+    if (hasBatchUpdates) {
+      await batch.commit();
     }
 
     res.status(200).json({ success: true, events });
@@ -114,16 +115,15 @@ export const updateEvent = async (req, res) => {
     const { title, type, date, startTime, endTime, meetingLink, description } = req.body;
     const trainerId = req.user.id;
     const trainerEmail = req.user.email;
-    const trainerName = req.user.fullName || "Trainer";
 
-    const eventRef = calendarRef.child(id);
-    const snapshot = await eventRef.once("value");
+    const eventDocRef = calendarRef.doc(id);
+    const doc = await eventDocRef.get();
 
-    if (!snapshot.exists()) {
+    if (!doc.exists) {
       return res.status(404).json({ success: false, message: "Event not found" });
     }
 
-    const existingEvent = snapshot.val();
+    const existingEvent = doc.data();
     if (existingEvent.trainerId !== trainerId) {
       return res.status(403).json({ success: false, message: "Unauthorized" });
     }
@@ -137,7 +137,6 @@ export const updateEvent = async (req, res) => {
     }
 
     const updatedData = {
-      ...existingEvent,
       title: title || existingEvent.title,
       type: type || existingEvent.type,
       date: date || existingEvent.date,
@@ -149,15 +148,17 @@ export const updateEvent = async (req, res) => {
       updatedAt: Date.now()
     };
 
-    await eventRef.set(updatedData);
+    await eventDocRef.update(updatedData);
+
+    const fullUpdatedEvent = { id, ...existingEvent, ...updatedData };
 
     // Trigger Email
-    await sendCalendarEventEmail(updatedData, true, trainerEmail);
+    await sendCalendarEventEmail(fullUpdatedEvent, true, trainerEmail);
 
     res.status(200).json({
       success: true,
       message: "Event updated successfully",
-      event: updatedData
+      event: fullUpdatedEvent
     });
   } catch (error) {
     console.error("Error updating calendar event:", error);
@@ -173,21 +174,22 @@ export const deleteEvent = async (req, res) => {
     const { id } = req.params;
     const trainerId = req.user.id;
 
-    const eventRef = calendarRef.child(id);
-    const snapshot = await eventRef.once("value");
+    const eventDocRef = calendarRef.doc(id);
+    const doc = await eventDocRef.get();
 
-    if (!snapshot.exists()) {
+    if (!doc.exists) {
       return res.status(404).json({ success: false, message: "Event not found" });
     }
 
-    if (snapshot.val().trainerId !== trainerId) {
+    if (doc.data().trainerId !== trainerId) {
       return res.status(403).json({ success: false, message: "Unauthorized" });
     }
 
-    await eventRef.remove();
+    await eventDocRef.delete();
     res.status(200).json({ success: true, message: "Event deleted successfully" });
   } catch (error) {
     console.error("Error deleting calendar event:", error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
+

@@ -14,11 +14,12 @@ import {
   User,
   Clock,
   Hash,
-  Monitor
+  Monitor,
+  Download
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useCourseContext } from '../../../context/CourseContext';
-import { getStudentBatchesAPI } from '../../../services/api';
+import { getStudentBatchesAPI, getBatchMaterialsAPI } from '../../../services/api';
 import './CourseTopics.css';
 
 const CourseTopics = () => {
@@ -36,6 +37,7 @@ const CourseTopics = () => {
 
   const [myBatches, setMyBatches] = useState({});
   const [isLoadingBatches, setIsLoadingBatches] = useState(true);
+  const [batchMaterials, setBatchMaterials] = useState([]);
 
   if (!course) return <div className="ct-viewport">Loading...</div>;
 
@@ -53,9 +55,33 @@ const CourseTopics = () => {
       }
     };
     fetchBatches();
-    const interval = setInterval(fetchBatches, 1000);
+    const interval = setInterval(fetchBatches, 10000); // 10s interval is enough
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    const fetchMaterials = async () => {
+      const batchMatch = Object.values(myBatches).find(b => 
+        b.courseId === courseId || 
+        b.courseName === course.title ||
+        b.batchName?.includes(course.title)
+      );
+
+      if (batchMatch) {
+        try {
+          const res = await getBatchMaterialsAPI(batchMatch.batchId || batchMatch.id);
+          if (res.success) {
+            setBatchMaterials(res.materials || []);
+          }
+        } catch (err) {
+          console.error("Failed to fetch batch materials:", err);
+        }
+      }
+    };
+    if (Object.keys(myBatches).length > 0) {
+      fetchMaterials();
+    }
+  }, [myBatches, courseId, course]);
 
   const dynamicData = useMemo(() => {
     const batchMatch = Object.values(myBatches).find(b => 
@@ -255,6 +281,38 @@ const CourseTopics = () => {
                 </motion.li>
               ))}
             </ul>
+
+            {/* Added Section for Materials */}
+            {(() => {
+              const modMaterial = batchMaterials.find(m => m.moduleName === section.level || section.level.includes(m.moduleName));
+              if (modMaterial) {
+                return (
+                  <div className="ct-material-box">
+                    <div className="ct-mat-header">
+                      <FileText size={14} />
+                      <span>Study Resources</span>
+                    </div>
+                    <div className="ct-mat-content">
+                      <span className="ct-mat-name">{modMaterial.fileName}</span>
+                      <button 
+                        className="ct-mat-download"
+                        onClick={() => window.open(modMaterial.fileUrl, '_blank')}
+                      >
+                        <Download size={14} /> Download
+                      </button>
+                    </div>
+                  </div>
+                );
+              }
+              return (
+                <div className="ct-material-box pending">
+                  <div className="ct-mat-header">
+                    <Clock size={14} />
+                    <span>Resources Coming Soon</span>
+                  </div>
+                </div>
+              );
+            })()}
 
             <button className="ct-enroll-btn">Unlock {section.level}</button>
           </motion.div>

@@ -1,6 +1,6 @@
 import db from "../config/firebase.js";
 
-const coursesRef = db.ref("courses");
+const coursesRef = db.collection("courses");
 
 const DEFAULT_COURSES = [
   {
@@ -121,27 +121,28 @@ const DEFAULT_COURSES = [
  */
 export const getCourses = async (req, res) => {
   try {
-    const snapshot = await coursesRef.once("value");
-    let data = snapshot.val() || {};
-
+    let snapshot = await coursesRef.get();
+    
     // Seed if empty
-    if (Object.keys(data).length === 0) {
+    if (snapshot.empty) {
       console.log("[Course Controller] Seeding default courses...");
+      const batch = db.batch();
       for (const course of DEFAULT_COURSES) {
-        await coursesRef.push({ 
+        const docRef = coursesRef.doc();
+        batch.set(docRef, { 
           ...course, 
           likes: 0, 
           isLiked: false, 
           createdAt: new Date().toISOString() 
         });
       }
-      const newSnapshot = await coursesRef.once("value");
-      data = newSnapshot.val() || {};
+      await batch.commit();
+      snapshot = await coursesRef.get();
     }
 
-    const courses = Object.entries(data)
-      .map(([id, course]) => ({ id, ...course }))
+    const courses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      
     res.status(200).json({ courses });
   } catch (error) {
     console.error("Error fetching courses:", error);
@@ -160,7 +161,6 @@ export const createCourse = async (req, res) => {
       return res.status(400).json({ error: "Title and description are required" });
     }
 
-    const newCourseRef = coursesRef.push();
     const newCourse = {
       ...courseData,
       likes: 0,
@@ -168,8 +168,8 @@ export const createCourse = async (req, res) => {
       createdAt: new Date().toISOString(),
     };
 
-    await newCourseRef.set(newCourse);
-    const course = { id: newCourseRef.key, ...newCourse };
+    const docRef = await coursesRef.add(newCourse);
+    const course = { id: docRef.id, ...newCourse };
     res.status(201).json({ message: "Course created successfully", course });
   } catch (error) {
     console.error("Error creating course:", error);
@@ -185,10 +185,10 @@ export const updateCourse = async (req, res) => {
   try {
     const { id } = req.params;
     const courseData = req.body;
-    await coursesRef.child(id).update(courseData);
+    await coursesRef.doc(id).update(courseData);
 
-    const snapshot = await coursesRef.child(id).once("value");
-    const course = { id, ...snapshot.val() };
+    const snapshot = await coursesRef.doc(id).get();
+    const course = { id, ...snapshot.data() };
     res.status(200).json({ message: "Course updated successfully", course });
   } catch (error) {
     console.error("Error updating course:", error);
@@ -203,7 +203,7 @@ export const updateCourse = async (req, res) => {
 export const deleteCourse = async (req, res) => {
   try {
     const { id } = req.params;
-    await coursesRef.child(id).remove();
+    await coursesRef.doc(id).delete();
     res.status(200).json({ message: "Course deleted successfully" });
   } catch (error) {
     console.error("Error deleting course:", error);
@@ -218,22 +218,23 @@ export const deleteCourse = async (req, res) => {
 export const toggleCourseLike = async (req, res) => {
   try {
     const { id } = req.params;
-    const snapshot = await coursesRef.child(id).once("value");
-    if (!snapshot.exists()) {
+    const snapshot = await coursesRef.doc(id).get();
+    if (!snapshot.exists) {
       return res.status(404).json({ error: "Course not found" });
     }
 
-    const course = snapshot.val();
+    const course = snapshot.data();
     const currentlyLiked = course.isLiked || false;
     const newIsLiked = !currentlyLiked;
     const newLikes = newIsLiked
       ? (course.likes || 0) + 1
       : Math.max(0, (course.likes || 0) - 1);
 
-    await coursesRef.child(id).update({ likes: newLikes, isLiked: newIsLiked });
+    await coursesRef.doc(id).update({ likes: newLikes, isLiked: newIsLiked });
     res.status(200).json({ isLiked: newIsLiked, likes: newLikes });
   } catch (error) {
     console.error("Error toggling like:", error);
     res.status(500).json({ error: "Failed to toggle like" });
   }
 };
+
