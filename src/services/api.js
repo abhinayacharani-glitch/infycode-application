@@ -739,5 +739,22 @@ export const getPendingCounsellingCountAPI = () =>
     headers: getAuthHeader(),
   });
 
+// ─────────────────────────────────────────────
+// MATERIALS
+// ─────────────────────────────────────────────
+
+export const getBatchMaterialsAPI = (batchId) =>
+  request(`/api/materials/${batchId}`, {
+    headers: getAuthHeader(),
+  });
+
+export const uploadMaterialAPI = (payload) =>
+  request('/api/materials/upload', {
+    method: 'POST',
+    headers: getAuthHeader(),
+    body: JSON.stringify(payload),
+  });
+
+
 
 

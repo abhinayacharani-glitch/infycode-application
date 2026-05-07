@@ -1,7 +1,7 @@
 import db from "../config/firebase.js";
 import sendEmail from "../utils/sendEmail.js";
 
-const trainersRef = db.ref("trainers");
+const trainersCollection = db.collection("trainers");
 
 const stages = ['Applied', 'Screening', 'Interview', 'Selected', 'Onboarded'];
 
@@ -15,7 +15,6 @@ export const submitApplication = async (req, res) => {
     }
 
     const fullName = `${firstName} ${lastName}`;
-    const newTrainerRef = trainersRef.push();
     const trainerData = {
       fullName,
       email,
@@ -33,7 +32,7 @@ export const submitApplication = async (req, res) => {
       createdAt: new Date().toISOString()
     };
 
-    await newTrainerRef.set(trainerData);
+    const docRef = await trainersCollection.add(trainerData);
 
     // Send "Applied" email
     await sendEmail({
@@ -52,7 +51,7 @@ export const submitApplication = async (req, res) => {
       `
     });
 
-    res.status(201).json({ success: true, message: "Application submitted successfully", id: newTrainerRef.key });
+    res.status(201).json({ success: true, message: "Application submitted successfully", id: docRef.id });
   } catch (error) {
     console.error("Error submitting trainer application:", error);
     res.status(500).json({ success: false, message: error.message });
@@ -65,12 +64,13 @@ export const updateApplicationStatus = async (req, res) => {
     const { id } = req.params;
     const { action } = req.body; // 'next', 'hold', 'reject'
 
-    const trainerSnap = await trainersRef.child(id).once("value");
-    if (!trainerSnap.exists()) {
+    const docRef = trainersCollection.doc(id);
+    const doc = await docRef.get();
+    if (!doc.exists) {
       return res.status(404).json({ success: false, message: "Trainer not found" });
     }
 
-    const trainer = trainerSnap.val();
+    const trainer = doc.data();
     let newStatus = trainer.status;
     let newProgress = trainer.progress;
     let sendNotifyEmail = false;
@@ -82,10 +82,10 @@ export const updateApplicationStatus = async (req, res) => {
         newStatus = trainer.prevStatus || 'Applied';
         const restoredIndex = stages.indexOf(newStatus);
         newProgress = (restoredIndex / (stages.length - 1)) * 100;
-        await trainersRef.child(id).update({ status: newStatus, progress: newProgress });
+        await docRef.update({ status: newStatus, progress: newProgress });
         return res.json({ success: true, message: "Hold released", status: newStatus });
       } else {
-        await trainersRef.child(id).update({ prevStatus: trainer.status, status: 'Hold' });
+        await docRef.update({ prevStatus: trainer.status, status: 'Hold' });
         return res.json({ success: true, message: "Trainer put on hold", status: 'Hold' });
       }
     }
@@ -140,7 +140,7 @@ export const updateApplicationStatus = async (req, res) => {
       }
     }
 
-    await trainersRef.child(id).update({ 
+    await docRef.update({ 
       status: newStatus, 
       progress: newProgress, 
       prevStatus: newStatus,
@@ -165,22 +165,18 @@ export const updateApplicationStatus = async (req, res) => {
 // ✅ MARK ALL APPLICATIONS AS SEEN (Admin Only)
 export const markAllApplicationsAsSeen = async (req, res) => {
   try {
-    const snapshot = await trainersRef.once("value");
-    if (!snapshot.exists()) {
-      return res.json({ success: true, message: "No applications found" });
+    const snapshot = await trainersCollection.where("isSeen", "==", false).get();
+    
+    if (snapshot.empty) {
+      return res.json({ success: true, message: "No unread applications found" });
     }
 
-    const updates = {};
-    snapshot.forEach((child) => {
-      const trainer = child.val();
-      if (trainer.isSeen === false || trainer.isSeen === undefined) {
-        updates[`${child.key}/isSeen`] = true;
-      }
+    const batch = db.batch();
+    snapshot.forEach((doc) => {
+      batch.update(doc.ref, { isSeen: true });
     });
 
-    if (Object.keys(updates).length > 0) {
-      await trainersRef.update(updates);
-    }
+    await batch.commit();
 
     res.json({ success: true, message: "All applications marked as seen" });
   } catch (error) {
@@ -188,3 +184,4 @@ export const markAllApplicationsAsSeen = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+

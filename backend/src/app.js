@@ -12,6 +12,8 @@ import counsellingRoutes from "./routes/counsellingRoutes.js";
 import syllabusRoutes from "./routes/syllabusRoutes.js";
 import calendarRoutes from "./routes/calendarRoutes.js";
 import { publishFAQ, getNewPublishedFAQs } from "./controllers/faqController.js";
+import materialRoutes from "./routes/materialRoutes.js";
+
 
 
 const app = express();
@@ -79,6 +81,8 @@ app.use("/api/faqs", faqRoutes);          // /api/faqs FAQ operations
 app.use("/api/student", studentRoutes);   // /api/student operations
 app.use("/api/counselling", counsellingRoutes); // /api/counselling operations
 app.use("/api/calendar", calendarRoutes);       // /api/calendar operations
+app.use("/api/materials", materialRoutes);      // /api/materials operations
+
 
 
 export default app;

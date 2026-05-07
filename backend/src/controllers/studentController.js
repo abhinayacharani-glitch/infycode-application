@@ -1,7 +1,7 @@
 import db from "../config/firebase.js";
 
-const studentsRef = db.ref("students");
-const enrollmentsRef = db.ref("enrollments");
+const studentsRef = db.collection("students");
+const enrollmentsRef = db.collection("enrollments");
 
 /**
  * @desc Save student test results
@@ -24,9 +24,9 @@ export const saveTestResult = async (req, res) => {
     // If ID is not in token, look up by email
     if (!studentId && email) {
       console.log(`[saveTestResult] No ID in token, searching by email: ${email}`);
-      const studentSnap = await studentsRef.orderByChild("email").equalTo(email).once("value");
-      if (studentSnap.exists()) {
-        studentSnap.forEach(child => { studentId = child.key; });
+      const studentSnap = await studentsRef.where("email", "==", email).limit(1).get();
+      if (!studentSnap.empty) {
+        studentId = studentSnap.docs[0].id;
       }
     }
 
@@ -35,25 +35,25 @@ export const saveTestResult = async (req, res) => {
       return res.status(404).json({ success: false, message: "Student not found" });
     }
 
-    const studentRef = studentsRef.child(studentId);
+    const studentDocRef = studentsRef.doc(studentId);
 
     const updates = {};
     if (testType === "foundational") {
-      updates["testResults/aptitude"] = scores.aptitude || 0;
-      updates["testResults/reasoning"] = scores.reasoning || 0;
-      updates["testResults/communication"] = scores.communication || 0;
-      updates["testResults/foundationalCompleted"] = true;
+      updates["testResults.aptitude"] = scores.aptitude || 0;
+      updates["testResults.reasoning"] = scores.reasoning || 0;
+      updates["testResults.communication"] = scores.communication || 0;
+      updates["testResults.foundationalCompleted"] = true;
     } else if (testType === "core") {
-      updates["testResults/coreTechnical"] = scores.coreTechnical || 0;
-      updates["testResults/coreCompleted"] = true;
+      updates["testResults.coreTechnical"] = scores.coreTechnical || 0;
+      updates["testResults.coreCompleted"] = true;
     } else {
       return res.status(400).json({ success: false, message: "Invalid testType" });
     }
 
     // Set isSeen to false so admin gets a notification
-    updates["testResults/isSeen"] = false;
+    updates["testResults.isSeen"] = false;
 
-    await studentRef.update(updates);
+    await studentDocRef.update(updates);
 
     res.status(200).json({ success: true, message: "Test results saved successfully" });
   } catch (error) {
@@ -68,10 +68,10 @@ export const saveTestResult = async (req, res) => {
  */
 export const getStudentResults = async (req, res) => {
   try {
-    const snapshot = await studentsRef.once("value");
-    const studentsData = snapshot.val() || {};
-
-    const results = Object.entries(studentsData).map(([id, data]) => {
+    const snapshot = await studentsRef.get();
+    
+    const results = snapshot.docs.map(doc => {
+      const data = doc.data();
       const results = data.testResults || {};
       const aptitude = results.aptitude || 0;
       const reasoning = results.reasoning || 0;
@@ -81,7 +81,7 @@ export const getStudentResults = async (req, res) => {
       const coreCompleted = results.coreCompleted || false;
 
       return {
-        id,
+        id: doc.id,
         name: data.fullname || data.fullName || data.username || "N/A",
         email: data.email,
         aptitude,
@@ -115,9 +115,9 @@ export const getMyResults = async (req, res) => {
     let finalId = studentId;
     if (!finalId) {
       console.log(`[getMyResults] No ID in token, searching by email: ${email}`);
-      const snapshot = await studentsRef.orderByChild("email").equalTo(email).once("value");
-      if (snapshot.exists()) {
-        snapshot.forEach(child => { finalId = child.key; });
+      const snapshot = await studentsRef.where("email", "==", email).limit(1).get();
+      if (!snapshot.empty) {
+        finalId = snapshot.docs[0].id;
       }
     }
 
@@ -126,13 +126,13 @@ export const getMyResults = async (req, res) => {
       return res.status(404).json({ success: false, message: "Student not found" });
     }
 
-    const snapshot = await studentsRef.child(finalId).once("value");
-    const data = snapshot.val();
-
-    if (!data) {
-      console.warn(`[getMyResults] Student data is null for ID: ${finalId}`);
+    const snapshot = await studentsRef.doc(finalId).get();
+    if (!snapshot.exists) {
+      console.warn(`[getMyResults] Student data not found for ID: ${finalId}`);
       return res.status(404).json({ success: false, message: "Student data not found" });
     }
+    
+    const data = snapshot.data();
 
     console.log(`[getMyResults] Success. testResults:`, data.testResults || "None");
     res.status(200).json({
@@ -167,11 +167,13 @@ export const enrollInCourse = async (req, res) => {
 
     const sanitizedEmail = email.trim().toLowerCase().replace(/\./g, ",");
 
-    // Add courseId to student's enrollment list
-    await enrollmentsRef.child(sanitizedEmail).child(courseId).set({
-      enrolledAt: new Date().toISOString(),
-      status: "active"
-    });
+    // Add courseId to student's enrollment list (Firestore uses map within document)
+    await enrollmentsRef.doc(sanitizedEmail).set({
+      [courseId]: {
+        enrolledAt: new Date().toISOString(),
+        status: "active"
+      }
+    }, { merge: true });
 
     console.log(`[enrollInCourse] Successfully enrolled ${email} in ${courseId}`);
     res.status(200).json({ message: "Enrolled successfully", courseId });
@@ -196,8 +198,8 @@ export const getEnrolledCourses = async (req, res) => {
     }
     const sanitizedEmail = email.trim().toLowerCase().replace(/\./g, ",");
 
-    const snapshot = await enrollmentsRef.child(sanitizedEmail).once("value");
-    const data = snapshot.val() || {};
+    const doc = await enrollmentsRef.doc(sanitizedEmail).get();
+    const data = doc.exists ? doc.data() : {};
 
     // Return unique, active enrollment IDs
     const enrolledIds = Object.keys(data).filter(id => data[id].status === "active");
@@ -223,17 +225,13 @@ export const getStudentBatches = async (req, res) => {
     // 1. Resolve student record
     let studentData = null;
     if (idFromToken) {
-      const snap = await studentsRef.child(idFromToken).once("value");
-      if (snap.exists()) studentData = { id: idFromToken, ...snap.val() };
+      const snap = await studentsRef.doc(idFromToken).get();
+      if (snap.exists) studentData = { id: idFromToken, ...snap.data() };
     }
     if (!studentData && email) {
-      const allSnap = await studentsRef.once("value");
-      const all = allSnap.val() || {};
-      for (const key in all) {
-        if (all[key].email?.toLowerCase() === email) {
-          studentData = { id: key, ...all[key] };
-          break;
-        }
+      const snapshot = await studentsRef.where("email", "==", email).limit(1).get();
+      if (!snapshot.empty) {
+        studentData = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
       }
     }
     if (!studentData) {
@@ -247,24 +245,25 @@ export const getStudentBatches = async (req, res) => {
     }
 
     // 3. Fetch batch + trainer for each course
-    const batchesRef = db.ref("batch");
-    const trainersRef = db.ref("trainers");
+    const batchesCollection = db.collection("batches");
+    const trainersCollection = db.collection("trainers");
     const result = {};
 
     // Pre-fetch all trainers for robust in-memory matching (avoids Firebase case-sensitivity issues)
-    const allTrainersSnap = await trainersRef.once("value");
-    const allTrainersRaw = allTrainersSnap.val() || {};
-    const trainersList = Object.entries(allTrainersRaw).map(([key, data]) => ({ key, ...data }));
+    const trainersSnap = await trainersCollection.get();
+    const trainersList = trainersSnap.docs.map(doc => ({ key: doc.id, ...doc.data() }));
 
     for (const [courseName, batchKey] of Object.entries(batchesMap)) {
       try {
-        const directSnap = await batchesRef.child(batchKey).once("value");
+        const directSnap = await batchesCollection.doc(batchKey).get();
         let batchData = null;
-        if (directSnap.exists()) {
-          batchData = { firebaseKey: batchKey, ...directSnap.val() };
+        if (directSnap.exists) {
+          batchData = { firebaseKey: batchKey, ...directSnap.data() };
         } else {
-          const qSnap = await batchesRef.orderByChild("batchId").equalTo(batchKey).once("value");
-          if (qSnap.exists()) qSnap.forEach(c => { batchData = { firebaseKey: c.key, ...c.val() }; });
+          const qSnap = await batchesCollection.where("batchId", "==", batchKey).limit(1).get();
+          if (!qSnap.empty) {
+            batchData = { firebaseKey: qSnap.docs[0].id, ...qSnap.docs[0].data() };
+          }
         }
         if (!batchData) continue;
 
@@ -334,7 +333,6 @@ export const getStudentBatches = async (req, res) => {
 
 export const getStudentProfile = async (req, res) => {
   try {
-
     const email = req.user?.email?.toLowerCase();
     const idFromToken = req.user?.id;
 
@@ -346,21 +344,17 @@ export const getStudentProfile = async (req, res) => {
 
     // 1. Try direct ID lookup
     if (idFromToken) {
-      const snapshot = await studentsRef.child(idFromToken).once("value");
-      if (snapshot.exists()) {
-        studentData = { id: idFromToken, ...snapshot.val() };
+      const snap = await studentsRef.doc(idFromToken).get();
+      if (snap.exists) {
+        studentData = { id: idFromToken, ...snap.data() };
       }
     }
 
     // 2. Try email fallback
     if (!studentData && email) {
-      const allStudentsSnap = await studentsRef.once("value");
-      const allStudents = allStudentsSnap.val() || {};
-      for (const key in allStudents) {
-        if (allStudents[key].email?.toLowerCase() === email) {
-          studentData = { id: key, ...allStudents[key] };
-          break;
-        }
+      const snapshot = await studentsRef.where("email", "==", email).limit(1).get();
+      if (!snapshot.empty) {
+        studentData = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
       }
     }
 
@@ -370,12 +364,12 @@ export const getStudentProfile = async (req, res) => {
 
     // Auto-migrate: Generate studentId if missing or non-numeric
     if (!studentData.studentId || isNaN(studentData.studentId)) {
-      const snapshot = await studentsRef.once("value");
-      const count = snapshot.numChildren();
+      const snapshot = await studentsRef.get();
+      const count = snapshot.size;
       // Generate a more robust unique number
       const newStudentId = (1001 + count).toString();
 
-      await studentsRef.child(studentData.id).update({ studentId: newStudentId });
+      await studentsRef.doc(studentData.id).update({ studentId: newStudentId });
       studentData.studentId = newStudentId;
     }
 
@@ -403,11 +397,9 @@ export const updateStudentProfile = async (req, res) => {
 
     if (!studentId && email) {
       console.log(`[updateStudentProfile] ID not in token, searching by email: ${email}`);
-      const snap = await studentsRef.once("value");
-      const all = snap.val() || {};
-      for (const key in all) {
-        const stored = all[key].email?.toLowerCase();
-        if (stored === email) { studentId = key; break; }
+      const snapshot = await studentsRef.where("email", "==", email).limit(1).get();
+      if (!snapshot.empty) {
+        studentId = snapshot.docs[0].id;
       }
     }
 
@@ -428,7 +420,7 @@ export const updateStudentProfile = async (req, res) => {
       const val = body[key];
       // Allow clearing profileImage
       if (key === 'profileImage' && (val === null || val === "")) {
-        sanitized[key] = null; // Firebase removes keys set to null
+        sanitized[key] = admin.firestore.FieldValue.delete(); // Correct way to remove field in Firestore
       } else if (val !== undefined && val !== null && val !== "") {
         sanitized[key] = val;
       }
@@ -441,7 +433,7 @@ export const updateStudentProfile = async (req, res) => {
     }
 
     // ── 3. Write to Firebase ──────────────────────────────────────────────
-    await studentsRef.child(studentId).update(sanitized);
+    await studentsRef.doc(studentId).update(sanitized);
 
     console.log(`[updateStudentProfile] SUCCESS for student ${studentId}`);
     res.status(200).json({ success: true, message: "Profile updated successfully." });
@@ -460,21 +452,21 @@ export const updateStudentProfile = async (req, res) => {
  */
 export const markAllStudentResultsAsSeen = async (req, res) => {
   try {
-    const snapshot = await studentsRef.once("value");
-    if (!snapshot.exists()) {
-      return res.json({ success: true, message: "No students found" });
-    }
+    const snapshot = await studentsRef.get();
+    
+    const batch = db.batch();
+    let hasUpdates = false;
 
-    const updates = {};
-    snapshot.forEach((child) => {
-      const student = child.val();
+    snapshot.forEach((doc) => {
+      const student = doc.data();
       if (student.testResults && student.testResults.isSeen === false) {
-        updates[`${child.key}/testResults/isSeen`] = true;
+        batch.update(doc.ref, { "testResults.isSeen": true });
+        hasUpdates = true;
       }
     });
 
-    if (Object.keys(updates).length > 0) {
-      await studentsRef.update(updates);
+    if (hasUpdates) {
+      await batch.commit();
     }
 
     res.json({ success: true, message: "All student results marked as seen" });
@@ -492,8 +484,8 @@ export const createStudentQuery = async (req, res) => {
     const { title, text, code, type, trainerName, batchId } = req.body;
     const studentId = req.user.id;
     
-    const snapshot = await studentsRef.child(studentId).once("value");
-    const studentData = snapshot.val();
+    const snap = await studentsRef.doc(studentId).get();
+    const studentData = snap.data();
 
     const newQuery = {
       studentId,
@@ -510,11 +502,10 @@ export const createStudentQuery = async (req, res) => {
       readByStudent: true
     };
 
-    const queriesRef = db.ref("queries");
-    const newRef = queriesRef.push();
-    await newRef.set(newQuery);
+    const queriesRef = db.collection("queries");
+    const docRef = await queriesRef.add(newQuery);
 
-    return res.status(201).json({ success: true, queryId: newRef.key });
+    return res.status(201).json({ success: true, queryId: docRef.id });
   } catch (error) {
     console.error("[createStudentQuery] Error:", error.message);
     res.status(500).json({ success: false, message: "Internal server error" });
@@ -527,15 +518,10 @@ export const createStudentQuery = async (req, res) => {
 export const getStudentQueries = async (req, res) => {
   try {
     const studentId = req.user.id;
-    const queriesRef = db.ref("queries");
-    const snapshot = await queriesRef.orderByChild("studentId").equalTo(studentId).once("value");
+    const queriesRef = db.collection("queries");
+    const snapshot = await queriesRef.where("studentId", "==", studentId).get();
     
-    const queries = [];
-    if (snapshot.exists()) {
-      snapshot.forEach(child => {
-        queries.push({ id: child.key, ...child.val() });
-      });
-    }
+    const queries = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
     queries.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
@@ -552,11 +538,12 @@ export const getStudentQueries = async (req, res) => {
 export const markQueryReadByStudent = async (req, res) => {
   try {
     const { queryId } = req.params;
-    await db.ref("queries").child(queryId).update({ readByStudent: true });
+    await db.collection("queries").doc(queryId).update({ readByStudent: true });
     return res.status(200).json({ success: true });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+
 
 

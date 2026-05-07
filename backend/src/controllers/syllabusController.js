@@ -1,6 +1,6 @@
 import db from "../config/firebase.js";
 
-const syllabusRef = db.ref("syllabuses");
+const syllabusesCollection = db.collection("syllabuses");
 
 const DEFAULT_SYLLABUSES = [
   {
@@ -94,22 +94,23 @@ const DEFAULT_SYLLABUSES = [
  */
 export const getSyllabuses = async (req, res) => {
   try {
-    const snapshot = await syllabusRef.once("value");
-    let data = snapshot.val() || {};
+    let snapshot = await syllabusesCollection.get();
     
     // Seed if empty
-    if (Object.keys(data).length === 0) {
+    if (snapshot.empty) {
       console.log("[Syllabus Controller] Seeding default syllabuses...");
+      const batch = db.batch();
       for (const syllabus of DEFAULT_SYLLABUSES) {
-        await syllabusRef.push({ ...syllabus, createdAt: new Date().toISOString() });
+        const docRef = syllabusesCollection.doc();
+        batch.set(docRef, { ...syllabus, createdAt: new Date().toISOString() });
       }
-      const newSnapshot = await syllabusRef.once("value");
-      data = newSnapshot.val() || {};
+      await batch.commit();
+      snapshot = await syllabusesCollection.get();
     }
 
-    const syllabuses = Object.entries(data).map(([id, syllabus]) => ({
-      id,
-      ...syllabus,
+    const syllabuses = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
     }));
     res.status(200).json({ syllabuses });
   } catch (error) {
@@ -129,20 +130,21 @@ export const createSyllabus = async (req, res) => {
       return res.status(400).json({ error: "Title and modules are required" });
     }
 
-    const newSyllabusRef = syllabusRef.push();
     const newSyllabus = {
       title,
       modules,
       createdAt: new Date().toISOString(),
     };
 
-    await newSyllabusRef.set(newSyllabus);
+    const docRef = await syllabusesCollection.add(newSyllabus);
+
     res.status(201).json({
       message: "Syllabus created successfully",
-      syllabus: { id: newSyllabusRef.key, ...newSyllabus },
+      syllabus: { id: docRef.id, ...newSyllabus },
     });
   } catch (error) {
     console.error("Error creating syllabus:", error);
     res.status(500).json({ error: "Failed to create syllabus" });
   }
 };
+

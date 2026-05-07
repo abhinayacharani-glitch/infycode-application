@@ -4,19 +4,19 @@
  * Unified login endpoint: POST /api/login
  *
  * Routing logic:
- *   1. admin@charani.in   → hardcoded admin credentials → store lastLogin in Firebase
- *   2. *@outlook.com       → look up in `trainers` node, bcrypt compare
- *   3. everything else    → look up in `students` node, bcrypt compare
+ *   1. admin@charani.in   → hardcoded admin credentials → store lastLogin in Firestore
+ *   2. *@outlook.com       → look up in `trainers` collection, bcrypt compare
+ *   3. everything else    → look up in `students` collection, bcrypt compare
  */
 
 import db from "../config/firebase.js";
 import bcrypt from "bcryptjs";
 import generateToken from "../utils/generateToken.js";
 
-// Firebase references
-const studentsRef = db.ref("students");
-const trainersRef = db.ref("trainers");
-const usersRef = db.ref("users");   // for admin lastLogin record
+// Firestore references
+const studentsRef = db.collection("students");
+const trainersRef = db.collection("trainers");
+const usersRef = db.collection("users");   // for admin lastLogin record
 
 // ---------------------------------------------------------------------------
 // Hardcoded admin credentials (development / seeded admin)
@@ -28,7 +28,6 @@ const ADMIN_PASSWORD = "Admin@520";
 // POST /api/login
 // ---------------------------------------------------------------------------
 export const unifiedLogin = async (req, res) => {
-  let userData; // Declare here so it's available in all branches
   try {
     const { email, password } = req.body;
 
@@ -72,12 +71,12 @@ export const unifiedLogin = async (req, res) => {
 
       const token = generateToken(adminUser);
 
-      // Record lastLogin in Firebase  →  users/admin/
-      await usersRef.child("admin").set({
+      // Record lastLogin in Firestore  →  users/admin/
+      await usersRef.doc("admin").set({
         email: ADMIN_EMAIL,
         role: "admin",
         lastLogin: Date.now(),
-      });
+      }, { merge: true });
 
       return res.status(200).json({
         success: true,
@@ -93,22 +92,19 @@ export const unifiedLogin = async (req, res) => {
     // ════════════════════════════════════════════════════════════════════════
     if (normalizedEmail.endsWith("@outlook.com")) {
       const snapshot = await trainersRef
-        .orderByChild("email")
-        .equalTo(normalizedEmail)
-        .once("value");
+        .where("email", "==", normalizedEmail)
+        .limit(1)
+        .get();
 
-      if (!snapshot.exists()) {
+      if (snapshot.empty) {
         return res.status(404).json({
           success: false,
           message: "Trainer account not found. Please register first.",
         });
       }
 
-      let userData;
-      snapshot.forEach((child) => {
-        userData = child.val();
-        userData.id = child.key;
-      });
+      const doc = snapshot.docs[0];
+      const userData = { id: doc.id, ...doc.data() };
 
       // Validate password
       const isMatch = await bcrypt.compare(password, userData.password);
@@ -139,21 +135,19 @@ export const unifiedLogin = async (req, res) => {
     // 3. STUDENT – fallback
     // ════════════════════════════════════════════════════════════════════════
     const snapshot = await studentsRef
-      .orderByChild("email")
-      .equalTo(normalizedEmail)
-      .once("value");
+      .where("email", "==", normalizedEmail)
+      .limit(1)
+      .get();
 
-    if (!snapshot.exists()) {
+    if (snapshot.empty) {
       return res.status(404).json({
         success: false,
         message: "Email not found",
       });
     }
 
-    snapshot.forEach((child) => {
-      userData = child.val();
-      userData.id = child.key;
-    });
+    const doc = snapshot.docs[0];
+    const userData = { id: doc.id, ...doc.data() };
 
     const isMatch = await bcrypt.compare(password, userData.password);
     if (!isMatch) {
@@ -163,6 +157,7 @@ export const unifiedLogin = async (req, res) => {
       });
     }
 
+    userData.role = "student"; // Explicitly set role for safety
     const token = generateToken(userData);
 
     return res.status(200).json({
@@ -182,3 +177,4 @@ export const unifiedLogin = async (req, res) => {
     });
   }
 };
+

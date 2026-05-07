@@ -1,8 +1,8 @@
 import db from "../config/firebase.js";
 import { sendFAQEmail } from "../services/emailService.js";
 
-const faqsRef = db.ref("faqs");
-const newFaqsRef = db.ref("FAQs"); // New node for published FAQs
+const faqsRef = db.collection("faqs");
+const newFaqsRef = db.collection("FAQs"); // New collection for published FAQs
 
 /**
  * @desc Get all published FAQs
@@ -10,11 +10,9 @@ const newFaqsRef = db.ref("FAQs"); // New node for published FAQs
  */
 export const getPublishedFAQs = async (req, res) => {
   try {
-    const snapshot = await faqsRef.once("value");
-    const data = snapshot.val() || {};
-    const faqs = Object.entries(data)
-      .map(([id, faq]) => ({ id, ...faq }))
-      .filter((faq) => faq.status === "published")
+    const snapshot = await faqsRef.where("status", "==", "published").get();
+    const faqs = snapshot.docs
+      .map(doc => ({ id: doc.id, ...doc.data() }))
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     res.status(200).json({ faqs });
   } catch (error) {
@@ -34,7 +32,6 @@ export const submitFAQ = async (req, res) => {
       return res.status(400).json({ error: "Question is required" });
     }
 
-    const newFAQRef = faqsRef.push();
     const newFAQ = {
       question,
       userEmail: userEmail || "Anonymous",
@@ -44,8 +41,8 @@ export const submitFAQ = async (req, res) => {
       createdAt: new Date().toISOString(),
     };
 
-    await newFAQRef.set(newFAQ);
-    res.status(201).json({ message: "Question submitted successfully for review", id: newFAQRef.key });
+    const docRef = await faqsRef.add(newFAQ);
+    res.status(201).json({ message: "Question submitted successfully for review", id: docRef.id });
   } catch (error) {
     console.error("Error submitting FAQ:", error);
     res.status(500).json({ error: "Failed to submit question" });
@@ -58,11 +55,9 @@ export const submitFAQ = async (req, res) => {
  */
 export const getPendingFAQs = async (req, res) => {
   try {
-    const snapshot = await faqsRef.once("value");
-    const data = snapshot.val() || {};
-    const faqs = Object.entries(data)
-      .map(([id, faq]) => ({ id, ...faq }))
-      .filter((faq) => faq.status === "pending")
+    const snapshot = await faqsRef.where("status", "==", "pending").get();
+    const faqs = snapshot.docs
+      .map(doc => ({ id: doc.id, ...doc.data() }))
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     res.status(200).json({ faqs });
   } catch (error) {
@@ -85,10 +80,11 @@ export const updateFAQStatus = async (req, res) => {
     if (status !== undefined) updateData.status = status;
     updateData.updatedAt = new Date().toISOString();
 
-    await faqsRef.child(id).update(updateData);
+    const docRef = faqsRef.doc(id);
+    await docRef.update(updateData);
     
-    const snapshot = await faqsRef.child(id).once("value");
-    res.status(200).json({ message: "FAQ updated successfully", faq: { id, ...snapshot.val() } });
+    const doc = await docRef.get();
+    res.status(200).json({ message: "FAQ updated successfully", faq: { id, ...doc.data() } });
   } catch (error) {
     console.error("Error updating FAQ:", error);
     res.status(500).json({ error: "Failed to update FAQ" });
@@ -102,7 +98,7 @@ export const updateFAQStatus = async (req, res) => {
 export const deleteFAQ = async (req, res) => {
   try {
     const { id } = req.params;
-    await faqsRef.child(id).remove();
+    await faqsRef.doc(id).delete();
     res.status(200).json({ message: "FAQ deleted successfully" });
   } catch (error) {
     console.error("Error deleting FAQ:", error);
@@ -125,17 +121,17 @@ export const publishFAQ = async (req, res) => {
 
     const emailToUse = userEmail || "gayathria.charani@gmail.com"; // Fallback to admin if user email is missing
 
-    const newFAQRef = newFaqsRef.push();
+    const docRef = newFaqsRef.doc();
     const newFAQ = {
-      id: newFAQRef.key,
+      id: docRef.id,
       question,
       answer,
       userEmail: emailToUse,
       createdAt: new Date().toISOString(),
     };
 
-    // Save data to Firebase under "FAQs" node
-    await newFAQRef.set(newFAQ);
+    // Save data to Firestore under "FAQs" collection
+    await docRef.set(newFAQ);
 
     // Send email to user (don't let email failure block the success response)
     sendFAQEmail(emailToUse, question, answer).catch(err => {
@@ -150,19 +146,19 @@ export const publishFAQ = async (req, res) => {
 };
 
 /**
- * @desc Get all FAQs from the new "FAQs" node for the frontend
+ * @desc Get all FAQs from the new "FAQs" collection for the frontend
  * @route GET /published-faqs
  */
 export const getNewPublishedFAQs = async (req, res) => {
   try {
-    const snapshot = await newFaqsRef.once("value");
-    const data = snapshot.val() || {};
-    const faqs = Object.entries(data)
-      .map(([id, faq]) => ({ id, ...faq }))
+    const snapshot = await newFaqsRef.get();
+    const faqs = snapshot.docs
+      .map(doc => ({ id: doc.id, ...doc.data() }))
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     res.status(200).json({ faqs });
   } catch (error) {
-    console.error("Error fetching published FAQs from FAQs node:", error);
+    console.error("Error fetching published FAQs from FAQs collection:", error);
     res.status(500).json({ error: "Failed to fetch FAQs" });
   }
 };
+

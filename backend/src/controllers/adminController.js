@@ -3,13 +3,13 @@ import bcrypt from "bcryptjs";
 import generateToken from "../utils/generateToken.js";
 import sendEmail from "../utils/sendEmail.js";
 
-const adminsRef = db.ref("admins");
-const tempRegistrationsRef = db.ref("tempRegistrations");
-const batchesRef = db.ref("batch");
-const studentsRef = db.ref("students");
-const trainersRef = db.ref("trainers");
-const coursesRef = db.ref("courses");
-const enrollmentsRef = db.ref("enrollments");
+const adminsRef = db.collection("admins");
+const tempRegistrationsRef = db.collection("tempRegistrations");
+const batchesRef = db.collection("batches");
+const studentsRef = db.collection("students");
+const trainersRef = db.collection("trainers");
+const coursesRef = db.collection("courses");
+const enrollmentsRef = db.collection("enrollments");
 
 // Helper: Normalized status matching
 const matchesStatus = (val, targetStatuses) => {
@@ -19,8 +19,8 @@ const matchesStatus = (val, targetStatuses) => {
 
 // Helper: Generate next Batch ID (BID-01)
 const generateNextBatchID = async () => {
-  const snapshot = await batchesRef.once("value");
-  const count = snapshot.numChildren();
+  const snapshot = await batchesRef.get();
+  const count = snapshot.size;
   return `BID-${String(count + 1).padStart(2, "0")}`;
 };
 
@@ -53,8 +53,8 @@ export const adminRegister = async (req, res) => {
     }
 
     // Check if admin already exists
-    const adminSnapshot = await adminsRef.orderByChild("email").equalTo(email.trim().toLowerCase()).once("value");
-    if (adminSnapshot.exists()) {
+    const adminSnapshot = await adminsRef.where("email", "==", email.trim().toLowerCase()).limit(1).get();
+    if (!adminSnapshot.empty) {
       return res.status(400).json({ success: false, message: "User already exists" });
     }
 
@@ -67,7 +67,7 @@ export const adminRegister = async (req, res) => {
     const sanitizedEmail = email.trim().toLowerCase().replace(/\./g, ",");
     const tempKey = `admin_${sanitizedEmail}`;
 
-    await tempRegistrationsRef.child(tempKey).set({
+    await tempRegistrationsRef.doc(tempKey).set({
       fullName: resolvedName.trim(),
       email: email.trim().toLowerCase(),
       phone: resolvedPhone.trim(),
@@ -132,21 +132,17 @@ export const adminLogin = async (req, res) => {
 
     // 2. Step 2 — Check Email Exists in Database
     const snapshot = await adminsRef
-      .orderByChild("email")
-      .equalTo(email.trim().toLowerCase())
-      .once("value");
+      .where("email", "==", email.trim().toLowerCase())
+      .limit(1)
+      .get();
 
-    if (!snapshot.exists()) {
+    if (snapshot.empty) {
       return res.status(404).json({ success: false, message: "Email not found" });
     }
 
-    let userData;
-    let adminId;
-    snapshot.forEach((child) => {
-      userData = child.val();
-      adminId = child.key;
-    });
-    userData.id = adminId;
+    const adminDoc = snapshot.docs[0];
+    const userData = adminDoc.data();
+    userData.id = adminDoc.id;
 
     // 3. Step 3 — Check Password
     const isMatch = await bcrypt.compare(password, userData.password);
@@ -186,20 +182,31 @@ export const adminDashboard = async (req, res) => {
 export const getDashboardStats = async (req, res) => {
   try {
     const [studentsSnap, trainersSnap, batchesSnap, coursesSnap, enrollmentsSnap, counsellingSnap] = await Promise.all([
-      studentsRef.once("value"),
-      trainersRef.once("value"),
-      batchesRef.once("value"),
-      coursesRef.once("value"),
-      enrollmentsRef.once("value"),
-      db.ref("counsellingBookings").once("value")
+      studentsRef.get(),
+      trainersRef.get(),
+      batchesRef.get(),
+      coursesRef.get(),
+      enrollmentsRef.get(),
+      db.collection("counsellingBookings").get()
     ]);
 
-    const studentsRaw = studentsSnap.val() || {};
-    const trainersRaw = trainersSnap.val() || {};
-    const batchesRaw = batchesSnap.val() || {};
-    const coursesRaw = coursesSnap.val() || {};
-    const enrollmentsRaw = enrollmentsSnap.val() || {};
-    const counsellingRaw = counsellingSnap.val() || {};
+    const studentsRaw = {};
+    studentsSnap.forEach(doc => { studentsRaw[doc.id] = doc.data(); });
+    
+    const trainersRaw = {};
+    trainersSnap.forEach(doc => { trainersRaw[doc.id] = doc.data(); });
+    
+    const batchesRaw = {};
+    batchesSnap.forEach(doc => { batchesRaw[doc.id] = doc.data(); });
+    
+    const coursesRaw = {};
+    coursesSnap.forEach(doc => { coursesRaw[doc.id] = doc.data(); });
+    
+    const enrollmentsRaw = {};
+    enrollmentsSnap.forEach(doc => { enrollmentsRaw[doc.id] = doc.data(); });
+    
+    const counsellingRaw = {};
+    counsellingSnap.forEach(doc => { counsellingRaw[doc.id] = doc.data(); });
 
     const students = Object.entries(studentsRaw).map(([id, data]) => {
       const rawEmail = (data.email || "").trim().toLowerCase();
@@ -289,7 +296,7 @@ export const createBatch = async (req, res) => {
     }
 
     const nextBID = await generateNextBatchID();
-    const newBatchRef = batchesRef.push();
+    const newBatchRef = batchesRef.doc();
     const rawBatchData = {
       batchId: nextBID, // Assign unique sequential Batch ID
       name,
@@ -314,8 +321,8 @@ export const createBatch = async (req, res) => {
     // --- AUTOMATIC CALENDAR EVENT CREATION FOR BATCHES ---
     if (trainerId && startDateTime) {
       try {
-        const calendarRef = db.ref("trainerCalendarEvents");
-        const eventId = `batch_${newBatchRef.key}`;
+        const calendarRef = db.collection("trainerCalendarEvents");
+        const eventId = `batch_${newBatchRef.id}`;
         
         // Extract time from startDateTime or use default
         const dateObj = new Date(startDateTime);
@@ -342,7 +349,7 @@ export const createBatch = async (req, res) => {
           createdAt: Date.now()
         };
 
-        await calendarRef.child(eventId).set(calendarEventData);
+        await calendarRef.doc(eventId).set(calendarEventData);
         console.log(`[Calendar] Automated batch event created: ${eventId} for trainer ${trainerId}`);
       } catch (calErr) {
         console.error("Error creating batch calendar event:", calErr);
@@ -352,7 +359,7 @@ export const createBatch = async (req, res) => {
 
     res.status(201).json({
       message: "Batch created correctly and synced with Firebase.",
-      batch: { id: newBatchRef.key, ...batchData, course, trainer } // Return normalized for immediate frontend use
+      batch: { id: newBatchRef.id, ...batchData, course, trainer } // Return normalized for immediate frontend use
     });
   } catch (error) {
     console.error("Backend Error creating batch:", error);
@@ -366,10 +373,10 @@ export const getAdminProfile = async (req, res) => {
     if (!req.user || !req.user.id) {
       return res.status(400).json({ success: false, message: "User ID not found in token" });
     }
-    const adminSnap = await adminsRef.child(req.user.id).once("value");
-    if (!adminSnap.exists()) return res.status(404).json({ success: false, message: "Admin not found" });
+    const adminSnap = await adminsRef.doc(req.user.id).get();
+    if (!adminSnap.exists) return res.status(404).json({ success: false, message: "Admin not found" });
 
-    const adminData = adminSnap.val();
+    const adminData = adminSnap.data();
     delete adminData.password;
     adminData.id = req.user.id;
 
@@ -390,9 +397,9 @@ export const updateAdminProfile = async (req, res) => {
     const filteredData = {};
     allowedFields.forEach(field => { if (updateData[field] !== undefined) filteredData[field] = updateData[field]; });
 
-    await adminsRef.child(req.user.id).update(filteredData);
-    const updatedSnap = await adminsRef.child(req.user.id).once("value");
-    const fullProfile = updatedSnap.val();
+    await adminsRef.doc(req.user.id).update(filteredData);
+    const updatedSnap = await adminsRef.doc(req.user.id).get();
+    const fullProfile = updatedSnap.data();
     delete fullProfile.password;
 
     res.status(200).json({ success: true, message: "Profile updated successfully", profile: fullProfile });
@@ -411,22 +418,22 @@ export const moveStudentsToBatch = async (req, res) => {
     }
 
     // 1. Get Batch Data
-    const batchSnap = await batchesRef.child(batchId).once("value");
-    if (!batchSnap.exists()) {
+    const batchSnap = await batchesRef.doc(batchId).get();
+    if (!batchSnap.exists) {
       return res.status(404).json({ success: false, message: "Batch not found" });
     }
-    const batchData = batchSnap.val();
+    const batchData = batchSnap.data();
 
     // 2. Get Student Data for all selected students
-    const studentPromises = studentIds.map(id => studentsRef.child(id).once("value"));
+    const studentPromises = studentIds.map(id => studentsRef.doc(id).get());
     const studentSnaps = await Promise.all(studentPromises);
 
     const studentsToMove = studentSnaps
-      .filter(snap => snap.exists())
+      .filter(snap => snap.exists)
       .map(snap => ({
-        id: snap.key,
-        ...snap.val(),
-        name: snap.val().fullname || snap.val().fullName || snap.val().username || snap.val().name || "N/A"
+        id: snap.id,
+        ...snap.data(),
+        name: snap.data().fullname || snap.data().fullName || snap.data().username || snap.data().name || "N/A"
       }));
 
     if (studentsToMove.length === 0) {
@@ -446,10 +453,10 @@ export const moveStudentsToBatch = async (req, res) => {
       batchUpdates.status = 'Ready';
     }
 
-    // Add students to batch node
+    // Add students to batch node (using dot notation for nested map update in Firestore)
     studentsToMove.forEach(student => {
       const studentKey = student.id;
-      batchUpdates[`students/${studentKey}`] = {
+      batchUpdates[`students.${studentKey}`] = {
         name: student.name,
         email: student.email,
         studentId: student.studentId || "",
@@ -457,20 +464,26 @@ export const moveStudentsToBatch = async (req, res) => {
       };
     });
 
-    await batchesRef.child(batchId).update(batchUpdates);
+    await batchesRef.doc(batchId).update(batchUpdates);
 
     // 4. Update Student records to link to batch
-    const studentUpdates = {};
+    const batch = db.batch();
     studentsToMove.forEach(student => {
-      // Basic root fields
-      studentUpdates[`${student.id}/batchId`] = batchId;
-      studentUpdates[`${student.id}/batchName`] = batchData.name || batchData.courseName || batchData.course;
+      const studentDocRef = studentsRef.doc(student.id);
+      
+      const studentUpdates = {
+        batchId: batchId,
+        batchName: batchData.name || batchData.courseName || batchData.course
+      };
       
       // Multi-course support: Map the specific course to this batch key
       const courseKey = (batchData.courseName || batchData.course || "General").replace(/\./g, ",");
-      studentUpdates[`${student.id}/batches/${courseKey}`] = batchId;
+      studentUpdates[`batches.${courseKey}`] = batchId;
+      
+      batch.update(studentDocRef, studentUpdates);
     });
-    await studentsRef.update(studentUpdates);
+    
+    await batch.commit();
 
     res.status(200).json({
       success: true,
@@ -482,4 +495,5 @@ export const moveStudentsToBatch = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
 

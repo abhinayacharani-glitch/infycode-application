@@ -1,214 +1,153 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search, Plus, X, Upload, Eye, Download, FileText, Video, File, Archive } from 'lucide-react';
+import { Search, Plus, X, Upload, Eye, Download, FileText, Video, File, Archive, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { useTrainer } from '../../../context/TrainerContext';
+import { getTrainerBatchesAPI, getAllSyllabuses, getBatchMaterialsAPI, uploadMaterialAPI } from '../../../services/api';
 import './Materials.css';
 
-const initialBatches = [
-  {
-    id: 'B1',
-    title: 'JavaScript Fundamentals',
-    uploaded: [
-      { id: '11', title: 'JavaScript Arrays.docx', size: '0.9 MB', date: 'Apr 3', tag: 'JS', type: 'DOC' },
-      { id: '12', title: 'Interview Tips.mp4', size: '84 MB', date: 'Apr 5', tag: 'Interview', type: 'VID' }
-    ],
-    pending: [
-      { id: '13', title: 'Promises' },
-      { id: '14', title: 'Async/Await' }
-    ]
-  },
-  {
-    id: 'B2',
-    title: 'Node.js',
-    uploaded: [
-      { id: '21', title: 'React Basics.pdf', size: '3.1 MB', date: 'Mar 28', tag: 'React', type: 'PDF' }
-    ],
-    pending: [
-      { id: '22', title: 'Hooks' },
-      { id: '23', title: 'Context API' }
-    ]
-  },
-  {
-    id: 'B3',
-    title: 'Interview Prep',
-    uploaded: [],
-    pending: [
-      { id: '31', title: 'React Performance' },
-      { id: '32', title: 'Custom Hooks' }
-    ]
-  },
-  {
-    id: 'B4',
-    title: 'React.js',
-    uploaded: [
-      { id: '41', title: 'React Hooks Deep Dive.pdf', size: '2.4 MB', date: 'Apr 9', tag: 'React', type: 'PDF' }
-    ],
-    pending: [
-      { id: '42', title: 'Redux' },
-      { id: '43', title: 'Testing' }
-    ]
-  }
-];
-
 const Materials = () => {
-  const [batches, setBatches] = useState(initialBatches);
+  const { trainerData } = useTrainer();
+  const [batches, setBatches] = useState([]);
+  const [syllabuses, setSyllabuses] = useState([]);
+  const [allMaterials, setAllMaterials] = useState({}); // { batchId: [materials] }
+  const [isLoading, setIsLoading] = useState(true);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [previewItem, setPreviewItem] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('all'); // all, uploaded, pending
-  const [filterType, setFilterType] = useState('all'); // all, PDF, VID, DOC
-
+  
   // Form State
   const [uploadData, setUploadData] = useState({
-    title: '',
-    batchId: 'B1',
-    pendingId: '',
-    tag: '',
-    fileName: ''
+    batchId: '',
+    moduleName: '',
+    fileName: '',
+    file: null
   });
 
-  const getTypeIcon = (type) => {
-    switch (type) {
-      case 'PDF': return <FileText size={18} />;
-      case 'VID': return <Video size={18} />;
-      case 'DOC': return <File size={18} />;
-      case 'ZIP': return <Archive size={18} />;
-      default: return <File size={18} />;
+  // 1. Fetch Data
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+
+        // Fetch Trainer Batches
+        const batchesRes = await getTrainerBatchesAPI();
+        const fetchedBatches = batchesRes.batches || [];
+        setBatches(fetchedBatches);
+
+        // Fetch All Syllabuses
+        const syllabusRes = await getAllSyllabuses();
+        setSyllabuses(syllabusRes.syllabuses || []);
+
+        // Fetch Materials for each batch
+        const materialsMap = {};
+        for (const batch of fetchedBatches) {
+          const matRes = await getBatchMaterialsAPI(batch.id);
+          materialsMap[batch.id] = matRes.materials || [];
+        }
+        setAllMaterials(materialsMap);
+
+      } catch (err) {
+        console.error("Failed to fetch materials data:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // 2. Logic: Process Batches with Syllabus and Materials
+  const processedBatches = useMemo(() => {
+    return batches.map(batch => {
+      // Find syllabus for this batch's course
+      const syllabus = syllabuses.find(s => 
+        s.title.toLowerCase().includes(batch.course.toLowerCase()) ||
+        batch.course.toLowerCase().includes(s.title.toLowerCase())
+      );
+
+      if (!syllabus) return { ...batch, modules: [] };
+
+      const batchMaterials = allMaterials[batch.id] || [];
+      
+      let foundOngoing = false;
+      const modules = syllabus.modules.map((mod, index) => {
+        const material = batchMaterials.find(m => m.moduleName === mod.name);
+        
+        let status = 'pending';
+        if (material) {
+          status = 'uploaded';
+        } else if (!foundOngoing) {
+          status = 'ongoing';
+          foundOngoing = true;
+        }
+
+        return {
+          ...mod,
+          status,
+          material: material || null
+        };
+      });
+
+      return { ...batch, modules };
+    });
+  }, [batches, syllabuses, allMaterials]);
+
+  const handleUploadSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const payload = {
+        batchId: uploadData.batchId,
+        moduleName: uploadData.moduleName,
+        fileName: uploadData.fileName || (uploadData.file ? uploadData.file.name : 'Module_Resource.pdf'),
+        trainerId: trainerData?.id || trainerData?._id,
+        trainerName: trainerData?.fullName || trainerData?.fullname || trainerData?.name || "Trainer"
+      };
+
+      await uploadMaterialAPI(payload);
+
+      // Refresh data
+      const matRes = await getBatchMaterialsAPI(uploadData.batchId);
+      setAllMaterials(prev => ({
+        ...prev,
+        [uploadData.batchId]: matRes.materials
+      }));
+
+      setShowUploadModal(false);
+      setUploadData({ batchId: '', moduleName: '', fileName: '', file: null });
+      alert("Material uploaded successfully!");
+    } catch (err) {
+      console.error("Upload failed:", err);
+      alert("Failed to upload material.");
     }
   };
 
-  const getTypeClass = (type) => {
-    switch (type) {
-      case 'PDF': return 'type-pdf';
-      case 'VID': return 'type-vid';
-      case 'DOC': return 'type-doc';
-      case 'ZIP': return 'type-zip';
-      default: return 'type-doc';
-    }
-  };
-
-  const calculateProgress = (b) => {
-    const active = b.uploaded.length;
-    const total = active + b.pending.length;
-    if (total === 0) return 0;
-    return Math.round((active / total) * 100);
-  };
-
-  const openGeneralUpload = () => {
-    setUploadData({ title: '', batchId: 'B1', pendingId: '', tag: '', fileName: '' });
-    setShowUploadModal(true);
-  };
-
-  const openInlineUpload = (batchId, pendingItem) => {
+  const openUpload = (batchId, moduleName) => {
     setUploadData({
-      title: pendingItem.title,
-      batchId: batchId,
-      pendingId: pendingItem.id,
-      tag: 'New',
-      fileName: ''
+      batchId,
+      moduleName,
+      fileName: '',
+      file: null
     });
     setShowUploadModal(true);
   };
 
-  const handleUploadSubmit = (e) => {
-    e.preventDefault();
-    const { batchId, pendingId, title, tag } = uploadData;
+  const filteredBatches = processedBatches.filter(b => 
+    b.course.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    b.id.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-    setBatches(curr => curr.map(b => {
-      if (b.id === batchId) {
-        let updatedPending = [...b.pending];
-        if (pendingId) {
-          updatedPending = updatedPending.filter(p => p.id === pendingId ? false : true);
-        } else {
-          // If general upload, maybe it matches a pending topic?
-          const match = updatedPending.find(p => p.title.toLowerCase() === title.toLowerCase());
-          if (match) {
-            updatedPending = updatedPending.filter(p => p.id !== match.id);
-          }
-        }
-
-        const fileExt = title.split('.').pop().toLowerCase();
-        let type = 'DOC';
-        if (['pdf'].includes(fileExt)) type = 'PDF';
-        else if (['mp4', 'mov', 'avi'].includes(fileExt)) type = 'VID';
-        else if (['zip', 'rar'].includes(fileExt)) type = 'ZIP';
-
-        const newItem = {
-          id: Date.now().toString(),
-          title: title,
-          size: '1.5 MB',
-          date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-          tag: tag || 'General',
-          type: type
-        };
-        return { ...b, uploaded: [...b.uploaded, newItem], pending: updatedPending };
-      }
-      return b;
-    }));
-    setShowUploadModal(false);
-  };
-
-  const handleDownload = (item) => {
-    // Create a dummy link and click it
-    const element = document.createElement("a");
-    const file = new Blob(["Simulated content for " + item.title], { type: 'text/plain' });
-    element.href = URL.createObjectURL(file);
-    element.download = item.title;
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
-  };
-
-  // Advanced Filtering Logic
-  const filteredBatches = useMemo(() => {
-    return batches.map(batch => {
-      const filteredUploaded = batch.uploaded.filter(item =>
-        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        batch.title.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      const filteredPending = batch.pending.filter(item =>
-        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        batch.title.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-
-      // Status filters
-      const showUploaded = filterStatus === 'all' || filterStatus === 'uploaded';
-      const showPending = filterStatus === 'all' || filterStatus === 'pending';
-
-      const finalUploadedTyped = filterType === 'all'
-        ? filteredUploaded
-        : filteredUploaded.filter(item => item.type === filterType);
-
-      const finalPending = showPending ? filteredPending : [];
-
-      if (finalUploadedTyped.length === 0 && finalPending.length === 0) return null;
-
-      // If filterStatus is 'uploaded', only return if there are uploaded items
-      if (filterStatus === 'uploaded' && finalUploadedTyped.length === 0) return null;
-      // If filterStatus is 'pending', only return if there are pending items
-      if (filterStatus === 'pending' && finalPending.length === 0) return null;
-
-      return { ...batch, uploaded: showUploaded ? finalUploadedTyped : [], pending: finalPending };
-    }).filter(Boolean);
-  }, [batches, searchQuery, filterStatus, filterType]);
-
-  // Derived state for Modal topic dropdown
-  const selectedBatchPendingTopics = useMemo(() => {
-    const selectedBatch = batches.find(b => b.id === uploadData.batchId);
-    return selectedBatch ? selectedBatch.pending : [];
-  }, [batches, uploadData.batchId]);
+  if (isLoading) {
+    return <div className="materials-page-wrapper">Loading Materials...</div>;
+  }
 
   return (
     <div className="materials-page-wrapper">
-
-      {/* Header Container — 2-Line Layout */}
       <div className="mat-header-container">
-
-        {/* Row 1: Titles */}
         <div className="mat-title-row">
-          <h1 className="mat-page-title">Course Materials</h1>
-          <p className="mat-page-subtitle">Upload and manage course content</p>
+          <h1 className="mat-page-title">Course & Materials</h1>
+          <p className="mat-page-subtitle">Manage module-wise resources for your active batches</p>
         </div>
 
-        {/* Row 2: Controls */}
         <div className="mat-controls-row">
           <div className="mat-search-wrapper">
             <div className="mat-search-box">
@@ -216,221 +155,167 @@ const Materials = () => {
               <input
                 type="text"
                 className="mat-input-field"
-                placeholder="Search by file or topic..."
+                placeholder="Search by batch or course..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
           </div>
-
+          
           <div className="mat-actions-right">
-            <div className="mat-filters-group">
-              <div className="mat-filter-wrapper">
-                <span className="mat-filter-label">All Status</span>
-                <select
-                  className="mat-select-field"
-                  value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value)}
-                >
-                  <option value="all">All</option>
-                  <option value="uploaded">Uploaded</option>
-                  <option value="pending">Pending</option>
-                </select>
-              </div>
-              <div className="mat-filter-wrapper">
-                <span className="mat-filter-label">File Type</span>
-                <select
-                  className="mat-select-field"
-                  value={filterType}
-                  onChange={(e) => setFilterType(e.target.value)}
-                >
-                  <option value="all">All Types</option>
-                  <option value="PDF">PDF Documents</option>
-                  <option value="VID">Video Lessons</option>
-                  <option value="DOC">Word Docs</option>
-                  <option value="ZIP">Zip Archives</option>
-                </select>
-              </div>
-            </div>
-            <button className="mat-btn-primary header-btn" onClick={openGeneralUpload}>
-              <Plus size={16} /> Upload General
-            </button>
+             <div className="mat-filters-group">
+                <div className="mat-filter-wrapper">
+                  <span className="mat-filter-label">Filter Status</span>
+                  <select 
+                    className="mat-select-field"
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                  >
+                    <option value="all">All Modules</option>
+                    <option value="uploaded">Uploaded Only</option>
+                    <option value="ongoing">Ongoing Only</option>
+                    <option value="pending">Pending Only</option>
+                  </select>
+                </div>
+             </div>
           </div>
         </div>
       </div>
 
-      {/* 2-Column Batch Grid */}
       <div className="mat-batch-grid">
-        {filteredBatches.map((batch, idx) => {
-          const progress = calculateProgress(batch);
-          const showUploaded = filterStatus === 'all' || filterStatus === 'uploaded';
-          const showPending = filterStatus === 'all' || filterStatus === 'pending';
-
-          return (
-            <div key={batch.id} className="mat-batch-card" style={{ animationDelay: `${idx * 0.1}s` }}>
-              <div className="mat-batch-header">
-                <h2 className="mat-batch-title">{batch.id} – {batch.title}</h2>
-                <div className="mat-progress-wrapper">
-                  <div className="mat-progress-label">
-                    <span>{batch.uploaded.length} / {batch.uploaded.length + batch.pending.length} Topics Uploaded</span>
+        {filteredBatches.map((batch, idx) => (
+          <div key={batch.id} className="mat-batch-card" style={{ animationDelay: `${idx * 0.1}s` }}>
+            <div className="mat-batch-header">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div>
+                  <h2 className="mat-batch-title">{batch.course}</h2>
+                  <div className="mat-tag" style={{ background: '#f1f5f9', color: '#64748b', fontSize: '12px' }}>
+                    Batch: {batch.id}
+                  </div>
+                </div>
+                <div className="mat-progress-wrapper" style={{ width: '120px' }}>
+                  <div className="mat-progress-label" style={{ fontSize: '11px' }}>
+                    <span>{batch.modules.filter(m => m.status === 'uploaded').length}/{batch.modules.length} Modules</span>
                   </div>
                   <div className="mat-progress-track">
-                    <div className="mat-progress-fill" style={{ width: `${progress}%` }}></div>
+                    <div 
+                      className="mat-progress-fill" 
+                      style={{ width: `${(batch.modules.filter(m => m.status === 'uploaded').length / batch.modules.length) * 100}%` }}
+                    ></div>
                   </div>
                 </div>
               </div>
+            </div>
 
-              <div className="mat-batch-body">
-                {/* Uploaded Section */}
-                {showUploaded && batch.uploaded.length > 0 && (
-                  <div className="mat-section">
-                    <h3 className="mat-section-title">Uploaded</h3>
-                    <div className="mat-item-list">
-                      {batch.uploaded.map(item => (
-                        <div key={item.id} className="mat-uploaded-item">
-                          <div className="mat-item-left">
-                            <div className={`mat-icon-type ${getTypeClass(item.type)}`}>
-                              {getTypeIcon(item.type)}
-                            </div>
-                            <div className="mat-item-info">
-                              <div className="mat-item-name">{item.title}</div>
-                              <div className="mat-item-meta">
-                                <span>{item.size} • {item.date}</span>
-                                <span className="mat-tag">{item.tag}</span>
-                              </div>
+            <div className="mat-batch-body">
+              <div className="mat-section">
+                <h3 className="mat-section-title">Course Modules</h3>
+                <div className="mat-item-list">
+                  {batch.modules.map((mod, mIdx) => {
+                    if (filterStatus !== 'all' && mod.status !== filterStatus) return null;
+
+                    return (
+                      <div 
+                        key={mIdx} 
+                        className={`mat-pending-item ${mod.status}`}
+                        style={{ 
+                          borderStyle: mod.status === 'uploaded' ? 'solid' : 'dashed',
+                          background: mod.status === 'ongoing' ? '#eff6ff' : mod.status === 'uploaded' ? '#f0fdf4' : '#f8fafc',
+                          borderColor: mod.status === 'ongoing' ? '#3b82f6' : mod.status === 'uploaded' ? '#22c55e' : '#e2e8f0'
+                        }}
+                      >
+                        <div className="mat-pending-info" style={{ flex: 1 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            {mod.status === 'uploaded' ? <CheckCircle size={16} color="#22c55e" /> : 
+                             mod.status === 'ongoing' ? <Clock size={16} color="#3b82f6" /> : 
+                             <AlertCircle size={16} color="#94a3b8" />}
+                            <div className="mat-pending-name" style={{ color: mod.status === 'pending' ? '#94a3b8' : '#1e293b' }}>
+                              {mod.name}
                             </div>
                           </div>
+                          <div style={{ fontSize: '12px', color: '#64748b', marginLeft: '24px', marginTop: '4px' }}>
+                            {mod.topics.slice(0, 3).join(', ')}{mod.topics.length > 3 ? '...' : ''}
+                          </div>
+                        </div>
+
+                        {mod.status === 'uploaded' ? (
                           <div className="mat-item-actions">
-                            <button className="mat-btn-action" onClick={() => setPreviewItem(item)}>
+                            <button className="mat-btn-action" onClick={() => setPreviewItem(mod.material)}>
                               <Eye size={16} /> View
                             </button>
-                            <button className="mat-btn-action download" onClick={() => handleDownload(item)}>
-                              <Download size={16} /> Down
+                            <button className="mat-btn-action download" onClick={() => window.open(mod.material.fileUrl, '_blank')}>
+                              <Download size={16} /> Get
                             </button>
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Pending Section */}
-                {showPending && batch.pending.length > 0 && (
-                  <div className="mat-section">
-                    <h3 className="mat-section-title">Pending Topics</h3>
-                    <div className="mat-item-list">
-                      {batch.pending.map(item => (
-                        <div key={item.id} className="mat-pending-item">
-                          <div className="mat-pending-info">
-                            <div className="mat-pending-name">{item.title}</div>
-                            <span className="mat-pending-label">(Pending)</span>
-                          </div>
-                          <button className="mat-btn-primary mat-btn-xs" onClick={() => openInlineUpload(batch.id, item)}>
-                            Upload
+                        ) : mod.status === 'ongoing' ? (
+                          <button className="mat-btn-primary mat-btn-xs" onClick={() => openUpload(batch.id, mod.name)}>
+                            <Upload size={14} /> Upload PDF
                           </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {batch.uploaded.length === 0 && batch.pending.length === 0 && (
-                  <div className="mat-empty-section">No materials found matching your criteria.</div>
-                )}
+                        ) : (
+                          <span className="mat-pending-label">Locked</span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
-
-      {filteredBatches.length === 0 && (
-        <div className="mat-empty-global">
-          <div className="mat-empty-icon">📁</div>
-          <p>No materials found matching your search or filters.</p>
-        </div>
-      )}
 
       {/* Upload Modal */}
       {showUploadModal && (
         <div className="mat-overlay">
           <div className="mat-modal animate-pop">
             <div className="mat-modal-title">
-              <span>{uploadData.pendingId ? 'Complete Topic Upload' : 'Upload Material'}</span>
+              <span>Upload Module Material</span>
               <button className="mat-btn-close" onClick={() => setShowUploadModal(false)}><X size={20} /></button>
             </div>
             <form onSubmit={handleUploadSubmit}>
-              <div className="mat-form-grid">
-                <div className="mat-form-group">
-                  <label>Batch</label>
-                  <select
-                    className="mat-select-field width-full"
-                    value={uploadData.batchId}
-                    onChange={(e) => setUploadData({ ...uploadData, batchId: e.target.value, pendingId: '' })}
-                    disabled={!!uploadData.pendingId}
-                  >
-                    {batches.map(b => <option key={b.id} value={b.id}>{b.id} – {b.title}</option>)}
-                  </select>
-                </div>
-
-                <div className="mat-form-group">
-                  <label>Topic</label>
-                  <select
-                    className="mat-select-field width-full"
-                    value={uploadData.pendingId}
-                    onChange={(e) => {
-                      const selected = selectedBatchPendingTopics.find(p => p.id === e.target.value);
-                      setUploadData({ ...uploadData, pendingId: e.target.value, title: selected ? selected.title : uploadData.title });
-                    }}
-                    disabled={!!uploadData.pendingId}
-                  >
-                    <option value="">Select Topic</option>
-                    {selectedBatchPendingTopics.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
-                  </select>
-                </div>
-              </div>
-
               <div className="mat-form-group">
-                <label>Title</label>
+                <label>Module Name</label>
                 <input
                   type="text"
                   className="mat-input-field"
-                  value={uploadData.title}
-                  onChange={(e) => setUploadData({ ...uploadData, title: e.target.value })}
-                  placeholder="e.g. JavaScript Arrays Deep Dive"
+                  value={uploadData.moduleName}
+                  readOnly
+                  style={{ background: '#f1f5f9' }}
+                />
+              </div>
+
+              <div className="mat-form-group">
+                <label>Material Title</label>
+                <input
+                  type="text"
+                  className="mat-input-field"
+                  value={uploadData.fileName}
+                  onChange={(e) => setUploadData({ ...uploadData, fileName: e.target.value })}
+                  placeholder="e.g. JavaScript Basics Guide.pdf"
                   required
                 />
               </div>
 
               <div className="mat-form-group">
-                <label>Tag (Optional)</label>
-                <input
-                  type="text"
-                  className="mat-input-field"
-                  value={uploadData.tag}
-                  onChange={(e) => setUploadData({ ...uploadData, tag: e.target.value })}
-                  placeholder="e.g. JS, React, Interview"
-                />
-              </div>
-
-              <div className="mat-form-group">
-                <label>Upload File</label>
+                <label>Choose PDF File</label>
                 <div className="mat-file-input-wrapper">
                   <input
                     type="file"
                     className="mat-file-input"
-                    onChange={(e) => setUploadData({ ...uploadData, fileName: e.target.files[0]?.name })}
+                    accept=".pdf"
+                    onChange={(e) => setUploadData({ ...uploadData, file: e.target.files[0], fileName: e.target.files[0]?.name })}
                     required
                   />
                   <div className="mat-file-placeholder">
                     <Upload size={18} />
-                    {uploadData.fileName || 'Choose file...'}
+                    {uploadData.file ? uploadData.file.name : 'Drag or click to upload PDF'}
                   </div>
                 </div>
               </div>
 
               <div className="mat-modal-footer">
                 <button type="button" className="mat-btn-cancel" onClick={() => setShowUploadModal(false)}>Cancel</button>
-                <button type="submit" className="mat-btn-primary">Submit & Upload</button>
+                <button type="submit" className="mat-btn-primary">Save Material</button>
               </div>
             </form>
           </div>
@@ -442,32 +327,31 @@ const Materials = () => {
         <div className="mat-overlay" onClick={() => setPreviewItem(null)}>
           <div className="mat-modal mat-modal-lg animate-pop" onClick={e => e.stopPropagation()}>
             <div className="mat-modal-title">
-              <span>File Preview: {previewItem.title}</span>
+              <span>Preview: {previewItem.fileName}</span>
               <button className="mat-btn-close" onClick={() => setPreviewItem(null)}><X size={20} /></button>
             </div>
             <div className="mat-preview-content">
               <div className="mat-preview-placeholder">
-                <div className={`mat-preview-icon ${getTypeClass(previewItem.type)}`}>
-                  {previewItem.type === 'VID' ? <Video size={80} /> : <FileText size={80} />}
+                <div className={`mat-preview-icon type-pdf`}>
+                  <FileText size={80} />
                 </div>
-                <h4 className="mat-preview-title">{previewItem.title}</h4>
-                <p>This is a simulated preview of the uploaded content.</p>
+                <h4 className="mat-preview-title">{previewItem.fileName}</h4>
+                <p>Uploaded on {new Date(previewItem.uploadedAt).toLocaleDateString()}</p>
                 <div className="mat-preview-meta">
-                  <div className="mat-meta-badge"><span>Size:</span> {previewItem.size}</div>
-                  <div className="mat-meta-badge"><span>Type:</span> {previewItem.type}</div>
-                  <div className="mat-meta-badge"><span>Date:</span> {previewItem.date}</div>
+                  <div className="mat-meta-badge"><span>Size:</span> 1.5 MB</div>
+                  <div className="mat-meta-badge"><span>Module:</span> {previewItem.moduleName}</div>
+                  <div className="mat-meta-badge"><span>Trainer:</span> {previewItem.trainerName}</div>
                 </div>
               </div>
               <div className="mat-modal-footer">
-                <button className="mat-btn-primary" onClick={() => handleDownload(previewItem)}>
-                  <Download size={16} /> Download Copy
+                <button className="mat-btn-primary" onClick={() => window.open(previewItem.fileUrl, '_blank')}>
+                  <Download size={16} /> Open Document
                 </button>
               </div>
             </div>
           </div>
         </div>
       )}
-
     </div>
   );
 };

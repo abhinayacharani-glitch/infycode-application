@@ -2,7 +2,7 @@
  * trainerNotificationController.js
  *
  * Manages notifications for trainers.
- * Firebase path: trainerNotifications/{trainerKey}/items/{notifId}
+ * Firestore path: trainerNotifications/{trainerId}/items/{notifId}
  *
  * Routes (all protected):
  *   GET  /api/trainer/notifications            → fetch trainer's notifications
@@ -13,42 +13,41 @@
 
 import db from "../config/firebase.js";
 
-const trainersRef = db.ref("trainers");
-const notificationsRef = db.ref("trainerNotifications");
+const trainersCollection = db.collection("trainers");
+const notificationsCollection = db.collection("trainerNotifications");
 
-// ─── Helper: resolve trainer Firebase key from req.user ─────────────────────
-const resolveTrainerKey = async ({ id, email }) => {
+// ─── Helper: resolve trainer Firestore ID from req.user ─────────────────────
+const resolveTrainerId = async ({ id, email }) => {
   // 1. Try direct ID first
-  const snap = await trainersRef.child(id).once("value");
-  if (snap.exists()) return id;
+  const doc = await trainersCollection.doc(id).get();
+  if (doc.exists) return id;
 
   // 2. Fallback to email lookup
-  const emailSnap = await trainersRef
-    .orderByChild("email")
-    .equalTo(email)
-    .once("value");
+  const snapshot = await trainersCollection
+    .where("email", "==", email)
+    .limit(1)
+    .get();
 
-  let key = null;
-  emailSnap.forEach((child) => { key = child.key; });
-  return key;
+  if (!snapshot.empty) {
+    return snapshot.docs[0].id;
+  }
+  return null;
 };
 
 // ─── GET /api/trainer/notifications ─────────────────────────────────────────
 export const getTrainerNotifications = async (req, res) => {
   try {
-    const trainerKey = await resolveTrainerKey(req.user);
-    if (!trainerKey)
+    const trainerId = await resolveTrainerId(req.user);
+    if (!trainerId)
       return res.status(404).json({ success: false, message: "Trainer not found" });
 
-    const snap = await notificationsRef
-      .child(trainerKey)
-      .child("items")
-      .once("value");
+    const snapshot = await notificationsCollection
+      .doc(trainerId)
+      .collection("items")
+      .orderBy("createdAt", "desc")
+      .get();
 
-    const raw = snap.val() || {};
-    const notifications = Object.entries(raw)
-      .map(([id, data]) => ({ id, ...data }))
-      .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)); // newest first
+    const notifications = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
     return res.status(200).json({ success: true, notifications });
   } catch (error) {
@@ -61,23 +60,26 @@ export const getTrainerNotifications = async (req, res) => {
 // Body: { id: "notifId" }  — OR omit id to mark ALL as read
 export const markNotificationsRead = async (req, res) => {
   try {
-    const trainerKey = await resolveTrainerKey(req.user);
-    if (!trainerKey)
+    const trainerId = await resolveTrainerId(req.user);
+    if (!trainerId)
       return res.status(404).json({ success: false, message: "Trainer not found" });
 
     const { id } = req.body;
-    const itemsRef = notificationsRef.child(trainerKey).child("items");
+    const itemsCollection = notificationsCollection.doc(trainerId).collection("items");
 
     if (id) {
       // Mark single notification read
-      await itemsRef.child(id).update({ read: true });
+      await itemsCollection.doc(id).update({ read: true });
     } else {
       // Mark ALL as read
-      const snap = await itemsRef.once("value");
-      const raw = snap.val() || {};
-      const updates = {};
-      Object.keys(raw).forEach((k) => { updates[`${k}/read`] = true; });
-      if (Object.keys(updates).length > 0) await itemsRef.update(updates);
+      const snapshot = await itemsCollection.where("read", "==", false).get();
+      if (!snapshot.empty) {
+        const batch = db.batch();
+        snapshot.forEach((doc) => {
+          batch.update(doc.ref, { read: true });
+        });
+        await batch.commit();
+      }
     }
 
     return res.status(200).json({ success: true, message: "Marked as read" });
@@ -98,22 +100,23 @@ export const sendTrainerNotification = async (req, res) => {
       return res.status(400).json({ success: false, message: "title and text are required" });
 
     // Resolve target trainer
-    let trainerKey = trainerId || null;
+    let resolvedTrainerId = trainerId || null;
 
-    if (!trainerKey && trainerEmail) {
-      const emailSnap = await trainersRef
-        .orderByChild("email")
-        .equalTo(trainerEmail.trim().toLowerCase())
-        .once("value");
+    if (!resolvedTrainerId && trainerEmail) {
+      const snapshot = await trainersCollection
+        .where("email", "==", trainerEmail.trim().toLowerCase())
+        .limit(1)
+        .get();
 
-      emailSnap.forEach((child) => { trainerKey = child.key; });
+      if (!snapshot.empty) {
+        resolvedTrainerId = snapshot.docs[0].id;
+      }
     }
 
-    if (!trainerKey)
+    if (!resolvedTrainerId)
       return res.status(404).json({ success: false, message: "Target trainer not found" });
 
-    const newRef = notificationsRef.child(trainerKey).child("items").push();
-    await newRef.set({
+    const newNotif = {
       title:       title.trim(),
       text:        text.trim(),
       type:        type || "info",         // info | success | warning | student
@@ -121,12 +124,14 @@ export const sendTrainerNotification = async (req, res) => {
       senderRole:  senderRole || "admin",  // admin | student
       read:        false,
       createdAt:   Date.now(),
-    });
+    };
+
+    const docRef = await notificationsCollection.doc(resolvedTrainerId).collection("items").add(newNotif);
 
     return res.status(201).json({
       success: true,
       message: "Notification sent",
-      notificationId: newRef.key,
+      notificationId: docRef.id,
     });
   } catch (error) {
     console.error("[sendTrainerNotification] Error:", error.message);
@@ -137,12 +142,12 @@ export const sendTrainerNotification = async (req, res) => {
 // ─── DELETE /api/trainer/notifications/:id ────────────────────────────────────
 export const deleteTrainerNotification = async (req, res) => {
   try {
-    const trainerKey = await resolveTrainerKey(req.user);
-    if (!trainerKey)
+    const trainerId = await resolveTrainerId(req.user);
+    if (!trainerId)
       return res.status(404).json({ success: false, message: "Trainer not found" });
 
     const { id } = req.params;
-    await notificationsRef.child(trainerKey).child("items").child(id).remove();
+    await notificationsCollection.doc(trainerId).collection("items").doc(id).delete();
 
     return res.status(200).json({ success: true, message: "Notification deleted" });
   } catch (error) {
@@ -155,11 +160,11 @@ export const deleteTrainerNotification = async (req, res) => {
 // Dev helper: seeds some sample notifications for the logged-in trainer
 export const seedTrainerNotifications = async (req, res) => {
   try {
-    const trainerKey = await resolveTrainerKey(req.user);
-    if (!trainerKey)
+    const trainerId = await resolveTrainerId(req.user);
+    if (!trainerId)
       return res.status(404).json({ success: false, message: "Trainer not found" });
 
-    const itemsRef = notificationsRef.child(trainerKey).child("items");
+    const itemsCollection = notificationsCollection.doc(trainerId).collection("items");
     const now = Date.now();
 
     const samples = [
@@ -210,9 +215,12 @@ export const seedTrainerNotifications = async (req, res) => {
       },
     ];
 
+    const batch = db.batch();
     for (const notif of samples) {
-      await itemsRef.push(notif);
+      const docRef = itemsCollection.doc();
+      batch.set(docRef, notif);
     }
+    await batch.commit();
 
     return res.status(201).json({ success: true, message: "Sample notifications seeded" });
   } catch (error) {
@@ -220,3 +228,4 @@ export const seedTrainerNotifications = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+

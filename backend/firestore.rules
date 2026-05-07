@@ -1,0 +1,114 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+        get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == 'admin'
+      );
+    }
+
+    function isTrainer() {
+      return isAuthenticated() && (
+        get(/databases/$(database)/documents/trainers/$(request.auth.uid)).data.role == 'trainer'
+      );
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Admins collection
+    match /admins/{adminId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Students collection
+    match /students/{studentId} {
+      allow create: if true; // Public registration
+      allow read: if isAdmin() || isOwner(studentId);
+      allow update, delete: if isAdmin() || isOwner(studentId);
+    }
+
+    // Trainers collection
+    match /trainers/{trainerId} {
+      allow create: if true; // Public application
+      allow read: if isAdmin() || isOwner(trainerId);
+      allow update, delete: if isAdmin() || isOwner(trainerId);
+    }
+
+    // Courses and Batches
+    match /courses/{courseId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /batches/{batchId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // Syllabuses
+    match /syllabuses/{syllabusId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Enrollments
+    match /enrollments/{enrollmentId} {
+      allow read: if isAdmin() || (isAuthenticated() && resource.data.studentId == request.auth.uid);
+      allow write: if isAdmin();
+    }
+
+    // Materials (subcollection)
+    match /materials/{batchId} {
+      allow read: if isAuthenticated(); // More granular rules could check batch enrollment
+      match /items/{itemId} {
+        allow read: if isAuthenticated();
+        allow write: if isAdmin() || isTrainer();
+      }
+    }
+
+    // Trainer Notifications
+    match /trainerNotifications/{trainerId} {
+      match /items/{itemId} {
+        allow read: if isOwner(trainerId) || isAdmin();
+        allow write: if isAdmin();
+      }
+    }
+
+    // FAQs
+    match /faqs/{faqId} {
+      allow read: if isAdmin();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAdmin();
+    }
+
+    match /FAQs/{faqId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Queries
+    match /queries/{queryId} {
+      allow create: if true;
+      allow read, write: if isAdmin();
+    }
+
+    // Password Reset Tokens
+    match /passwordResetTokens/{tokenId} {
+      allow read, write: if false; // Only Admin SDK should touch this
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if isAdmin();
+    }
+  }
+}

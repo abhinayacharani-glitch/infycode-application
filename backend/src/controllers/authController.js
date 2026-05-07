@@ -3,17 +3,17 @@ import bcrypt from "bcryptjs";
 import generateToken from "../utils/generateToken.js";
 import sendEmail from "../utils/sendEmail.js";
 
-const studentsRef = db.ref("students");
-const adminsRef = db.ref("admins");
-const trainersRef = db.ref("trainers");
-const tempRegistrationsRef = db.ref("tempRegistrations");
+const studentsRef = db.collection("students");
+const adminsRef = db.collection("admins");
+const trainersRef = db.collection("trainers");
+const tempRegistrationsRef = db.collection("tempRegistrations");
 
-const coursesRef = db.ref("courses");
+const coursesRef = db.collection("courses");
 
 // Helper: Generate next Student ID (INFY-110, INFY-111)
 const generateNextStudentID = async () => {
-  const snapshot = await studentsRef.once("value");
-  const count = snapshot.numChildren();
+  const snapshot = await studentsRef.get();
+  const count = snapshot.size;
   const nextNumber = 110 + count;
   return `INFY-${nextNumber}`;
 };
@@ -46,16 +46,15 @@ export const studentRegister = async (req, res) => {
 
     // Check if user already exists
     const existingSnapshot = await studentsRef
-      .orderByChild("email")
-      .equalTo(email.trim().toLowerCase())
-      .once("value");
+      .where("email", "==", email.trim().toLowerCase())
+      .limit(1)
+      .get();
 
-    if (existingSnapshot.exists()) {
+    if (!existingSnapshot.empty) {
       return res.status(400).json({ success: false, message: "User already exists" });
     }
 
     // Generate 6-digit OTP
-
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const otpExpiresAt = Date.now() + 1 * 60 * 1000; // 1 minute
     const sessionExpiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes
@@ -64,7 +63,7 @@ export const studentRegister = async (req, res) => {
     const sanitizedEmail = email.trim().toLowerCase().replace(/\./g, ",");
     const tempKey = `student_${sanitizedEmail}`;
 
-    await tempRegistrationsRef.child(tempKey).set({
+    await tempRegistrationsRef.doc(tempKey).set({
       fullname: fullname.trim(),
       email: email.trim().toLowerCase(),
       phno: phno.trim(),
@@ -128,18 +127,17 @@ export const studentLogin = async (req, res) => {
 
     // 2. Step 2 — Check Email Exists in Database
     const snapshot = await studentsRef
-      .orderByChild("email")
-      .equalTo(email.trim().toLowerCase())
-      .once("value");
+      .where("email", "==", email.trim().toLowerCase())
+      .limit(1)
+      .get();
 
-    if (!snapshot.exists()) {
+    if (snapshot.empty) {
       return res.status(404).json({ success: false, message: "Email not found" });
     }
 
-    let userData;
-    snapshot.forEach((child) => {
-      userData = child.val();
-    });
+    const userDoc = snapshot.docs[0];
+    const userData = userDoc.data();
+    userData.id = userDoc.id;
 
     // 3. Step 3 — Check Password
     const isMatch = await bcrypt.compare(password, userData.password);
@@ -176,20 +174,20 @@ export const verifyRegistrationOTP = async (req, res) => {
     const sanitizedEmail = email.trim().toLowerCase().replace(/\./g, ",");
     const tempKey = `${role.toLowerCase()}_${sanitizedEmail}`;
 
-    const tempSnapshot = await tempRegistrationsRef.child(tempKey).once("value");
+    const tempDoc = await tempRegistrationsRef.doc(tempKey).get();
 
-    if (!tempSnapshot.exists()) {
+    if (!tempDoc.exists) {
       return res.status(400).json({
         success: false,
         message: "Registration session expired. Please register again."
       });
     }
 
-    const registrationData = tempSnapshot.val();
+    const registrationData = tempDoc.data();
 
     // 1. Check Session Expiry (5 minutes)
     if (Date.now() > (registrationData.sessionExpiresAt || 0)) {
-      await tempRegistrationsRef.child(tempKey).remove();
+      await tempRegistrationsRef.doc(tempKey).delete();
       return res.status(400).json({
         success: false,
         message: "Registration session expired. Please register again."
@@ -217,26 +215,26 @@ export const verifyRegistrationOTP = async (req, res) => {
     }
 
     // 4. Deferred Email Check: Check if permanently registered
-    let targetRef;
+    let targetCollection;
     if (isTrainerEmail) {
-      targetRef = trainersRef;
+      targetCollection = trainersRef;
     } else if (role.toLowerCase() === "admin") {
-      targetRef = adminsRef;
+      targetCollection = adminsRef;
     } else if (role.toLowerCase() === "trainer") {
-      targetRef = trainersRef;
+      targetCollection = trainersRef;
     } else if (role.toLowerCase() === "student") {
-      targetRef = studentsRef;
+      targetCollection = studentsRef;
     } else {
       return res.status(400).json({ message: "Invalid role" });
     }
 
-    const permanentSnapshot = await targetRef
-      .orderByChild("email")
-      .equalTo(email.trim().toLowerCase())
-      .once("value");
+    const permanentSnapshot = await targetCollection
+      .where("email", "==", email.trim().toLowerCase())
+      .limit(1)
+      .get();
 
-    if (permanentSnapshot.exists()) {
-      await tempRegistrationsRef.child(tempKey).remove();
+    if (!permanentSnapshot.empty) {
+      await tempRegistrationsRef.doc(tempKey).delete();
       return res.status(400).json({
         success: false,
         message: "User already exists"
@@ -256,11 +254,10 @@ export const verifyRegistrationOTP = async (req, res) => {
       finalUserData.studentId = await generateNextStudentID();
     }
 
-    const newRef = targetRef.push();
-    await newRef.set(finalUserData);
+    await targetCollection.add(finalUserData);
 
     // Remove temp registration
-    await tempRegistrationsRef.child(tempKey).remove();
+    await tempRegistrationsRef.doc(tempKey).delete();
 
     res.status(201).json({
       success: true,
@@ -284,20 +281,20 @@ export const resendRegistrationOTP = async (req, res) => {
     const sanitizedEmail = email.trim().toLowerCase().replace(/\./g, ",");
     const tempKey = `${role.toLowerCase()}_${sanitizedEmail}`;
 
-    const tempSnapshot = await tempRegistrationsRef.child(tempKey).once("value");
+    const tempDoc = await tempRegistrationsRef.doc(tempKey).get();
 
-    if (!tempSnapshot.exists()) {
+    if (!tempDoc.exists) {
       return res.status(400).json({
         success: false,
         message: "Registration session expired. Please register again."
       });
     }
 
-    const registrationData = tempSnapshot.val();
+    const registrationData = tempDoc.data();
 
     // Check Session Expiry (5 minutes)
     if (Date.now() > (registrationData.sessionExpiresAt || 0)) {
-      await tempRegistrationsRef.child(tempKey).remove();
+      await tempRegistrationsRef.doc(tempKey).delete();
       return res.status(400).json({
         success: false,
         message: "Registration session expired. Please register again."
@@ -308,7 +305,7 @@ export const resendRegistrationOTP = async (req, res) => {
     const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
     const newOtpExpiresAt = Date.now() + 1 * 60 * 1000; // 1 minute
 
-    await tempRegistrationsRef.child(tempKey).update({
+    await tempRegistrationsRef.doc(tempKey).update({
       otp: newOtp,
       expiresAt: newOtpExpiresAt,
     });
@@ -345,4 +342,4 @@ export const resendRegistrationOTP = async (req, res) => {
       message: "Failed to send OTP email. Please try again."
     });
   }
-};
+};

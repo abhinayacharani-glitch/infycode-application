@@ -1,29 +1,28 @@
-import db from "../config/firebaseAdmin.js";
+import db from "../config/firebase.js";
 
-const studentsRef = db.ref("students");
-const adminsRef = db.ref("admins");
+const studentsRef = db.collection("students");
+const adminsRef = db.collection("admins");
 
 export const findUserByUsername = async (role, username) => {
-  const ref = role === "admin" ? adminsRef : studentsRef;
-  const snapshot = await ref
-    .orderByChild("username")
-    .equalTo(username)
-    .once("value");
+  const collection = role === "admin" ? adminsRef : studentsRef;
+  const snapshot = await collection
+    .where("username", "==", username)
+    .limit(1)
+    .get();
 
-  if (!snapshot.exists()) return null;
+  if (snapshot.empty) return null;
 
-  let userData;
-  snapshot.forEach((child) => (userData = child.val()));
-  return userData;
+  return { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
 };
 
 export const createStudent = async (studentData) => {
-  const newUserRef = studentsRef.push();
-  await newUserRef.set({
+  const student = {
     ...studentData,
     role: "student",
     status: "Pending",
     createdAt: new Date().toISOString(),
-  });
-  return newUserRef.key;
+  };
+  const docRef = await studentsRef.add(student);
+  return docRef.id;
 };
+

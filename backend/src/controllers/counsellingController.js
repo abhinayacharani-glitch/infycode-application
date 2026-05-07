@@ -2,8 +2,7 @@ import db from "../config/firebase.js";
 import sendEmail from "../utils/sendEmail.js";
 import { emitToTrainer } from "../utils/socket.js";
 
-
-const counsellingRef = db.ref("counsellingBookings");
+const counsellingRef = db.collection("counsellingBookings");
 
 const BACKEND_TIME_SLOTS = [
   { id: 'slot1', label: '10:00 AM – 11:00 AM', startHour: 10 },
@@ -55,13 +54,12 @@ export const bookSlot = async (req, res) => {
       submittedAt: new Date().toISOString(),
     };
 
-    const newBookingRef = counsellingRef.push();
-    await newBookingRef.set(bookingData);
+    const docRef = await counsellingRef.add(bookingData);
 
     res.status(201).json({
       success: true,
       message: "Slot request submitted! Awaiting admin approval.",
-      booking: { id: newBookingRef.key, ...bookingData },
+      booking: { id: docRef.id, ...bookingData },
     });
   } catch (error) {
     console.error("Book Slot Error:", error);
@@ -75,13 +73,8 @@ export const bookSlot = async (req, res) => {
  */
 export const getAdminRequests = async (req, res) => {
   try {
-    const snapshot = await counsellingRef.once("value");
-    const data = snapshot.val() || {};
-
-    const requests = Object.entries(data).map(([id, val]) => ({
-      id,
-      ...val,
-    }));
+    const snapshot = await counsellingRef.get();
+    const requests = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
     res.status(200).json({ success: true, requests });
   } catch (error) {
@@ -103,11 +96,12 @@ export const assignTrainer = async (req, res) => {
     }
 
     // Fetch the booking to get details
-    const bookingSnapshot = await counsellingRef.child(bookingId).once("value");
-    if (!bookingSnapshot.exists()) {
+    const docRef = counsellingRef.doc(bookingId);
+    const doc = await docRef.get();
+    if (!doc.exists) {
       return res.status(404).json({ success: false, message: "Booking not found" });
     }
-    const booking = bookingSnapshot.val();
+    const booking = doc.data();
 
     // Determine session type
     const sessionType = booking.serviceId === 1 ? "1-many" : "1-1";
@@ -119,17 +113,15 @@ export const assignTrainer = async (req, res) => {
     if (trainerId) updates.assignedTrainerId = trainerId;
     if (trainerName) updates.assignedTrainerName = trainerName;
 
-    await counsellingRef.child(bookingId).update(updates);
+    await docRef.update(updates);
 
     // ─── Create Notification for Trainer ────────────────────────────────────
     if (trainerId) {
-      const notificationsRef = db.ref("trainerNotifications");
       const notifText = sessionType === "1-1" 
         ? "New counselling session assigned (1-1)" 
         : "New group counselling session assigned (1-many)";
       
-      const newNotifRef = notificationsRef.child(trainerId).child("items").push();
-      await newNotifRef.set({
+      await db.collection("trainerNotifications").doc(trainerId).collection("items").add({
         title: "New Counselling Session",
         text: notifText,
         type: "info",
@@ -154,7 +146,7 @@ export const assignTrainer = async (req, res) => {
       // --- AUTOMATIC CALENDAR EVENT CREATION ---
       try {
         console.log("[Calendar] Attempting to create automated event...");
-        const calendarRef = db.ref("trainerCalendarEvents");
+        const calendarCollection = db.collection("trainerCalendarEvents");
         
         // Map slotId to 24h startTime/endTime
         const slotMap = {
@@ -192,16 +184,12 @@ export const assignTrainer = async (req, res) => {
             createdAt: Date.now()
           };
 
-          await calendarRef.child(eventId).set(calendarEventData);
+          await calendarCollection.doc(eventId).set(calendarEventData);
           console.log(`[Calendar] Automated event created/updated: ${eventId} for trainer ${finalTrainerId}`);
         }
-
-
       } catch (calErr) {
         console.error("Error creating calendar event:", calErr);
-        // We don't block the response if calendar fails, but log it
       }
-      // --- END CALENDAR LOGIC ---
 
       if (booking.studentEmail) {
         await sendEmail({
@@ -244,7 +232,6 @@ export const assignTrainer = async (req, res) => {
   }
 };
 
-
 /**
  * @desc Get assigned sessions for Trainer
  * @route GET /api/counselling/trainer-sessions
@@ -252,13 +239,8 @@ export const assignTrainer = async (req, res) => {
 export const getTrainerSessions = async (req, res) => {
   try {
     const trainerId = req.user.id;
-    const snapshot = await counsellingRef.orderByChild("assignedTrainerId").equalTo(trainerId).once("value");
-    const data = snapshot.val() || {};
-
-    const sessions = Object.entries(data).map(([id, val]) => ({
-      id,
-      ...val,
-    }));
+    const snapshot = await counsellingRef.where("assignedTrainerId", "==", trainerId).get();
+    const sessions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
     res.status(200).json({ success: true, sessions });
   } catch (error) {
@@ -274,13 +256,8 @@ export const getTrainerSessions = async (req, res) => {
 export const getStudentSessions = async (req, res) => {
   try {
     const studentId = req.user.id;
-    const snapshot = await counsellingRef.orderByChild("studentId").equalTo(studentId).once("value");
-    const data = snapshot.val() || {};
-
-    const sessions = Object.entries(data).map(([id, val]) => ({
-      id,
-      ...val,
-    }));
+    const snapshot = await counsellingRef.where("studentId", "==", studentId).get();
+    const sessions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
     res.status(200).json({ success: true, sessions });
   } catch (error) {
@@ -288,19 +265,18 @@ export const getStudentSessions = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
 /**
  * @desc Logic to shift slots if min 10 students not met (1 hour before)
- * This should be called by a cron job or a dedicated route
  * @route POST /api/counselling/process-shifts (Admin only)
  */
 export const checkAndShiftSlots = async (req, res) => {
   try {
     const now = new Date();
-    const snapshot = await counsellingRef.once("value");
-    const allBookings = snapshot.val() || {};
+    const snapshot = await counsellingRef.get();
     
-    const groupBookings = Object.entries(allBookings)
-      .map(([id, val]) => ({ id, ...val }))
+    const groupBookings = snapshot.docs
+      .map(doc => ({ id: doc.id, ...doc.data() }))
       .filter(b => b.serviceId === 1 && b.status === "pending");
 
     const slotsMap = {};
@@ -319,6 +295,7 @@ export const checkAndShiftSlots = async (req, res) => {
     });
 
     let shiftedCount = 0;
+    const batch = db.batch();
 
     for (const key in slotsMap) {
       const slot = slotsMap[key];
@@ -332,7 +309,7 @@ export const checkAndShiftSlots = async (req, res) => {
         const nextSlot = getNextSlot(slot.date, slot.slotId);
         
         for (const booking of slot.students) {
-          await counsellingRef.child(booking.id).update({
+          batch.update(counsellingRef.doc(booking.id), {
             slotDate: nextSlot.date,
             slotId: nextSlot.id,
             slotLabel: nextSlot.label,
@@ -361,6 +338,10 @@ export const checkAndShiftSlots = async (req, res) => {
       }
     }
 
+    if (shiftedCount > 0) {
+      await batch.commit();
+    }
+
     if (res) res.status(200).json({ success: true, message: `Processed slots. Shifted ${shiftedCount} students.` });
   } catch (error) {
     console.error("Shift Slots Error:", error);
@@ -376,12 +357,10 @@ export const getPendingCount = async (req, res) => {
   try {
     const trainerId = req.user.id;
     const snapshot = await counsellingRef
-      .orderByChild("assignedTrainerId")
-      .equalTo(trainerId)
-      .once("value");
+      .where("assignedTrainerId", "==", trainerId)
+      .get();
     
-    const data = snapshot.val() || {};
-    const pendingCount = Object.values(data).filter(b => b.status === "pending").length;
+    const pendingCount = snapshot.docs.filter(doc => doc.data().status === "pending").length;
 
     res.status(200).json({ success: true, count: pendingCount });
   } catch (error) {
@@ -404,16 +383,17 @@ export const updateSessionStatus = async (req, res) => {
     }
 
     // Verify booking belongs to this trainer
-    const snap = await counsellingRef.child(bookingId).once("value");
-    if (!snap.exists()) {
+    const docRef = counsellingRef.doc(bookingId);
+    const doc = await docRef.get();
+    if (!doc.exists) {
       return res.status(404).json({ success: false, message: "Booking not found" });
     }
-    const booking = snap.val();
+    const booking = doc.data();
     if (booking.assignedTrainerId !== trainerId) {
       return res.status(403).json({ success: false, message: "Not authorized to update this session" });
     }
 
-    await counsellingRef.child(bookingId).update({ status });
+    await docRef.update({ status });
 
     // ─── Real-Time Update (Socket) ─────────────────────────────────────────
     emitToTrainer(trainerId, "COUNSELLING_STATUS_UPDATED", {
@@ -427,4 +407,5 @@ export const updateSessionStatus = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
 
