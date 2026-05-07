@@ -196,12 +196,21 @@ const Batches = () => {
           {loading ? (
             <div className="loading-state-saas">Loading batches...</div>
           ) : filteredBatches.length > 0 ? (
-            filteredBatches.map((batch) => (
-              <div
-                key={batch.id}
-                className="batch-card-saas-v3"
-                onClick={() => navigate(`/trainer-dashboard/batches/${batch.id}`, { state: { batch } })}
-              >
+            filteredBatches.map((batch) => {
+              const isBatchStarted = batch.status === 'Active' || batch.status === 'started';
+              
+              return (
+                <div
+                  key={batch.id}
+                  className={`batch-card-saas-v3 ${!isBatchStarted ? 'blocked' : ''}`}
+                  onClick={() => {
+                    if (isBatchStarted) {
+                      navigate(`/trainer-dashboard/batches/${batch.id}`, { state: { batch } });
+                    } else {
+                      alert("Please start the batch to view its overview.");
+                    }
+                  }}
+                >
                 <div className="batch-card-accent-border"></div>
 
                 <div className="batch-card-body-saas">
@@ -238,7 +247,7 @@ const Batches = () => {
                   <div className="card-divider-saas"></div>
 
                   <div className="batch-card-footer-v3">
-                    <div className="footer-left-saas">
+                    <div className={`footer-left-saas ${!isBatchStarted ? 'disabled' : ''}`}>
                       <span className="view-details-v3">View Overview</span>
                       <ArrowRight size={16} />
                     </div>
@@ -252,7 +261,7 @@ const Batches = () => {
                           Start Batch
                         </button>
                       )}
-                      {batch.status === 'Active' && (
+                      {(batch.status === 'Active' || batch.status === 'started') && (
                         <button
                           className="btn-connect-students-action"
                           onClick={(e) => {
@@ -267,7 +276,8 @@ const Batches = () => {
                   </div>
                 </div>
               </div>
-            ))
+            );
+          })
           ) : (
             <div className="empty-state-saas">No batches found for you.</div>
           )}

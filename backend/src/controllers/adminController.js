@@ -263,7 +263,7 @@ export const getDashboardStats = async (req, res) => {
     const stats = {
       totalStudents: students.length,
       activeTrainers: trainers.filter(t => !t.status || matchesStatus(t.status, ["Active", "Onboarded"])).length,
-      activeBatches: batches.filter(b => matchesStatus(b.status, ["Active"])).length,
+      activeBatches: batches.filter(b => matchesStatus(b.status, ["Active", "started"])).length,
       pendingVerifications: students.filter(s => matchesStatus(s.status, ["Pending"])).length,
       coursesCount: Object.keys(coursesRaw).length,
       pendingTrainers: trainers.filter(t => t.status === 'Applied').length,

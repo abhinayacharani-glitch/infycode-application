@@ -302,6 +302,27 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    transition: 0.2s;
+}
+
+.footer-left-saas.disabled {
+    color: #94a3b8;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.batch-card-saas-v3.blocked {
+    cursor: not-allowed;
+}
+
+.batch-card-saas-v3.blocked:hover {
+    border-color: #E5E7EB;
+    transform: none;
+    box-shadow: none;
+}
+
+.batch-card-saas-v3.blocked:hover .batch-card-accent-border {
+    background: #3B82F640;
 }
 
 .footer-actions-saas {

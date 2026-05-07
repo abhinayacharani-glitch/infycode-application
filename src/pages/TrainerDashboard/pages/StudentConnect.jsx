@@ -29,7 +29,12 @@ const StudentConnect = () => {
         setLoading(true);
         const response = await getTrainerBatchesAPI();
         if (response.success) {
-          setBatches(response.batches || []);
+          const allBatches = response.batches || [];
+          // Filter batches that have been started
+          const startedBatches = allBatches.filter(b => 
+            b.status === 'started' || b.status === 'Active' || b.batchStatus === 'started' || b.batchStatus === 'Active'
+          );
+          setBatches(startedBatches);
         }
       } catch (e) {
         console.error("Data Load Error in StudentConnect", e);

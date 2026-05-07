@@ -87,7 +87,7 @@ const formatTime = (createdAt) => {
 const Topbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { trainerData, profileImage } = useTrainer();
+  const { trainerData, profileImage, notifications, setNotifications, fetchTrainerNotifications } = useTrainer();
 
   const userName = trainerData.fullName || trainerData.fullname || trainerData.name || 'Trainer';
   const role = trainerData.role || 'Trainer';
@@ -99,8 +99,6 @@ const Topbar = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
 
-  /* ── Notification state ── */
-  const [notifications, setNotifications] = useState([]);
   const [notifLoading, setNotifLoading] = useState(false);
   const [notifError, setNotifError] = useState(null);
 
@@ -109,47 +107,21 @@ const Topbar = () => {
   const userMenuRef = useRef(null);
 
   /* ── Fetch notifications ─────────────────────────────────────────── */
-  const fetchNotifications = useCallback(async () => {
+  const handleRefresh = async () => {
     setNotifLoading(true);
     setNotifError(null);
     try {
-      const data = await getTrainerNotificationsAPI();
-      if (data.success) {
-        setNotifications(data.notifications || []);
-      }
+      await fetchTrainerNotifications();
     } catch (err) {
       setNotifError('Could not load notifications');
-      console.error('[Topbar] fetchNotifications error:', err.message);
     } finally {
       setNotifLoading(false);
     }
-  }, []);
+  };
 
   useEffect(() => {
-    fetchNotifications(); // load on mount
-
-    // ─── Socket.io Integration ─────────────────────────────────────────────
-    const socket = io(API_BASE_URL);
-
-    if (trainerData?.id || trainerData?._id) {
-      const trainerId = trainerData.id || trainerData._id;
-      socket.emit("join_trainer_room", trainerId);
-
-      socket.on("NEW_COUNSELLING_ASSIGNED", (data) => {
-        console.log("[Socket] New counselling session assigned, refreshing notifications:", data);
-        fetchNotifications();
-      });
-
-      socket.on("COUNSELLING_STATUS_UPDATED", (data) => {
-        console.log("[Socket] Counselling status updated, refreshing notifications:", data);
-        fetchNotifications();
-      });
-    }
-
-    return () => {
-      socket.disconnect();
-    };
-  }, [fetchNotifications, trainerData?.id, trainerData?._id]);
+    // Initial fetch handled by Context Provider
+  }, []);
 
 
 
@@ -287,7 +259,7 @@ const Topbar = () => {
                 {!notifLoading && notifError && (
                   <div className="tb-notif-empty tb-notif-error">
                     <span>⚠ {notifError}</span>
-                    <button onClick={() => fetchNotifications(false)} className="tb-notif-retry">Retry</button>
+                    <button onClick={handleRefresh} className="tb-notif-retry">Retry</button>
                   </div>
                 )}
 
@@ -357,7 +329,7 @@ const Topbar = () => {
                 <div className="tb-notif-panel-footer">
                   <button
                     className="tb-notif-refresh-btn"
-                    onClick={() => fetchNotifications(false)}
+                    onClick={handleRefresh}
                   >
                     ↻ Refresh
                   </button>
