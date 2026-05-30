@@ -83,7 +83,7 @@ const LiveIcon = () => (
 
 const Sidebar = ({ isOpen, onClose, externalShowLogoutModal, setExternalShowLogoutModal }) => {
   const navigate = useNavigate();
-  const { trainerData, profileImage, pendingCounsellingCount, batchNotificationCount } = useTrainer();
+  const { trainerData, profileImage, pendingCounsellingCount, batchNotificationCount, unreadQueryCount } = useTrainer();
 
   const userName = trainerData.fullName || trainerData.fullname || trainerData.name || "Trainer";
   const userInitial = userName.charAt(0).toUpperCase();
@@ -189,6 +189,9 @@ const Sidebar = ({ isOpen, onClose, externalShowLogoutModal, setExternalShowLogo
             <div className="sd-box">
               <span className="sd-icon"><MessageIcon /></span>
               <span className="sd-text">Student connect</span>
+              {unreadQueryCount > 0 && (
+                <span className="sd-count-badge">{unreadQueryCount}</span>
+              )}
             </div>
           </NavLink>
 

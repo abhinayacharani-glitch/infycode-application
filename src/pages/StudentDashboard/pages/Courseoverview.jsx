@@ -136,10 +136,6 @@ const CourseOverview = () => {
       }
     };
     fetchBatches();
-
-    // Polling every 1 second for near-instant updates
-    const pollInterval = setInterval(fetchBatches, 1000);
-    return () => clearInterval(pollInterval);
   }, []);
 
   // 2. Resolve Dynamic Course Data (Trainer & Batch)

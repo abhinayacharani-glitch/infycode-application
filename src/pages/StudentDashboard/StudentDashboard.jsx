@@ -22,6 +22,7 @@ import PreparationResources from "./pages/PreparationResources";
 import MyQueries from "./pages/MyQueries";
 import QuerySolution from "./pages/QuerySolution";
 import Logout from "./pages/Logout";
+import { StudentProvider } from "../../context/StudentContext";
 import "./StudentDashboard.css"; // We'll create this to store the layout styles
 
 function StudentDashboard() {
@@ -41,7 +42,8 @@ function StudentDashboard() {
   };
 
   return (
-    <div className={`student-dashboard-layout ${isCourseExplore ? 'full-screen' : ''}`}>
+    <StudentProvider>
+      <div className={`student-dashboard-layout ${isCourseExplore ? 'full-screen' : ''}`}>
       
       {/* Sidebar - Positioned naturally in the flex flow */}
       {!isCourseExplore && (
@@ -81,9 +83,9 @@ function StudentDashboard() {
           </Routes>
         </main>
       </div>
-
     </div>
+    </StudentProvider>
   );
 }
 
-export default StudentDashboard;
+export default StudentDashboard;

@@ -55,8 +55,6 @@ const CourseTopics = () => {
       }
     };
     fetchBatches();
-    const interval = setInterval(fetchBatches, 10000); // 10s interval is enough
-    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {

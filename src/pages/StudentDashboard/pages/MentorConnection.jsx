@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
   MessageSquare,
-  Code,
   Video,
   ExternalLink,
   Send,
@@ -13,7 +12,6 @@ import {
   CheckCircle,
   Eye
 } from 'lucide-react';
-import Editor from '@monaco-editor/react';
 import { getStudentBatchesAPI, createStudentQueryAPI, getStudentQueriesAPI } from '../../../services/api';
 import './MentorConnection.css';
 
@@ -23,8 +21,7 @@ const MentorConnection = () => {
 
   // Form States
   const [description, setDescription] = useState('');
-  const [code, setCode] = useState('');
-  const [language, setLanguage] = useState('javascript');
+
   const fileInputRef = React.useRef(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -96,15 +93,7 @@ const MentorConnection = () => {
   }, []);
 
 
-  const getLanguageOptions = (courses) => {
-    const all = [];
-    if (courses.some(c => c.toLowerCase().includes('java'))) all.push('Java', 'Spring Boot', 'SQL');
-    if (courses.some(c => c.toLowerCase().includes('python'))) all.push('Python', 'Django', 'Flask');
-    if (courses.some(c => c.toLowerCase().includes('aws') || c.toLowerCase().includes('cloud'))) all.push('AWS', 'Terraform', 'Docker');
-    if (courses.some(c => c.toLowerCase().includes('web') || c.toLowerCase().includes('ui'))) all.push('JavaScript', 'React', 'HTML/CSS');
-    if (all.length === 0) all.push('JavaScript', 'Python', 'Java');
-    return [...new Set(all)];
-  };
+
 
   useEffect(() => {
     const fetchMyQueries = async () => {
@@ -112,11 +101,6 @@ const MentorConnection = () => {
         const res = await getStudentQueriesAPI();
         if (res.success) {
           setMyQueries(res.queries);
-          // If we had an active ticket, refresh it
-          if (activeTicket) {
-            const updated = res.queries.find(q => q.id === activeTicket.id);
-            if (updated) setActiveTicket(updated);
-          }
         }
       } catch (e) {
         console.error("Failed to fetch my queries", e);
@@ -125,21 +109,32 @@ const MentorConnection = () => {
     fetchMyQueries();
   }, [querySuccess]);
 
+  useEffect(() => {
+    if (selected !== null && mentors.length > 0 && myQueries.length > 0) {
+      const trainerName = mentors[selected].n;
+      const batchId = mentors[selected].batchId;
+      // myQueries is already sorted by newest first from backend
+      const latestQuery = myQueries.find(q => q.trainerName === trainerName && q.batchId === batchId);
+      setActiveTicket(latestQuery || null);
+    } else if (selected === null) {
+      setActiveTicket(null);
+    }
+  }, [selected, myQueries, mentors]);
+
 
   const handleSubmitQuery = async (e) => {
     if (e) e.preventDefault();
 
     // Validation
     if (solutionType === 'chat' && !description.trim()) return;
-    if (solutionType === 'editor' && !code.trim()) return;
     if (solutionType === 'meet' && !description.trim()) return;
 
     setIsSubmitting(true);
     try {
       const payload = {
-        title: solutionType === 'meet' ? 'Meeting Request' : (description.substring(0, 40) || 'Code Review'),
+        title: solutionType === 'meet' ? 'Meeting Request' : (description.substring(0, 40) || 'Query'),
         text: description,
-        code: solutionType === 'editor' ? code : "",
+        code: "",
         type: solutionType,
         trainerName: mentors[selected].n,
         batchId: mentors[selected].batchId
@@ -155,7 +150,6 @@ const MentorConnection = () => {
         }, 3000);
         
         setDescription('');
-        setCode('');
         setAttachedFile(null);
       }
     } catch (err) {
@@ -170,8 +164,6 @@ const MentorConnection = () => {
     if (!activeTicket) return;
     setIsEditing(true);
     setDescription(activeTicket.description || '');
-    setCode(activeTicket.code || '');
-    setLanguage(activeTicket.language || 'javascript');
     setSolutionType(activeTicket.solutionType);
   };
 
@@ -254,13 +246,7 @@ const MentorConnection = () => {
               <MessageSquare size={20} />
               <span>Quick Chat</span>
             </button>
-            <button
-              className={`mode-card ${solutionType === 'editor' ? 'active' : ''}`}
-              onClick={() => { setSolutionType('editor'); setDescription(''); }}
-            >
-              <Code size={20} />
-              <span>Code Editor</span>
-            </button>
+
             <button
               className={`mode-card ${solutionType === 'meet' ? 'active' : ''}`}
               onClick={() => { setSolutionType('meet'); setDescription(''); }}
@@ -299,56 +285,7 @@ const MentorConnection = () => {
               </div>
             )}
 
-            {solutionType === 'editor' && (
-              <div className="editor-interface-upgraded animate-fade-in">
-                <div className="editor-header-actions">
-                  <span className="editor-label">Code Workspace</span>
-                  <select className="premium-select" value={language} onChange={e => setLanguage(e.target.value)}>
-                    {getLanguageOptions(mentors[selected].courses).map(l => (
-                      <option key={l} value={l.toLowerCase()}>{l}</option>
-                    ))}
-                  </select>
-                </div>
 
-                <div className="monaco-wrapper-premium">
-                  <Editor
-                    height="320px"
-                    language={language}
-                    theme="vs-dark"
-                    value={code}
-                    onChange={setCode}
-                    options={{
-                      minimap: { enabled: false },
-                      fontSize: 14,
-                      roundedSelection: true,
-                      scrollBeyondLastLine: false,
-                    }}
-                  />
-                </div>
-
-                <div className="editor-details">
-                  <textarea
-                    className="description-box"
-                    placeholder="Provide context or specific errors you're facing..."
-                    value={description}
-                    onChange={e => setDescription(e.target.value)}
-                  />
-                  <div className="editor-footer-upgraded">
-                    <button className="dashed-upload-btn" onClick={triggerFileUpload}>
-                      <ExternalLink size={16} />
-                      <span>{attachedFile ? attachedFile.name : 'Upload Material / ScreenShot'}</span>
-                    </button>
-                    <button
-                      className="gradient-submit-btn"
-                      onClick={handleSubmitQuery}
-                      disabled={isSubmitting || !code.trim()}
-                    >
-                      {isSubmitting ? <span className="q-loader"></span> : <span>{isEditing ? 'Update Review' : 'Submit Review'}</span>}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
 
             {solutionType === 'meet' && (
               <div className="meet-interface-upgraded animate-fade-in">
@@ -403,20 +340,20 @@ const MentorConnection = () => {
               </div>
               <div className="info-row-premium">
                 <span className="info-label-premium">Query Status</span>
-                <span className={`status-badge-premium ${activeTicket?.status || 'none'}`}>
-                  {activeTicket?.status === 'pending' ? 'Pending' : (activeTicket?.status === 'solved' ? 'Solved' : 'No Active Query')}
+                <span className={`status-badge-premium ${(activeTicket?.status || 'none').toLowerCase()}`}>
+                  {activeTicket?.status?.toLowerCase() === 'pending' ? 'Pending' : (activeTicket?.status?.toLowerCase() === 'solved' ? 'Solved' : 'No Active Query')}
                 </span>
               </div>
             </div>
 
-            {activeTicket?.status === 'solved' && (
+            {activeTicket?.status?.toLowerCase() === 'solved' && (
               <button className="view-solution-premium-btn" onClick={() => navigate(`/student-dashboard/my-queries/${activeTicket.id}/solution`)}>
                 <Eye size={18} />
                 <span>View Solution</span>
               </button>
             )}
 
-            {activeTicket && activeTicket.status === 'pending' && (
+            {activeTicket && activeTicket.status?.toLowerCase() === 'pending' && (
               <div className="action-buttons-group">
                 <button className="edit-query-btn" onClick={handleEditQuery}>
                   <MessageSquare size={18} />

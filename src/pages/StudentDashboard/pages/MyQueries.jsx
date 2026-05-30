@@ -1,48 +1,41 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Filter, MessageCircle, CheckCircle, Clock, Eye, AlertCircle } from 'lucide-react';
+import { Search, Filter, MessageCircle, CheckCircle, Clock, Eye, AlertCircle, ArrowLeft } from 'lucide-react';
 import './MyQueries.css';
+
+import { getStudentQueriesAPI } from '../../../services/api';
 
 const MyQueries = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('All');
-  const [queries, setQueries] = useState([
-    { id: 'q1', trainer: 'Charani', query: 'React useEffect dependency array doubt', status: 'Solved', response: 'useEffect runs after every render by default...', date: '2024-04-28' },
-    { id: 'q2', trainer: 'Charani', query: 'Django ORM queries optimization', status: 'Pending', response: null, date: '2024-04-29' }
-  ]);
+  const [queries, setQueries] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Load student's own raised queries
-    const raised = JSON.parse(localStorage.getItem('student_queries') || '[]');
-    // Load any solved queries from localStorage (simulating real-time updates)
-    const solved = JSON.parse(localStorage.getItem('solved_queries') || '[]');
-    
-    setQueries(prev => {
-      let updated = [...prev];
-      
-      raised.forEach(rq => {
-        if (!updated.find(q => q.id === rq.id)) {
-          updated.push({
-            id: rq.id,
-            trainer: rq.trainerName || rq.trainer,
-            query: rq.title,
-            status: rq.status,
-            response: null,
-            date: rq.createdAt ? rq.createdAt.split('T')[0] : (rq.date || 'Today')
-          });
+    const fetchQueries = async () => {
+      try {
+        setLoading(true);
+        const res = await getStudentQueriesAPI();
+        if (res.success && res.queries) {
+          const formatted = res.queries.map(q => ({
+            id: q.id,
+            trainer: q.trainerName || 'Trainer',
+            query: q.title || q.text || 'Technical Doubt',
+            status: q.solution ? 'Solved' : 'Pending',
+            response: q.solution,
+            date: q.createdAt ? q.createdAt.split('T')[0] : 'N/A',
+            batchId: q.batchId
+          }));
+          setQueries(formatted);
         }
-      });
-
-      // Update status of solved queries
-      solved.forEach(sq => {
-        const idx = updated.findIndex(q => q.id === sq.id);
-        if (idx !== -1) {
-          updated[idx] = { ...updated[idx], status: 'Solved', response: sq.response };
-        }
-      });
-      return updated;
-    });
+      } catch (err) {
+        console.error("Error fetching student queries list:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchQueries();
   }, []);
 
   const filteredQueries = queries.filter(q => {
@@ -54,9 +47,41 @@ const MyQueries = () => {
 
   return (
     <div className="mq-container animate-fade-in">
-      <div className="mq-header">
-        <h1 className="mq-title">My Queries</h1>
-        <p className="mq-subtitle">Track your technical doubts and trainer responses.</p>
+      <div className="mq-header" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <button 
+          className="circular-back-btn" 
+          onClick={() => navigate('/student-dashboard/trainer-connect')}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '40px',
+            height: '40px',
+            borderRadius: '50%',
+            border: '1px solid #cbd5e1',
+            background: '#fff',
+            cursor: 'pointer',
+            color: '#64748b',
+            transition: 'all 0.2s',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+          }}
+          onMouseOver={e => {
+            e.currentTarget.style.borderColor = '#3b82f6';
+            e.currentTarget.style.color = '#3b82f6';
+            e.currentTarget.style.background = '#eff6ff';
+          }}
+          onMouseOut={e => {
+            e.currentTarget.style.borderColor = '#cbd5e1';
+            e.currentTarget.style.color = '#64748b';
+            e.currentTarget.style.background = '#fff';
+          }}
+        >
+          <ArrowLeft size={20} />
+        </button>
+        <div>
+          <h1 className="mq-title" style={{ margin: 0 }}>My Queries</h1>
+          <p className="mq-subtitle" style={{ margin: '4px 0 0 0' }}>Track your technical doubts and trainer responses.</p>
+        </div>
       </div>
 
       <div className="mq-controls">
@@ -83,55 +108,61 @@ const MyQueries = () => {
       </div>
 
       <div className="mq-table-container">
-        <table className="mq-table">
-          <thead>
-            <tr>
-              <th>Trainer Name</th>
-              <th>Query</th>
-              <th>Status</th>
-              <th>Date</th>
-              <th className="text-right">Response</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredQueries.map(q => (
-              <tr key={q.id}>
-                <td className="mq-trainer-cell">
-                  <div className="mq-avatar">
-                    {q.trainer[0]}
-                  </div>
-                  <span>{q.trainer}</span>
-                </td>
-                <td className="mq-query-cell">
-                  <div className="mq-query-text">{q.query}</div>
-                </td>
-                <td>
-                  <span className={`mq-status-badge ${q.status.toLowerCase()}`}>
-                    {q.status === 'Solved' ? <CheckCircle size={14} /> : <Clock size={14} />}
-                    {q.status}
-                  </span>
-                </td>
-                <td className="mq-date-cell">{q.date}</td>
-                <td className="text-right">
-                  {q.status === 'Solved' ? (
-                    <button className="mq-view-btn" onClick={() => navigate(`/student-dashboard/my-queries/${q.id}/solution`, { state: { batchId: q.batchId || 'B1' } })}>
-                      <Eye size={18} />
-                      <span>View Solution</span>
-                    </button>
-                  ) : (
-                    <span className="mq-pending-text">Awaiting Response</span>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        
-        {filteredQueries.length === 0 && (
-          <div className="mq-empty">
-            <AlertCircle size={48} />
-            <p>No queries found matching your filters.</p>
-          </div>
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>Loading raised queries...</div>
+        ) : (
+          <>
+            <table className="mq-table">
+              <thead>
+                <tr>
+                  <th>Trainer Name</th>
+                  <th>Query</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                  <th className="text-right">Response</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredQueries.map(q => (
+                  <tr key={q.id}>
+                    <td className="mq-trainer-cell">
+                      <div className="mq-avatar">
+                        {q.trainer[0]}
+                      </div>
+                      <span>{q.trainer}</span>
+                    </td>
+                    <td className="mq-query-cell">
+                      <div className="mq-query-text">{q.query}</div>
+                    </td>
+                    <td>
+                      <span className={`mq-status-badge ${q.status.toLowerCase()}`}>
+                        {q.status === 'Solved' ? <CheckCircle size={14} /> : <Clock size={14} />}
+                        {q.status}
+                      </span>
+                    </td>
+                    <td className="mq-date-cell">{q.date}</td>
+                    <td className="text-right">
+                      {q.status === 'Solved' ? (
+                        <button className="mq-view-btn" onClick={() => navigate(`/student-dashboard/my-queries/${q.id}/solution`, { state: { batchId: q.batchId } })}>
+                          <Eye size={18} />
+                          <span>View Solution</span>
+                        </button>
+                      ) : (
+                        <span className="mq-pending-text">Awaiting Response</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            
+            {filteredQueries.length === 0 && (
+              <div className="mq-empty">
+                <AlertCircle size={48} />
+                <p>No queries found matching your filters.</p>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

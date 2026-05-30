@@ -176,10 +176,6 @@ const EnrollCourses = ({ onNavigate }) => {
       }
     };
     if (publishedCourses) fetchData();
-
-    // Polling every 10 seconds to catch Admin batch-start events
-    const pollInterval = setInterval(fetchData, 10000);
-    return () => clearInterval(pollInterval);
   }, [publishedCourses]);
 
   if (loading) {

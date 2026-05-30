@@ -7,11 +7,13 @@ import {
 import Editor from '@monaco-editor/react';
 import { getQueryByIdAPI, solveTrainerQueryAPI, markQueryReadByTrainerAPI } from '../../../services/api';
 import { formatDistanceToNow } from 'date-fns';
+import { useTrainer } from '../../../context/TrainerContext';
 import './StudentConnectQuery.css';
 
 const StudentConnectQuery = () => {
   const { batchId, studentId } = useParams();
   const navigate = useNavigate();
+  const { fetchTrainerQueries } = useTrainer();
   const [selectedMode, setSelectedMode] = useState(null); // 'editor', 'chat', 'meet'
   const [response, setResponse] = useState('');
   const [language, setLanguage] = useState('javascript');
@@ -36,7 +38,8 @@ const StudentConnectQuery = () => {
           setStatus(res.query.status);
           setCode(res.query.code || '// No code provided...');
           // Mark as read
-          markQueryReadByTrainerAPI(studentId);
+          await markQueryReadByTrainerAPI(studentId);
+          fetchTrainerQueries();
         }
       } catch (err) {
         console.error("Failed to fetch query details", err);
@@ -135,6 +138,7 @@ const StudentConnectQuery = () => {
       const res = await solveTrainerQueryAPI(studentId, solutionData);
       if (res.success) {
         setStatus('Solved');
+        fetchTrainerQueries();
         setShowSuccess(true);
         setTimeout(() => {
           setShowSuccess(false);

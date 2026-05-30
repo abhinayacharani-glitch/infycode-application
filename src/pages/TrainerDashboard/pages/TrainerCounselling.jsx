@@ -18,8 +18,6 @@ const TrainerCounselling = () => {
 
   useEffect(() => {
     loadSessions();
-    const interval = setInterval(loadSessions, 5000);
-    return () => clearInterval(interval);
   }, []);
 
   return (

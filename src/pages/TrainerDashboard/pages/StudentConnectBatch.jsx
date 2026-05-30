@@ -51,8 +51,6 @@ const StudentConnectBatch = () => {
       }
     };
     fetchData();
-    const interval = setInterval(fetchData, 10000); // 10s polling
-    return () => clearInterval(interval);
   }, [batchId]);
 
 

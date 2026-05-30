@@ -120,8 +120,6 @@ const CounsellingRequests = () => {
 
   React.useEffect(() => {
     loadBookings();
-    const interval = setInterval(loadBookings, 2000); // poll every 2s for new requests
-    return () => clearInterval(interval);
   }, []);
 
   const handleAccept = (booking) => {
