@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getStudentQueriesAPI, markQueryReadByStudentAPI } from '../../../services/api';
-import { 
-  ArrowLeft, 
-  MessageSquare, 
-  Code, 
-  Video, 
-  CheckCircle, 
-  Clock, 
-  User, 
+import {
+  ArrowLeft,
+  MessageSquare,
+  Code,
+  Video,
+  CheckCircle,
+  Clock,
+  User,
   Download,
   Terminal,
   FileText
@@ -129,8 +129,8 @@ const QuerySolution = () => {
             </div>
             {(ticket.solution || ticket.trainerResponse) && (
               <div className="trainer-explanation-card">
-                 <h5>Implementation Notes</h5>
-                 <p>{ticket.solution || ticket.trainerResponse}</p>
+                <h5>Implementation Notes</h5>
+                <p>{ticket.solution || ticket.trainerResponse}</p>
               </div>
             )}
           </div>
@@ -169,60 +169,60 @@ const QuerySolution = () => {
     <div className="solution-viewport animate-fade-in">
       <div className="solution-header">
         <div className="header-left">
-           <button className="circular-back-btn" onClick={() => navigate('/student-dashboard/trainer-connect')}>
-              <ArrowLeft size={20} />
-           </button>
-           <div className="header-info">
-              <h1>Query Resolution</h1>
-              <p>ID: {ticket.id} • Resolved by {ticket.trainerName}</p>
-           </div>
+          <button className="circular-back-btn" onClick={() => navigate('/student-dashboard/trainer-connect')}>
+            <ArrowLeft size={20} />
+          </button>
+          <div className="header-info">
+            <h1>Query Resolution</h1>
+            <p>ID: {ticket.id} • Resolved by {ticket.trainerName}</p>
+          </div>
         </div>
         <div className="header-right">
-           <span className="status-pill-solved">
-              <CheckCircle size={16} />
-              <span>Resolved</span>
-           </span>
+          <span className="status-pill-solved">
+            <CheckCircle size={16} />
+            <span>Resolved</span>
+          </span>
         </div>
       </div>
 
       <div className="solution-main-grid">
         <div className="solution-left-col">
-           <div className="solution-premium-card">
-              {renderSolutionContent()}
-           </div>
+          <div className="solution-premium-card">
+            {renderSolutionContent()}
+          </div>
         </div>
 
         <div className="solution-right-col">
-           <div className="ticket-meta-card">
-              <h4>Query Details</h4>
-              <div className="meta-list">
-                 <div className="meta-item">
-                    <span className="m-label">Mode</span>
-                    <span className="m-val capitalize">{ticket.type}</span>
-                 </div>
-                 <div className="meta-item">
-                    <span className="m-label">Language</span>
-                    <span className="m-val">{ticket.language || 'N/A'}</span>
-                 </div>
-                 <div className="meta-item">
-                    <span className="m-label">Submitted</span>
-                    <span className="m-val">{new Date(ticket.createdAt).toLocaleDateString()}</span>
-                 </div>
+          <div className="ticket-meta-card">
+            <h4>Query Details</h4>
+            <div className="meta-list">
+              <div className="meta-item">
+                <span className="m-label">Mode</span>
+                <span className="m-val capitalize">{ticket.type}</span>
               </div>
-              <div className="meta-divider"></div>
-              <div className="trainer-mini-profile">
-                 <div className="mini-avatar">{ticket.trainerName[0]}</div>
-                 <div className="mini-info">
-                    <p className="mini-name">{ticket.trainerName}</p>
-                    <p className="mini-role">Expert Trainer</p>
-                 </div>
+              <div className="meta-item">
+                <span className="m-label">Language</span>
+                <span className="m-val">{ticket.language || 'N/A'}</span>
               </div>
-           </div>
+              <div className="meta-item">
+                <span className="m-label">Submitted</span>
+                <span className="m-val">{new Date(ticket.createdAt).toLocaleDateString()}</span>
+              </div>
+            </div>
+            <div className="meta-divider"></div>
+            <div className="trainer-mini-profile">
+              <div className="mini-avatar">{ticket.trainerName[0]}</div>
+              <div className="mini-info">
+                <p className="mini-name">{ticket.trainerName}</p>
+                <p className="mini-role">Expert Trainer</p>
+              </div>
+            </div>
+          </div>
 
-           <button className="download-receipt-btn">
-              <Download size={18} />
-              <span>Download Resolution PDF</span>
-           </button>
+          <button className="download-receipt-btn">
+            <Download size={18} />
+            <span>Download Resolution PDF</span>
+          </button>
         </div>
       </div>
     </div>

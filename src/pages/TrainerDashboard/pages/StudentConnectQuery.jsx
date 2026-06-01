@@ -24,6 +24,9 @@ const StudentConnectQuery = () => {
   const [output, setOutput] = useState('');
   const [course, setCourse] = useState('Full Stack Development');
   const [meetLink, setMeetLink] = useState('');
+  const [meetLinkInput, setMeetLinkInput] = useState('');
+  const [meetLinkError, setMeetLinkError] = useState('');
+  const [linkCopied, setLinkCopied] = useState(false);
 
   const [loading, setLoading] = useState(true);
   const [queryData, setQueryData] = useState(null);
@@ -120,19 +123,41 @@ const StudentConnectQuery = () => {
     }, 800);
   };
 
-  const handleGenerateMeet = () => {
-    const link = `https://meet.google.com/abc-${Math.random().toString(36).substring(2, 5)}-${Math.random().toString(36).substring(2, 5)}`;
-    setMeetLink(link);
+  const handleOpenGoogleMeet = () => {
+    window.open('https://meet.google.com/new', '_blank');
+  };
+
+  const handleConfirmMeetLink = () => {
+    const raw = meetLinkInput.trim();
+    if (!raw) {
+      setMeetLinkError('Please paste the Google Meet link.');
+      return;
+    }
+    if (!raw.startsWith('https://meet.google.com/')) {
+      setMeetLinkError('Invalid link. Please paste a link starting with https://meet.google.com/');
+      return;
+    }
+    setMeetLinkError('');
+    setMeetLink(raw);
+    setLinkCopied(false);
+    setResponse(`Join the Google Meet session here: ${raw}`);
+  };
+
+  const handleClearMeetLink = () => {
+    setMeetLink('');
+    setMeetLinkInput('');
+    setMeetLinkError('');
+    setResponse('');
   };
 
   const handleSendSolution = async () => {
-    if (!response.trim()) return;
+    if (!response.trim() && !meetLink) return;
     setIsSaving(true);
     try {
       const solutionData = {
-        solution: response,
+        solution: response || (selectedMode === 'meet' && meetLink ? `Join the Google Meet session here: ${meetLink}` : ''),
         codeSolution: selectedMode === 'editor' ? code : "",
-        meetLink: selectedMode === 'meet' ? meetLink : ""
+        meetLink: meetLink
       };
 
       const res = await solveTrainerQueryAPI(studentId, solutionData);
@@ -287,14 +312,69 @@ const StudentConnectQuery = () => {
                   </div>
                   <div className="meet-content">
                     {!meetLink ? (
-                      <button className="generate-meet-btn" onClick={handleGenerateMeet}>Generate Meet Link</button>
+                      <div className="google-meet-setup">
+                        <div className="meet-step-card">
+                          <div className="meet-step-number">1</div>
+                          <div className="meet-step-body">
+                            <p className="meet-step-title">Create a Google Meet room</p>
+                            <p className="meet-step-desc">Click the button below to open Google Meet and start a new meeting. Copy the meeting link from your browser.</p>
+                            <button className="open-gmeet-btn" onClick={handleOpenGoogleMeet}>
+                              <Video size={16} />
+                              Create on Google Meet
+                            </button>
+                          </div>
+                        </div>
+                        <div className="meet-step-divider" />
+                        <div className="meet-step-card">
+                          <div className="meet-step-number">2</div>
+                          <div className="meet-step-body">
+                            <p className="meet-step-title">Paste the meeting link here</p>
+                            <div className="meet-paste-row">
+                              <input
+                                type="text"
+                                className="meet-paste-input"
+                                placeholder="https://meet.google.com/xxx-xxxx-xxx"
+                                value={meetLinkInput}
+                                onChange={(e) => {
+                                  setMeetLinkInput(e.target.value);
+                                  if (meetLinkError) setMeetLinkError('');
+                                }}
+                                onKeyDown={(e) => { if (e.key === 'Enter') handleConfirmMeetLink(); }}
+                              />
+                              <button className="confirm-meet-btn" onClick={handleConfirmMeetLink}>
+                                Confirm Link
+                              </button>
+                            </div>
+                            {meetLinkError && (
+                              <p className="meet-link-error">{meetLinkError}</p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
                     ) : (
                       <div className="meet-link-box">
+                        <div className="meet-link-row">
+                          <span className="meet-service-badge">Google Meet</span>
+                          <span className="meet-live-dot">● Link Saved</span>
+                        </div>
                         <input type="text" value={meetLink} readOnly />
                         <div className="meet-actions">
-                          <button onClick={() => window.open(meetLink, '_blank')}>Join Meet</button>
-                          <button onClick={() => { navigator.clipboard.writeText(meetLink) }}>Copy Link</button>
+                          <button className="join-btn" onClick={() => window.open(meetLink, '_blank')}>
+                            Join as Host
+                          </button>
+                          <button
+                            className={linkCopied ? 'copied-btn' : ''}
+                            onClick={() => {
+                              navigator.clipboard.writeText(meetLink);
+                              setLinkCopied(true);
+                              setTimeout(() => setLinkCopied(false), 2500);
+                            }}
+                          >
+                            {linkCopied ? 'Copied!' : 'Copy Link'}
+                          </button>
                         </div>
+                        <p className="meet-hint">This link will be sent to the student when you submit below.</p>
+                        <button className="regenerate-link-btn" onClick={handleClearMeetLink}>Use a Different Link</button>
                       </div>
                     )}
                   </div>
@@ -315,9 +395,9 @@ const StudentConnectQuery = () => {
                 <button
                   className="scq-send-btn"
                   onClick={handleSendSolution}
-                  disabled={isSaving || !response.trim()}
+                  disabled={isSaving || (!response.trim() && !meetLink)}
                 >
-                  {isSaving ? "Submitting..." : "Submit Solution"}
+                  {isSaving ? "Submitting..." : (selectedMode === 'meet' && meetLink ? 'Send Session Link to Student' : 'Submit Solution')}
                 </button>
               </div>
             </div>
