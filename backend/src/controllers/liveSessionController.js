@@ -98,7 +98,13 @@ export const saveLiveSessionConfig = async (req, res) => {
       const batchSnap = await batchesRef.doc(batchId).get();
       if (batchSnap.exists) {
         const bd = batchSnap.data();
-        batchName = bd.name || batchId;
+        if (bd.courseName && bd.startDateTime) {
+          const formattedDate = new Date(bd.startDateTime).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+          const formattedTime = new Date(bd.startDateTime).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
+          batchName = `${bd.courseName} - ${formattedDate}, ${formattedTime}`;
+        } else {
+          batchName = bd.name || batchId;
+        }
         if (trainerName === "Your Trainer") {
           trainerName = bd.trainerName || bd.trainer || "Your Trainer";
         }
@@ -106,7 +112,13 @@ export const saveLiveSessionConfig = async (req, res) => {
         const qSnap = await batchesRef.where("batchId", "==", batchId).limit(1).get();
         if (!qSnap.empty) {
           const bd = qSnap.docs[0].data();
-          batchName = bd.name || batchId;
+          if (bd.courseName && bd.startDateTime) {
+            const formattedDate = new Date(bd.startDateTime).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+            const formattedTime = new Date(bd.startDateTime).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
+            batchName = `${bd.courseName} - ${formattedDate}, ${formattedTime}`;
+          } else {
+            batchName = bd.name || batchId;
+          }
           if (trainerName === "Your Trainer") {
             trainerName = bd.trainerName || bd.trainer || "Your Trainer";
           }
@@ -182,10 +194,11 @@ export const saveLiveSessionConfig = async (req, res) => {
             .doc(notifId)
             .set({
               id: notifId,
-              title: `⚠️ Class Cancelled: ${item.day}`,
-              text: `Your class on ${item.day} is cancelled/marked as a holiday. Reason: "${item.reason}"`,
+              title: `📅 Class Update: ${item.day}`,
+              text: `Please be informed that the class for "${batchName}" scheduled on ${item.day} has been cancelled or marked as a holiday. Reason: "${item.reason}".`,
               type: "class_cancellation",
               batchId,
+              batchName,
               createdAt: Date.now(),
               read: false
             });

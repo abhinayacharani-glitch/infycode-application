@@ -6,7 +6,6 @@ import {
   Calendar,
   CheckCircle,
   Clock,
-  ArrowUpRight,
   Play,
   Upload,
   UserCheck,
@@ -20,39 +19,8 @@ import {
 } from 'lucide-react';
 import { useTrainer } from '../../../context/TrainerContext';
 import LiveSessionCard from '../components/LiveSessionCard';
+import { getTrainerBatchesAPI, getTrainerScheduleAPI, getTrainerQueriesAPI } from '../../../services/api';
 import './Dashboard.css';
-
-// --- MOCK API LAYER ---
-const fetchDashboardData = () => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        attendance: {
-          batch: "Batch B12",
-          present: 24,
-          total: 32,
-          lastMarked: "10:30 AM",
-          percentage: 75
-        },
-        materials: {
-          moduleName: "Python: Module 4 - Advanced Data structures",
-          uploaded: ["Lecture Notes", "Assignment PDF", "Quiz Link"],
-          pending: ["Video Tutorial", "Reference Guide"]
-        },
-        queries: {
-          count: 3,
-          latestMessage: "Could you please explain the difference between for-in and for-of loops in detail?",
-          students: [
-            { initials: "RK", color: "#6366F1", bg: "#EEF2FF" },
-            { initials: "AM", color: "#10B981", bg: "#ECFDF5" },
-            { initials: "VK", color: "#F59E0B", bg: "#FFFBEB" },
-          ],
-          totalAvatars: 5
-        }
-      });
-    }, 1500);
-  });
-};
 
 const Counter = ({ target, isDecimal = false }) => {
   const [count, setCount] = useState(0);
@@ -92,6 +60,16 @@ const SkeletonCard = () => (
   </div>
 );
 
+const formatTimeToAMPM = (time24) => {
+  if (!time24 || !time24.includes(':')) return time24;
+  const [hours, minutes] = time24.split(':');
+  let h = parseInt(hours, 10);
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12;
+  h = h ? h : 12;
+  return `${h}:${minutes} ${ampm}`;
+};
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
@@ -99,26 +77,123 @@ const Dashboard = () => {
   const { trainerData } = useTrainer();
   const userName = trainerData.fullName || trainerData.fullname || trainerData.name || "Trainer";
 
+  const [activeBatches, setActiveBatches] = useState(0);
+  const [totalStudents, setTotalStudents] = useState(0);
+  const [sessionsTodayCount, setSessionsTodayCount] = useState(0);
+  const [schedule, setSchedule] = useState([]);
+
   useEffect(() => {
-    const loadData = async () => {
-      const data = await fetchDashboardData();
-      setDashData(data);
-      setIsLoading(false);
+    const loadDashboardData = async () => {
+      try {
+        setIsLoading(true);
+
+        // 1. Fetch Batches
+        const batchesRes = await getTrainerBatchesAPI();
+        let batchesList = [];
+        if (batchesRes.success) {
+          batchesList = batchesRes.batches || [];
+        }
+        
+        // 2. Fetch Schedule
+        const scheduleRes = await getTrainerScheduleAPI();
+        let scheduleList = [];
+        if (scheduleRes.success) {
+          scheduleList = scheduleRes.schedule || [];
+        }
+
+        // 3. Fetch Queries
+        const queriesRes = await getTrainerQueriesAPI();
+        let queriesList = [];
+        if (queriesRes.success) {
+          queriesList = queriesRes.queries || [];
+        }
+
+        // Calculate dynamic stats
+        const activeCount = batchesList.length;
+        const studentsCount = batchesList.reduce((sum, b) => sum + (parseInt(b.students) || 0), 0);
+
+        // Filter sessions scheduled for today (local timezone date comparison)
+        const todayStr = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD format
+        const todaysSessions = scheduleList.filter(s => s.date === todayStr);
+
+        const formattedSessions = todaysSessions.map(s => {
+          const matchingBatch = batchesList.find(b => b.id === s.batchId || b.name === s.batchName || b.firebaseId === s.batchId);
+          return {
+            id: s.id,
+            time: formatTimeToAMPM(s.startTime),
+            course: s.courseName || s.course || "Live Session",
+            batch: s.batchName || s.batchId || "Batch",
+            students: matchingBatch ? matchingBatch.students : 0,
+            duration: s.duration || "2h",
+            mode: s.mode || "Online",
+            status: s.status || "Upcoming",
+            active: s.status === "In Progress",
+            link: s.meetingLink || ""
+          };
+        });
+
+        setActiveBatches(activeCount);
+        setTotalStudents(studentsCount);
+        setSessionsTodayCount(todaysSessions.length);
+        setSchedule(formattedSessions);
+
+        // Format Queries Info
+        const unreadQueries = queriesList.filter(q => !q.readByTrainer);
+        const latestQueryText = unreadQueries.length > 0
+          ? (unreadQueries[0].queryText || unreadQueries[0].message || "New query pending review")
+          : "No pending student queries.";
+
+        const studentMap = new Map();
+        unreadQueries.forEach(q => {
+          const name = q.studentName || "Student";
+          const initials = name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+          studentMap.set(name, initials);
+        });
+
+        const queryAvatars = Array.from(studentMap.entries()).slice(0, 3).map(([name, initials], idx) => {
+          const colors = [
+            { color: "#6366F1", bg: "#EEF2FF" },
+            { color: "#10B981", bg: "#ECFDF5" },
+            { color: "#F59E0B", bg: "#FFFBEB" }
+          ];
+          return {
+            initials,
+            color: colors[idx % colors.length].color,
+            bg: colors[idx % colors.length].bg
+          };
+        });
+
+        setDashData({
+          materials: {
+            moduleName: batchesList.length > 0 
+              ? `Manage syllabuses and files for ${batchesList[0].name || batchesList[0].course}`
+              : "Upload files for your assigned courses.",
+            uploaded: ["Syllabus overview", "Reference guidelines"],
+            pending: ["Video tutorial links"]
+          },
+          queries: {
+            count: unreadQueries.length,
+            latestMessage: latestQueryText,
+            students: queryAvatars,
+            totalAvatars: studentMap.size
+          }
+        });
+
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error loading trainer dashboard:", error);
+        setIsLoading(false);
+      }
     };
-    loadData();
+
+    loadDashboardData();
   }, []);
 
   const kpis = [
-    { label: 'Active Batches', value: parseInt(trainerData.activeBatches || 4), trend: '+5%', icon: <Layers size={22} />, color: 'blue' },
-    { label: 'Total Students', value: parseInt(trainerData.totalStudents || 128), trend: '+12%', icon: <Users size={22} />, color: 'green' },
-    { label: 'Sessions Today', value: 3, trend: 'On track', icon: <Calendar size={22} />, color: 'amber' },
+    { label: 'Active Batches', value: activeBatches, trend: 'Updated', icon: <Layers size={22} />, color: 'blue' },
+    { label: 'Total Students', value: totalStudents, trend: 'Updated', icon: <Users size={22} />, color: 'green' },
+    { label: 'Sessions Today', value: sessionsTodayCount, trend: 'Today', icon: <Calendar size={22} />, color: 'amber' },
   ];
-
-  const [schedule, setSchedule] = useState([
-    { id: 1, time: '09:00 AM', course: 'Full Stack Development', batch: 'B1', students: 32, duration: '2h', mode: 'Online', status: 'Completed' },
-    { id: 2, time: '12:00 PM', course: 'Python & Data Science', batch: 'B2', students: 28, duration: '1.5h', mode: 'Offline', status: 'In Progress', active: true },
-    { id: 3, time: '03:30 PM', course: 'UI/UX Design Basics', batch: 'B3', students: 24, duration: '2h', mode: 'Online', status: 'Upcoming' },
-  ]);
 
   return (
     <div className="dashboard-container-v2 animate-fade-in">
@@ -140,9 +215,9 @@ const Dashboard = () => {
             <div className="kpi-info-v2">
               <span className="kpi-label-v2">{kpi.label}</span>
               <h3 className="kpi-value-v2">
-                <Counter target={kpi.value} />{kpi.suffix}
+                <Counter target={kpi.value} />
               </h3>
-              <span className={`kpi-trend-v2 ${kpi.trend.startsWith('+') ? 'pos' : ''}`}>{kpi.trend}</span>
+              <span className={`kpi-trend-v2 pos`}>{kpi.trend}</span>
             </div>
           </div>
         ))}
@@ -160,9 +235,16 @@ const Dashboard = () => {
             </button>
           </div>
           <div className="schedule-list-v2">
-            {schedule.map((session, idx) => (
-              <LiveSessionCard key={idx} session={session} />
-            ))}
+            {schedule.length > 0 ? (
+              schedule.map((session, idx) => (
+                <LiveSessionCard key={idx} session={session} />
+              ))
+            ) : (
+              <div className="empty-state-v2" style={{ padding: '24px', textAlign: 'center', color: '#64748b' }}>
+                <Calendar size={36} style={{ marginBottom: '12px', opacity: 0.5 }} />
+                <p style={{ fontWeight: 600 }}>No live classes scheduled for today.</p>
+              </div>
+            )}
           </div>
         </section>
 
@@ -176,12 +258,10 @@ const Dashboard = () => {
               <>
                 <SkeletonCard />
                 <SkeletonCard />
-                <SkeletonCard />
               </>
             ) : dashData ? (
               <>
-
-                {/* 2. Materials Card */}
+                {/* Materials Card */}
                 <div className="modern-card materials-card-v2 clickable" onClick={() => navigate('/trainer-dashboard/materials')}>
                   <div className="card-main-content">
                     <div className="card-icon-wrapper">
@@ -205,8 +285,8 @@ const Dashboard = () => {
                   </div>
                 </div>
 
-                {/* 3. Queries Card */}
-                <div className="modern-card queries-card-v2 clickable" onClick={() => navigate('/trainer-dashboard/feedback')}>
+                {/* Queries Card */}
+                <div className="modern-card queries-card-v2 clickable" onClick={() => navigate('/trainer-dashboard/student-connect')}>
                   <div className="card-main-content">
                     <span className="query-count">{dashData.queries.count} New Messages</span>
                     <div className="card-icon-wrapper">
@@ -216,17 +296,23 @@ const Dashboard = () => {
                       <h4>Respond to Queries</h4>
                       <p className="message-preview">"{dashData.queries.latestMessage}"</p>
                       <div className="student-avatars">
-                        <div className="avatar-stack">
-                          {dashData.queries.students.map((st, i) => (
-                            <div key={i} className="avatar" style={{ backgroundColor: st.bg, color: st.color }}>{st.initials}</div>
-                          ))}
-                          <div className="avatar-more">+{dashData.queries.totalAvatars - dashData.queries.students.length}</div>
-                        </div>
-                        <p className="avatar-text">Students are waiting</p>
+                        {dashData.queries.count > 0 && (
+                          <div className="avatar-stack">
+                            {dashData.queries.students.map((st, i) => (
+                              <div key={i} className="avatar" style={{ backgroundColor: st.bg, color: st.color }}>{st.initials}</div>
+                            ))}
+                            {dashData.queries.totalAvatars > dashData.queries.students.length && (
+                              <div className="avatar-more">+{dashData.queries.totalAvatars - dashData.queries.students.length}</div>
+                            )}
+                          </div>
+                        )}
+                        <p className="avatar-text">
+                          {dashData.queries.count > 0 ? "Students are waiting" : "All caught up"}
+                        </p>
                       </div>
                     </div>
                     <button className="modern-card-cta accent">
-                      Open Chat <MessageSquare size={16} />
+                      Open Queries <MessageSquare size={16} />
                     </button>
                   </div>
                 </div>

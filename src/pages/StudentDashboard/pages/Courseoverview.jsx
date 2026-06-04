@@ -13,15 +13,12 @@ import {
   Lock,
   Layout,
   Video,
-  ChevronRight,
-  Bell
+  ChevronRight
 } from 'lucide-react';
 import { getCourseImage } from '../../../utils/courseUtils';
 import {
   getStudentBatchesAPI,
-  getStudentLiveSessionAPI,
-  getStudentNotificationsAPI,
-  markStudentNotificationReadAPI
+  getStudentLiveSessionAPI
 } from '../../../services/api';
 import './Courseoverview.css';
 
@@ -125,15 +122,23 @@ const CourseOverview = () => {
   }, [publishedCourses, courseId]);
 
   const [sessionStatus, setSessionStatus] = useState('no-link');
-  const [sessionConfig, setSessionConfig] = useState(null);
+  const [sessionConfig, setSessionConfig] = useState({
+    sessionLink: "https://meet.google.com/abc-defg-hij",
+    weeklySchedule: [
+      { day: "Monday", start: "09:00 AM", end: "10:00 AM", enabled: true },
+      { day: "Tuesday", start: "09:00 AM", end: "10:00 AM", enabled: true },
+      { day: "Wednesday", start: "09:00 AM", end: "10:00 AM", enabled: true },
+      { day: "Thursday", start: "09:00 AM", end: "10:00 AM", enabled: true },
+      { day: "Friday", start: "09:00 AM", end: "10:00 AM", enabled: true },
+      { day: "Saturday", start: "09:00 AM", end: "10:00 AM", enabled: false, reason: "Weekend" },
+      { day: "Sunday", start: "09:00 AM", end: "10:00 AM", enabled: false, reason: "Weekend" }
+    ]
+  });
   const [dayStatuses, setDayStatuses] = useState([]);
   const [myBatches, setMyBatches] = useState({});
   const [isLoadingBatches, setIsLoadingBatches] = useState(true);
 
-  // Student dashboard alerts state
-  const [notifications, setNotifications] = useState([]);
-  const [showPopup, setShowPopup] = useState(false);
-  const [currentPopupNotif, setCurrentPopupNotif] = useState(null);
+
 
   // 1. Fetch student batches on mount
   useEffect(() => {
@@ -192,47 +197,71 @@ const CourseOverview = () => {
 
   // 3. Fetch Live Session config from Backend Firestore instead of localStorage
   useEffect(() => {
-    if (!activeBatchId) return;
+    const addOneHourToTime12 = (time12) => {
+      if (!time12 || time12 === 'Flexible' || time12.toLowerCase().includes('flexible')) {
+        return '10:00 AM';
+      }
+      try {
+        const [time, suffix] = time12.split(' ');
+        let [hour, minute] = time.split(':').map(Number);
+        let nextHour = hour + 1;
+        let nextSuffix = suffix;
+        if (nextHour === 12) {
+          nextSuffix = suffix === 'AM' ? 'PM' : 'AM';
+        } else if (nextHour > 12) {
+          nextHour = 1;
+        }
+        return `${String(nextHour).padStart(2, '0')}:${String(minute).padStart(2, '0')} ${nextSuffix}`;
+      } catch (e) {
+        return '10:00 AM';
+      }
+    };
+
+    const batchMatch = Object.values(myBatches).find(b =>
+      b.batchId === activeBatchId || b.firebaseKey === activeBatchId
+    );
+    const resolvedStartTime = batchMatch?.startTime && batchMatch.startTime !== 'Flexible' ? batchMatch.startTime : '09:00 AM';
+    const resolvedEndTime = addOneHourToTime12(resolvedStartTime);
+    const resolvedLink = batchMatch?.liveClassLink || "https://meet.google.com/abc-defg-hij";
+
+    const defaultSchedule = {
+      sessionLink: resolvedLink,
+      weeklySchedule: [
+        { day: "Monday", start: resolvedStartTime, end: resolvedEndTime, enabled: true },
+        { day: "Tuesday", start: resolvedStartTime, end: resolvedEndTime, enabled: true },
+        { day: "Wednesday", start: resolvedStartTime, end: resolvedEndTime, enabled: true },
+        { day: "Thursday", start: resolvedStartTime, end: resolvedEndTime, enabled: true },
+        { day: "Friday", start: resolvedStartTime, end: resolvedEndTime, enabled: true },
+        { day: "Saturday", start: resolvedStartTime, end: resolvedEndTime, enabled: false, reason: "Weekend" },
+        { day: "Sunday", start: resolvedStartTime, end: resolvedEndTime, enabled: false, reason: "Weekend" }
+      ]
+    };
+
+    if (!activeBatchId) {
+      setSessionConfig(defaultSchedule);
+      return;
+    }
 
     const fetchLiveSession = async () => {
       try {
         const res = await getStudentLiveSessionAPI(activeBatchId);
-        if (res.success && res.config) {
+        if (res.success && res.config && res.config.sessionLink && res.config.weeklySchedule) {
           setSessionConfig(res.config);
+        } else {
+          setSessionConfig(defaultSchedule);
         }
       } catch (err) {
         console.error("Failed to fetch live session config:", err.message);
+        setSessionConfig(defaultSchedule);
       }
     };
 
     fetchLiveSession();
     const interval = setInterval(fetchLiveSession, 15000); // Poll backend every 15s
     return () => clearInterval(interval);
-  }, [activeBatchId]);
+  }, [activeBatchId, myBatches]);
 
-  // 4. Periodically poll notifications for dashboard popups
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const res = await getStudentNotificationsAPI();
-        if (res.success && res.notifications) {
-          setNotifications(res.notifications);
-          // Find most recent unread 1-hour class reminder or cancellation
-          const unreadReminder = res.notifications.find(n => (n.type === 'class_reminder_1h' || n.type === 'class_cancellation') && !n.read);
-          if (unreadReminder && !showPopup) {
-            setCurrentPopupNotif(unreadReminder);
-            setShowPopup(true);
-          }
-        }
-      } catch (err) {
-        console.error("Failed to fetch student notifications:", err);
-      }
-    };
 
-    fetchNotifications();
-    const interval = setInterval(fetchNotifications, 10000); // Poll notifications every 10s
-    return () => clearInterval(interval);
-  }, [showPopup]);
 
   // 5. Update session states every second
   useEffect(() => {
@@ -280,16 +309,7 @@ const CourseOverview = () => {
     }
   };
 
-  const dismissPopup = async () => {
-    if (currentPopupNotif) {
-      try {
-        await markStudentNotificationReadAPI(currentPopupNotif.id);
-      } catch (err) {
-        console.error("Error reading notification:", err.message);
-      }
-    }
-    setShowPopup(false);
-  };
+
 
   const statusLabel = {
     'live': { text: 'Class is Live', className: 'status-live' },
@@ -307,169 +327,13 @@ const CourseOverview = () => {
 
   const courseImage = getCourseImage(course);
 
-  // Filter out read notifications for counts
-  const unreadCount = notifications.filter(n => !n.read).length;
-
   return (
     <div className="course-overview-page">
-      {/* 🔔 Student Dashboard Pop-up Alert */}
-      {showPopup && currentPopupNotif && (
-        <div style={{
-          position: "fixed",
-          top: "20px",
-          right: "20px",
-          zIndex: 9999,
-          background: "#ffffff",
-          boxShadow: currentPopupNotif.type === 'class_cancellation' ? "0 12px 40px rgba(220, 38, 38, 0.18)" : "0 12px 40px rgba(26, 115, 232, 0.18)",
-          borderRadius: "14px",
-          width: "380px",
-          overflow: "hidden",
-          animation: "slideIn 0.35s cubic-bezier(0.16,1,0.3,1)"
-        }}>
-          {/* Colored top bar */}
-          <div style={{ 
-            background: currentPopupNotif.type === 'class_cancellation' ? "linear-gradient(135deg, #dc2626, #991b1b)" : "linear-gradient(135deg, #1a73e8, #0d47a1)", 
-            padding: "12px 16px", 
-            display: "flex", 
-            alignItems: "center", 
-            gap: "10px" 
-          }}>
-            <div style={{ background: "rgba(255,255,255,0.2)", borderRadius: "8px", padding: "6px", display: "flex" }}>
-              <Bell size={18} color="#fff" />
-            </div>
-            <span style={{ color: "#fff", fontWeight: 700, fontSize: "14px" }}>
-              {currentPopupNotif.title}
-            </span>
-            <button
-              onClick={dismissPopup}
-              style={{ marginLeft: "auto", background: "transparent", border: "none", color: "rgba(255,255,255,0.8)", fontSize: "18px", cursor: "pointer", lineHeight: 1, padding: "0 2px" }}
-              title="Dismiss"
-            >×</button>
-          </div>
-
-          {/* Body */}
-          <div style={{ padding: "16px" }}>
-            {/* Timings row or Cancellation notice */}
-            {currentPopupNotif.type === 'class_cancellation' ? (
-              <div style={{ background: "#fef2f2", borderLeft: "4px solid #ef4444", borderRadius: "8px", padding: "12px", marginBottom: "12px", textAlign: "center" }}>
-                <div style={{ fontSize: "14px", fontWeight: 700, color: "#991b1b" }}>Class Cancelled / Holiday</div>
-              </div>
-            ) : (
-              (currentPopupNotif.startTime || currentPopupNotif.endTime) && (
-                <div style={{ display: "flex", gap: "10px", marginBottom: "12px" }}>
-                  <div style={{ flex: 1, background: "#f0f7ff", borderRadius: "8px", padding: "10px 12px", textAlign: "center" }}>
-                    <div style={{ fontSize: "10px", color: "#64748b", fontWeight: 700, marginBottom: "2px", textTransform: "uppercase" }}>Starts</div>
-                    <div style={{ fontSize: "16px", fontWeight: 700, color: "#1a73e8" }}>{currentPopupNotif.startTime}</div>
-                  </div>
-                  <div style={{ flex: 1, background: "#f0fff4", borderRadius: "8px", padding: "10px 12px", textAlign: "center" }}>
-                    <div style={{ fontSize: "10px", color: "#64748b", fontWeight: 700, marginBottom: "2px", textTransform: "uppercase" }}>Ends</div>
-                    <div style={{ fontSize: "16px", fontWeight: 700, color: "#16a34a" }}>{currentPopupNotif.endTime}</div>
-                  </div>
-                </div>
-              )
-            )}
-
-            <p style={{ margin: "0 0 14px", color: "#475569", fontSize: "13px", lineHeight: 1.5 }}>
-              {currentPopupNotif.text}
-            </p>
-
-            <div style={{ display: "flex", gap: "8px" }}>
-              {currentPopupNotif.type === 'class_cancellation' ? (
-                <button
-                  onClick={dismissPopup}
-                  style={{
-                    flex: 1,
-                    padding: "10px",
-                    background: "linear-gradient(135deg, #dc2626, #991b1b)",
-                    border: "none",
-                    borderRadius: "8px",
-                    color: "#fff",
-                    fontSize: "13px",
-                    fontWeight: 700,
-                    cursor: "pointer",
-                    textAlign: "center"
-                  }}
-                >
-                  Acknowledge
-                </button>
-              ) : (
-                <>
-                  <button
-                    onClick={dismissPopup}
-                    style={{ flex: 1, padding: "8px", background: "#f1f5f9", border: "none", borderRadius: "8px", color: "#475569", fontSize: "13px", cursor: "pointer", fontWeight: 600 }}
-                  >
-                    Dismiss
-                  </button>
-                  <button
-                    onClick={() => { handleJoin(); dismissPopup(); }}
-                    disabled={sessionStatus !== 'live'}
-                    title={sessionStatus !== 'live' ? 'Join button activates when class is live' : 'Join the live class'}
-                    style={{
-                      flex: 2,
-                      padding: "8px",
-                      background: sessionStatus === 'live' ? "linear-gradient(135deg,#1a73e8,#0d47a1)" : "#e2e8f0",
-                      border: "none",
-                      borderRadius: "8px",
-                      color: sessionStatus === 'live' ? "#fff" : "#94a3b8",
-                      fontSize: "13px",
-                      fontWeight: 700,
-                      cursor: sessionStatus === 'live' ? "pointer" : "not-allowed",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "6px"
-                    }}
-                  >
-                    <Video size={14} />
-                    {sessionStatus === 'live' ? 'Join Now' : 'Opens When Live'}
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Styled slideIn animation */}
-      <style>{`
-        @keyframes slideIn {
-          from { transform: translateX(120%); opacity: 0; }
-          to { transform: translateX(0); opacity: 1; }
-        }
-      `}</style>
-
       <div className="co-top-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <button className="co-back-btn" onClick={handleBack}>
           <ArrowLeft size={18} />
           <span>Back to Courses</span>
         </button>
-        {/* Simple Notification Bell Indicator */}
-        <div style={{ position: 'relative', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <div style={{ color: '#475569', display: 'flex', padding: '8px', background: '#f8fafc', borderRadius: '50%' }}>
-            <Bell size={20} />
-          </div>
-          {unreadCount > 0 && (
-            <span style={{
-              position: 'absolute',
-              top: '-4px',
-              right: '-4px',
-              background: '#ef4444',
-              color: 'white',
-              fontSize: '10px',
-              fontWeight: 'bold',
-              borderRadius: '50%',
-              minWidth: '18px',
-              height: '18px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '0 4px',
-              border: '2px solid white'
-            }}>
-              {unreadCount}
-            </span>
-          )}
-        </div>
       </div>
 
       {/* Header Card (Hero) */}

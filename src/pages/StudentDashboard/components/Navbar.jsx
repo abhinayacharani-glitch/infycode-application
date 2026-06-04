@@ -2,13 +2,14 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Search, Mail, Bell, ChevronDown, LogOut, User, Edit, MessageSquare, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useStudent } from '../../../context/StudentContext';
-import { markQueryReadByStudentAPI } from '../../../services/api';
+import { markQueryReadByStudentAPI, getStudentNotificationsAPI, markStudentNotificationReadAPI } from '../../../services/api';
 import "./Navbar.css";
 
 const Navbar = ({ onToggleSidebar }) => {
   const navigate = useNavigate();
   const { studentQueries, unreadQueryCount, fetchStudentQueries } = useStudent();
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const [dbNotifications, setDbNotifications] = useState([]);
   const dropdownRef = useRef(null);
   const notificationsRef = useRef(null);
   const messagesRef = useRef(null);
@@ -55,6 +56,23 @@ const Navbar = ({ onToggleSidebar }) => {
     };
   }, []);
 
+  // Poll DB notifications
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const res = await getStudentNotificationsAPI();
+        if (res.success && res.notifications) {
+          setDbNotifications(res.notifications);
+        }
+      } catch (err) {
+        console.error("Failed to fetch student db notifications in topbar:", err);
+      }
+    };
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 10000); // every 10s
+    return () => clearInterval(interval);
+  }, []);
+
   // Map unread trainer solutions to notifications
   const queryNotifications = studentQueries
     .filter(q => q.readByStudent === false && q.solution)
@@ -70,7 +88,20 @@ const Navbar = ({ onToggleSidebar }) => {
       createdAt: new Date(q.createdAt).getTime()
     }));
 
-  const allNotifications = [...queryNotifications].sort((a, b) => b.createdAt - a.createdAt);
+  const parsedDbNotifications = dbNotifications
+    .filter(n => !n.read)
+    .map(n => ({
+      id: n.id,
+      title: n.title,
+      message: n.text,
+      time: new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      type: n.type === 'class_cancellation' ? 'error' : 'warning',
+      read: false,
+      isDbNotification: true,
+      createdAt: n.createdAt
+    }));
+
+  const allNotifications = [...queryNotifications, ...parsedDbNotifications].sort((a, b) => b.createdAt - a.createdAt);
   const totalUnreadCount = allNotifications.filter(n => !n.read).length;
 
   const messages = [
@@ -148,6 +179,13 @@ const Navbar = ({ onToggleSidebar }) => {
                           console.error("Error marking query as read:", err);
                         }
                         navigate(`/student-dashboard/my-queries/${notif.queryId}/solution`);
+                      } else if (notif.isDbNotification) {
+                        try {
+                          await markStudentNotificationReadAPI(notif.id);
+                          setDbNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, read: true } : n));
+                        } catch (err) {
+                          console.error("Error marking notification as read:", err);
+                        }
                       }
                     };
 
