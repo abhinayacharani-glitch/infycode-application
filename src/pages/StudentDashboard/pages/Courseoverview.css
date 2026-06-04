@@ -112,6 +112,11 @@
   color: #16a34a;
 }
 
+.co-status-badge.status-cancelled {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
 .co-schedule-card {
   background: #f8fafc;
   border-radius: 12px;

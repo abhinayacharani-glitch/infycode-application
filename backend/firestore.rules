@@ -83,6 +83,25 @@ service cloud.firestore {
       }
     }
 
+    // Student Notifications (1h before class popup alerts)
+    match /studentNotifications/{studentId} {
+      match /items/{itemId} {
+        allow read, update: if isOwner(studentId) || isAdmin();
+        allow write: if isAdmin(); // backend Admin SDK writes these
+      }
+    }
+
+    // Live Session Config (trainer sets meeting link + schedule)
+    match /liveSessionConfig/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || isTrainer();
+    }
+
+    // Sent Reminders tracker (prevents duplicate email reminders)
+    match /sentReminders/{reminderId} {
+      allow read, write: if false; // Only Admin SDK
+    }
+
     // FAQs
     match /faqs/{faqId} {
       allow read: if isAdmin();

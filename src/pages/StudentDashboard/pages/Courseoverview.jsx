@@ -13,10 +13,16 @@ import {
   Lock,
   Layout,
   Video,
-  ChevronRight
+  ChevronRight,
+  Bell
 } from 'lucide-react';
 import { getCourseImage } from '../../../utils/courseUtils';
-import { getStudentBatchesAPI } from '../../../services/api';
+import {
+  getStudentBatchesAPI,
+  getStudentLiveSessionAPI,
+  getStudentNotificationsAPI,
+  markStudentNotificationReadAPI
+} from '../../../services/api';
 import './Courseoverview.css';
 
 const daysOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -39,15 +45,14 @@ const formatCountdown = (ms) => {
 };
 
 const getDayStatus = (dayName, dayData, now) => {
-  if (dayData?.status === 'cancelled') {
-    return { state: 'cancelled', text: `Cancelled` };
+  if (!dayData || !dayData.enabled) {
+    return { state: 'cancelled', text: dayData?.reason ? `Holiday: ${dayData.reason}` : `Cancelled` };
   }
-  if (dayData?.status !== 'scheduled') return { state: 'completed', text: 'Over' };
 
-  const currentDayIndex = (now.getDay() + 6) % 7;
+  const currentDayIndex = (now.getDay() + 6) % 7; // Monday = 0
   const itemDayIndex = daysOrder.indexOf(dayName);
-  const startMinutes = parse12HourToMinutes(dayData.startTime);
-  const endMinutes = parse12HourToMinutes(dayData.endTime);
+  const startMinutes = parse12HourToMinutes(dayData.start);
+  const endMinutes = parse12HourToMinutes(dayData.end);
   const nowMinutes = (now.getHours() * 60) + now.getMinutes();
 
   if (itemDayIndex === currentDayIndex) {
@@ -73,11 +78,15 @@ const getDayStatus = (dayName, dayData, now) => {
 };
 
 const getOverallStatus = (config, now) => {
-  if (!config || !config.sessionLink) return 'no-link';
-  const liveSessionRaw = localStorage.getItem('liveSessionData');
-  const dayWiseData = liveSessionRaw ? JSON.parse(liveSessionRaw) : {};
+  if (!config || !config.sessionLink || !config.weeklySchedule) return 'no-link';
+  
   const todayName = daysOrder[(now.getDay() + 6) % 7];
-  const todayStatus = getDayStatus(todayName, dayWiseData[todayName], now);
+  const todaySchedule = config.weeklySchedule.find(item => item.day === todayName);
+  
+  if (todaySchedule && !todaySchedule.enabled) return 'cancelled';
+  if (!todaySchedule) return 'ended';
+  
+  const todayStatus = getDayStatus(todayName, todaySchedule, now);
   if (todayStatus.state === 'live') return 'live';
   if (todayStatus.state === 'upcoming') return 'upcoming';
   return 'ended';
@@ -121,6 +130,11 @@ const CourseOverview = () => {
   const [myBatches, setMyBatches] = useState({});
   const [isLoadingBatches, setIsLoadingBatches] = useState(true);
 
+  // Student dashboard alerts state
+  const [notifications, setNotifications] = useState([]);
+  const [showPopup, setShowPopup] = useState(false);
+  const [currentPopupNotif, setCurrentPopupNotif] = useState(null);
+
   // 1. Fetch student batches on mount
   useEffect(() => {
     const fetchBatches = async () => {
@@ -139,11 +153,9 @@ const CourseOverview = () => {
   }, []);
 
   // 2. Resolve Dynamic Course Data (Trainer & Batch)
-  // If the student is assigned to a batch for this course, override details
   const dynamicCourse = React.useMemo(() => {
     if (!course) return null;
 
-    // Try to find a match in myBatches by course title
     const batchMatch = Object.values(myBatches).find(b =>
       b.courseName === course.title ||
       b.batchName?.startsWith(course.title) ||
@@ -162,6 +174,7 @@ const CourseOverview = () => {
         } : course.trainer,
         batch: {
           id: batchMatch.batchId,
+          firebaseKey: batchMatch.firebaseKey,
           name: batchMatch.batchName,
           startDate: batchMatch.startDate || course.batch?.startDate,
           timing: batchMatch.startTime || batchMatch.timing || course.batch?.timing || 'Flexible',
@@ -175,27 +188,77 @@ const CourseOverview = () => {
     return course;
   }, [course, myBatches]);
 
+  const activeBatchId = dynamicCourse?.batch?.firebaseKey || dynamicCourse?.batch?.id;
+
+  // 3. Fetch Live Session config from Backend Firestore instead of localStorage
+  useEffect(() => {
+    if (!activeBatchId) return;
+
+    const fetchLiveSession = async () => {
+      try {
+        const res = await getStudentLiveSessionAPI(activeBatchId);
+        if (res.success && res.config) {
+          setSessionConfig(res.config);
+        }
+      } catch (err) {
+        console.error("Failed to fetch live session config:", err.message);
+      }
+    };
+
+    fetchLiveSession();
+    const interval = setInterval(fetchLiveSession, 15000); // Poll backend every 15s
+    return () => clearInterval(interval);
+  }, [activeBatchId]);
+
+  // 4. Periodically poll notifications for dashboard popups
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const res = await getStudentNotificationsAPI();
+        if (res.success && res.notifications) {
+          setNotifications(res.notifications);
+          // Find most recent unread 1-hour class reminder or cancellation
+          const unreadReminder = res.notifications.find(n => (n.type === 'class_reminder_1h' || n.type === 'class_cancellation') && !n.read);
+          if (unreadReminder && !showPopup) {
+            setCurrentPopupNotif(unreadReminder);
+            setShowPopup(true);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch student notifications:", err);
+      }
+    };
+
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 10000); // Poll notifications every 10s
+    return () => clearInterval(interval);
+  }, [showPopup]);
+
+  // 5. Update session states every second
   useEffect(() => {
     const check = () => {
+      if (!sessionConfig || !sessionConfig.weeklySchedule) {
+        setSessionStatus('no-link');
+        return;
+      }
       try {
-        const raw = localStorage.getItem('live_session_config');
-        const config = raw ? JSON.parse(raw) : null;
-        const liveSessionRaw = localStorage.getItem('liveSessionData');
-        const liveSessionData = liveSessionRaw ? JSON.parse(liveSessionRaw) : {};
         const now = new Date();
         const todayIndex = (now.getDay() + 6) % 7;
         const todayName = daysOrder[todayIndex];
         const tomorrowName = daysOrder[(todayIndex + 1) % 7];
 
+        const todaySchedule = sessionConfig.weeklySchedule.find(item => item.day === todayName);
+        const tomorrowSchedule = sessionConfig.weeklySchedule.find(item => item.day === tomorrowName);
+
         const computedStatuses = [
-          { day: todayName, ...getDayStatus(todayName, liveSessionData[todayName], now) },
-          { day: tomorrowName, ...getDayStatus(tomorrowName, liveSessionData[tomorrowName], now) },
+          { day: todayName, ...getDayStatus(todayName, todaySchedule, now) },
+          { day: tomorrowName, ...getDayStatus(tomorrowName, tomorrowSchedule, now) },
         ];
 
-        setSessionConfig(config);
-        setSessionStatus(getOverallStatus(config, now));
+        setSessionStatus(getOverallStatus(sessionConfig, now));
         setDayStatuses(computedStatuses);
-      } catch {
+      } catch (err) {
+        console.error("Error computing session status:", err);
         setSessionStatus('no-link');
       }
     };
@@ -203,7 +266,7 @@ const CourseOverview = () => {
     check();
     const timer = setInterval(check, 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [sessionConfig]);
 
   if (!course) {
     return <div className="overview-error">Course not found.</div>;
@@ -217,23 +280,196 @@ const CourseOverview = () => {
     }
   };
 
+  const dismissPopup = async () => {
+    if (currentPopupNotif) {
+      try {
+        await markStudentNotificationReadAPI(currentPopupNotif.id);
+      } catch (err) {
+        console.error("Error reading notification:", err.message);
+      }
+    }
+    setShowPopup(false);
+  };
+
   const statusLabel = {
     'live': { text: 'Class is Live', className: 'status-live' },
-    'upcoming': { text: sessionConfig ? `Starts at ${sessionConfig.startTime}` : 'Upcoming', className: 'status-upcoming' },
+    'upcoming': { text: sessionConfig ? `Starts at ${sessionConfig.weeklySchedule.find(i => i.day === daysOrder[(new Date().getDay() + 6) % 7])?.start || ""}` : 'Upcoming', className: 'status-upcoming' },
     'ended': { text: 'Session Ended', className: 'status-ended' },
     'expired': { text: 'Session Ended', className: 'status-ended' },
+    'cancelled': { 
+      text: sessionConfig?.weeklySchedule?.find(i => i.day === daysOrder[(new Date().getDay() + 6) % 7])?.reason 
+        ? `Holiday: ${sessionConfig.weeklySchedule.find(i => i.day === daysOrder[(new Date().getDay() + 6) % 7]).reason}` 
+        : 'Class Cancelled', 
+      className: 'status-cancelled' 
+    },
     'no-link': { text: 'Not Configured', className: 'status-none' },
-  }[sessionStatus];
+  }[sessionStatus] || { text: 'Not Configured', className: 'status-none' };
 
   const courseImage = getCourseImage(course);
 
+  // Filter out read notifications for counts
+  const unreadCount = notifications.filter(n => !n.read).length;
+
   return (
     <div className="course-overview-page">
-      <div className="co-top-bar">
+      {/* 🔔 Student Dashboard Pop-up Alert */}
+      {showPopup && currentPopupNotif && (
+        <div style={{
+          position: "fixed",
+          top: "20px",
+          right: "20px",
+          zIndex: 9999,
+          background: "#ffffff",
+          boxShadow: currentPopupNotif.type === 'class_cancellation' ? "0 12px 40px rgba(220, 38, 38, 0.18)" : "0 12px 40px rgba(26, 115, 232, 0.18)",
+          borderRadius: "14px",
+          width: "380px",
+          overflow: "hidden",
+          animation: "slideIn 0.35s cubic-bezier(0.16,1,0.3,1)"
+        }}>
+          {/* Colored top bar */}
+          <div style={{ 
+            background: currentPopupNotif.type === 'class_cancellation' ? "linear-gradient(135deg, #dc2626, #991b1b)" : "linear-gradient(135deg, #1a73e8, #0d47a1)", 
+            padding: "12px 16px", 
+            display: "flex", 
+            alignItems: "center", 
+            gap: "10px" 
+          }}>
+            <div style={{ background: "rgba(255,255,255,0.2)", borderRadius: "8px", padding: "6px", display: "flex" }}>
+              <Bell size={18} color="#fff" />
+            </div>
+            <span style={{ color: "#fff", fontWeight: 700, fontSize: "14px" }}>
+              {currentPopupNotif.title}
+            </span>
+            <button
+              onClick={dismissPopup}
+              style={{ marginLeft: "auto", background: "transparent", border: "none", color: "rgba(255,255,255,0.8)", fontSize: "18px", cursor: "pointer", lineHeight: 1, padding: "0 2px" }}
+              title="Dismiss"
+            >×</button>
+          </div>
+
+          {/* Body */}
+          <div style={{ padding: "16px" }}>
+            {/* Timings row or Cancellation notice */}
+            {currentPopupNotif.type === 'class_cancellation' ? (
+              <div style={{ background: "#fef2f2", borderLeft: "4px solid #ef4444", borderRadius: "8px", padding: "12px", marginBottom: "12px", textAlign: "center" }}>
+                <div style={{ fontSize: "14px", fontWeight: 700, color: "#991b1b" }}>Class Cancelled / Holiday</div>
+              </div>
+            ) : (
+              (currentPopupNotif.startTime || currentPopupNotif.endTime) && (
+                <div style={{ display: "flex", gap: "10px", marginBottom: "12px" }}>
+                  <div style={{ flex: 1, background: "#f0f7ff", borderRadius: "8px", padding: "10px 12px", textAlign: "center" }}>
+                    <div style={{ fontSize: "10px", color: "#64748b", fontWeight: 700, marginBottom: "2px", textTransform: "uppercase" }}>Starts</div>
+                    <div style={{ fontSize: "16px", fontWeight: 700, color: "#1a73e8" }}>{currentPopupNotif.startTime}</div>
+                  </div>
+                  <div style={{ flex: 1, background: "#f0fff4", borderRadius: "8px", padding: "10px 12px", textAlign: "center" }}>
+                    <div style={{ fontSize: "10px", color: "#64748b", fontWeight: 700, marginBottom: "2px", textTransform: "uppercase" }}>Ends</div>
+                    <div style={{ fontSize: "16px", fontWeight: 700, color: "#16a34a" }}>{currentPopupNotif.endTime}</div>
+                  </div>
+                </div>
+              )
+            )}
+
+            <p style={{ margin: "0 0 14px", color: "#475569", fontSize: "13px", lineHeight: 1.5 }}>
+              {currentPopupNotif.text}
+            </p>
+
+            <div style={{ display: "flex", gap: "8px" }}>
+              {currentPopupNotif.type === 'class_cancellation' ? (
+                <button
+                  onClick={dismissPopup}
+                  style={{
+                    flex: 1,
+                    padding: "10px",
+                    background: "linear-gradient(135deg, #dc2626, #991b1b)",
+                    border: "none",
+                    borderRadius: "8px",
+                    color: "#fff",
+                    fontSize: "13px",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    textAlign: "center"
+                  }}
+                >
+                  Acknowledge
+                </button>
+              ) : (
+                <>
+                  <button
+                    onClick={dismissPopup}
+                    style={{ flex: 1, padding: "8px", background: "#f1f5f9", border: "none", borderRadius: "8px", color: "#475569", fontSize: "13px", cursor: "pointer", fontWeight: 600 }}
+                  >
+                    Dismiss
+                  </button>
+                  <button
+                    onClick={() => { handleJoin(); dismissPopup(); }}
+                    disabled={sessionStatus !== 'live'}
+                    title={sessionStatus !== 'live' ? 'Join button activates when class is live' : 'Join the live class'}
+                    style={{
+                      flex: 2,
+                      padding: "8px",
+                      background: sessionStatus === 'live' ? "linear-gradient(135deg,#1a73e8,#0d47a1)" : "#e2e8f0",
+                      border: "none",
+                      borderRadius: "8px",
+                      color: sessionStatus === 'live' ? "#fff" : "#94a3b8",
+                      fontSize: "13px",
+                      fontWeight: 700,
+                      cursor: sessionStatus === 'live' ? "pointer" : "not-allowed",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "6px"
+                    }}
+                  >
+                    <Video size={14} />
+                    {sessionStatus === 'live' ? 'Join Now' : 'Opens When Live'}
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Styled slideIn animation */}
+      <style>{`
+        @keyframes slideIn {
+          from { transform: translateX(120%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+      `}</style>
+
+      <div className="co-top-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <button className="co-back-btn" onClick={handleBack}>
           <ArrowLeft size={18} />
           <span>Back to Courses</span>
         </button>
+        {/* Simple Notification Bell Indicator */}
+        <div style={{ position: 'relative', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div style={{ color: '#475569', display: 'flex', padding: '8px', background: '#f8fafc', borderRadius: '50%' }}>
+            <Bell size={20} />
+          </div>
+          {unreadCount > 0 && (
+            <span style={{
+              position: 'absolute',
+              top: '-4px',
+              right: '-4px',
+              background: '#ef4444',
+              color: 'white',
+              fontSize: '10px',
+              fontWeight: 'bold',
+              borderRadius: '50%',
+              minWidth: '18px',
+              height: '18px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '0 4px',
+              border: '2px solid white'
+            }}>
+              {unreadCount}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Header Card (Hero) */}
@@ -256,13 +492,16 @@ const CourseOverview = () => {
             {dayStatuses.map((item) => (
               <div key={item.day} className="co-schedule-row">
                 <span className="co-day">{item.day}</span>
-                <span className={`co-status ${item.state === 'completed' ? 'over' : ''}`}>{item.text}</span>
+                <span className={`co-status ${item.state === 'completed' ? 'over' : item.state === 'cancelled' ? 'cancelled' : ''}`}>
+                  {item.text}
+                </span>
               </div>
             ))}
           </div>
           <button
             className={`co-join-live-btn ${sessionStatus !== 'live' ? 'disabled' : ''}`}
             onClick={handleJoin}
+            disabled={sessionStatus !== 'live'}
           >
             <Video size={18} />
             <span>Join Live Class</span>
@@ -337,6 +576,24 @@ const CourseOverview = () => {
         </div>
       </div>
 
+      {/* Announcements & Holiday Messages Banner */}
+      {sessionConfig?.weeklySchedule?.some(item => !item.enabled && item.reason) && (
+        <div className="co-card" style={{ marginTop: '24px', padding: '16px', borderLeft: '4px solid #f59e0b' }}>
+          <h3 style={{ margin: '0 0 10px 0', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '15px', color: '#d97706' }}>
+            <span>📢</span> Announcements & Holiday Schedule
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {sessionConfig.weeklySchedule
+              .filter(item => !item.enabled && item.reason)
+              .map(item => (
+                <div key={item.day} style={{ fontSize: '14px', color: '#4b5563' }}>
+                  <strong>{item.day}:</strong> <span style={{ color: '#ef4444' }}>Holiday</span> - {item.reason}
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
+
       {/* Course Objective Section */}
       <div className="co-objective-card">
         <div className="co-section-label">COURSE OBJECTIVE</div>
@@ -408,5 +665,4 @@ const CourseOverview = () => {
   );
 };
 
-
-export default CourseOverview;
+export default CourseOverview;

@@ -18,6 +18,13 @@ import {
   Circle,
   Edit2
 } from 'lucide-react';
+import {
+  getTrainerBatchesAPI,
+  getTrainerScheduleAPI,
+  createTrainerScheduleAPI,
+  updateTrainerScheduleAPI,
+  deleteTrainerScheduleAPI
+} from '../../../services/api';
 import './Schedule.css';
 
 // --- HELPERS ---
@@ -27,16 +34,6 @@ const getStartOfWeek = (date) => {
   const diff = d.getDate() - day + (day === 0 ? -6 : 1);
   return new Date(d.setDate(diff));
 };
-
-const BATCHES = [
-  { id: 'B1', course: 'Full Stack Web Development', color: 'b1' },
-  { id: 'B2', course: 'Python & Data Science', color: 'b2' },
-  { id: 'B3', course: 'UI/UX Advanced Design', color: 'b3' },
-  { id: 'B4', course: 'AWS & Cloud Architecture', color: 'b4' },
-  { id: 'B5', course: 'Java Full Stack Mastery', color: 'b5' },
-  { id: 'B6', course: 'Mobile App Development', color: 'b6' },
-  { id: 'B7', course: 'Cyber Security Essentials', color: 'b7' }
-];
 
 const SkeletonRow = () => (
   <tr className="skeleton-row-v2">
@@ -52,6 +49,7 @@ const EmptyState = () => (
     <p>No scheduled sessions found.</p>
   </div>
 );
+
 const CountdownTimer = ({ targetDate, startTime }) => {
   const [timeLeft, setTimeLeft] = useState('');
 
@@ -94,6 +92,117 @@ const formatTimeToAMPM = (time24) => {
   return `${h}:${minutes} ${ampm}`;
 };
 
+const parse24hTo12h = (time24) => {
+  if (!time24 || !time24.includes(':')) return { hour: '10', minute: '00', ampm: 'AM' };
+  const [hours, minutes] = time24.split(':');
+  let h = parseInt(hours, 10);
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12;
+  h = h ? h : 12;
+  return {
+    hour: h.toString(),
+    minute: minutes,
+    ampm
+  };
+};
+
+const format12hTo24h = (hour, minute, ampm) => {
+  let h = parseInt(hour, 10);
+  if (ampm === 'PM' && h < 12) h += 12;
+  if (ampm === 'AM' && h === 12) h = 0;
+  return `${h.toString().padStart(2, '0')}:${minute.padStart(2, '0')}`;
+};
+
+const CustomTimePicker = ({ value, onChange }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = React.useRef(null);
+
+  const { hour, minute, ampm } = useMemo(() => parse24hTo12h(value), [value]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (containerRef.current && !containerRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const hoursList = Array.from({ length: 24 }, (_, i) => (i + 1).toString());
+  const minutesList = Array.from({ length: 12 }, (_, i) => (i * 5).toString().padStart(2, '0'));
+
+  const getMinutesList = () => {
+    const list = [...minutesList];
+    if (!list.includes(minute)) {
+      list.push(minute);
+      list.sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+    }
+    return list;
+  };
+
+  const handleSelectHour = (h) => {
+    onChange(format12hTo24h(h, minute, ampm));
+  };
+
+  const handleSelectMinute = (m) => {
+    onChange(format12hTo24h(hour, m, ampm));
+  };
+
+  const handleSelectAMPM = (p) => {
+    onChange(format12hTo24h(hour, minute, p));
+  };
+
+  return (
+    <div className="custom-timepicker" ref={containerRef}>
+      <div 
+        className={`timepicker-display ${isOpen ? 'open' : ''}`}
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <span>{hour}:{minute} {ampm}</span>
+        <Clock size={16} className="timepicker-icon" />
+      </div>
+      {isOpen && (
+        <div className="timepicker-dropdown">
+          <div className="timepicker-column">
+            {hoursList.map(h => (
+              <div 
+                key={h} 
+                className={`timepicker-option ${hour === h ? 'selected' : ''}`}
+                onClick={() => handleSelectHour(h)}
+              >
+                {h}
+              </div>
+            ))}
+          </div>
+          <div className="timepicker-column">
+            {getMinutesList().map(m => (
+              <div 
+                key={m} 
+                className={`timepicker-option ${minute === m ? 'selected' : ''}`}
+                onClick={() => handleSelectMinute(m)}
+              >
+                {m}
+              </div>
+            ))}
+          </div>
+          <div className="timepicker-column">
+            {['AM', 'PM'].map(p => (
+              <div 
+                key={p} 
+                className={`timepicker-option ${ampm === p ? 'selected' : ''}`}
+                onClick={() => handleSelectAMPM(p)}
+              >
+                {p}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const calculateDuration = (startTime, endTime) => {
   if (!startTime || !endTime) return 60;
   const [sh, sm] = startTime.split(':').map(Number);
@@ -122,20 +231,19 @@ const computeSessionStatus = (dateStr, startTime, duration = 60, type = 'Class')
   return 'upcoming';
 };
 
-const getSmartIndicator = (dateStr, status, type) => {
+const getSmartIndicator = (dateStr, status, type, startTime) => {
   if (type === 'Holiday' || status === 'holiday') return 'Holiday - No Classes';
   if (status === 'completed') return 'Class is over';
   if (status === 'ongoing') return 'Ongoing now';
 
   const now = new Date();
   const today = now.toISOString().split('T')[0];
-  const target = new Date(dateStr);
   const tomorrow = new Date();
   tomorrow.setDate(now.getDate() + 1);
   const tomorrowStr = tomorrow.toISOString().split('T')[0];
 
   if (dateStr === today) {
-    if (status === 'upcoming') {
+    if (status === 'upcoming' && startTime) {
       const [sh, sm] = startTime.split(':').map(Number);
       const startMins = sh * 60 + sm;
       const currentMins = now.getHours() * 60 + now.getMinutes();
@@ -149,66 +257,6 @@ const getSmartIndicator = (dateStr, status, type) => {
   return '';
 };
 
-const generateDummySessions = () => {
-  const sessions = [];
-  const now = new Date();
-
-  // Pattern: 09:00 -> B1, 10:00 -> B2, 11:00 -> B3, 12:00 -> B4
-  const scheduleTemplate = [
-    { time: "09:00", batch: "B1", topic: "Introduction to React Hooks" },
-    { time: "10:00", batch: "B2", topic: "Node.js Express Middleware" },
-    { time: "11:00", batch: "B3", topic: "Advanced Figma Prototyping" },
-    { time: "12:00", batch: "B4", topic: "MongoDB Schema Design" }
-  ];
-
-  // Generate for last 3 days and next 7 days
-  for (let i = -3; i <= 7; i++) {
-    const d = new Date();
-    d.setDate(now.getDate() + i);
-    const dateStr = d.toISOString().split('T')[0];
-
-    // Add all 4 batches for each day
-    scheduleTemplate.forEach((slot, idx) => {
-      const status = computeSessionStatus(dateStr, slot.time, 60, "Class");
-      sessions.push({
-        id: `${dateStr}-${slot.batch}`,
-        title: slot.topic,
-        topic: slot.topic,
-        date: dateStr,
-        startTime: slot.time,
-        endTime: `${(parseInt(slot.time.split(':')[0]) + 1).toString().padStart(2, '0')}:00`,
-        duration: 60,
-        batchId: slot.batch,
-        courseName: slot.batch === 'B1' ? 'Full Stack Web' : slot.batch === 'B2' ? 'Node.js Backend' : slot.batch === 'B3' ? 'UI/UX Design' : 'Cloud Architecture',
-        status: status,
-        mode: "Online",
-        type: "Class"
-      });
-    });
-
-    // Add a Holiday example
-    if (i === 2) {
-      sessions.push({
-        id: `${dateStr}-holiday`,
-        title: "Holiday",
-        topic: "Holiday",
-        date: dateStr,
-        startTime: "--:--",
-        endTime: "--:--",
-        duration: 0,
-        batchId: "GEN",
-        courseName: "N/A",
-        status: "upcoming",
-        mode: "Online",
-        type: "Holiday",
-        holidayReason: "Public Holiday"
-      });
-    }
-  }
-
-  return sessions;
-};
-
 const HOURS = Array.from({ length: 10 }, (_, i) => i + 9); // 9 AM to 6 PM
 
 const Schedule = () => {
@@ -217,38 +265,47 @@ const Schedule = () => {
   const [activeView, setActiveView] = useState('Week'); // 'Day', 'Week', 'Month'
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
-  const [sessions, setSessions] = useState(() => {
-    const fallback = generateDummySessions();
-    try {
-      const data = localStorage.getItem('trainer_sessions');
-      if (!data) {
-        localStorage.setItem('trainer_sessions', JSON.stringify(fallback));
-        return fallback;
-      }
-      const parsed = JSON.parse(data);
-      if (!Array.isArray(parsed)) return fallback;
+  const [sessions, setSessions] = useState([]);
+  const [batches, setBatches] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-      return parsed.map(s => {
-        // Sanitize legacy AM/PM format
-        if (s.startTime && (s.startTime.includes('AM') || s.startTime.includes('PM'))) {
-          const parts = s.startTime.split(' ');
-          const time = parts[0];
-          const modifier = parts[1];
-          let [hours, minutes] = time.split(':');
-          if (hours === '12') hours = '00';
-          if (modifier === 'PM') hours = parseInt(hours, 10) + 12;
-          return { ...s, startTime: `${hours.toString().padStart(2, '0')}:${minutes}` };
+  // Fetch batches and sessions on mount
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const [batchesRes, scheduleRes] = await Promise.all([
+          getTrainerBatchesAPI(),
+          getTrainerScheduleAPI()
+        ]);
+
+        if (batchesRes.success) {
+          setBatches(batchesRes.batches || []);
         }
-        return s;
-      });
-    } catch (err) {
-      console.error("Schedule Data Error:", err);
-      return fallback;
-    }
-  });
-
-  const [batches] = useState(BATCHES);
-  const [loading, setLoading] = useState(false);
+        if (scheduleRes.success) {
+          const loadedSessions = (scheduleRes.schedule || []).map(s => {
+            // Sanitize legacy AM/PM format
+            if (s.startTime && (s.startTime.includes('AM') || s.startTime.includes('PM'))) {
+              const parts = s.startTime.split(' ');
+              const time = parts[0];
+              const modifier = parts[1];
+              let [hours, minutes] = time.split(':');
+              if (hours === '12') hours = '00';
+              if (modifier === 'PM') hours = parseInt(hours, 10) + 12;
+              return { ...s, startTime: `${hours.toString().padStart(2, '0')}:${minutes}` };
+            }
+            return s;
+          });
+          setSessions(loadedSessions);
+        }
+      } catch (err) {
+        console.error("Error loading schedule data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   const isDateHoliday = (dateStr) => {
     return sessions.some(s => s.type === 'Holiday' && s.date === dateStr);
@@ -258,34 +315,10 @@ const Schedule = () => {
     return sessions.find(s => s.type === 'Holiday' && s.date === dateStr)?.holidayReason || 'Holiday';
   };
 
-  // Helper to generate a full timetable for a day (9 AM - 9 PM)
-  const generateDayTimetable = (dateStr) => {
-    const timetable = [];
+  // Returns only real sessions for a given date from Firestore data
+  const getSessionsForDate = (dateStr) => {
     if (isDateHoliday(dateStr)) return [];
-
-    // 9 AM to 9 PM = 12 slots
-    for (let i = 0; i < 12; i++) {
-      const hour = 9 + i;
-      const timeStr = `${hour.toString().padStart(2, '0')}:00`;
-      const batchIndex = i % batches.length; // B1 to B7 rotation
-      const batch = batches[batchIndex];
-
-      // Check if there's a custom session for this batch at this time
-      const customSess = sessions.find(s => s.date === dateStr && s.startTime === timeStr && s.batchId === batch.id && s.type !== 'Holiday');
-
-      timetable.push(customSess || {
-        id: `auto-${dateStr}-${timeStr}-${batch.id}`,
-        batchId: batch.id,
-        courseName: batch.course,
-        topic: "Standard Session",
-        date: dateStr,
-        startTime: timeStr,
-        duration: 60,
-        type: 'Class',
-        status: computeSessionStatus(dateStr, timeStr, 60, 'Class')
-      });
-    }
-    return timetable;
+    return sessions.filter(s => s.date === dateStr && s.type !== 'Holiday');
   };
 
   // UI State
@@ -318,24 +351,6 @@ const Schedule = () => {
     }
   }, [selectedSession]);
 
-  useEffect(() => {
-    try {
-      const updated = sessions.map(s => {
-        const newStatus = computeSessionStatus(s.date, s.startTime, s.duration, s.type || 'Class');
-        return s.status !== newStatus ? { ...s, status: newStatus } : s;
-      });
-
-      const hasChanged = updated.some((s, idx) => s.status !== sessions[idx].status);
-      if (hasChanged) {
-        setSessions(updated);
-      }
-
-      localStorage.setItem('trainer_sessions', JSON.stringify(updated));
-    } catch (e) {
-      console.error("Failed to save sessions:", e);
-    }
-  }, [sessions]);
-
   // Derived Data
   const weekDays = useMemo(() => {
     try {
@@ -362,10 +377,11 @@ const Schedule = () => {
 
   const displaySessions = useMemo(() => {
     const todayStr = formatDateForGrid(selectedDate);
+    let list = [];
 
     if (activeView === 'Day') {
       if (isDateHoliday(todayStr)) {
-        return [{
+        list = [{
           id: `holiday-${todayStr}`,
           date: todayStr,
           startTime: '--:--',
@@ -376,11 +392,12 @@ const Schedule = () => {
           batchId: 'GEN',
           courseName: 'All Batches'
         }];
+      } else {
+        list = filteredSessions
+          .filter(s => s.date === todayStr)
+          .sort((a, b) => a.startTime.localeCompare(b.startTime));
       }
-      return generateDayTimetable(todayStr);
-    }
-
-    if (activeView === 'Month') {
+    } else if (activeView === 'Month') {
       const month = selectedDate.getMonth();
       const year = selectedDate.getFullYear();
       const sessionsInMonth = filteredSessions.filter(s => {
@@ -410,84 +427,74 @@ const Schedule = () => {
           grouped.push(...daySessions);
         }
       });
-      return grouped;
-    }
+      list = grouped;
+    } else {
+      // Week View
+      const start = getStartOfWeek(selectedDate);
+      const weekSessions = [];
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(start);
+        d.setDate(d.getDate() + i);
+        const dateStr = formatDateForGrid(d);
 
-    // Week View
-    const start = getStartOfWeek(selectedDate);
-    const weekSessions = [];
-    for (let i = 0; i < 7; i++) {
-      const d = new Date(start);
-      d.setDate(d.getDate() + i);
-      const dateStr = formatDateForGrid(d);
-
-      if (isDateHoliday(dateStr)) {
-        weekSessions.push({
-          id: `holiday-${dateStr}`,
-          date: dateStr,
-          startTime: '--:--',
-          type: 'Holiday',
-          topic: 'Holiday',
-          holidayReason: getHolidayReason(dateStr),
-          status: 'holiday',
-          batchId: 'GEN',
-          courseName: 'All Batches'
-        });
-      } else {
-        const daySessions = filteredSessions.filter(s => s.date === dateStr);
-        weekSessions.push(...daySessions);
+        if (isDateHoliday(dateStr)) {
+          weekSessions.push({
+            id: `holiday-${dateStr}`,
+            date: dateStr,
+            startTime: '--:--',
+            type: 'Holiday',
+            topic: 'Holiday',
+            holidayReason: getHolidayReason(dateStr),
+            status: 'holiday',
+            batchId: 'GEN',
+            courseName: 'All Batches'
+          });
+        } else {
+          const daySessions = filteredSessions.filter(s => s.date === dateStr);
+          weekSessions.push(...daySessions);
+        }
       }
+      list = weekSessions.sort((a, b) => new Date(a.date) - new Date(b.date));
     }
-    return weekSessions.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    return list.map(s => {
+      const computedStatus = computeSessionStatus(s.date, s.startTime, s.duration, s.type || 'Class');
+      return { ...s, status: computedStatus };
+    });
   }, [filteredSessions, activeView, selectedDate, sessions]);
 
   const todayStr = formatDateForGrid(new Date());
   const selectedDateStr = formatDateForGrid(selectedDate);
+
   const todaySessions = useMemo(() => {
     const today = formatDateForGrid(new Date());
     if (isDateHoliday(today)) return [];
-    return generateDayTimetable(today).filter(s => s.status !== 'completed');
-  }, [sessions, batches]);
+    return sessions
+      .filter(s => s.date === today && s.type !== 'Holiday')
+      .filter(s => {
+        const status = computeSessionStatus(s.date, s.startTime, s.duration, s.type || 'Class');
+        return status !== 'completed';
+      });
+  }, [sessions]);
 
   const nextSession = useMemo(() => {
     try {
-      const now = new Date();
-      const todayStr = formatDateForGrid(now);
-
-      // Check today first
-      if (!isDateHoliday(todayStr)) {
-        const todayTimetable = generateDayTimetable(todayStr);
-        const upcomingToday = todayTimetable
-          .filter(s => s.status === 'upcoming' || s.status === 'ongoing')
-          .sort((a, b) => new Date(`${a.date}T${a.startTime}`) - new Date(`${b.date}T${b.startTime}`));
-        if (upcomingToday.length > 0) return upcomingToday[0];
-      }
-
-      // Check next 7 days
-      for (let i = 1; i <= 7; i++) {
-        const nextDate = new Date();
-        nextDate.setDate(now.getDate() + i);
-        const dateStr = formatDateForGrid(nextDate);
-        if (isDateHoliday(dateStr)) continue;
-        const timetable = generateDayTimetable(dateStr);
-        if (timetable.length > 0) return timetable[0];
-      }
-      return null;
+      return sessions
+        .filter(s => s.type !== 'Holiday')
+        .map(s => ({ ...s, status: computeSessionStatus(s.date, s.startTime, s.duration, s.type || 'Class') }))
+        .filter(s => s.status === 'upcoming' || s.status === 'ongoing')
+        .sort((a, b) => new Date(`${a.date}T${a.startTime}`) - new Date(`${b.date}T${b.startTime}`))[0] || null;
     } catch { return null; }
-  }, [sessions, batches]);
+  }, [sessions]);
 
   const weeklyClassesCount = useMemo(() => {
     const start = getStartOfWeek(new Date());
-    let count = 0;
-    for (let i = 0; i < 7; i++) {
-      const d = new Date(start);
-      d.setDate(d.getDate() + i);
-      const dateStr = formatDateForGrid(d);
-      if (isDateHoliday(dateStr)) continue;
-      count += generateDayTimetable(dateStr).length;
-    }
-    return count;
-  }, [sessions, batches]);
+    const end = new Date(start);
+    end.setDate(start.getDate() + 6);
+    const startStr = formatDateForGrid(start);
+    const endStr = formatDateForGrid(end);
+    return sessions.filter(s => s.type !== 'Holiday' && s.date >= startStr && s.date <= endStr).length;
+  }, [sessions]);
 
   // Handlers
   const navigateTime = (dir) => {
@@ -510,23 +517,41 @@ const Schedule = () => {
     setTimeout(() => setLoading(false), 300);
   };
 
-  const handleUpdateSession = (e) => {
+  const handleUpdateSession = async (e) => {
     e.preventDefault();
     if (!editSessionData) return;
 
     const durationMins = calculateDuration(editSessionData.startTime, editSessionData.endTime);
-    const updated = {
-      ...editSessionData,
-      duration: editSessionData.type === 'Holiday' ? 0 : durationMins,
-      status: computeSessionStatus(editSessionData.date, editSessionData.startTime, durationMins, editSessionData.type)
+    const updatedPayload = {
+      batchId: editSessionData.batchId,
+      courseName: editSessionData.courseName,
+      topic: editSessionData.topic,
+      date: editSessionData.date,
+      startTime: editSessionData.startTime,
+      endTime: editSessionData.endTime,
+      duration: durationMins,
+      mode: editSessionData.mode,
+      type: editSessionData.type,
+      holidayReason: editSessionData.holidayReason
     };
 
-    setSessions(prev => prev.map(s => s.id === updated.id ? updated : s));
-    setSelectedSession(null);
-    setIsEditing(false);
+    try {
+      setLoading(true);
+      const res = await updateTrainerScheduleAPI(editSessionData.id, updatedPayload);
+      if (res.success) {
+        setSessions(prev => prev.map(s => s.id === editSessionData.id ? res.session : s));
+        setSelectedSession(null);
+        setIsEditing(false);
+      }
+    } catch (err) {
+      console.error("Failed to update session:", err);
+      alert(err.message || "Failed to update session");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleAddSession = (e) => {
+  const handleAddSession = async (e) => {
     e.preventDefault();
     try {
       const { type, batchId, topic, date, startTime, endTime, mode, holidayReason } = newSessionData;
@@ -544,11 +569,9 @@ const Schedule = () => {
       const batch = batches.find(b => b.id === batchId);
       const durationMins = calculateDuration(startTime, endTime);
 
-      const newSess = {
-        id: Date.now(),
+      const sessionPayload = {
         batchId: type === 'Holiday' ? 'GEN' : (batchId || 'GEN'),
         courseName: type === 'Holiday' ? 'N/A' : (batch?.course || 'General'),
-        title: type === 'Holiday' ? 'Holiday' : topic,
         topic: type === 'Holiday' ? 'Holiday' : topic,
         date: date,
         startTime: type === 'Holiday' ? '--:--' : startTime,
@@ -557,32 +580,49 @@ const Schedule = () => {
         mode: mode,
         type: type,
         holidayReason: type === 'Holiday' ? holidayReason : '',
-        status: computeSessionStatus(date, startTime, durationMins, type)
       };
 
-      setSessions(prev => [...prev, newSess]);
-      setShowAddModal(false);
-      // Reset form
-      setNewSessionData({
-        type: 'Class',
-        batchId: '',
-        topic: '',
-        date: formatDateForGrid(new Date()),
-        startTime: '10:00',
-        endTime: '11:00',
-        mode: 'Online',
-        holidayReason: ''
-      });
+      setLoading(true);
+      const res = await createTrainerScheduleAPI(sessionPayload);
+      if (res.success) {
+        setSessions(prev => [...prev, res.session]);
+        setShowAddModal(false);
+        // Reset form
+        setNewSessionData({
+          type: 'Class',
+          batchId: '',
+          topic: '',
+          date: formatDateForGrid(new Date()),
+          startTime: '10:00',
+          endTime: '11:00',
+          mode: 'Online',
+          holidayReason: ''
+        });
+      }
     } catch (err) {
       console.error("Add Session Error:", err);
+      alert(err.message || "Failed to add session");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const resetData = () => {
-    if (window.confirm("This will clear your schedule and restore defaults. Proceed?")) {
-      localStorage.removeItem('trainer_sessions');
-      localStorage.removeItem('trainer_batches_v2');
-      window.location.reload();
+  const handleDeleteSession = async (id) => {
+    if (!window.confirm("Delete session?")) return;
+    try {
+      setLoading(true);
+      const res = await deleteTrainerScheduleAPI(id);
+      if (res.success) {
+        setSessions(prev => prev.filter(item => item.id !== id));
+        if (selectedSession && selectedSession.id === id) {
+          setSelectedSession(null);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to delete session:", err);
+      alert(err.message || "Failed to delete session");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -621,7 +661,6 @@ const Schedule = () => {
               <span>{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
             </div>
             <button className="icon-btn-v2" onClick={() => navigateTime(0)} title="Today"><Zap size={18} /></button>
-            <button className="icon-btn-v2" onClick={resetData} title="Reset Data" style={{ opacity: 0.5 }}><Trash2 size={16} /></button>
           </div>
         </div>
 
@@ -773,15 +812,13 @@ const Schedule = () => {
                           <td>
                             <div className="indicator-wrap">
                               {isToday && <span className="today-tag">Today</span>}
-                              <span className="smart-indicator">{getSmartIndicator(s?.date, s?.status, s?.type)}</span>
+                              <span className="smart-indicator">{getSmartIndicator(s?.date, s?.status, s?.type, s?.startTime)}</span>
                             </div>
                           </td>
                           <td className="actions-cell">
                             <div className="action-btns">
                               <button className="action-icon-btn" onClick={() => setSelectedSession(s)} title="View Details"><ExternalLink size={16} /></button>
-                              <button className="action-icon-btn delete" onClick={() => {
-                                if (s?.id && window.confirm("Delete session?")) setSessions(sessions.filter(item => item.id !== s.id));
-                              }} title="Delete"><Trash2 size={16} /></button>
+                              <button className="action-icon-btn delete" onClick={() => handleDeleteSession(s?.id)} title="Delete"><Trash2 size={16} /></button>
                             </div>
                           </td>
                         </tr>
@@ -871,11 +908,9 @@ const Schedule = () => {
                   {newSessionData.type === 'Class' && (
                     <div className="v2-form-group">
                       <label>Start Time</label>
-                      <input
-                        type="time"
+                      <CustomTimePicker
                         value={newSessionData.startTime}
-                        onChange={(e) => setNewSessionData({ ...newSessionData, startTime: e.target.value })}
-                        required
+                        onChange={(val) => setNewSessionData({ ...newSessionData, startTime: val })}
                       />
                     </div>
                   )}
@@ -885,11 +920,9 @@ const Schedule = () => {
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                     <div className="v2-form-group">
                       <label>End Time</label>
-                      <input
-                        type="time"
+                      <CustomTimePicker
                         value={newSessionData.endTime}
-                        onChange={(e) => setNewSessionData({ ...newSessionData, endTime: e.target.value })}
-                        required
+                        onChange={(val) => setNewSessionData({ ...newSessionData, endTime: val })}
                       />
                     </div>
                     <div className="v2-form-group">
@@ -916,7 +949,7 @@ const Schedule = () => {
         {selectedSession && (
           <div className="modal-overlay-v2">
             <div className={`detail-card-glass ${isEditing ? 'editing' : ''}`}>
-              <div className={`card-header batch-${editSessionData?.batchId?.toLowerCase() || 'gen'}`}>
+              <div className={`detail-card-header batch-${editSessionData?.batchId?.toLowerCase() || 'gen'}`}>
                 <div className="header-top">
                   <span className="type-pill">{editSessionData?.type}</span>
                   <button onClick={() => setSelectedSession(null)} className="card-close-btn"><X size={20} /></button>
@@ -964,16 +997,14 @@ const Schedule = () => {
                           <label>Time & Duration</label>
                           {isEditing ? (
                             <div className="time-edit-group">
-                              <input
-                                type="time"
-                                value={editSessionData?.startTime}
-                                onChange={(e) => setEditSessionData({ ...editSessionData, startTime: e.target.value })}
+                              <CustomTimePicker
+                                value={editSessionData?.startTime || '10:00'}
+                                onChange={(val) => setEditSessionData({ ...editSessionData, startTime: val })}
                               />
                               <span>to</span>
-                              <input
-                                type="time"
-                                value={editSessionData?.endTime}
-                                onChange={(e) => setEditSessionData({ ...editSessionData, endTime: e.target.value })}
+                              <CustomTimePicker
+                                value={editSessionData?.endTime || '11:00'}
+                                onChange={(val) => setEditSessionData({ ...editSessionData, endTime: val })}
                               />
                             </div>
                           ) : (
@@ -1025,7 +1056,7 @@ const Schedule = () => {
                   <div className={`status-pill ${selectedSession.status}`}>
                     {selectedSession.status.toUpperCase()}
                   </div>
-                  <span className="card-indicator">{getSmartIndicator(selectedSession.date, selectedSession.status, selectedSession.type)}</span>
+                  <span className="card-indicator">{getSmartIndicator(selectedSession.date, selectedSession.status, selectedSession.type, selectedSession.startTime)}</span>
                 </div>
               </div>
 
@@ -1056,12 +1087,7 @@ const Schedule = () => {
                     )}
                     <button
                       className="delete-action-btn"
-                      onClick={() => {
-                        if (window.confirm("Delete this session?")) {
-                          setSessions(sessions.filter(s => s.id !== selectedSession.id));
-                          setSelectedSession(null);
-                        }
-                      }}
+                      onClick={() => handleDeleteSession(selectedSession.id)}
                     >
                       <Trash2 size={18} />
                     </button>

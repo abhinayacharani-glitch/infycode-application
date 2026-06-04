@@ -7,7 +7,7 @@ import {
   Monitor, Layout, Database, Zap, AlertCircle,
   Edit2, Trash2, Circle
 } from 'lucide-react';
-import { getBatchStudentsAPI } from '../../../services/api';
+import { getBatchStudentsAPI, getTrainerScheduleAPI, createTrainerScheduleAPI } from '../../../services/api';
 import './BatchDetails.css';
 
 // 0. CENTRALIZED DATA SOURCE with DYNAMIC content
@@ -264,32 +264,36 @@ const BatchDetails = () => {
     return 'planned';
   };
 
-  // Use global schedule storage filtered by batchId
-  const [batchSessions, setBatchSessions] = useState(() => {
-    const fallback = [
-      { id: 1, topic: "React Context API", date: "2026-04-15", time: "09:00 AM", duration: "2h", status: computeSessionStatus("2026-04-15") },
-      { id: 2, topic: "Redux State Management", date: "2026-04-16", time: "10:00 AM", duration: "2h", status: computeSessionStatus("2026-04-16") },
-      { id: 3, topic: "Node.js Express Basics", date: "2026-04-17", time: "11:00 AM", duration: "2.5h", status: computeSessionStatus("2026-04-17") }
-    ];
-    try {
-      const stored = localStorage.getItem('trainer_sessions');
-      if (stored) {
-        const allSessions = JSON.parse(stored);
-        const mySessions = allSessions.filter(s => s.batchId === batchId);
-        if (mySessions.length > 0) {
-          return mySessions.map(s => ({
-            id: s.id,
-            topic: s.topic,
-            date: s.date,
-            time: s.startTime,
-            duration: `${s.duration}m`,
-            status: computeSessionStatus(s.date)
-          })).sort((a, b) => new Date(`${a.date} ${a.time}`) - new Date(`${b.date} ${b.time}`));
+  const [batchSessions, setBatchSessions] = useState([]);
+  const [loadingSessions, setLoadingSessions] = useState(true);
+
+  useEffect(() => {
+    const fetchSessions = async () => {
+      try {
+        setLoadingSessions(true);
+        const res = await getTrainerScheduleAPI();
+        if (res.success) {
+          const allSessions = res.schedule || [];
+          const mySessions = allSessions.filter(s => s.batchId === batchId);
+          setBatchSessions(
+            mySessions.map(s => ({
+              id: s.id,
+              topic: s.topic,
+              date: s.date,
+              time: s.startTime,
+              duration: `${s.duration}m`,
+              status: computeSessionStatus(s.date)
+            })).sort((a, b) => new Date(`${a.date}T${a.startTime || '00:00'}`) - new Date(`${b.date}T${b.startTime || '00:00'}`))
+          );
         }
+      } catch (err) {
+        console.error("Failed to fetch sessions for batch:", err);
+      } finally {
+        setLoadingSessions(false);
       }
-      return fallback;
-    } catch { return fallback; }
-  });
+    };
+    fetchSessions();
+  }, [batchId]);
 
   const [history, setHistory] = useState(() => {
     try {
@@ -394,12 +398,13 @@ const BatchDetails = () => {
     setShowAddStudentModal(false);
   };
 
-  const handleSessionSubmit = (e) => {
+  const handleSessionSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
 
     // Convert 24hr time (14:30) to 12hr AM/PM (02:30 PM) display string
     let formattedTime = formData.get('time');
+    let rawTime = formattedTime; // keep 24hr time for startTime parameter
     if (formattedTime) {
       let [hours, minutes] = formattedTime.split(':');
       let h = parseInt(hours, 10);
@@ -408,58 +413,60 @@ const BatchDetails = () => {
       formattedTime = `${h.toString().padStart(2, '0')}:${minutes} ${ampm}`;
     }
 
-    // 1. Create local batch session object
-    const newSession = {
-      id: Date.now(),
+    let durationStr = formData.get('duration');
+    let durationMins = parseInt(durationStr) || 60;
+    if (durationStr && durationStr.toLowerCase().includes('h')) {
+      durationMins = parseFloat(durationStr) * 60;
+    }
+
+    // compute end time based on start time and duration
+    let endTime = '';
+    if (rawTime) {
+      let [h, m] = rawTime.split(':').map(Number);
+      let endMins = h * 60 + m + durationMins;
+      let eh = Math.floor(endMins / 60) % 24;
+      let em = endMins % 60;
+      endTime = `${eh.toString().padStart(2, '0')}:${em.toString().padStart(2, '0')}`;
+    }
+
+    const sessionPayload = {
+      batchId: batchId,
+      courseName: baseBatch?.title || 'General Course',
       topic: formData.get('topic'),
       date: formData.get('date'),
-      time: formattedTime,
-      duration: formData.get('duration'),
-      status: formData.get('status')
+      startTime: rawTime || '10:00',
+      endTime: endTime || '11:00',
+      duration: durationMins,
+      mode: baseBatch?.mode || 'Online',
+      type: 'Class',
+      holidayReason: ''
     };
 
-    setBatchSessions(prev => [...prev, newSession]);
-
-    // Add history entry for the new session
-    setHistory(prev => [{
-      id: Date.now(),
-      type: "SESSION",
-      message: `Scheduled new session: ${newSession.topic}`,
-      time: "Just now"
-    }, ...prev]);
-
-    // 2. Sync to global schedule (trainer_sessions)
     try {
-      const globalSessionsStr = localStorage.getItem('trainer_sessions');
-      let globalSessions = [];
-      if (globalSessionsStr) {
-        globalSessions = JSON.parse(globalSessionsStr);
+      const res = await createTrainerScheduleAPI(sessionPayload);
+      if (res.success) {
+        const s = res.session;
+        const newSession = {
+          id: s.id,
+          topic: s.topic,
+          date: s.date,
+          time: s.startTime,
+          duration: `${s.duration}m`,
+          status: computeSessionStatus(s.date)
+        };
+        setBatchSessions(prev => [...prev, newSession].sort((a, b) => new Date(`${a.date}T${a.time || '00:00'}`) - new Date(`${b.date}T${b.time || '00:00'}`)));
+
+        // Add history entry for the new session
+        setHistory(prev => [{
+          id: Date.now(),
+          type: "SESSION",
+          message: `Scheduled new session: ${newSession.topic}`,
+          time: "Just now"
+        }, ...prev]);
       }
-      if (!Array.isArray(globalSessions)) globalSessions = [];
-
-      let durationStr = formData.get('duration');
-      let durationMins = parseInt(durationStr) || 60;
-      if (durationStr.toLowerCase().includes('h')) {
-        durationMins = parseFloat(durationStr) * 60;
-      }
-
-      const newGlobalSession = {
-        id: newSession.id,
-        batchId: batchId,
-        courseName: baseBatch?.title || 'General Course',
-        topic: newSession.topic,
-        date: newSession.date,
-        startTime: formattedTime || newSession.time,
-        duration: durationMins,
-        mode: baseBatch?.mode || 'Online',
-        status: newSession.status === 'Completed' ? 'Completed' : 'Upcoming',
-        endTime: "" // Placeholder per requirement
-      };
-
-      globalSessions.push(newGlobalSession);
-      localStorage.setItem('trainer_sessions', JSON.stringify(globalSessions));
     } catch (err) {
-      console.error("Failed to sync session to global schedule:", err);
+      console.error("Failed to save session to backend:", err);
+      alert(err.message || "Failed to schedule session");
     }
 
     setShowAddSessionModal(false);
