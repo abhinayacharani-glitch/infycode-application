@@ -67,6 +67,16 @@
   font-weight: 500;
 }
 
+.session-link-hint {
+  display: flex;
+  align-items: center;
+  font-size: 11px;
+  color: #10b981;
+  font-weight: 600;
+  margin: 4px 0 0;
+  gap: 2px;
+}
+
 .session-actions {
   display: flex;
   align-items: center;

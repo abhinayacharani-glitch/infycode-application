@@ -804,10 +804,17 @@ export const saveTrainerLiveSessionAPI = (payload) =>
     body: JSON.stringify(payload),
   });
 
+/** GET /api/student/live-session/:batchId — also usable by trainer to retrieve saved meeting link */
+export const getTrainerLiveSessionConfigAPI = (batchId) =>
+  request(`/api/student/live-session/${batchId}`, {
+    headers: getAuthHeader(),
+  });
+
 export const getStudentLiveSessionAPI = (batchId) =>
   request(`/api/student/live-session/${batchId}`, {
     headers: getAuthHeader(),
   });
+
 
 export const getStudentNotificationsAPI = () =>
   request('/api/student/notifications', {

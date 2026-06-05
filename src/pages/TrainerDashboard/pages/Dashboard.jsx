@@ -4,205 +4,246 @@ import {
   Users,
   Layers,
   Calendar,
-  CheckCircle,
   Clock,
   Play,
   Upload,
-  UserCheck,
   MessageSquare,
-  FileText,
   TrendingUp,
   AlertCircle,
-  ExternalLink,
   ChevronRight,
-  ArrowRight
 } from 'lucide-react';
 import { useTrainer } from '../../../context/TrainerContext';
 import LiveSessionCard from '../components/LiveSessionCard';
-import { getTrainerBatchesAPI, getTrainerScheduleAPI, getTrainerQueriesAPI } from '../../../services/api';
+import {
+  getTrainerBatchesAPI,
+  getTrainerScheduleAPI,
+  getTrainerQueriesAPI,
+  getTrainerLiveSessionConfigAPI,
+} from '../../../services/api';
 import './Dashboard.css';
 
-const Counter = ({ target, isDecimal = false }) => {
+// ─── Animated counter ───────────────────────────────────────────────────────
+const Counter = ({ target }) => {
   const [count, setCount] = useState(0);
-
   useEffect(() => {
     let s = 0;
     const dur = 1400;
     const step = 16;
     const inc = target / (dur / step);
-
     const t = setInterval(() => {
       s += inc;
-      if (s >= target) {
-        s = target;
-        clearInterval(t);
-      }
+      if (s >= target) { s = target; clearInterval(t); }
       setCount(s);
     }, step);
-
     return () => clearInterval(t);
   }, [target]);
-
-  return <span>{isDecimal ? count.toFixed(1) : Math.floor(count)}</span>;
+  return <span>{Math.floor(count)}</span>;
 };
 
+// ─── Skeleton placeholder card ──────────────────────────────────────────────
 const SkeletonCard = () => (
   <div className="modern-card skeleton-pulse">
     <div className="card-main-content">
-      <div className="skeleton-icon"></div>
+      <div className="skeleton-icon" />
       <div className="card-details">
-        <div className="skeleton-line title"></div>
-        <div className="skeleton-line sub"></div>
-        <div className="skeleton-line progress"></div>
+        <div className="skeleton-line title" />
+        <div className="skeleton-line sub" />
+        <div className="skeleton-line progress" />
       </div>
     </div>
-    <div className="skeleton-btn"></div>
+    <div className="skeleton-btn" />
   </div>
 );
 
+// ─── Helpers ────────────────────────────────────────────────────────────────
 const formatTimeToAMPM = (time24) => {
   if (!time24 || !time24.includes(':')) return time24;
   const [hours, minutes] = time24.split(':');
   let h = parseInt(hours, 10);
   const ampm = h >= 12 ? 'PM' : 'AM';
-  h = h % 12;
-  h = h ? h : 12;
+  h = h % 12 || 12;
   return `${h}:${minutes} ${ampm}`;
 };
 
+/**
+ * Returns 'upcoming' | 'ongoing' | 'completed' based on the current time
+ * compared to the session start time + duration.
+ */
+const computeRealtimeStatus = (dateStr, startTime, duration) => {
+  if (!dateStr || !startTime || startTime === '--:--') return 'upcoming';
+  try {
+    const now = new Date();
+    const start = new Date(`${dateStr}T${startTime}`);
+    const durationMins = parseInt(duration) || 60;
+    const end = new Date(start.getTime() + durationMins * 60 * 1000);
+    if (now < start) return 'upcoming';
+    if (now >= start && now <= end) return 'ongoing';
+    return 'completed';
+  } catch {
+    return 'upcoming';
+  }
+};
+
+// ─── Main component ─────────────────────────────────────────────────────────
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
-  const [dashData, setDashData] = useState(null);
   const { trainerData } = useTrainer();
-  const userName = trainerData.fullName || trainerData.fullname || trainerData.name || "Trainer";
+  const userName = trainerData.fullName || trainerData.fullname || trainerData.name || 'Trainer';
 
-  const [activeBatches, setActiveBatches] = useState(0);
-  const [totalStudents, setTotalStudents] = useState(0);
+  const [isLoading, setIsLoading]               = useState(true);
+  const [dashData,  setDashData]                = useState(null);
+  const [activeBatches, setActiveBatches]       = useState(0);
+  const [totalStudents, setTotalStudents]       = useState(0);
   const [sessionsTodayCount, setSessionsTodayCount] = useState(0);
-  const [schedule, setSchedule] = useState([]);
+  const [schedule, setSchedule]                 = useState([]);
+  const [refreshTick, setRefreshTick]           = useState(0);
 
+  // ── Data loader ────────────────────────────────────────────────────────────
   useEffect(() => {
     const loadDashboardData = async () => {
       try {
         setIsLoading(true);
 
-        // 1. Fetch Batches
+        // 1. Batches
         const batchesRes = await getTrainerBatchesAPI();
-        let batchesList = [];
-        if (batchesRes.success) {
-          batchesList = batchesRes.batches || [];
-        }
-        
-        // 2. Fetch Schedule
+        const batchesList = batchesRes.success ? (batchesRes.batches || []) : [];
+
+        // 2. Schedule
         const scheduleRes = await getTrainerScheduleAPI();
-        let scheduleList = [];
-        if (scheduleRes.success) {
-          scheduleList = scheduleRes.schedule || [];
-        }
+        const scheduleList = scheduleRes.success ? (scheduleRes.schedule || []) : [];
 
-        // 3. Fetch Queries
+        // 3. Queries
         const queriesRes = await getTrainerQueriesAPI();
-        let queriesList = [];
-        if (queriesRes.success) {
-          queriesList = queriesRes.queries || [];
-        }
+        const queriesList = queriesRes.success ? (queriesRes.queries || []) : [];
 
-        // Calculate dynamic stats
-        const activeCount = batchesList.length;
+        // 4. Fetch meeting links for every unique batchId in one pass
+        const uniqueBatchIds = [...new Set(scheduleList.map(s => s.batchId).filter(Boolean))];
+        const meetingLinkMap = {};
+        await Promise.all(
+          uniqueBatchIds.map(async (batchId) => {
+            try {
+              const res = await getTrainerLiveSessionConfigAPI(batchId);
+              if (res.success && res.config?.sessionLink) {
+                meetingLinkMap[batchId] = res.config.sessionLink;
+              }
+            } catch (_) { /* ignore per-batch errors */ }
+          })
+        );
+
+        // 5. Stats
+        const activeCount   = batchesList.length;
         const studentsCount = batchesList.reduce((sum, b) => sum + (parseInt(b.students) || 0), 0);
 
-        // Filter sessions scheduled for today (local timezone date comparison)
-        const todayStr = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD format
-        const todaysSessions = scheduleList.filter(s => s.date === todayStr);
+        // 6. Today's non-holiday sessions with real-time status + meeting link
+        const todayStr      = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+        const todaysSessions = scheduleList.filter(
+          s => s.date === todayStr && s.type !== 'Holiday'
+        );
 
         const formattedSessions = todaysSessions.map(s => {
-          const matchingBatch = batchesList.find(b => b.id === s.batchId || b.name === s.batchName || b.firebaseId === s.batchId);
+          const matchingBatch   = batchesList.find(
+            b => b.id === s.batchId || b.firebaseId === s.batchId
+          );
+          const realtimeStatus  = computeRealtimeStatus(s.date, s.startTime, s.duration);
+          const meetingLink     = meetingLinkMap[s.batchId] || s.meetingLink || '';
           return {
-            id: s.id,
-            time: formatTimeToAMPM(s.startTime),
-            course: s.courseName || s.course || "Live Session",
-            batch: s.batchName || s.batchId || "Batch",
+            id:       s.id,
+            time:     formatTimeToAMPM(s.startTime),
+            rawTime:  s.startTime,
+            course:   s.courseName || s.course || 'Live Session',
+            batch:    s.batchName  || s.batchId || 'Batch',
             students: matchingBatch ? matchingBatch.students : 0,
-            duration: s.duration || "2h",
-            mode: s.mode || "Online",
-            status: s.status || "Upcoming",
-            active: s.status === "In Progress",
-            link: s.meetingLink || ""
+            duration: s.duration   || 60,
+            mode:     s.mode       || 'Online',
+            status:   realtimeStatus,
+            active:   realtimeStatus === 'ongoing',
+            link:     meetingLink,
+            date:     s.date,
           };
         });
+
+        // 7. Show only next 2 upcoming/ongoing sessions sorted by time
+        const upcomingSessions = formattedSessions
+          .filter(s => s.status === 'upcoming' || s.status === 'ongoing')
+          .sort((a, b) => (a.rawTime || '').localeCompare(b.rawTime || ''))
+          .slice(0, 2);
 
         setActiveBatches(activeCount);
         setTotalStudents(studentsCount);
         setSessionsTodayCount(todaysSessions.length);
-        setSchedule(formattedSessions);
+        setSchedule(upcomingSessions);
 
-        // Format Queries Info
-        const unreadQueries = queriesList.filter(q => !q.readByTrainer);
+        // 8. Queries data
+        const unreadQueries  = queriesList.filter(q => !q.readByTrainer);
         const latestQueryText = unreadQueries.length > 0
-          ? (unreadQueries[0].queryText || unreadQueries[0].message || "New query pending review")
-          : "No pending student queries.";
+          ? (unreadQueries[0].queryText || unreadQueries[0].message || 'New query pending review')
+          : 'No pending student queries.';
 
         const studentMap = new Map();
         unreadQueries.forEach(q => {
-          const name = q.studentName || "Student";
+          const name = q.studentName || 'Student';
           const initials = name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
           studentMap.set(name, initials);
         });
 
-        const queryAvatars = Array.from(studentMap.entries()).slice(0, 3).map(([name, initials], idx) => {
-          const colors = [
-            { color: "#6366F1", bg: "#EEF2FF" },
-            { color: "#10B981", bg: "#ECFDF5" },
-            { color: "#F59E0B", bg: "#FFFBEB" }
-          ];
-          return {
-            initials,
-            color: colors[idx % colors.length].color,
-            bg: colors[idx % colors.length].bg
-          };
-        });
+        const palette = [
+          { color: '#6366F1', bg: '#EEF2FF' },
+          { color: '#10B981', bg: '#ECFDF5' },
+          { color: '#F59E0B', bg: '#FFFBEB' },
+        ];
+        const queryAvatars = Array.from(studentMap.entries())
+          .slice(0, 3)
+          .map(([, initials], idx) => ({ initials, ...palette[idx % palette.length] }));
 
         setDashData({
           materials: {
-            moduleName: batchesList.length > 0 
+            moduleName: batchesList.length > 0
               ? `Manage syllabuses and files for ${batchesList[0].name || batchesList[0].course}`
-              : "Upload files for your assigned courses.",
-            uploaded: ["Syllabus overview", "Reference guidelines"],
-            pending: ["Video tutorial links"]
+              : 'Upload files for your assigned courses.',
+            uploaded: ['Syllabus overview', 'Reference guidelines'],
+            pending:  ['Video tutorial links'],
           },
           queries: {
-            count: unreadQueries.length,
+            count:         unreadQueries.length,
             latestMessage: latestQueryText,
-            students: queryAvatars,
-            totalAvatars: studentMap.size
-          }
+            students:      queryAvatars,
+            totalAvatars:  studentMap.size,
+          },
         });
 
         setIsLoading(false);
       } catch (error) {
-        console.error("Error loading trainer dashboard:", error);
+        console.error('Error loading trainer dashboard:', error);
         setIsLoading(false);
       }
     };
 
     loadDashboardData();
+  }, [refreshTick]);
+
+  // Auto-refresh every 60 s so completed sessions drop off automatically
+  useEffect(() => {
+    const interval = setInterval(() => setRefreshTick(t => t + 1), 60_000);
+    return () => clearInterval(interval);
   }, []);
 
+  // ── KPI config ─────────────────────────────────────────────────────────────
   const kpis = [
-    { label: 'Active Batches', value: activeBatches, trend: 'Updated', icon: <Layers size={22} />, color: 'blue' },
-    { label: 'Total Students', value: totalStudents, trend: 'Updated', icon: <Users size={22} />, color: 'green' },
-    { label: 'Sessions Today', value: sessionsTodayCount, trend: 'Today', icon: <Calendar size={22} />, color: 'amber' },
+    { label: 'Active Batches',  value: activeBatches,       trend: 'Updated', icon: <Layers size={22} />,   color: 'blue'  },
+    { label: 'Total Students',  value: totalStudents,        trend: 'Updated', icon: <Users size={22} />,    color: 'green' },
+    { label: 'Sessions Today',  value: sessionsTodayCount,  trend: 'Today',   icon: <Calendar size={22} />, color: 'amber' },
   ];
 
+  // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <div className="dashboard-container-v2 animate-fade-in">
-      {/* Welcome Banner — Restored with identical design */}
+
+      {/* Welcome Banner */}
       <div className="dashboard-banner">
         <div className="banner-content">
           <div className="banner-left">
             <h1>Welcome Back, {userName}!</h1>
-            <p>Here’s what’s happening with your batches today.</p>
+            <p>Here's what's happening with your batches today.</p>
           </div>
         </div>
       </div>
@@ -210,14 +251,12 @@ const Dashboard = () => {
       {/* KPI CARDS */}
       <div className="dashboard-kpi-row-v2">
         {kpis.map((kpi, idx) => (
-          <div key={idx} className={`kpi-card-v2`}>
+          <div key={idx} className="kpi-card-v2">
             <div className={`kpi-icon-v2 ${kpi.color}`}>{kpi.icon}</div>
             <div className="kpi-info-v2">
               <span className="kpi-label-v2">{kpi.label}</span>
-              <h3 className="kpi-value-v2">
-                <Counter target={kpi.value} />
-              </h3>
-              <span className={`kpi-trend-v2 pos`}>{kpi.trend}</span>
+              <h3 className="kpi-value-v2"><Counter target={kpi.value} /></h3>
+              <span className="kpi-trend-v2 pos">{kpi.trend}</span>
             </div>
           </div>
         ))}
@@ -226,7 +265,7 @@ const Dashboard = () => {
       {/* MAIN LAYOUT */}
       <div className="dashboard-main-content-v2">
 
-        {/* TOP SECTION: Today's Class */}
+        {/* TODAY'S LIVE SESSIONS */}
         <section className="dashboard-section-v2">
           <div className="section-header-v2">
             <h2 className="section-title-v2">Today's Live Sessions</h2>
@@ -235,63 +274,65 @@ const Dashboard = () => {
             </button>
           </div>
           <div className="schedule-list-v2">
-            {schedule.length > 0 ? (
+            {isLoading ? (
+              <>
+                <div className="schedule-item-saas skeleton-pulse" style={{ height: 72 }} />
+                <div className="schedule-item-saas skeleton-pulse" style={{ height: 72 }} />
+              </>
+            ) : schedule.length > 0 ? (
               schedule.map((session, idx) => (
-                <LiveSessionCard key={idx} session={session} />
+                <LiveSessionCard key={session.id || idx} session={session} />
               ))
             ) : (
               <div className="empty-state-v2" style={{ padding: '24px', textAlign: 'center', color: '#64748b' }}>
                 <Calendar size={36} style={{ marginBottom: '12px', opacity: 0.5 }} />
-                <p style={{ fontWeight: 600 }}>No live classes scheduled for today.</p>
+                <p style={{ fontWeight: 600 }}>No upcoming live classes for today.</p>
               </div>
             )}
           </div>
         </section>
 
-        {/* PENDING ACTIONS GRID */}
+        {/* PENDING ACTIONS */}
         <section className="dashboard-section-v2">
           <div className="section-header-v2">
             <h2 className="section-title-v2">Pending Actions</h2>
           </div>
           <div className="pending-actions-grid-v2">
             {isLoading ? (
-              <>
-                <SkeletonCard />
-                <SkeletonCard />
-              </>
+              <><SkeletonCard /><SkeletonCard /></>
             ) : dashData ? (
               <>
                 {/* Materials Card */}
-                <div className="modern-card materials-card-v2 clickable" onClick={() => navigate('/trainer-dashboard/materials')}>
+                <div
+                  className="modern-card materials-card-v2 clickable"
+                  onClick={() => navigate('/trainer-dashboard/materials')}
+                >
                   <div className="card-main-content">
-                    <div className="card-icon-wrapper">
-                      <Upload size={26} />
-                    </div>
+                    <div className="card-icon-wrapper"><Upload size={26} /></div>
                     <div className="card-details">
                       <h4>Upload Materials</h4>
                       <p className="module-name">{dashData.materials.moduleName}</p>
                       <div className="upload-items">
                         {dashData.materials.uploaded.map((item, i) => (
-                          <span key={i} className="upload-item"><div className="dot"></div> {item}</span>
+                          <span key={i} className="upload-item"><div className="dot" /> {item}</span>
                         ))}
                         {dashData.materials.pending.map((item, i) => (
-                          <span key={i} className="upload-item pending"><div className="dot grey"></div> {item} (Pending)</span>
+                          <span key={i} className="upload-item pending"><div className="dot grey" /> {item} (Pending)</span>
                         ))}
                       </div>
                     </div>
-                    <button className="modern-card-cta secondary">
-                      Upload Files <Upload size={16} />
-                    </button>
+                    <button className="modern-card-cta secondary">Upload Files <Upload size={16} /></button>
                   </div>
                 </div>
 
                 {/* Queries Card */}
-                <div className="modern-card queries-card-v2 clickable" onClick={() => navigate('/trainer-dashboard/student-connect')}>
+                <div
+                  className="modern-card queries-card-v2 clickable"
+                  onClick={() => navigate('/trainer-dashboard/student-connect')}
+                >
                   <div className="card-main-content">
                     <span className="query-count">{dashData.queries.count} New Messages</span>
-                    <div className="card-icon-wrapper">
-                      <MessageSquare size={26} />
-                    </div>
+                    <div className="card-icon-wrapper"><MessageSquare size={26} /></div>
                     <div className="card-details">
                       <h4>Respond to Queries</h4>
                       <p className="message-preview">"{dashData.queries.latestMessage}"</p>
@@ -307,13 +348,11 @@ const Dashboard = () => {
                           </div>
                         )}
                         <p className="avatar-text">
-                          {dashData.queries.count > 0 ? "Students are waiting" : "All caught up"}
+                          {dashData.queries.count > 0 ? 'Students are waiting' : 'All caught up'}
                         </p>
                       </div>
                     </div>
-                    <button className="modern-card-cta accent">
-                      Open Queries <MessageSquare size={16} />
-                    </button>
+                    <button className="modern-card-cta accent">Open Queries <MessageSquare size={16} /></button>
                   </div>
                 </div>
               </>
@@ -326,7 +365,7 @@ const Dashboard = () => {
           </div>
         </section>
 
-        {/* QUICK INSIGHTS ROW */}
+        {/* QUICK INSIGHTS */}
         <section className="dashboard-section-v2">
           <div className="section-header-v2">
             <h2 className="section-title-v2">Quick Insights</h2>

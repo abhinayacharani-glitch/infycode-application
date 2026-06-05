@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getTrainerBatchesAPI, saveTrainerLiveSessionAPI } from "../../../services/api";
+import { ArrowLeft } from "lucide-react";
 import "./LiveSession.css";
 
 const timeOptions = Array.from({ length: 14 }, (_, i) => {
@@ -17,6 +18,7 @@ const days = [
 
 const LiveSession = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { topic, date, time } = location.state || {};
 
   const getTodayName = () => days[(new Date().getDay() + 6) % 7];
@@ -124,8 +126,15 @@ const LiveSession = () => {
   return (
     <div className="live-session-container">
 
+      <div className="back-btn-wrapper">
+        <button className="back-btn" onClick={() => navigate('/trainer-dashboard/schedule')}>
+          <ArrowLeft size={18} />
+          <span>Back</span>
+        </button>
+      </div>
+
       {/* 🔥 HEADER */}
-      <div className="page-header">
+      <div className="page-header" style={{ width: "100%", maxWidth: "450px" }}>
         <h1>Live Session</h1>
         <p>
           Manage and start your live classroom sessions
