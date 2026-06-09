@@ -93,7 +93,6 @@ export const unifiedLogin = async (req, res) => {
     if (normalizedEmail.endsWith("@outlook.com")) {
       const snapshot = await trainersRef
         .where("email", "==", normalizedEmail)
-        .limit(1)
         .get();
 
       if (snapshot.empty) {
@@ -103,8 +102,21 @@ export const unifiedLogin = async (req, res) => {
         });
       }
 
-      const doc = snapshot.docs[0];
+      // If there are multiple documents (e.g. an application doc and a registration doc),
+      // find the one that has a password set.
+      let doc = snapshot.docs.find(d => d.data().password);
+      if (!doc) {
+        doc = snapshot.docs[0];
+      }
+
       const userData = { id: doc.id, ...doc.data() };
+
+      if (!userData.password) {
+        return res.status(400).json({
+          success: false,
+          message: "Trainer account is not fully set up. Please register first.",
+        });
+      }
 
       // Validate password
       const isMatch = await bcrypt.compare(password, userData.password);
@@ -148,6 +160,13 @@ export const unifiedLogin = async (req, res) => {
 
     const doc = snapshot.docs[0];
     const userData = { id: doc.id, ...doc.data() };
+
+    if (!userData.password) {
+      return res.status(400).json({
+        success: false,
+        message: "Account is not fully set up. Please register first.",
+      });
+    }
 
     const isMatch = await bcrypt.compare(password, userData.password);
     if (!isMatch) {
