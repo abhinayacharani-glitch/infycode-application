@@ -16,7 +16,10 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { getCourseImage } from '../../../utils/courseUtils';
-import { getStudentBatchesAPI } from '../../../services/api';
+import {
+  getStudentBatchesAPI,
+  getStudentLiveSessionAPI
+} from '../../../services/api';
 import './Courseoverview.css';
 
 const daysOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -39,15 +42,14 @@ const formatCountdown = (ms) => {
 };
 
 const getDayStatus = (dayName, dayData, now) => {
-  if (dayData?.status === 'cancelled') {
-    return { state: 'cancelled', text: `Cancelled` };
+  if (!dayData || !dayData.enabled) {
+    return { state: 'cancelled', text: dayData?.reason ? `Holiday: ${dayData.reason}` : `Cancelled` };
   }
-  if (dayData?.status !== 'scheduled') return { state: 'completed', text: 'Over' };
 
-  const currentDayIndex = (now.getDay() + 6) % 7;
+  const currentDayIndex = (now.getDay() + 6) % 7; // Monday = 0
   const itemDayIndex = daysOrder.indexOf(dayName);
-  const startMinutes = parse12HourToMinutes(dayData.startTime);
-  const endMinutes = parse12HourToMinutes(dayData.endTime);
+  const startMinutes = parse12HourToMinutes(dayData.start);
+  const endMinutes = parse12HourToMinutes(dayData.end);
   const nowMinutes = (now.getHours() * 60) + now.getMinutes();
 
   if (itemDayIndex === currentDayIndex) {
@@ -73,11 +75,15 @@ const getDayStatus = (dayName, dayData, now) => {
 };
 
 const getOverallStatus = (config, now) => {
-  if (!config || !config.sessionLink) return 'no-link';
-  const liveSessionRaw = localStorage.getItem('liveSessionData');
-  const dayWiseData = liveSessionRaw ? JSON.parse(liveSessionRaw) : {};
+  if (!config || !config.sessionLink || !config.weeklySchedule) return 'no-link';
+  
   const todayName = daysOrder[(now.getDay() + 6) % 7];
-  const todayStatus = getDayStatus(todayName, dayWiseData[todayName], now);
+  const todaySchedule = config.weeklySchedule.find(item => item.day === todayName);
+  
+  if (todaySchedule && !todaySchedule.enabled) return 'cancelled';
+  if (!todaySchedule) return 'ended';
+  
+  const todayStatus = getDayStatus(todayName, todaySchedule, now);
   if (todayStatus.state === 'live') return 'live';
   if (todayStatus.state === 'upcoming') return 'upcoming';
   return 'ended';
@@ -116,10 +122,23 @@ const CourseOverview = () => {
   }, [publishedCourses, courseId]);
 
   const [sessionStatus, setSessionStatus] = useState('no-link');
-  const [sessionConfig, setSessionConfig] = useState(null);
+  const [sessionConfig, setSessionConfig] = useState({
+    sessionLink: "https://meet.google.com/abc-defg-hij",
+    weeklySchedule: [
+      { day: "Monday", start: "09:00 AM", end: "10:00 AM", enabled: true },
+      { day: "Tuesday", start: "09:00 AM", end: "10:00 AM", enabled: true },
+      { day: "Wednesday", start: "09:00 AM", end: "10:00 AM", enabled: true },
+      { day: "Thursday", start: "09:00 AM", end: "10:00 AM", enabled: true },
+      { day: "Friday", start: "09:00 AM", end: "10:00 AM", enabled: true },
+      { day: "Saturday", start: "09:00 AM", end: "10:00 AM", enabled: false, reason: "Weekend" },
+      { day: "Sunday", start: "09:00 AM", end: "10:00 AM", enabled: false, reason: "Weekend" }
+    ]
+  });
   const [dayStatuses, setDayStatuses] = useState([]);
   const [myBatches, setMyBatches] = useState({});
   const [isLoadingBatches, setIsLoadingBatches] = useState(true);
+
+
 
   // 1. Fetch student batches on mount
   useEffect(() => {
@@ -136,18 +155,12 @@ const CourseOverview = () => {
       }
     };
     fetchBatches();
-
-    // Polling every 1 second for near-instant updates
-    const pollInterval = setInterval(fetchBatches, 1000);
-    return () => clearInterval(pollInterval);
   }, []);
 
   // 2. Resolve Dynamic Course Data (Trainer & Batch)
-  // If the student is assigned to a batch for this course, override details
   const dynamicCourse = React.useMemo(() => {
     if (!course) return null;
 
-    // Try to find a match in myBatches by course title
     const batchMatch = Object.values(myBatches).find(b =>
       b.courseName === course.title ||
       b.batchName?.startsWith(course.title) ||
@@ -166,6 +179,7 @@ const CourseOverview = () => {
         } : course.trainer,
         batch: {
           id: batchMatch.batchId,
+          firebaseKey: batchMatch.firebaseKey,
           name: batchMatch.batchName,
           startDate: batchMatch.startDate || course.batch?.startDate,
           timing: batchMatch.startTime || batchMatch.timing || course.batch?.timing || 'Flexible',
@@ -179,27 +193,101 @@ const CourseOverview = () => {
     return course;
   }, [course, myBatches]);
 
+  const activeBatchId = dynamicCourse?.batch?.firebaseKey || dynamicCourse?.batch?.id;
+
+  // 3. Fetch Live Session config from Backend Firestore instead of localStorage
+  useEffect(() => {
+    const addOneHourToTime12 = (time12) => {
+      if (!time12 || time12 === 'Flexible' || time12.toLowerCase().includes('flexible')) {
+        return '10:00 AM';
+      }
+      try {
+        const [time, suffix] = time12.split(' ');
+        let [hour, minute] = time.split(':').map(Number);
+        let nextHour = hour + 1;
+        let nextSuffix = suffix;
+        if (nextHour === 12) {
+          nextSuffix = suffix === 'AM' ? 'PM' : 'AM';
+        } else if (nextHour > 12) {
+          nextHour = 1;
+        }
+        return `${String(nextHour).padStart(2, '0')}:${String(minute).padStart(2, '0')} ${nextSuffix}`;
+      } catch (e) {
+        return '10:00 AM';
+      }
+    };
+
+    const batchMatch = Object.values(myBatches).find(b =>
+      b.batchId === activeBatchId || b.firebaseKey === activeBatchId
+    );
+    const resolvedStartTime = batchMatch?.startTime && batchMatch.startTime !== 'Flexible' ? batchMatch.startTime : '09:00 AM';
+    const resolvedEndTime = addOneHourToTime12(resolvedStartTime);
+    const resolvedLink = batchMatch?.liveClassLink || "https://meet.google.com/abc-defg-hij";
+
+    const defaultSchedule = {
+      sessionLink: resolvedLink,
+      weeklySchedule: [
+        { day: "Monday", start: resolvedStartTime, end: resolvedEndTime, enabled: true },
+        { day: "Tuesday", start: resolvedStartTime, end: resolvedEndTime, enabled: true },
+        { day: "Wednesday", start: resolvedStartTime, end: resolvedEndTime, enabled: true },
+        { day: "Thursday", start: resolvedStartTime, end: resolvedEndTime, enabled: true },
+        { day: "Friday", start: resolvedStartTime, end: resolvedEndTime, enabled: true },
+        { day: "Saturday", start: resolvedStartTime, end: resolvedEndTime, enabled: false, reason: "Weekend" },
+        { day: "Sunday", start: resolvedStartTime, end: resolvedEndTime, enabled: false, reason: "Weekend" }
+      ]
+    };
+
+    if (!activeBatchId) {
+      setSessionConfig(defaultSchedule);
+      return;
+    }
+
+    const fetchLiveSession = async () => {
+      try {
+        const res = await getStudentLiveSessionAPI(activeBatchId);
+        if (res.success && res.config && res.config.sessionLink && res.config.weeklySchedule) {
+          setSessionConfig(res.config);
+        } else {
+          setSessionConfig(defaultSchedule);
+        }
+      } catch (err) {
+        console.error("Failed to fetch live session config:", err.message);
+        setSessionConfig(defaultSchedule);
+      }
+    };
+
+    fetchLiveSession();
+    const interval = setInterval(fetchLiveSession, 15000); // Poll backend every 15s
+    return () => clearInterval(interval);
+  }, [activeBatchId, myBatches]);
+
+
+
+  // 5. Update session states every second
   useEffect(() => {
     const check = () => {
+      if (!sessionConfig || !sessionConfig.weeklySchedule) {
+        setSessionStatus('no-link');
+        return;
+      }
       try {
-        const raw = localStorage.getItem('live_session_config');
-        const config = raw ? JSON.parse(raw) : null;
-        const liveSessionRaw = localStorage.getItem('liveSessionData');
-        const liveSessionData = liveSessionRaw ? JSON.parse(liveSessionRaw) : {};
         const now = new Date();
         const todayIndex = (now.getDay() + 6) % 7;
         const todayName = daysOrder[todayIndex];
         const tomorrowName = daysOrder[(todayIndex + 1) % 7];
 
+        const todaySchedule = sessionConfig.weeklySchedule.find(item => item.day === todayName);
+        const tomorrowSchedule = sessionConfig.weeklySchedule.find(item => item.day === tomorrowName);
+
         const computedStatuses = [
-          { day: todayName, ...getDayStatus(todayName, liveSessionData[todayName], now) },
-          { day: tomorrowName, ...getDayStatus(tomorrowName, liveSessionData[tomorrowName], now) },
+          { day: todayName, ...getDayStatus(todayName, todaySchedule, now) },
+          { day: tomorrowName, ...getDayStatus(tomorrowName, tomorrowSchedule, now) },
         ];
 
-        setSessionConfig(config);
-        setSessionStatus(getOverallStatus(config, now));
+        setSessionStatus(getOverallStatus(sessionConfig, now));
         setDayStatuses(computedStatuses);
-      } catch {
+      } catch (err) {
+        console.error("Error computing session status:", err);
         setSessionStatus('no-link');
       }
     };
@@ -207,7 +295,7 @@ const CourseOverview = () => {
     check();
     const timer = setInterval(check, 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [sessionConfig]);
 
   if (!course) {
     return <div className="overview-error">Course not found.</div>;
@@ -221,19 +309,27 @@ const CourseOverview = () => {
     }
   };
 
+
+
   const statusLabel = {
     'live': { text: 'Class is Live', className: 'status-live' },
-    'upcoming': { text: sessionConfig ? `Starts at ${sessionConfig.startTime}` : 'Upcoming', className: 'status-upcoming' },
+    'upcoming': { text: sessionConfig ? `Starts at ${sessionConfig.weeklySchedule.find(i => i.day === daysOrder[(new Date().getDay() + 6) % 7])?.start || ""}` : 'Upcoming', className: 'status-upcoming' },
     'ended': { text: 'Session Ended', className: 'status-ended' },
     'expired': { text: 'Session Ended', className: 'status-ended' },
+    'cancelled': { 
+      text: sessionConfig?.weeklySchedule?.find(i => i.day === daysOrder[(new Date().getDay() + 6) % 7])?.reason 
+        ? `Holiday: ${sessionConfig.weeklySchedule.find(i => i.day === daysOrder[(new Date().getDay() + 6) % 7]).reason}` 
+        : 'Class Cancelled', 
+      className: 'status-cancelled' 
+    },
     'no-link': { text: 'Not Configured', className: 'status-none' },
-  }[sessionStatus];
+  }[sessionStatus] || { text: 'Not Configured', className: 'status-none' };
 
   const courseImage = getCourseImage(course);
 
   return (
     <div className="course-overview-page">
-      <div className="co-top-bar">
+      <div className="co-top-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <button className="co-back-btn" onClick={handleBack}>
           <ArrowLeft size={18} />
           <span>Back to Courses</span>
@@ -260,13 +356,16 @@ const CourseOverview = () => {
             {dayStatuses.map((item) => (
               <div key={item.day} className="co-schedule-row">
                 <span className="co-day">{item.day}</span>
-                <span className={`co-status ${item.state === 'completed' ? 'over' : ''}`}>{item.text}</span>
+                <span className={`co-status ${item.state === 'completed' ? 'over' : item.state === 'cancelled' ? 'cancelled' : ''}`}>
+                  {item.text}
+                </span>
               </div>
             ))}
           </div>
           <button
             className={`co-join-live-btn ${sessionStatus !== 'live' ? 'disabled' : ''}`}
             onClick={handleJoin}
+            disabled={sessionStatus !== 'live'}
           >
             <Video size={18} />
             <span>Join Live Class</span>
@@ -341,6 +440,24 @@ const CourseOverview = () => {
         </div>
       </div>
 
+      {/* Announcements & Holiday Messages Banner */}
+      {sessionConfig?.weeklySchedule?.some(item => !item.enabled && item.reason) && (
+        <div className="co-card" style={{ marginTop: '24px', padding: '16px', borderLeft: '4px solid #f59e0b' }}>
+          <h3 style={{ margin: '0 0 10px 0', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '15px', color: '#d97706' }}>
+            <span>📢</span> Announcements & Holiday Schedule
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {sessionConfig.weeklySchedule
+              .filter(item => !item.enabled && item.reason)
+              .map(item => (
+                <div key={item.day} style={{ fontSize: '14px', color: '#4b5563' }}>
+                  <strong>{item.day}:</strong> <span style={{ color: '#ef4444' }}>Holiday</span> - {item.reason}
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
+
       {/* Course Objective Section */}
       <div className="co-objective-card">
         <div className="co-section-label">COURSE OBJECTIVE</div>
@@ -412,5 +529,4 @@ const CourseOverview = () => {
   );
 };
 
-
-export default CourseOverview;
+export default CourseOverview;

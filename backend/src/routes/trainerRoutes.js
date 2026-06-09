@@ -5,6 +5,8 @@ import { trainerRegister, trainerVerifyOtp, trainerDashboard, getTrainerProfile,
 import { submitApplication } from "../controllers/trainerApplicationController.js";
 import { verifyToken, isTrainer } from "../middleware/authMiddleware.js";
 import { checkRole } from "../middleware/roleMiddleware.js";
+import { getTrainerSchedule, createTrainerSchedule, updateTrainerSchedule, deleteTrainerSchedule } from "../controllers/trainerScheduleController.js";
+import { saveLiveSessionConfig } from "../controllers/liveSessionController.js";
 import {
   getTrainerNotifications,
   markNotificationsRead,
@@ -41,6 +43,14 @@ router.get("/queries", verifyToken, isTrainer, getTrainerQueries);
 router.get("/queries/:queryId", verifyToken, isTrainer, getQueryById);
 router.put("/queries/:queryId/solve", verifyToken, isTrainer, solveTrainerQuery);
 router.put("/queries/:queryId/read", verifyToken, isTrainer, markQueryReadByTrainer);
+
+
+// ✅ Trainer Schedule/Sessions (protected — trainer only)
+router.get("/schedule", verifyToken, isTrainer, getTrainerSchedule);
+router.post("/schedule", verifyToken, isTrainer, createTrainerSchedule);
+router.put("/schedule/:id", verifyToken, isTrainer, updateTrainerSchedule);
+router.delete("/schedule/:id", verifyToken, isTrainer, deleteTrainerSchedule);
+router.put("/live-session", verifyToken, isTrainer, saveLiveSessionConfig);
 
 
 // ✅ Trainer Notifications (protected — trainer only)

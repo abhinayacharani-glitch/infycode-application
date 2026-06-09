@@ -304,6 +304,7 @@ export const getStudentBatches = async (req, res) => {
 
         result[courseName] = {
           batchId: batchData.batchId || batchKey,
+          firebaseKey: batchData.firebaseKey || batchKey,
           batchName: batchData.name || courseName,
           courseName: batchData.courseName || batchData.course || courseName,
           courseId: batchData.courseId || "",
@@ -544,6 +545,54 @@ export const markQueryReadByStudent = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// ═══════════════════════════════════════════════════════════════════════════
+// GET /api/student/notifications
+// ═══════════════════════════════════════════════════════════════════════════
+export const getStudentNotifications = async (req, res) => {
+  try {
+    const studentId = req.user.id;
+    const notificationsSnapshot = await db
+      .collection("studentNotifications")
+      .doc(studentId)
+      .collection("items")
+      .orderBy("createdAt", "desc")
+      .get();
+
+    const notifications = [];
+    notificationsSnapshot.forEach((doc) => {
+      notifications.push({ id: doc.id, ...doc.data() });
+    });
+
+    return res.status(200).json({ success: true, notifications });
+  } catch (error) {
+    console.error("[getStudentNotifications] Error:", error.message);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PUT /api/student/notifications/:id/read
+// ═══════════════════════════════════════════════════════════════════════════
+export const markStudentNotificationRead = async (req, res) => {
+  try {
+    const studentId = req.user.id;
+    const { id } = req.params;
+
+    await db
+      .collection("studentNotifications")
+      .doc(studentId)
+      .collection("items")
+      .doc(id)
+      .update({ read: true });
+
+    return res.status(200).json({ success: true, message: "Notification marked as read" });
+  } catch (error) {
+    console.error("[markStudentNotificationRead] Error:", error.message);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
 
 
 

@@ -14,6 +14,7 @@ import {
   markTrainerNotificationsReadAPI,
   deleteTrainerNotificationAPI,
   seedTrainerNotificationsAPI,
+  markQueryReadByTrainerAPI,
 } from '../../../services/api';
 
 /* ─── SVG Icon Components ─────────────────────────────────────────────── */
@@ -87,7 +88,7 @@ const formatTime = (createdAt) => {
 const Topbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { trainerData, profileImage, notifications, setNotifications, fetchTrainerNotifications } = useTrainer();
+  const { trainerData, profileImage, notifications, setNotifications, fetchTrainerNotifications, trainerQueries, unreadQueryCount, fetchTrainerQueries } = useTrainer();
 
   const userName = trainerData.fullName || trainerData.fullname || trainerData.name || 'Trainer';
   const role = trainerData.role || 'Trainer';
@@ -136,7 +137,24 @@ const Topbar = () => {
   }, []);
 
   /* ── Derived counts ─────────────────────────────────────────────── */
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const baseUnreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = baseUnreadCount + unreadQueryCount;
+
+  /* ── Build query notifications for the dropdown ────────────────── */
+  const queryNotifications = trainerQueries
+    .filter(q => q.readByTrainer === false)
+    .map(q => ({
+      id: `query_${q.id}`,
+      queryId: q.id,
+      title: `📩 New Query from ${q.studentName || 'Student'}`,
+      text: q.title || q.text?.substring(0, 60) || 'New student query',
+      type: 'student',
+      read: false,
+      createdAt: new Date(q.createdAt).getTime(),
+      senderRole: 'student',
+      senderName: q.studentName || 'Student',
+      isQueryNotif: true,
+    }));
 
   /* ── Handlers ───────────────────────────────────────────────────── */
   const handleLogout = () => {
@@ -263,7 +281,7 @@ const Topbar = () => {
                   </div>
                 )}
 
-                {!notifLoading && !notifError && notifications.length === 0 && (
+                {!notifLoading && !notifError && notifications.length === 0 && queryNotifications.length === 0 && (
                   <div className="tb-notif-empty">
                     <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="1.5">
                       <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
@@ -273,16 +291,32 @@ const Topbar = () => {
                   </div>
                 )}
 
-                {!notifLoading && !notifError && notifications.map((notif) => {
+                {!notifLoading && !notifError && [...notifications, ...queryNotifications]
+                  .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+                  .map((notif) => {
                   const cfg = getConfig(notif.type);
+                  const handleNotifClick = async () => {
+                    if (notif.isQueryNotif) {
+                      try {
+                        await markQueryReadByTrainerAPI(notif.queryId);
+                        fetchTrainerQueries();
+                      } catch (err) {
+                        console.error('[Topbar] markQueryRead error:', err.message);
+                      }
+                      navigate('/trainer-dashboard/student-connect');
+                      setShowNotifications(false);
+                    } else {
+                      handleMarkOneRead(notif);
+                    }
+                  };
                   return (
                     <div
                       key={notif.id}
                       className={`tb-notif-item ${notif.read ? '' : 'unread'}`}
-                      onClick={() => handleMarkOneRead(notif)}
+                      onClick={handleNotifClick}
                       role="button"
                       tabIndex={0}
-                      onKeyDown={e => e.key === 'Enter' && handleMarkOneRead(notif)}
+                      onKeyDown={e => e.key === 'Enter' && handleNotifClick()}
                     >
                       {/* Unread dot */}
                       {!notif.read && <span className="tb-notif-unread-dot" />}
@@ -310,15 +344,17 @@ const Topbar = () => {
                         )}
                       </div>
 
-                      {/* Delete button */}
-                      <button
-                        className="tb-notif-delete-btn"
-                        onClick={(e) => handleDelete(e, notif.id)}
-                        aria-label="Delete notification"
-                        title="Delete"
-                      >
-                        <TrashIcon />
-                      </button>
+                      {/* Delete button - only for regular notifications */}
+                      {!notif.isQueryNotif && (
+                        <button
+                          className="tb-notif-delete-btn"
+                          onClick={(e) => handleDelete(e, notif.id)}
+                          aria-label="Delete notification"
+                          title="Delete"
+                        >
+                          <TrashIcon />
+                        </button>
+                      )}
                     </div>
                   );
                 })}

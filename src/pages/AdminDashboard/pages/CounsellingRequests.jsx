@@ -29,8 +29,6 @@ const CounsellingRequests = () => {
 
   useEffect(() => {
     loadBookings();
-    const interval = setInterval(loadBookings, 5000);
-    return () => clearInterval(interval);
   }, []);
 
   // Calculate counts for 1-Many slots

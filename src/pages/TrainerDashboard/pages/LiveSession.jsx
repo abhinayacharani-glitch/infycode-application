@@ -1,5 +1,7 @@
-import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { getTrainerBatchesAPI, saveTrainerLiveSessionAPI } from "../../../services/api";
+import { ArrowLeft } from "lucide-react";
 import "./LiveSession.css";
 
 const timeOptions = Array.from({ length: 14 }, (_, i) => {
@@ -16,15 +18,21 @@ const days = [
 
 const LiveSession = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { topic, date, time } = location.state || {};
 
   const getTodayName = () => days[(new Date().getDay() + 6) % 7];
   const todayName = getTodayName();
+
+  const [batches, setBatches] = useState([]);
+  const [selectedBatchId, setSelectedBatchId] = useState("");
   const [meetingLink, setMeetingLink] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [savedHint, setSavedHint] = useState(false);
   const [topTimings, setTopTimings] = useState({ start: "09:00 AM", end: "10:00 AM" });
   const [lastEditedDay, setLastEditedDay] = useState(todayName);
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const [schedule, setSchedule] = useState(
     days.map(day => ({
@@ -35,6 +43,26 @@ const LiveSession = () => {
       reason: ""
     }))
   );
+
+  // Fetch trainer's batches
+  useEffect(() => {
+    const fetchBatches = async () => {
+      try {
+        const res = await getTrainerBatchesAPI();
+        if (res.success) {
+          // getTrainerBatchesAPI returns an array under `batches`
+          const batchList = Array.isArray(res.batches) ? res.batches : Object.values(res.batches || {});
+          setBatches(batchList);
+          if (batchList.length > 0) {
+            setSelectedBatchId(batchList[0].firebaseId || batchList[0].id);
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching batches:", err.message);
+      }
+    };
+    fetchBatches();
+  }, []);
 
   const isValidMeetingLink = (link) => {
     if (!link.trim()) return false;
@@ -60,81 +88,53 @@ const LiveSession = () => {
   const isMeetingLinkInvalid = hasMeetingLink && !isValidMeetingLink(meetingLink);
   const todaySchedule = schedule.find((item) => item.day === todayName) || schedule[0];
   const hasMissingReason = !todaySchedule.enabled && !todaySchedule.reason.trim();
-  const isDisabled = !hasMeetingLink || isMeetingLinkInvalid || hasMissingReason;
+  const isDisabled = !hasMeetingLink || isMeetingLinkInvalid || hasMissingReason || !selectedBatchId || loading;
 
-  const getStatusForDay = (item) => {
-    if (!item.enabled) return "cancelled";
-    const now = new Date();
-    const weekDayIndex = (now.getDay() + 6) % 7; // Monday = 0
-    const itemDayIndex = days.indexOf(item.day);
-    const nowMinutes = now.getHours() * 60 + now.getMinutes();
-    const [endHour, endMinute] = to24Hour(item.end).split(":").map(Number);
-    const endMinutes = endHour * 60 + endMinute;
-    if (itemDayIndex === weekDayIndex && nowMinutes > endMinutes) return "completed";
-    return "scheduled";
-  };
-
-  const handleSave = () => {
+  const handleSave = async () => {
     if (isDisabled) return;
-    const existingConfig = JSON.parse(localStorage.getItem("live_session_config") || "{}");
-    const previousSchedule = Array.isArray(existingConfig.schedule) ? existingConfig.schedule : [];
-    const selectedDaySchedule = schedule.find((item) => item.day === lastEditedDay) || todaySchedule;
-    const updatedToday = {
-      ...selectedDaySchedule,
-      status: getStatusForDay(selectedDaySchedule),
-      cancellationReason: selectedDaySchedule.enabled ? "" : selectedDaySchedule.reason.trim()
-    };
-    const scheduleWithStatus = previousSchedule.length > 0
-      ? previousSchedule.map((item) => (item.day === todayName ? updatedToday : item))
-      : schedule.map((item) => (item.day === todayName ? updatedToday : item));
-    const cancellationReason = updatedToday.status === "cancelled"
-      ? `${updatedToday.day}: ${updatedToday.cancellationReason}`
-      : "";
-    const previousTiming = JSON.stringify(
-      previousSchedule.map((item) => ({ day: item.day, start: item.start, end: item.end, enabled: item.enabled }))
-    );
-    const currentTiming = JSON.stringify(
-      scheduleWithStatus.map((item) => ({ day: item.day, start: item.start, end: item.end, enabled: item.enabled }))
-    );
-    const notification = updatedToday.status === "cancelled"
-      ? { type: "cancelled", message: `Class Cancelled for ${updatedToday.day}` }
-      : previousTiming && previousTiming !== currentTiming
-        ? { type: "success", message: "Timing Updated Successfully" }
-        : { type: "info", message: "Schedule Updated" };
+    setLoading(true);
+    setErrorMessage("");
 
-    localStorage.setItem(
-      "live_session_config",
-      JSON.stringify({
-        ...existingConfig,
-        sessionLink: meetingLink.trim(),
-        startTime: to24Hour(updatedToday.start),
-        endTime: to24Hour(updatedToday.end),
-        schedule: scheduleWithStatus,
-        cancellationReason,
-        notification,
-        lastSaved: new Date().toISOString(),
-        duration: existingConfig.duration || "1 Month"
-      })
-    );
-    const existingDayWise = JSON.parse(localStorage.getItem("liveSessionData") || "{}");
-    existingDayWise[updatedToday.day] = {
-      status: updatedToday.enabled ? "scheduled" : "cancelled",
-      startTime: updatedToday.start,
-      endTime: updatedToday.end,
-      reason: updatedToday.enabled ? "" : (updatedToday.cancellationReason || ""),
-      updatedAt: new Date().getTime()
-    };
-    localStorage.setItem("liveSessionData", JSON.stringify(existingDayWise));
-    setTopTimings({ start: updatedToday.start, end: updatedToday.end });
-    setSavedHint(true);
-    setTimeout(() => setSavedHint(false), 2500);
+    try {
+      const res = await saveTrainerLiveSessionAPI({
+        batchId: selectedBatchId,
+        meetingLink: meetingLink.trim(),
+        weeklySchedule: schedule.map(item => ({
+          day: item.day,
+          enabled: item.enabled,
+          start: item.start,
+          end: item.end,
+          reason: item.enabled ? "" : item.reason.trim()
+        }))
+      });
+
+      if (res.success) {
+        setSavedHint(true);
+        const activeDaySchedule = schedule.find((item) => item.day === todayName) || schedule[0];
+        setTopTimings({ start: activeDaySchedule.start, end: activeDaySchedule.end });
+        setTimeout(() => setSavedHint(false), 2500);
+      } else {
+        setErrorMessage(res.message || "Failed to save live session details.");
+      }
+    } catch (err) {
+      setErrorMessage(err.message || "Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="live-session-container">
 
+      <div className="back-btn-wrapper">
+        <button className="back-btn" onClick={() => navigate('/trainer-dashboard/schedule')}>
+          <ArrowLeft size={18} />
+          <span>Back</span>
+        </button>
+      </div>
+
       {/* 🔥 HEADER */}
-      <div className="page-header">
+      <div className="page-header" style={{ width: "100%", maxWidth: "450px" }}>
         <h1>Live Session</h1>
         <p>
           Manage and start your live classroom sessions
@@ -180,6 +180,35 @@ const LiveSession = () => {
             alt="Live Session"
             className="live-session-image"
           />
+        </div>
+
+        {/* Batch Selector */}
+        <div className="form-group">
+          <label>Select Batch</label>
+          <div className="input-wrapper">
+            <span className="icon">🎓</span>
+            <select
+              value={selectedBatchId}
+              onChange={(e) => setSelectedBatchId(e.target.value)}
+              className="batch-selector"
+              style={{
+                width: "100%",
+                background: "transparent",
+                border: "none",
+                outline: "none",
+                fontSize: "14px",
+                padding: "8px 0",
+                color: "#1e293b"
+              }}
+            >
+              <option value="" disabled>-- Select a Batch --</option>
+              {batches.map((batch) => (
+                <option key={batch.firebaseId || batch.id} value={batch.firebaseId || batch.id}>
+                  {batch.name || batch.batchName} ({batch.course || batch.courseName})
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {/* Meeting Link */}
@@ -241,7 +270,7 @@ const LiveSession = () => {
                   disabled={!item.enabled}
                   value={item.start}
                   onChange={(e) =>
-                    handleChange(index, "start", e.target.value)
+                     handleChange(index, "start", e.target.value)
                   }
                 >
                   {timeOptions.map((time, i) => (
@@ -274,9 +303,15 @@ const LiveSession = () => {
           </div>
         )}
 
+        {errorMessage && (
+          <div className="error-text" style={{ color: "#ef4444", marginBottom: "10px", fontSize: "14px" }}>
+            {errorMessage}
+          </div>
+        )}
+
         {/* Save */}
         <button className="save-btn" disabled={isDisabled} onClick={handleSave}>
-          Save Details
+          {loading ? "Saving..." : "Save Details"}
         </button>
         {savedHint && (
           <div
@@ -288,7 +323,9 @@ const LiveSession = () => {
               padding: "8px 10px",
               fontSize: "12px",
               fontWeight: 600,
-              animation: "fade-in 0.3s ease-in-out"
+              animation: "fade-in 0.3s ease-in-out",
+              marginTop: "10px",
+              textAlign: "center"
             }}
           >
             Data Saved Successfully
@@ -296,7 +333,6 @@ const LiveSession = () => {
         )}
 
       </div>
-
 
     </div>
   );

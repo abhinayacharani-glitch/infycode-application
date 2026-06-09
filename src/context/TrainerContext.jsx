@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { getTrainerProfileAPI, updateTrainerProfileAPI, getPendingCounsellingCountAPI } from '../services/api';
+import { getTrainerProfileAPI, updateTrainerProfileAPI, getPendingCounsellingCountAPI, getTrainerQueriesAPI } from '../services/api';
 import { io } from 'socket.io-client';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
@@ -35,6 +35,21 @@ export const TrainerProvider = ({ children }) => {
   const [pendingCounsellingCount, setPendingCounsellingCount] = useState(0);
   const [notifications, setNotifications] = useState([]);
   const [batchNotificationCount, setBatchNotificationCount] = useState(0);
+  const [trainerQueries, setTrainerQueries] = useState([]);
+  const [unreadQueryCount, setUnreadQueryCount] = useState(0);
+
+  const fetchTrainerQueries = async () => {
+    try {
+      const res = await getTrainerQueriesAPI();
+      if (res.success) {
+        setTrainerQueries(res.queries || []);
+        const unread = (res.queries || []).filter(q => q.readByTrainer === false).length;
+        setUnreadQueryCount(unread);
+      }
+    } catch (error) {
+      console.error("Error fetching trainer queries:", error);
+    }
+  };
   
   const fetchTrainerNotifications = async () => {
     try {
@@ -86,6 +101,7 @@ export const TrainerProvider = ({ children }) => {
 
     fetchInitialData();
     fetchTrainerNotifications();
+    fetchTrainerQueries();
 
     // ─── Socket.io Integration ─────────────────────────────────────────────
     const socket = io(API_BASE_URL);
@@ -180,7 +196,12 @@ export const TrainerProvider = ({ children }) => {
     setNotifications,
     batchNotificationCount,
     setBatchNotificationCount,
-    fetchTrainerNotifications
+    fetchTrainerNotifications,
+    trainerQueries,
+    setTrainerQueries,
+    unreadQueryCount,
+    setUnreadQueryCount,
+    fetchTrainerQueries,
   };
 
 

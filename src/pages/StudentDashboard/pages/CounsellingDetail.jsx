@@ -126,8 +126,6 @@ const CounsellingDetail = () => {
     };
 
     fetchMyBookings();
-    const interval = setInterval(fetchMyBookings, 5000);
-    return () => clearInterval(interval);
   }, [id, card]);
 
   if (!card) return <div className="detail-error">Service not found.</div>;

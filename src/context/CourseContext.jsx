@@ -47,9 +47,6 @@ export const CourseProvider = ({ children }) => {
 
   useEffect(() => {
     loadCourses();
-    // Refresh every 60 seconds so newly published courses appear automatically
-    const interval = setInterval(loadCourses, 60000);
-    return () => clearInterval(interval);
   }, [loadCourses]);
 
   return (

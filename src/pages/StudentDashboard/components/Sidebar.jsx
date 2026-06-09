@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { User } from 'lucide-react';
+import { useStudent } from '../../../context/StudentContext';
 import "./Sidebar.css";
 import icLogo from '../../../assets/infycode-final-logo4-1.png';
 
 const Sidebar = ({ externalShowLogoutModal, setExternalShowLogoutModal }) => {
   const navigate = useNavigate();
+  const { unreadQueryCount } = useStudent();
   const [internalShowLogoutModal, setInternalShowLogoutModal] = useState(false);
   const [logoutDest, setLogoutDest] = useState('/');
 
@@ -95,14 +97,30 @@ const Sidebar = ({ externalShowLogoutModal, setExternalShowLogoutModal }) => {
 
         {/* NAV */}
         <nav className="student-sd-nav">
-          {navItems.map((item, i) => (
-            <NavLink key={i} to={item.to}
-              className={({ isActive }) => `student-sd-item ${isActive ? 'active' : ''}`}>
-              <div className="student-sd-box">
-                <span className="student-sd-text">{item.label}</span>
-              </div>
-            </NavLink>
-          ))}
+          {navItems.map((item, i) => {
+            const isTrainerConnect = item.label === "Trainer Connect";
+            return (
+              <NavLink key={i} to={item.to}
+                className={({ isActive }) => `student-sd-item ${isActive ? 'active' : ''}`}>
+                <div className="student-sd-box" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                  <span className="student-sd-text">{item.label}</span>
+                  {isTrainerConnect && unreadQueryCount > 0 && (
+                    <span className="student-sd-badge" style={{
+                      background: '#ef4444',
+                      color: 'white',
+                      borderRadius: '12px',
+                      padding: '2px 8px',
+                      fontSize: '11px',
+                      fontWeight: 'bold',
+                      marginLeft: '8px'
+                    }}>
+                      {unreadQueryCount}
+                    </span>
+                  )}
+                </div>
+              </NavLink>
+            );
+          })}
         </nav>
 
         {/* FOOTER LOGOUT */}

@@ -1,11 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, Mail, Bell, ChevronDown, LogOut, User, Edit, MessageSquare, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useStudent } from '../../../context/StudentContext';
+import { markQueryReadByStudentAPI, getStudentNotificationsAPI, markStudentNotificationReadAPI } from '../../../services/api';
 import "./Navbar.css";
 
 const Navbar = ({ onToggleSidebar }) => {
   const navigate = useNavigate();
+  const { studentQueries, unreadQueryCount, fetchStudentQueries } = useStudent();
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const [dbNotifications, setDbNotifications] = useState([]);
   const dropdownRef = useRef(null);
   const notificationsRef = useRef(null);
   const messagesRef = useRef(null);
@@ -52,11 +56,53 @@ const Navbar = ({ onToggleSidebar }) => {
     };
   }, []);
 
-  const notifications = [
-    { id: 1, title: "Assessment Due", message: "Your React Fundamentals assessment is due in 2 hours.", time: "2h ago", type: "warning" },
-    { id: 2, title: "Grade Updated", message: "Your project 'E-commerce API' has been graded.", time: "5h ago", type: "info" },
-    { id: 3, title: "New Course Available", message: "Advanced Node.js is now open for enrollment.", time: "1d ago", type: "success" }
-  ];
+  // Poll DB notifications
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const res = await getStudentNotificationsAPI();
+        if (res.success && res.notifications) {
+          setDbNotifications(res.notifications);
+        }
+      } catch (err) {
+        console.error("Failed to fetch student db notifications in topbar:", err);
+      }
+    };
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 10000); // every 10s
+    return () => clearInterval(interval);
+  }, []);
+
+  // Map unread trainer solutions to notifications
+  const queryNotifications = studentQueries
+    .filter(q => q.readByStudent === false && q.solution)
+    .map(q => ({
+      id: `query_${q.id}`,
+      queryId: q.id,
+      title: `💬 Reply from ${q.trainerName || 'Trainer'}`,
+      message: q.solution.substring(0, 60) + (q.solution.length > 60 ? '...' : ''),
+      time: "Just now",
+      type: "success",
+      read: false,
+      isQuery: true,
+      createdAt: new Date(q.createdAt).getTime()
+    }));
+
+  const parsedDbNotifications = dbNotifications
+    .filter(n => !n.read)
+    .map(n => ({
+      id: n.id,
+      title: n.title,
+      message: n.text,
+      time: new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      type: n.type === 'class_cancellation' ? 'error' : 'warning',
+      read: false,
+      isDbNotification: true,
+      createdAt: n.createdAt
+    }));
+
+  const allNotifications = [...queryNotifications, ...parsedDbNotifications].sort((a, b) => b.createdAt - a.createdAt);
+  const totalUnreadCount = allNotifications.filter(n => !n.read).length;
 
   const messages = [
     { id: 1, sender: "Charani (Mentor)", text: "Don't forget to push your code for the latest assignment.", time: "10m ago", unread: true },
@@ -110,7 +156,7 @@ const Navbar = ({ onToggleSidebar }) => {
         <div className="dropdown-wrapper" ref={notificationsRef} onClick={() => toggleDropdown('notifications')}>
           <div className="action-with-badge">
             <Bell size={24} />
-            <span className="nav-badge blue">3</span>
+            {totalUnreadCount > 0 && <span className="nav-badge blue">{totalUnreadCount}</span>}
           </div>
 
           {activeDropdown === 'notifications' && (
@@ -120,16 +166,46 @@ const Navbar = ({ onToggleSidebar }) => {
                 <button className="view-all">Mark all read</button>
               </div>
               <div className="dropdown-body">
-                {notifications.map(notif => (
-                  <div key={notif.id} className={`dropdown-item ${notif.type === 'warning' ? 'unread' : ''}`}>
-                    <div className={`item-icon ${notif.type}`}><Bell size={20} /></div>
-                    <div className="item-content">
-                      <div className="item-title">{notif.title}</div>
-                      <div className="item-snippet">{notif.message}</div>
-                      <div className="item-time"><Clock size={12} /> {notif.time}</div>
-                    </div>
-                  </div>
-                ))}
+                {allNotifications.length === 0 ? (
+                  <div style={{ padding: '20px', textAlign: 'center', color: '#64748b' }}>No notifications yet</div>
+                ) : (
+                  allNotifications.map(notif => {
+                    const handleItemClick = async () => {
+                      if (notif.isQuery) {
+                        try {
+                          await markQueryReadByStudentAPI(notif.queryId);
+                          fetchStudentQueries();
+                        } catch (err) {
+                          console.error("Error marking query as read:", err);
+                        }
+                        navigate(`/student-dashboard/my-queries/${notif.queryId}/solution`);
+                      } else if (notif.isDbNotification) {
+                        try {
+                          await markStudentNotificationReadAPI(notif.id);
+                          setDbNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, read: true } : n));
+                        } catch (err) {
+                          console.error("Error marking notification as read:", err);
+                        }
+                      }
+                    };
+
+                    return (
+                      <div
+                        key={notif.id}
+                        className={`dropdown-item ${!notif.read ? 'unread' : ''}`}
+                        onClick={handleItemClick}
+                        style={{ cursor: notif.isQuery ? 'pointer' : 'default' }}
+                      >
+                        <div className={`item-icon ${notif.type}`}><Bell size={20} /></div>
+                        <div className="item-content">
+                          <div className="item-title">{notif.title}</div>
+                          <div className="item-snippet">{notif.message}</div>
+                          <div className="item-time"><Clock size={12} /> {notif.time}</div>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
               </div>
             </div>
           )}

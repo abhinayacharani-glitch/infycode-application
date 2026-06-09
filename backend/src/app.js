@@ -13,10 +13,14 @@ import syllabusRoutes from "./routes/syllabusRoutes.js";
 import calendarRoutes from "./routes/calendarRoutes.js";
 import { publishFAQ, getNewPublishedFAQs } from "./controllers/faqController.js";
 import materialRoutes from "./routes/materialRoutes.js";
+import { startSessionReminderCron } from "./services/sessionReminder.js";
 
 
 
 const app = express();
+
+// Start background timers
+startSessionReminderCron();
 
 // ── CORS ────────────────────────────────────────────────────────────────────
 // Allow the Vite dev server and any localhost port used during development.

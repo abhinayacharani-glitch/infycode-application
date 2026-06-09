@@ -345,6 +345,44 @@ export const getTrainerBatchesAPI = () => {
 };
 
 // ─────────────────────────────────────────────
+// TRAINER SCHEDULE / SESSIONS
+// ─────────────────────────────────────────────
+
+export const getTrainerScheduleAPI = () => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return request('/api/trainer/schedule', {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${user.token || ''}` },
+  });
+};
+
+export const createTrainerScheduleAPI = (sessionData) => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return request('/api/trainer/schedule', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${user.token || ''}` },
+    body: JSON.stringify(sessionData),
+  });
+};
+
+export const updateTrainerScheduleAPI = (id, sessionData) => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return request(`/api/trainer/schedule/${id}`, {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${user.token || ''}` },
+    body: JSON.stringify(sessionData),
+  });
+};
+
+export const deleteTrainerScheduleAPI = (id) => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return request(`/api/trainer/schedule/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${user.token || ''}` },
+  });
+};
+
+// ─────────────────────────────────────────────
 // TRAINER NOTIFICATIONS
 // ─────────────────────────────────────────────
 
@@ -754,6 +792,41 @@ export const uploadMaterialAPI = (payload) =>
     headers: getAuthHeader(),
     body: JSON.stringify(payload),
   });
+
+// ─────────────────────────────────────────────
+// LIVE SESSIONS & STUDENT NOTIFICATIONS
+// ─────────────────────────────────────────────
+
+export const saveTrainerLiveSessionAPI = (payload) =>
+  request('/api/trainer/live-session', {
+    method: 'PUT',
+    headers: getAuthHeader(),
+    body: JSON.stringify(payload),
+  });
+
+/** GET /api/student/live-session/:batchId — also usable by trainer to retrieve saved meeting link */
+export const getTrainerLiveSessionConfigAPI = (batchId) =>
+  request(`/api/student/live-session/${batchId}`, {
+    headers: getAuthHeader(),
+  });
+
+export const getStudentLiveSessionAPI = (batchId) =>
+  request(`/api/student/live-session/${batchId}`, {
+    headers: getAuthHeader(),
+  });
+
+
+export const getStudentNotificationsAPI = () =>
+  request('/api/student/notifications', {
+    headers: getAuthHeader(),
+  });
+
+export const markStudentNotificationReadAPI = (id) =>
+  request(`/api/student/notifications/${id}/read`, {
+    method: 'PUT',
+    headers: getAuthHeader(),
+  });
+
 
 
 

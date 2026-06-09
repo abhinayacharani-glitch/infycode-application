@@ -414,14 +414,6 @@ export const AdminProvider = ({ children }) => {
     loadSyllabuses();
     loadPendingFAQs();
     fetchAdminProfile();
-
-    const interval = setInterval(() => {
-      fetchDashboardStats();
-      loadCourses();
-      loadSyllabuses();
-      loadPendingFAQs();
-    }, 1000);
-    return () => clearInterval(interval);
   }, []);
 
   const value = {
