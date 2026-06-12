@@ -104,7 +104,7 @@ export const trainerRegister = async (req, res) => {
       trainerId,
       createdAt,
     };
-    
+
     const docRef = await trainersRef.add(newTrainerDoc);
 
     // ── Mirror to users collection ──────────────────────────────────────────
@@ -208,7 +208,7 @@ export const getTrainerProfile = async (req, res) => {
     try {
       const batchesCollection = db.collection("batches");
       const batchesSnap = await batchesCollection.get();
-      
+
       let activeBatchesCount = 0;
       let totalStudentsCount = 0;
 
@@ -313,7 +313,7 @@ export const getTrainerBatches = async (req, res) => {
     // 2. Fetch all batches
     const batchesCollection = db.collection("batches");
     const snapshot = await batchesCollection.get();
-    
+
     // 3. Filter and normalize
     const batches = snapshot.docs
       .map(doc => {
@@ -504,7 +504,7 @@ export const getBatchStudents = async (req, res) => {
   try {
     const { batchId } = req.params; // Can be doc ID OR sequential ID
     const batchesCollection = db.collection("batches");
-    
+
     // 1. Resolve batch
     let batchData = null;
     let batchKey = batchId;
@@ -557,7 +557,7 @@ export const getTrainerQueries = async (req, res) => {
   try {
     const { email } = req.user;
     const trainerSnapshot = await trainersRef.where("email", "==", email).limit(1).get();
-    
+
     if (trainerSnapshot.empty) {
       return res.status(404).json({ success: false, message: "Trainer not found" });
     }
@@ -567,7 +567,7 @@ export const getTrainerQueries = async (req, res) => {
 
     const queriesCollection = db.collection("queries");
     const queriesSnap = await queriesCollection.where("trainerName", "==", trainerName).get();
-    
+
     const queries = queriesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
     // Sort: Pending first, then by date
@@ -592,7 +592,7 @@ export const solveTrainerQuery = async (req, res) => {
     const { queryId } = req.params;
     const { solution, codeSolution, meetLink } = req.body;
     const queriesCollection = db.collection("queries");
-    
+
     const queryDocRef = queriesCollection.doc(queryId);
     const querySnap = await queryDocRef.get();
     if (!querySnap.exists) {
@@ -609,7 +609,7 @@ export const solveTrainerQuery = async (req, res) => {
     };
 
     await queryDocRef.update(updateData);
-    
+
     return res.status(200).json({ success: true, message: "Query solved successfully" });
   } catch (error) {
     console.error("[solveTrainerQuery] Error:", error.message);
