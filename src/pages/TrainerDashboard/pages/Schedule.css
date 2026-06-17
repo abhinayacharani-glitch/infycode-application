@@ -320,6 +320,36 @@
   transform: scale(0.97);
 }
 
+/* Join Now button — replaces Add Session */
+.v2-join-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  padding: 10px 22px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: 0.3px;
+}
+
+.v2-join-btn:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+.v2-join-btn:active {
+  transform: scale(0.97);
+}
+
 /* 4. PROFESSIONAL TABLE STYLES */
 .v2-table-wrapper {
   background: white;
@@ -528,7 +558,8 @@
   color: white;
   min-width: 32px;
   white-space: nowrap;
-  background: #475569; /* Slate grey default background for contrast */
+  background: #475569;
+  /* Slate grey default background for contrast */
   box-shadow: 0 2px 4px rgba(71, 85, 105, 0.2);
 }
 
@@ -681,11 +712,20 @@
     padding: 20px;
   }
 
-  .v2-add-btn span {
+  .v2-add-btn span,
+  .v2-join-btn span {
     display: none;
   }
 
   .v2-add-btn {
+    padding: 10px;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    justify-content: center;
+  }
+
+  .v2-join-btn {
     padding: 10px;
     border-radius: 50%;
     width: 44px;
@@ -941,7 +981,8 @@
   padding: 32px;
   color: white;
   position: relative;
-  background: linear-gradient(135deg, #1e293b, #0f172a); /* Gorgeous default dark theme gradient */
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  /* Gorgeous default dark theme gradient */
 }
 
 .detail-card-header.batch-b1 {
@@ -1108,6 +1149,7 @@
     opacity: 0;
     transform: translateY(4px) scale(0.98);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -1119,11 +1161,13 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  scrollbar-width: none; /* Hide standard Firefox scrollbar */
+  scrollbar-width: none;
+  /* Hide standard Firefox scrollbar */
 }
 
 .timepicker-column::-webkit-scrollbar {
-  display: none; /* Hide Chrome/Safari scrollbar for maximum clean look */
+  display: none;
+  /* Hide Chrome/Safari scrollbar for maximum clean look */
 }
 
 .timepicker-option {

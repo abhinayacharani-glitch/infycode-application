@@ -73,7 +73,7 @@ const PAGE_META = {
   'student-verification': { title: 'Student Verification', sub: 'Manage registration approvals' },
   'course-config': { title: 'Course Management', sub: 'New Courses creation' },
   'trainer-approval': { title: 'Trainer Approvals', sub: 'Onboard and assign new trainers' },
-  'batch-setup': { title: 'Batch Management', sub: 'Configure and schedule training batches' },
+  'batch-setup': { title: 'Batch Management & Schedule', sub: 'Configure and schedule training batches' },
   enrollment: { title: 'Enrolment Mapping', sub: 'Map students to courses and batches' },
   analytics: { title: 'Analytics & Monitoring', sub: 'System performance overview' },
   activation: { title: 'Learning Activation', sub: 'Manage active learning modules' },

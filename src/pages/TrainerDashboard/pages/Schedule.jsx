@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Plus,
   ChevronLeft,
   ChevronRight,
   X,
@@ -12,16 +11,15 @@ import {
   Trash2,
   Play,
   Zap,
-  Filter,
   Users,
   CheckCircle,
   Circle,
-  Edit2
+  Edit2,
+  Video
 } from 'lucide-react';
 import {
   getTrainerBatchesAPI,
   getTrainerScheduleAPI,
-  createTrainerScheduleAPI,
   updateTrainerScheduleAPI,
   deleteTrainerScheduleAPI
 } from '../../../services/api';
@@ -155,7 +153,7 @@ const CustomTimePicker = ({ value, onChange }) => {
 
   return (
     <div className="custom-timepicker" ref={containerRef}>
-      <div 
+      <div
         className={`timepicker-display ${isOpen ? 'open' : ''}`}
         onClick={() => setIsOpen(!isOpen)}
       >
@@ -166,8 +164,8 @@ const CustomTimePicker = ({ value, onChange }) => {
         <div className="timepicker-dropdown">
           <div className="timepicker-column">
             {hoursList.map(h => (
-              <div 
-                key={h} 
+              <div
+                key={h}
                 className={`timepicker-option ${hour === h ? 'selected' : ''}`}
                 onClick={() => handleSelectHour(h)}
               >
@@ -177,8 +175,8 @@ const CustomTimePicker = ({ value, onChange }) => {
           </div>
           <div className="timepicker-column">
             {getMinutesList().map(m => (
-              <div 
-                key={m} 
+              <div
+                key={m}
                 className={`timepicker-option ${minute === m ? 'selected' : ''}`}
                 onClick={() => handleSelectMinute(m)}
               >
@@ -188,8 +186,8 @@ const CustomTimePicker = ({ value, onChange }) => {
           </div>
           <div className="timepicker-column">
             {['AM', 'PM'].map(p => (
-              <div 
-                key={p} 
+              <div
+                key={p}
                 className={`timepicker-option ${ampm === p ? 'selected' : ''}`}
                 onClick={() => handleSelectAMPM(p)}
               >
@@ -322,24 +320,10 @@ const Schedule = () => {
   };
 
   // UI State
-  const [showAddModal, setShowAddModal] = useState(false);
   const [selectedSession, setSelectedSession] = useState(null);
   const [filters, setFilters] = useState({ batchId: '', courseName: '' });
   const [isEditing, setIsEditing] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
-
-  // Form State
-  const [newSessionData, setNewSessionData] = useState({
-    type: 'Class',
-    batchId: '',
-    topic: '',
-    date: formatDateForGrid(new Date()),
-    startTime: '10:00',
-    endTime: '11:00',
-    mode: 'Online',
-    holidayReason: ''
-  });
-
   const [editSessionData, setEditSessionData] = useState(null);
 
   useEffect(() => {
@@ -551,62 +535,6 @@ const Schedule = () => {
     }
   };
 
-  const handleAddSession = async (e) => {
-    e.preventDefault();
-    try {
-      const { type, batchId, topic, date, startTime, endTime, mode, holidayReason } = newSessionData;
-
-      // Validation
-      if (type === 'Holiday' && !holidayReason) {
-        alert("Please provide a reason for the holiday.");
-        return;
-      }
-      if (type === 'Class' && (!batchId || !topic || !startTime || !endTime)) {
-        alert("Please fill in all required fields.");
-        return;
-      }
-
-      const batch = batches.find(b => b.id === batchId);
-      const durationMins = calculateDuration(startTime, endTime);
-
-      const sessionPayload = {
-        batchId: type === 'Holiday' ? 'GEN' : (batchId || 'GEN'),
-        courseName: type === 'Holiday' ? 'N/A' : (batch?.course || 'General'),
-        topic: type === 'Holiday' ? 'Holiday' : topic,
-        date: date,
-        startTime: type === 'Holiday' ? '--:--' : startTime,
-        endTime: type === 'Holiday' ? '--:--' : endTime,
-        duration: type === 'Holiday' ? 0 : durationMins,
-        mode: mode,
-        type: type,
-        holidayReason: type === 'Holiday' ? holidayReason : '',
-      };
-
-      setLoading(true);
-      const res = await createTrainerScheduleAPI(sessionPayload);
-      if (res.success) {
-        setSessions(prev => [...prev, res.session]);
-        setShowAddModal(false);
-        // Reset form
-        setNewSessionData({
-          type: 'Class',
-          batchId: '',
-          topic: '',
-          date: formatDateForGrid(new Date()),
-          startTime: '10:00',
-          endTime: '11:00',
-          mode: 'Online',
-          holidayReason: ''
-        });
-      }
-    } catch (err) {
-      console.error("Add Session Error:", err);
-      alert(err.message || "Failed to add session");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleDeleteSession = async (id) => {
     if (!window.confirm("Delete session?")) return;
     try {
@@ -730,8 +658,11 @@ const Schedule = () => {
               <button className={`toggle-unit ${activeView === 'Week' ? 'active' : ''}`} onClick={() => setActiveView('Week')}>Week</button>
               <button className={`toggle-unit ${activeView === 'Month' ? 'active' : ''}`} onClick={() => setActiveView('Month')}>Month</button>
             </div>
-            <button className="v2-add-btn" onClick={() => setShowAddModal(true)}>
-              <Plus size={18} /> <span>Add Session</span>
+            <button
+              className="v2-join-btn"
+              onClick={() => navigate('/trainer-dashboard/live-session')}
+            >
+              <Video size={18} /> <span>Join Now</span>
             </button>
           </div>
         </div>
@@ -833,117 +764,6 @@ const Schedule = () => {
             </tbody>
           </table>
         </div>
-
-        {/* 5. ADD MODAL */}
-        {showAddModal && (
-          <div className="modal-overlay-v2">
-            <div className="modal-box-v2">
-              <div className="modal-hdr-v2">
-                <h2 className="modal-title-v2">Schedule New Session</h2>
-                <button onClick={() => setShowAddModal(false)} className="close-btn-v2"><X size={20} /></button>
-              </div>
-              <form onSubmit={handleAddSession} className="modal-form-v2">
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                  <div className="v2-form-group">
-                    <label>Session Type</label>
-                    <select
-                      value={newSessionData.type}
-                      onChange={(e) => setNewSessionData({ ...newSessionData, type: e.target.value })}
-                    >
-                      <option value="Class">Class Session</option>
-                      <option value="Holiday">Holiday</option>
-                    </select>
-                  </div>
-                  {newSessionData.type === 'Class' && (
-                    <div className="v2-form-group">
-                      <label>Select Batch</label>
-                      <select
-                        value={newSessionData.batchId}
-                        onChange={(e) => setNewSessionData({ ...newSessionData, batchId: e.target.value })}
-                        required
-                      >
-                        <option value="">Choose Batch...</option>
-                        {batches.map(b => <option key={b.id} value={b.id}>{b.id} - {b.course}</option>)}
-                      </select>
-                    </div>
-                  )}
-                </div>
-
-                {newSessionData.type === 'Class' && (
-                  <div className="v2-form-group">
-                    <label>Topic / Title</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Introduction to React Hooks"
-                      value={newSessionData.topic}
-                      onChange={(e) => setNewSessionData({ ...newSessionData, topic: e.target.value })}
-                      required
-                    />
-                  </div>
-                )}
-
-                {newSessionData.type === 'Holiday' && (
-                  <div className="v2-form-group">
-                    <label>Holiday Reason</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. National Holiday"
-                      value={newSessionData.holidayReason}
-                      onChange={(e) => setNewSessionData({ ...newSessionData, holidayReason: e.target.value })}
-                      required
-                    />
-                  </div>
-                )}
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                  <div className="v2-form-group">
-                    <label>Date</label>
-                    <input
-                      type="date"
-                      value={newSessionData.date}
-                      onChange={(e) => setNewSessionData({ ...newSessionData, date: e.target.value })}
-                      required
-                    />
-                  </div>
-                  {newSessionData.type === 'Class' && (
-                    <div className="v2-form-group">
-                      <label>Start Time</label>
-                      <CustomTimePicker
-                        value={newSessionData.startTime}
-                        onChange={(val) => setNewSessionData({ ...newSessionData, startTime: val })}
-                      />
-                    </div>
-                  )}
-                </div>
-
-                {newSessionData.type === 'Class' && (
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                    <div className="v2-form-group">
-                      <label>End Time</label>
-                      <CustomTimePicker
-                        value={newSessionData.endTime}
-                        onChange={(val) => setNewSessionData({ ...newSessionData, endTime: val })}
-                      />
-                    </div>
-                    <div className="v2-form-group">
-                      <label>Class Mode</label>
-                      <select
-                        value={newSessionData.mode}
-                        onChange={(e) => setNewSessionData({ ...newSessionData, mode: e.target.value })}
-                      >
-                        <option value="Online">Online</option>
-                        <option value="Offline">Offline</option>
-                      </select>
-                    </div>
-                  </div>
-                )}
-                <button type="submit" className="v2-submit-btn">
-                  {newSessionData.type === 'Holiday' ? 'Submit Holiday' : 'Create Session'}
-                </button>
-              </form>
-            </div>
-          </div>
-        )}
 
         {/* 6. PROFESSIONAL DETAIL CARD MODAL */}
         {selectedSession && (

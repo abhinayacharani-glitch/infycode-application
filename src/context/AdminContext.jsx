@@ -95,7 +95,7 @@ export const AdminProvider = ({ children }) => {
 
     // Apply Optimistic Update
     setTrainers(prev => prev.map(t => t.id === id ? { ...t, status: newStatus, prevStatus: newPrevStatus } : t));
-    
+
     if (targetTrainer.status === 'Applied' && newStatus !== 'Applied') {
       setStats(prev => ({
         ...prev,
@@ -130,7 +130,7 @@ export const AdminProvider = ({ children }) => {
   const addBatch = async (batch) => {
     const tempId = `temp_${Date.now()}`;
     const optimisticBatch = { ...batch, id: tempId, enrolled: 0 };
-    
+
     // Optimistic Update
     setBatches(prev => [...prev, optimisticBatch]);
 
@@ -138,7 +138,7 @@ export const AdminProvider = ({ children }) => {
       const data = await createBatch(batch);
       // Replace temporary batch with the one from server
       setBatches(prev => prev.map(b => b.id === tempId ? data.batch : b));
-      fetchDashboardStats(); 
+      fetchDashboardStats();
     } catch (error) {
       console.error("Error creating batch:", error.message);
       // Revert on error
@@ -303,16 +303,16 @@ export const AdminProvider = ({ children }) => {
     try {
       const payload = { ...(newData || {}) };
       if (newImage) payload.profileImage = newImage;
-      
+
       const response = await updateAdminProfileAPI(payload);
       if (response.success && response.profile) {
         setAdminData(prev => ({ ...prev, ...response.profile }));
         const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
         localStorage.setItem('user', JSON.stringify({ ...currentUser, ...response.profile }));
-        
+
         // Notify other components (Sidebar, Topbar) that profile has changed
         window.dispatchEvent(new Event('adminProfileUpdate'));
-        
+
         return response;
       }
     } catch (error) {
@@ -379,9 +379,9 @@ export const AdminProvider = ({ children }) => {
 
   const startBatch = async (firebaseId) => {
     const originalBatches = [...batches];
-    
+
     // Optimistic Update
-    setBatches(prev => prev.map(b => 
+    setBatches(prev => prev.map(b =>
       (b.firebaseId === firebaseId || b.id === firebaseId) ? { ...b, status: 'started' } : b
     ));
 
@@ -410,7 +410,7 @@ export const AdminProvider = ({ children }) => {
 
   useEffect(() => {
     fetchDashboardStats();
-    loadCourses(); 
+    loadCourses();
     loadSyllabuses();
     loadPendingFAQs();
     fetchAdminProfile();

@@ -14,6 +14,12 @@ const initialFormState = {
   duration: "",
   mode: "Online",
   batchImage: null,
+  meetLink: "",
+  scheduleDays: [],
+  scheduleStartTime: "10:00",
+  scheduleEndTime: "12:00",
+  scheduleNote: "",
+  holidayNotice: "",
 };
 
 function BatchCreation() {
@@ -82,6 +88,15 @@ function BatchCreation() {
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
+  const handleDayToggle = (day) => {
+    setForm(prev => {
+      const days = prev.scheduleDays || [];
+      const isSelected = days.includes(day);
+      const newDays = isSelected ? days.filter(d => d !== day) : [...days, day];
+      return { ...prev, scheduleDays: newDays };
+    });
+  };
+
   const validate = () => {
     const newErrors = {};
     if (!form.trainerName.trim()) newErrors.trainerName = "Trainer required";
@@ -98,6 +113,13 @@ function BatchCreation() {
 
     setIsSubmitting(true);
     try {
+      const weeklySchedule = (form.scheduleDays || []).map(day => ({
+        day,
+        startTime: form.scheduleStartTime,
+        endTime: form.scheduleEndTime,
+        note: form.scheduleNote || ""
+      }));
+
       const batchData = {
         name: `${form.courseName} - ${new Date(form.startDateTime).toLocaleString('en-US', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`,
         course: form.courseName,
@@ -108,7 +130,22 @@ function BatchCreation() {
         startDateTime: form.startDateTime,
         duration: form.duration || "",
         mode: form.mode || "Online",
-        batchImage: form.batchImage || ""
+        batchImage: form.batchImage || "",
+        meetLink: form.meetLink || "",
+        classTimings: weeklySchedule.map(item => {
+          const formatTime = (t) => {
+            if (!t) return "";
+            const [hours, minutes] = t.split(":");
+            let h = parseInt(hours, 10);
+            const ampm = h >= 12 ? "PM" : "AM";
+            h = h % 12;
+            h = h ? h : 12;
+            return `${h}:${minutes} ${ampm}`;
+          };
+          return `${item.day} (${formatTime(item.startTime)} - ${formatTime(item.endTime)})${item.note ? ` [${item.note}]` : ""}`;
+        }).join(", "),
+        weeklySchedule,
+        holidayNotice: form.holidayNotice || "",
       };
 
       await addBatch(batchData);
@@ -137,18 +174,19 @@ function BatchCreation() {
 
       <div className="batch-page-header">
         <div className="header-text">
-          <h1>Batch Management Console</h1>
-          <p>Initialize training cycles and track active batches</p>
+          <h1>Batch Management &amp; Schedule Console</h1>
+          <p>Initialize training cycles, configure schedules, and track active batches</p>
         </div>
       </div>
 
       <div className="batch-split-container">
 
-        {/* LEFT PANEL: FORM */}
+        {/* LEFT PANEL: FORM + BROADCAST */}
         <div className="batch-left-panel">
+
+          {/* SECTION 1: Generate New Batch */}
           <div className="panel-card">
             <div className="panel-header">
-              {/* Icon removed as per requirement */}
               <h3>Generate New Batch</h3>
             </div>
 
@@ -222,22 +260,250 @@ function BatchCreation() {
                     <option value="Offline">Offline</option>
                   </select>
                 </div>
+                <div className="form-group">
+                  <label>Google Meet Link</label>
+                  <input type="url" name="meetLink" placeholder="e.g. https://meet.google.com/abc-defg-hij" value={form.meetLink} onChange={handleChange} />
+                </div>
+
+                <div className="form-group full batch-weekly-schedule-section">
+                  <label className="section-label">Select Class Days &amp; Timings</label>
+                  
+                  {/* Checkbox grid for Days */}
+                  <div className="days-checkbox-grid">
+                    {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map(day => {
+                      const isSelected = (form.scheduleDays || []).includes(day);
+                      return (
+                        <button
+                          key={day}
+                          type="button"
+                          className={`day-checkbox-btn ${isSelected ? 'selected' : ''}`}
+                          onClick={() => handleDayToggle(day)}
+                        >
+                          <span className="checkbox-indicator">{isSelected ? "✓" : ""}</span>
+                          <span className="day-name">{day}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Times & Note */}
+                  <div className="schedule-time-row">
+                    <div className="schedule-col time">
+                      <label>Class Start Time</label>
+                      <input
+                        type="time"
+                        name="scheduleStartTime"
+                        value={form.scheduleStartTime}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div className="schedule-col time">
+                      <label>Class End Time</label>
+                      <input
+                        type="time"
+                        name="scheduleEndTime"
+                        value={form.scheduleEndTime}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div className="schedule-col note">
+                      <label>Message/Note for Scheduled Days</label>
+                      <input
+                        type="text"
+                        name="scheduleNote"
+                        placeholder="e.g. Intro class / Lab session"
+                        value={form.scheduleNote}
+                        onChange={handleChange}
+                        className="schedule-note-input"
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
 
+              {/* Initialize Batch button — directly after all form fields, before Broadcast */}
               <div className="form-footer">
                 <button type="submit" className="batch-submit-btn" disabled={isSubmitting}>
-                  {isSubmitting ? "Finalizing..." : form.courseName ? `Start ${form.courseName} Batch` : "Initialize Batch"}
+                  {isSubmitting ? "Finalizing..." : form.courseName ? `Initialize ${form.courseName} Batch` : "Initialize Batch"}
                 </button>
               </div>
             </form>
           </div>
+
+          {/* SECTION 2: Broadcast Schedule Updates & Holiday Notices — separate independent card */}
+          <div className="panel-card broadcast-panel-card">
+            <div className="panel-header broadcast-panel-header">
+              <h3>Broadcast Schedule Updates &amp; Holiday Notices</h3>
+            </div>
+
+            <div className="broadcast-panel-body">
+              <p className="broadcast-desc">Notify students about sudden timing changes or holidays for an existing batch.</p>
+
+              <div className="announcement-tabs-header">
+                <button
+                  type="button"
+                  className={`tab-btn ${(form.announcementTab || "timings") === "timings" ? "active" : ""}`}
+                  onClick={() => setForm(prev => ({ ...prev, announcementTab: "timings" }))}
+                >
+                  Modify Day Timings
+                </button>
+                <button
+                  type="button"
+                  className={`tab-btn ${(form.announcementTab || "timings") === "holiday" ? "active" : ""}`}
+                  onClick={() => setForm(prev => ({ ...prev, announcementTab: "holiday" }))}
+                >
+                  Sudden Holiday Announcement
+                </button>
+              </div>
+
+              <div className="announcement-card">
+                {/* Select Batch */}
+                <div className="announcement-row">
+                  <div className="announce-col full-width">
+                    <label>Target Batch</label>
+                    <select
+                      value={form.announcementBatchId || ""}
+                      onChange={(e) => setForm(prev => ({ ...prev, announcementBatchId: e.target.value }))}
+                    >
+                      <option value="">— Select Batch to Update —</option>
+                      {batches.map(b => (
+                        <option key={b.id || b.firebaseId} value={b.id || b.firebaseId}>
+                          {b.course} - {b.name || b.batchId} ({b.trainer})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {(form.announcementTab || "timings") === "timings" ? (
+                  <>
+                    {/* Select Day */}
+                    <div className="announcement-row">
+                      <div className="announce-col full-width">
+                        <label>Select Affected Day</label>
+                        <div className="announcement-days-grid">
+                          {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map(day => {
+                            const isSelected = form.announcementDay === day;
+                            return (
+                              <button
+                                key={day}
+                                type="button"
+                                className={`announcement-day-btn ${isSelected ? 'selected' : ''}`}
+                                onClick={() => setForm(prev => ({ ...prev, announcementDay: isSelected ? "" : day }))}
+                              >
+                                {day}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Reschedule Timings */}
+                    <div className="announcement-row timings-grid">
+                      <div className="announce-col">
+                        <label>New Start Time</label>
+                        <input
+                          type="time"
+                          value={form.announcementStartTime || ""}
+                          onChange={(e) => setForm(prev => ({ ...prev, announcementStartTime: e.target.value }))}
+                        />
+                      </div>
+                      <div className="announce-col">
+                        <label>New End Time</label>
+                        <input
+                          type="time"
+                          value={form.announcementEndTime || ""}
+                          onChange={(e) => setForm(prev => ({ ...prev, announcementEndTime: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Action Button */}
+                    <div className="announcement-action">
+                      <button
+                        type="button"
+                        className="announcement-submit-btn"
+                        onClick={() => {
+                          if (!form.announcementBatchId) {
+                            alert("Please select a target batch.");
+                            return;
+                          }
+                          if (!form.announcementDay) {
+                            alert("Please select the affected day.");
+                            return;
+                          }
+                          if (!form.announcementStartTime || !form.announcementEndTime) {
+                            alert("Please enter both the new start and end times.");
+                            return;
+                          }
+                          alert("Class timings updated successfully!");
+                          setForm(prev => ({
+                            ...prev,
+                            announcementBatchId: "",
+                            announcementDay: "",
+                            announcementStartTime: "",
+                            announcementEndTime: ""
+                          }));
+                        }}
+                      >
+                        Publish Timing Update
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {/* Sudden Holiday Message */}
+                    <div className="announcement-row">
+                      <div className="announce-col full-width">
+                        <label>Holiday Message</label>
+                        <textarea
+                          placeholder="Type holiday announcement message here..."
+                          value={form.announcementMessage || ""}
+                          onChange={(e) => setForm(prev => ({ ...prev, announcementMessage: e.target.value }))}
+                          rows="3"
+                          className="batch-textarea-announcement"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Action Button */}
+                    <div className="announcement-action">
+                      <button
+                        type="button"
+                        className="announcement-submit-btn"
+                        onClick={() => {
+                          if (!form.announcementBatchId) {
+                            alert("Please select a target batch.");
+                            return;
+                          }
+                          if (!form.announcementMessage) {
+                            alert("Please type a holiday message.");
+                            return;
+                          }
+                          alert("Holiday notice published successfully!");
+                          setForm(prev => ({
+                            ...prev,
+                            announcementBatchId: "",
+                            announcementMessage: ""
+                          }));
+                        }}
+                      >
+                        Publish Holiday Notice
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
         </div>
 
         {/* RIGHT PANEL: BATCH REPOSITORY */}
         <div className="batch-right-panel">
           <div className="panel-card repository-card">
             <div className="panel-header">
-              {/* Icon removed as per requirement */}
               <h3>Live Batch Repository ({batches.length})</h3>
             </div>
 

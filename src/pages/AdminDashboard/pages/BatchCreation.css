@@ -32,6 +32,13 @@
   margin: 0 auto;
 }
 
+/* Left panel stacks two cards vertically */
+.batch-left-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
 @media (max-width: 1200px) {
   .batch-split-container {
     grid-template-columns: 1fr;
@@ -395,4 +402,376 @@
 
 .start-batch-action-btn:active {
   transform: translateY(0);
+}
+
+.meet-link-anchor {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.meet-link-anchor:hover {
+  text-decoration: underline;
+  color: #1d4ed8;
+}
+
+.batch-holiday-notice-box {
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: #fef2f2;
+  border: 1px solid #fee2e2;
+  border-radius: 10px;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  color: #991b1b;
+  font-size: 0.85rem;
+}
+
+.batch-holiday-notice-box .notice-icon {
+  font-size: 1rem;
+}
+
+.batch-holiday-notice-box strong {
+  color: #7f1d1d;
+}
+
+.batch-textarea-announcement {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: #fdfdfd;
+  font-size: 0.95rem;
+  color: #1e293b;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.batch-textarea-announcement:focus {
+  border-color: #3b82f6;
+  background: white;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08);
+  outline: none;
+}
+
+/* Weekly Schedule Styling */
+.batch-weekly-schedule-section {
+  border-top: 1px dashed #e2e8f0;
+  margin-top: 16px;
+  padding-top: 20px;
+}
+
+.batch-weekly-schedule-section .section-label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 16px;
+}
+
+.days-checkbox-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.day-checkbox-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #475569;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.day-checkbox-btn:hover {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  color: #2563eb;
+}
+
+.day-checkbox-btn.selected {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: white;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.checkbox-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.schedule-time-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr;
+  gap: 16px;
+  align-items: flex-end;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.schedule-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.schedule-col label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.schedule-note-input {
+  width: 100% !important;
+  height: 48px !important;
+  font-size: 0.95rem !important;
+  padding: 0 16px !important;
+  background: white !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  box-sizing: border-box;
+}
+
+.schedule-note-input:focus {
+  border-color: #3b82f6 !important;
+  outline: none;
+}
+
+/* Weekly Timings Display in Card */
+.batch-weekly-timings-display {
+  background: #f8fafc;
+  border-radius: 10px;
+  padding: 12px 16px;
+  border: 1px solid #e2e8f0;
+}
+
+.weekly-timings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.weekly-timing-item {
+  font-size: 0.8rem !important;
+  color: #475569;
+}
+
+.weekly-timing-item .day-name {
+  font-weight: 800;
+  color: #1e40af;
+}
+
+.weekly-timing-item .time-range {
+  font-weight: 700;
+  color: #334155;
+}
+
+.weekly-timing-item .item-note {
+  color: #64748b;
+  font-style: italic;
+}
+
+/* Broadcast Panel Card — independent card below the form */
+.broadcast-panel-card {
+  border-left: 4px solid #2563eb;
+}
+
+.broadcast-panel-header {
+  background: #f8faff;
+  border-radius: 20px 20px 0 0;
+}
+
+.broadcast-panel-body {
+  padding: 24px 32px 32px;
+}
+
+.broadcast-desc {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0 0 20px;
+  line-height: 1.5;
+}
+
+.announcement-tabs-header {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 8px;
+}
+
+.announcement-tabs-header .tab-btn {
+  background: none;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #64748b;
+  cursor: pointer;
+  padding: 8px 16px;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.announcement-tabs-header .tab-btn.active {
+  color: #2563eb;
+}
+
+.announcement-tabs-header .tab-btn.active::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #2563eb;
+}
+
+.announcement-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.announcement-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.announce-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.announce-col.full-width {
+  width: 100%;
+}
+
+.announce-col label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.announcement-days-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.announcement-day-btn {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: white;
+  color: #475569;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.announcement-day-btn:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.announcement-day-btn.selected {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: white;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.15);
+}
+
+.timings-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.announcement-submit-btn {
+  width: 100%;
+  height: 48px;
+  border-radius: 12px;
+  background: #2563eb;
+  color: white;
+  font-weight: 700;
+  font-size: 0.95rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.announcement-submit-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+}
+
+.announcement-submit-btn:active {
+  transform: translateY(0);
+}
+
+/* announce-col selects inside broadcast panel */
+.announce-col select,
+.announce-col input[type="time"] {
+  width: 100%;
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  font-size: 0.9rem;
+  color: #1e293b;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 14px;
+}
+
+.announce-col input[type="time"] {
+  background-image: none;
+}
+
+.announce-col select:focus,
+.announce-col input[type="time"]:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.08);
+  outline: none;
 }

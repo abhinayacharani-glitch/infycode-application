@@ -145,9 +145,9 @@ const Sidebar = ({ isCollapsed, externalShowLogoutModal, setExternalShowLogoutMo
             {!isCollapsed && <span className="adm-nav-label">Course management</span>}
           </NavLink>
 
-          <NavLink to="/admin-dashboard/batch-setup" className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`} title="Batch management" data-tooltip="Batch management">
+          <NavLink to="/admin-dashboard/batch-setup" className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`} title="Batch management and schedule" data-tooltip="Batch management and schedule">
             <span className="adm-nav-icon"><CalendarIcon /></span>
-            {!isCollapsed && <span className="adm-nav-label">Batch management</span>}
+            {!isCollapsed && <span className="adm-nav-label">Batch management and schedule</span>}
           </NavLink>
 
           <NavLink to="/admin-dashboard/student-results" className={({ isActive }) => `adm-nav-item${isActive ? ' active' : ''}`} title="Student results" data-tooltip="Student results">

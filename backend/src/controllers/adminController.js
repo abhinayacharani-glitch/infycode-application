@@ -192,19 +192,19 @@ export const getDashboardStats = async (req, res) => {
 
     const studentsRaw = {};
     studentsSnap.forEach(doc => { studentsRaw[doc.id] = doc.data(); });
-    
+
     const trainersRaw = {};
     trainersSnap.forEach(doc => { trainersRaw[doc.id] = doc.data(); });
-    
+
     const batchesRaw = {};
     batchesSnap.forEach(doc => { batchesRaw[doc.id] = doc.data(); });
-    
+
     const coursesRaw = {};
     coursesSnap.forEach(doc => { coursesRaw[doc.id] = doc.data(); });
-    
+
     const enrollmentsRaw = {};
     enrollmentsSnap.forEach(doc => { enrollmentsRaw[doc.id] = doc.data(); });
-    
+
     const counsellingRaw = {};
     counsellingSnap.forEach(doc => { counsellingRaw[doc.id] = doc.data(); });
 
@@ -289,7 +289,7 @@ export const getDashboardStats = async (req, res) => {
  **/
 export const createBatch = async (req, res) => {
   try {
-    const { name, course, trainer, trainerId, capacity, status, startDateTime, duration, batchImage, mode } = req.body;
+    const { name, course, trainer, trainerId, capacity, status, startDateTime, duration, batchImage, mode, meetLink, classTimings, holidayNotice, weeklySchedule } = req.body;
 
     if (!name || !course || !trainer) {
       return res.status(400).json({ message: "Name, course, and trainer are required." });
@@ -310,6 +310,10 @@ export const createBatch = async (req, res) => {
       duration: duration || "",
       batchImage: batchImage || "",
       mode: mode || "Online",
+      meetLink: meetLink || "",
+      classTimings: classTimings || "",
+      holidayNotice: holidayNotice || "",
+      weeklySchedule: weeklySchedule || [],
       createdAt: new Date().toISOString()
     };
 
@@ -323,17 +327,17 @@ export const createBatch = async (req, res) => {
       try {
         const calendarRef = db.collection("trainerCalendarEvents");
         const eventId = `batch_${newBatchRef.id}`;
-        
+
         // Extract time from startDateTime or use default
         const dateObj = new Date(startDateTime);
         const startTime = dateObj.toTimeString().slice(0, 5); // HH:MM
-        
+
         // Calculate end time (duration is usually string like "2 Hours", default to 1h if parsing fails)
         let endTime = "11:00";
         try {
           const endHour = (dateObj.getHours() + 1) % 24;
           endTime = `${String(endHour).padStart(2, '0')}:${String(dateObj.getMinutes()).padStart(2, '0')}`;
-        } catch(e) {}
+        } catch (e) { }
 
         const calendarEventData = {
           id: eventId,
@@ -470,19 +474,19 @@ export const moveStudentsToBatch = async (req, res) => {
     const batch = db.batch();
     studentsToMove.forEach(student => {
       const studentDocRef = studentsRef.doc(student.id);
-      
+
       const studentUpdates = {
         batchId: batchId,
         batchName: batchData.name || batchData.courseName || batchData.course
       };
-      
+
       // Multi-course support: Map the specific course to this batch key
       const courseKey = (batchData.courseName || batchData.course || "General").replace(/\./g, ",");
       studentUpdates[`batches.${courseKey}`] = batchId;
-      
+
       batch.update(studentDocRef, studentUpdates);
     });
-    
+
     await batch.commit();
 
     res.status(200).json({
